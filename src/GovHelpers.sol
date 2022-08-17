@@ -5,6 +5,43 @@ pragma abicoder v2;
 import 'forge-std/Vm.sol';
 
 interface IAaveGov {
+  enum ProposalState {
+    Pending,
+    Canceled,
+    Active,
+    Failed,
+    Succeeded,
+    Queued,
+    Expired,
+    Executed
+  }
+
+  struct Vote {
+    bool support;
+    uint248 votingPower;
+  }
+
+  struct Proposal {
+    uint256 id;
+    address creator;
+    address executor;
+    address[] targets;
+    uint256[] values;
+    string[] signatures;
+    bytes[] calldatas;
+    bool[] withDelegatecalls;
+    uint256 startBlock;
+    uint256 endBlock;
+    uint256 executionTime;
+    uint256 forVotes;
+    uint256 againstVotes;
+    bool executed;
+    bool canceled;
+    address strategy;
+    bytes32 ipfsHash;
+    mapping(address => Vote) votes;
+  }
+
   struct ProposalWithoutVotes {
     uint256 id;
     address creator;
@@ -23,17 +60,6 @@ interface IAaveGov {
     bool canceled;
     address strategy;
     bytes32 ipfsHash;
-  }
-
-  enum ProposalState {
-    Pending,
-    Canceled,
-    Active,
-    Failed,
-    Succeeded,
-    Queued,
-    Expired,
-    Executed
   }
 
   struct SPropCreateParams {
