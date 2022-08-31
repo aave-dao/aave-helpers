@@ -1,7 +1,14 @@
 [profile.default]
 src = 'src'
+test = 'tests'
+script = 'scripts'
 out = 'out'
 libs = ['lib']
-eth_rpc_url = 'https://rpc.flashbots.net/'
-block_number = 15263859
+remappings = [
+]
 
+[rpc_endpoints]
+ethereum="${RPC_ETHEREUM}"
+optimism = "${RPC_OPTIMISM}"
+avalanche = "${RPC_AVALANCHE}"
+polygon = "${RPC_POLYGON}"
