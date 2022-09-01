@@ -2,7 +2,7 @@
 pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
-import {IPool, IPoolAddressesProvider, IAaveProtocolDataProvider, TokenData, IInterestRateStrategy} from 'aave-address-book/AaveV3.sol';
+import {IPool, IPoolAddressesProvider, IAaveProtocolDataProvider, TokenData, IInterestRateStrategy, DataTypes} from 'aave-address-book/AaveV3.sol';
 
 struct ReserveTokens {
   address aToken;
@@ -47,43 +47,118 @@ contract ProtocolV3Helper is Test {
     ReserveConfig[] memory configs = _getReservesConfigs(IPool(pool));
     _writeReserveConfigs(path, configs);
     _writeStrategyConfigs(path, configs);
+    _writeEModeConfigs(path, configs, IPool(pool));
+  }
+
+  function _isInUint256Array(uint256[] memory haystack, uint256 needle) private returns (bool) {
+    for (uint256 i = 0; i < haystack.length; i++) {
+      if (haystack[i] == needle) return true;
+    }
+    return false;
+  }
+
+  function _isInAddressArray(address[] memory haystack, address needle) private returns (bool) {
+    for (uint256 i = 0; i < haystack.length; i++) {
+      if (haystack[i] == needle) return true;
+    }
+    return false;
+  }
+
+  function _writeEModeConfigs(
+    string memory path,
+    ReserveConfig[] memory configs,
+    IPool pool
+  ) internal {
+    vm.writeLine(path, '## EMode categories\n\n');
+    vm.writeLine(
+      path,
+      '| id | label | ltv | liquidationThreshold | liquidationBonus | priceSource |'
+    );
+    vm.writeLine(path, '|---|---|---|---|---|---|');
+    uint256[] memory usedCategories = new uint256[](configs.length);
+    for (uint256 i = 0; i < configs.length; i++) {
+      if (!_isInUint256Array(usedCategories, configs[i].eModeCategory)) {
+        usedCategories[i] = configs[i].eModeCategory;
+        DataTypes.EModeCategory memory category = pool.getEModeCategoryData(
+          uint8(configs[i].eModeCategory)
+        );
+        vm.writeLine(
+          path,
+          string.concat(
+            '| ',
+            vm.toString(configs[i].eModeCategory),
+            ' | ',
+            category.label,
+            ' | ',
+            vm.toString(category.ltv),
+            ' | ',
+            vm.toString(category.liquidationThreshold),
+            ' | ',
+            vm.toString(category.liquidationBonus),
+            ' | ',
+            vm.toString(category.priceSource),
+            ' |'
+          )
+        );
+      }
+    }
+    vm.writeLine(path, '\n');
   }
 
   function _writeStrategyConfigs(string memory path, ReserveConfig[] memory configs) internal {
+    vm.writeLine(path, '## InterestRateStrategies\n');
     vm.writeLine(
       path,
-      '| strategy | getBaseStableBorrowRate | getStableRateSlope1 | getStableRateSlope2 | getBaseVariableBorrowRate | getVariableRateSlope1 | getVariableRateSlope2 |'
+      string.concat(
+        '| strategy | getBaseStableBorrowRate | getStableRateSlope1 | getStableRateSlope2 | optimalStableToTotal | maxStabletoTotalExcess ',
+        '| getBaseVariableBorrowRate | getVariableRateSlope1 | getVariableRateSlope2 | optimalUsageRatio | maxExcessUsageRatio |'
+      )
     );
-    vm.writeLine(path, '|---|---|---|---|---|---|---|');
+    vm.writeLine(path, '|---|---|---|---|---|---|---|---|---|---|---|');
+    address[] memory usedStrategies = new address[](configs.length);
     for (uint256 i = 0; i < configs.length; i++) {
-      IInterestRateStrategy strategy = IInterestRateStrategy(configs[i].interestRateStrategy);
-      vm.writeLine(
-        path,
-        string.concat(
+      if (!_isInAddressArray(usedStrategies, configs[i].interestRateStrategy)) {
+        usedStrategies[i] = configs[i].interestRateStrategy;
+        IInterestRateStrategy strategy = IInterestRateStrategy(configs[i].interestRateStrategy);
+        vm.writeLine(
+          path,
           string.concat(
-            '| ',
-            vm.toString(address(strategy)),
-            ' | ',
-            vm.toString(strategy.getBaseStableBorrowRate()),
-            ' | ',
-            vm.toString(strategy.getStableRateSlope1()),
-            ' | ',
-            vm.toString(strategy.getStableRateSlope2()),
-            ' |'
-          ),
-          string.concat(
-            vm.toString(strategy.getBaseVariableBorrowRate()),
-            ' | ',
-            vm.toString(strategy.getVariableRateSlope1()),
-            ' | ',
-            vm.toString(strategy.getVariableRateSlope2())
+            string.concat(
+              '| ',
+              vm.toString(address(strategy)),
+              ' | ',
+              vm.toString(strategy.getBaseStableBorrowRate()),
+              ' | ',
+              vm.toString(strategy.getStableRateSlope1()),
+              ' | ',
+              vm.toString(strategy.getStableRateSlope2()),
+              ' | ',
+              vm.toString(strategy.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO()),
+              ' | ',
+              vm.toString(strategy.MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO()),
+              ' | '
+            ),
+            string.concat(
+              vm.toString(strategy.getBaseVariableBorrowRate()),
+              ' | ',
+              vm.toString(strategy.getVariableRateSlope1()),
+              ' | ',
+              vm.toString(strategy.getVariableRateSlope2()),
+              ' | ',
+              vm.toString(strategy.OPTIMAL_USAGE_RATIO()),
+              ' | ',
+              vm.toString(strategy.MAX_EXCESS_USAGE_RATIO()),
+              ' |'
+            )
           )
-        )
-      );
+        );
+      }
     }
+    vm.writeLine(path, '\n');
   }
 
   function _writeReserveConfigs(string memory path, ReserveConfig[] memory configs) internal {
+    vm.writeLine(path, '## Reserve Configurations\n');
     vm.writeLine(
       path,
       string.concat(
@@ -159,7 +234,7 @@ contract ProtocolV3Helper is Test {
         )
       );
     }
-    vm.writeLine(path, '\n\n');
+    vm.writeLine(path, '\n');
   }
 
   function _getReservesConfigs(IPool pool) internal view returns (ReserveConfig[] memory) {
