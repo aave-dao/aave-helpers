@@ -42,7 +42,7 @@ struct LocalVars {
 
 contract ProtocolV3Helper is Test {
   function createConfigurationSnapshot(string memory reportName, address pool) public {
-    string memory path = string.concat('./reports/', reportName, '.md');
+    string memory path = string.concat('./reports/', vm.toString(pool), '_', reportName, '.md');
     vm.writeFile(path, '# Report\n\n');
     ReserveConfig[] memory configs = _getReservesConfigs(IPool(pool));
     _writeReserveConfigs(path, configs);
