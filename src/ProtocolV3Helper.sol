@@ -53,6 +53,9 @@ contract ProtocolV3Helper is Test {
   }
 
   function e2eTest(ReserveConfig[] memory configs, IPool pool) public {
+    deal(address(this), 1000 ether);
+    uint256 snapshot = vm.snapshot();
+    // test all basic interactions
     for (uint256 i = 0; i < configs.length; i++) {
       uint256 amount = 100 * 10**configs[i].decimals;
       if (!configs[i].isFrozen) {
@@ -68,6 +71,8 @@ contract ProtocolV3Helper is Test {
         console.log('SKIP: REASON_FROZEN %s', configs[i].symbol);
       }
     }
+    vm.revertTo(snapshot);
+    // test emodes, isolation modes ...
   }
 
   function _deposit(
@@ -89,7 +94,6 @@ contract ProtocolV3Helper is Test {
   ) internal {
     console.log('BORROW: %s, Amount %s, Stable: %s', config.symbol, amount, stable);
     pool.borrow(config.underlying, amount, stable ? 1 : 2, 0, address(this));
-    // pool.deposit(config.underlying, amount, address(this), 0);
   }
 
   function _isInUint256Array(uint256[] memory haystack, uint256 needle) private returns (bool) {
