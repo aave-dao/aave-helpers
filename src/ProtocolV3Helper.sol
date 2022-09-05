@@ -3,6 +3,7 @@ pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
 import {IPool, IPoolAddressesProvider, IAaveProtocolDataProvider, TokenData, IInterestRateStrategy, DataTypes} from 'aave-address-book/AaveV3.sol';
+import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 
 struct ReserveTokens {
   address aToken;
@@ -48,6 +49,47 @@ contract ProtocolV3Helper is Test {
     _writeReserveConfigs(path, configs);
     _writeStrategyConfigs(path, configs);
     _writeEModeConfigs(path, configs, IPool(pool));
+    e2eTest(configs, IPool(pool));
+  }
+
+  function e2eTest(ReserveConfig[] memory configs, IPool pool) public {
+    for (uint256 i = 0; i < configs.length; i++) {
+      uint256 amount = 100 * 10**configs[i].decimals;
+      if (!configs[i].isFrozen) {
+        _deposit(configs[i], pool, amount);
+        if (configs[i].borrowingEnabled) {
+          _borrow(configs[i], pool, 10 * 10**configs[i].decimals, false);
+        }
+        // TODO: have to read up under which conditions you can borrow stable
+        // if (configs[i].borrowingEnabled && configs[i].stableBorrowRateEnabled) {
+        //   _borrow(configs[i], pool, 10 * 1**configs[i].decimals, true);
+        // }
+      } else {
+        console.log('SKIP: REASON_FROZEN %s', configs[i].symbol);
+      }
+    }
+  }
+
+  function _deposit(
+    ReserveConfig memory config,
+    IPool pool,
+    uint256 amount
+  ) internal {
+    deal(config.underlying, address(this), amount);
+    IERC20(config.underlying).approve(address(pool), amount);
+    console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
+    pool.deposit(config.underlying, amount, address(this), 0);
+  }
+
+  function _borrow(
+    ReserveConfig memory config,
+    IPool pool,
+    uint256 amount,
+    bool stable
+  ) internal {
+    console.log('BORROW: %s, Amount %s, Stable: %s', config.symbol, amount, stable);
+    pool.borrow(config.underlying, amount, stable ? 1 : 2, 0, address(this));
+    // pool.deposit(config.underlying, amount, address(this), 0);
   }
 
   function _isInUint256Array(uint256[] memory haystack, uint256 needle) private returns (bool) {
