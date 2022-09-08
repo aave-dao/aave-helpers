@@ -2,10 +2,10 @@
 pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
-import {ProtocolV3Helper} from '../ProtocolV3Helper.sol';
+import {ProtocolV3TestBase} from '../ProtocolV3TestBase.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 
-contract ProxyHelpersTest is ProtocolV3Helper {
+contract ProxyHelpersTest is ProtocolV3TestBase {
   function setUp() public {
     vm.createSelectFork('polygon', 32519994);
   }

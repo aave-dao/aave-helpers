@@ -41,7 +41,7 @@ struct LocalVars {
   ReserveConfig[] configs;
 }
 
-contract ProtocolV3Helper is Test {
+contract ProtocolV3TestBase is Test {
   address public constant ETH_MOCK_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
   function createConfigurationSnapshot(string memory reportName, IPool pool) public {
