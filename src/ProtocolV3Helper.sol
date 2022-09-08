@@ -44,17 +44,23 @@ struct LocalVars {
 contract ProtocolV3Helper is Test {
   address public constant ETH_MOCK_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
-  function createConfigurationSnapshot(string memory reportName, address pool) public {
-    string memory path = string.concat('./reports/', vm.toString(pool), '_', reportName, '.md');
+  function createConfigurationSnapshot(string memory reportName, IPool pool) public {
+    string memory path = string.concat(
+      './reports/',
+      vm.toString(address(pool)),
+      '_',
+      reportName,
+      '.md'
+    );
     vm.writeFile(path, '# Report\n\n');
-    ReserveConfig[] memory configs = _getReservesConfigs(IPool(pool));
+    ReserveConfig[] memory configs = _getReservesConfigs(pool);
     _writeReserveConfigs(path, configs);
     _writeStrategyConfigs(path, configs);
-    _writeEModeConfigs(path, configs, IPool(pool));
-    e2eTest(configs, IPool(pool));
+    _writeEModeConfigs(path, configs, pool);
   }
 
-  function e2eTest(ReserveConfig[] memory configs, IPool pool) public {
+  function e2eTest(IPool pool) public {
+    ReserveConfig[] memory configs = _getReservesConfigs(pool);
     deal(address(this), 1000 ether);
     uint256 snapshot = vm.snapshot();
     _supplyWithdrawFlow(configs, pool);

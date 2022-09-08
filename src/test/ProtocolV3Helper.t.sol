@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
 import {ProtocolV3Helper} from '../ProtocolV3Helper.sol';
+import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 
 contract ProxyHelpersTest is ProtocolV3Helper {
   function setUp() public {
@@ -10,6 +11,10 @@ contract ProxyHelpersTest is ProtocolV3Helper {
   }
 
   function testSnpashot() public {
-    this.createConfigurationSnapshot('bla', 0x794a61358D6845594F94dc1DB02A252b5b4814aD);
+    this.createConfigurationSnapshot('report', AaveV3Polygon.POOL);
+  }
+
+  function testE2E() public {
+    this.e2eTest(AaveV3Polygon.POOL);
   }
 }
