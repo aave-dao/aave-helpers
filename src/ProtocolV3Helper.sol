@@ -65,11 +65,17 @@ contract ProtocolV3Helper is Test {
     vm.revertTo(snapshot);
   }
 
+  /**
+   * @dev forwards time by x blocks
+   */
   function _skipBlocks(uint128 blocks) private {
     vm.roll(block.number + blocks);
     vm.warp(block.timestamp + blocks * 12); // assuming a block is around 12seconds
   }
 
+  /**
+   * @dev returns the first collateral in the list that cannot be borrowed in stable mode
+   */
   function _getFirstCollateral(ReserveConfig[] memory configs)
     private
     returns (ReserveConfig memory config)
@@ -102,7 +108,7 @@ contract ProtocolV3Helper is Test {
   }
 
   /**
-   * @dev tests that all assets can be deposited & withdrawn
+   * @dev tests that all assets with borrowing enabled can be borrowed
    */
   function _variableBorrowFlow(ReserveConfig[] memory configs, IPool pool) internal {
     // put 1M whatever collateral, which should be enough to borrow 1 of each
@@ -112,10 +118,6 @@ contract ProtocolV3Helper is Test {
       uint256 amount = 10**configs[i].decimals;
       if (configs[i].borrowingEnabled) {
         _borrow(configs[i], pool, 10**configs[i].decimals, false);
-        // TODO: have to read up under which conditions you can borrow stable
-        // if (configs[i].borrowingEnabled && configs[i].stableBorrowRateEnabled) {
-        //   _borrow(configs[i], pool, 10 * 1**configs[i].decimals, true);
-        // }
       } else {
         console.log('SKIP: BORROWING_DISABLED %s', configs[i].symbol);
       }
@@ -123,7 +125,7 @@ contract ProtocolV3Helper is Test {
   }
 
   /**
-   * @dev tests that all assets can be deposited & withdrawn
+   * @dev tests that all assets with stable borrowing enabled can be borrowed
    */
   function _stableBorrowFlow(ReserveConfig[] memory configs, IPool pool) internal {
     // put 1M whatever collateral, which should be enough to borrow 1 of each
