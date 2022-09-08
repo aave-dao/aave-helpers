@@ -42,6 +42,8 @@ struct LocalVars {
 }
 
 contract ProtocolV3Helper is Test {
+  address public constant ETH_MOCK_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+
   function createConfigurationSnapshot(string memory reportName, address pool) public {
     string memory path = string.concat('./reports/', vm.toString(pool), '_', reportName, '.md');
     vm.writeFile(path, '# Report\n\n');
@@ -55,24 +57,86 @@ contract ProtocolV3Helper is Test {
   function e2eTest(ReserveConfig[] memory configs, IPool pool) public {
     deal(address(this), 1000 ether);
     uint256 snapshot = vm.snapshot();
+    _supplyWithdrawFlow(configs, pool);
+    vm.revertTo(snapshot);
+    _variableBorrowFlow(configs, pool);
+    vm.revertTo(snapshot);
+    _stableBorrowFlow(configs, pool);
+    vm.revertTo(snapshot);
+  }
+
+  function _skipBlocks(uint128 blocks) private {
+    vm.roll(block.number + blocks);
+    vm.warp(block.timestamp + blocks * 12); // assuming a block is around 12seconds
+  }
+
+  function _getFirstCollateral(ReserveConfig[] memory configs)
+    private
+    returns (ReserveConfig memory config)
+  {
+    for (uint256 i = 0; i < configs.length; i++) {
+      if (configs[i].usageAsCollateralEnabled && !configs[i].stableBorrowRateEnabled)
+        return configs[i];
+    }
+    revert('ERROR: No collateral found');
+  }
+
+  /**
+   * @dev tests that all assets can be deposited & withdrawn
+   */
+  function _supplyWithdrawFlow(ReserveConfig[] memory configs, IPool pool) internal {
     // test all basic interactions
     for (uint256 i = 0; i < configs.length; i++) {
       uint256 amount = 100 * 10**configs[i].decimals;
       if (!configs[i].isFrozen) {
         _deposit(configs[i], pool, amount);
-        if (configs[i].borrowingEnabled) {
-          _borrow(configs[i], pool, 10 * 10**configs[i].decimals, false);
-        }
+        _skipBlocks(1000);
+        assertEq(_withdraw(configs[i], pool, amount, false), amount);
+        _deposit(configs[i], pool, amount);
+        _skipBlocks(1000);
+        assertGe(_withdraw(configs[i], pool, amount, true), amount);
+      } else {
+        console.log('SKIP: REASON_FROZEN %s', configs[i].symbol);
+      }
+    }
+  }
+
+  /**
+   * @dev tests that all assets can be deposited & withdrawn
+   */
+  function _variableBorrowFlow(ReserveConfig[] memory configs, IPool pool) internal {
+    // put 1M whatever collateral, which should be enough to borrow 1 of each
+    ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
+    _deposit(collateralConfig, pool, 1000000 ether);
+    for (uint256 i = 0; i < configs.length; i++) {
+      uint256 amount = 10**configs[i].decimals;
+      if (configs[i].borrowingEnabled) {
+        _borrow(configs[i], pool, 10**configs[i].decimals, false);
         // TODO: have to read up under which conditions you can borrow stable
         // if (configs[i].borrowingEnabled && configs[i].stableBorrowRateEnabled) {
         //   _borrow(configs[i], pool, 10 * 1**configs[i].decimals, true);
         // }
       } else {
-        console.log('SKIP: REASON_FROZEN %s', configs[i].symbol);
+        console.log('SKIP: BORROWING_DISABLED %s', configs[i].symbol);
       }
     }
-    vm.revertTo(snapshot);
-    // test emodes, isolation modes ...
+  }
+
+  /**
+   * @dev tests that all assets can be deposited & withdrawn
+   */
+  function _stableBorrowFlow(ReserveConfig[] memory configs, IPool pool) internal {
+    // put 1M whatever collateral, which should be enough to borrow 1 of each
+    ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
+    _deposit(collateralConfig, pool, 1000000 ether);
+    for (uint256 i = 0; i < configs.length; i++) {
+      uint256 amount = 10**configs[i].decimals;
+      if (configs[i].borrowingEnabled && configs[i].stableBorrowRateEnabled) {
+        _borrow(configs[i], pool, 10**configs[i].decimals, true);
+      } else {
+        console.log('SKIP: STABLE_BORROWING_DISABLED %s', configs[i].symbol);
+      }
+    }
   }
 
   function _deposit(
@@ -84,6 +148,21 @@ contract ProtocolV3Helper is Test {
     IERC20(config.underlying).approve(address(pool), amount);
     console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
     pool.deposit(config.underlying, amount, address(this), 0);
+  }
+
+  function _withdraw(
+    ReserveConfig memory config,
+    IPool pool,
+    uint256 amount,
+    bool max
+  ) internal returns (uint256) {
+    uint256 amountOut = pool.withdraw(
+      config.underlying,
+      max ? type(uint256).max : amount,
+      address(this)
+    );
+    console.log('WITHDRAW: %s, Amount: %s', config.symbol, amountOut);
+    return amountOut;
   }
 
   function _borrow(
