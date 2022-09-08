@@ -6,6 +6,7 @@ out = 'out'
 libs = ['lib']
 remappings = [
 ]
+fs_permissions = [{access = "write", path = "./reports"}]
 
 [rpc_endpoints]
 ethereum="${RPC_ETHEREUM}"
