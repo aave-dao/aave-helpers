@@ -2,7 +2,7 @@
 pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
-import {IPool, IPoolAddressesProvider, IAaveProtocolDataProvider, TokenData, IInterestRateStrategy, DataTypes} from 'aave-address-book/AaveV3.sol';
+import {IAaveOracle, IPool, IPoolAddressesProvider, IAaveProtocolDataProvider, TokenData, IInterestRateStrategy, DataTypes} from 'aave-address-book/AaveV3.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 
 struct ReserveTokens {
@@ -39,6 +39,28 @@ struct ReserveConfig {
 struct LocalVars {
   TokenData[] reserves;
   ReserveConfig[] configs;
+}
+
+struct InterestStrategyValues {
+  address addressesProvider;
+  uint256 optimalUsageRatio;
+  uint256 optimalStableToTotalDebtRatio;
+  uint256 baseStableBorrowRate;
+  uint256 stableRateSlope1;
+  uint256 stableRateSlope2;
+  uint256 baseVariableBorrowRate;
+  uint256 variableRateSlope1;
+  uint256 variableRateSlope2;
+}
+
+interface IInitializableAdminUpgradeabilityProxy {
+  function upgradeTo(address newImplementation) external;
+
+  function upgradeToAndCall(address newImplementation, bytes calldata data) external payable;
+
+  function admin() external returns (address);
+
+  function implementation() external returns (address);
 }
 
 contract ProtocolV3TestBase is Test {
@@ -84,6 +106,7 @@ contract ProtocolV3TestBase is Test {
    */
   function _getFirstCollateral(ReserveConfig[] memory configs)
     private
+    pure
     returns (ReserveConfig memory config)
   {
     for (uint256 i = 0; i < configs.length; i++) {
@@ -123,7 +146,7 @@ contract ProtocolV3TestBase is Test {
     for (uint256 i = 0; i < configs.length; i++) {
       uint256 amount = 10**configs[i].decimals;
       if (configs[i].borrowingEnabled) {
-        _borrow(configs[i], pool, 10**configs[i].decimals, false);
+        _borrow(configs[i], pool, amount, false);
       } else {
         console.log('SKIP: BORROWING_DISABLED %s', configs[i].symbol);
       }
@@ -140,7 +163,7 @@ contract ProtocolV3TestBase is Test {
     for (uint256 i = 0; i < configs.length; i++) {
       uint256 amount = 10**configs[i].decimals;
       if (configs[i].borrowingEnabled && configs[i].stableBorrowRateEnabled) {
-        _borrow(configs[i], pool, 10**configs[i].decimals, true);
+        _borrow(configs[i], pool, amount, true);
       } else {
         console.log('SKIP: STABLE_BORROWING_DISABLED %s', configs[i].symbol);
       }
@@ -183,14 +206,22 @@ contract ProtocolV3TestBase is Test {
     pool.borrow(config.underlying, amount, stable ? 1 : 2, 0, address(this));
   }
 
-  function _isInUint256Array(uint256[] memory haystack, uint256 needle) private returns (bool) {
+  function _isInUint256Array(uint256[] memory haystack, uint256 needle)
+    private
+    pure
+    returns (bool)
+  {
     for (uint256 i = 0; i < haystack.length; i++) {
       if (haystack[i] == needle) return true;
     }
     return false;
   }
 
-  function _isInAddressArray(address[] memory haystack, address needle) private returns (bool) {
+  function _isInAddressArray(address[] memory haystack, address needle)
+    private
+    pure
+    returns (bool)
+  {
     for (uint256 i = 0; i < haystack.length; i++) {
       if (haystack[i] == needle) return true;
     }
@@ -447,5 +478,300 @@ contract ProtocolV3TestBase is Test {
     localConfig.liquidationProtocolFee = pdp.getLiquidationProtocolFee(reserve.tokenAddress);
 
     return localConfig;
+  }
+
+  function _findReserveConfig(ReserveConfig[] memory configs, address underlying)
+    internal
+    pure
+    returns (ReserveConfig memory)
+  {
+    for (uint256 i = 0; i < configs.length; i++) {
+      if (configs[i].underlying == underlying) {
+        return configs[i];
+      }
+    }
+    revert('RESERVE_CONFIG_NOT_FOUND');
+  }
+
+  function _logReserveConfig(ReserveConfig memory config) internal view {
+    console.log('Symbol ', config.symbol);
+    console.log('Underlying address ', config.underlying);
+    console.log('AToken address ', config.aToken);
+    console.log('Stable debt token address ', config.stableDebtToken);
+    console.log('Variable debt token address ', config.variableDebtToken);
+    console.log('Decimals ', config.decimals);
+    console.log('LTV ', config.ltv);
+    console.log('Liquidation Threshold ', config.liquidationThreshold);
+    console.log('Liquidation Bonus ', config.liquidationBonus);
+    console.log('Liquidation protocol fee ', config.liquidationProtocolFee);
+    console.log('Reserve Factor ', config.reserveFactor);
+    console.log('Usage as collateral enabled ', (config.usageAsCollateralEnabled) ? 'Yes' : 'No');
+    console.log('Borrowing enabled ', (config.borrowingEnabled) ? 'Yes' : 'No');
+    console.log('Stable borrow rate enabled ', (config.stableBorrowRateEnabled) ? 'Yes' : 'No');
+    console.log('Supply cap ', config.supplyCap);
+    console.log('Borrow cap ', config.borrowCap);
+    console.log('Debt ceiling ', config.debtCeiling);
+    console.log('eMode category ', config.eModeCategory);
+    console.log('Interest rate strategy ', config.interestRateStrategy);
+    console.log('Is active ', (config.isActive) ? 'Yes' : 'No');
+    console.log('Is frozen ', (config.isFrozen) ? 'Yes' : 'No');
+    console.log('Is siloed ', (config.isSiloed) ? 'Yes' : 'No');
+    console.log('-----');
+    console.log('-----');
+  }
+
+  function _validateReserveConfig(
+    ReserveConfig memory expectedConfig,
+    ReserveConfig[] memory allConfigs
+  ) internal pure {
+    ReserveConfig memory config = _findReserveConfig(allConfigs, expectedConfig.underlying);
+    require(
+      keccak256(bytes(config.symbol)) == keccak256(bytes(expectedConfig.symbol)),
+      '_validateConfigsInAave() : INVALID_SYMBOL'
+    );
+    require(
+      config.underlying == expectedConfig.underlying,
+      '_validateConfigsInAave() : INVALID_UNDERLYING'
+    );
+    require(config.decimals == expectedConfig.decimals, '_validateConfigsInAave: INVALID_DECIMALS');
+    require(config.ltv == expectedConfig.ltv, '_validateConfigsInAave: INVALID_LTV');
+    require(
+      config.liquidationThreshold == expectedConfig.liquidationThreshold,
+      '_validateConfigsInAave: INVALID_LIQ_THRESHOLD'
+    );
+    require(
+      config.liquidationBonus == expectedConfig.liquidationBonus,
+      '_validateConfigsInAave: INVALID_LIQ_BONUS'
+    );
+    require(
+      config.liquidationProtocolFee == expectedConfig.liquidationProtocolFee,
+      '_validateConfigsInAave: INVALID_LIQUIDATION_PROTOCOL_FEE'
+    );
+    require(
+      config.reserveFactor == expectedConfig.reserveFactor,
+      '_validateConfigsInAave: INVALID_RESERVE_FACTOR'
+    );
+
+    require(
+      config.usageAsCollateralEnabled == expectedConfig.usageAsCollateralEnabled,
+      '_validateConfigsInAave: INVALID_USAGE_AS_COLLATERAL'
+    );
+    require(
+      config.borrowingEnabled == expectedConfig.borrowingEnabled,
+      '_validateConfigsInAave: INVALID_BORROWING_ENABLED'
+    );
+    require(
+      config.stableBorrowRateEnabled == expectedConfig.stableBorrowRateEnabled,
+      '_validateConfigsInAave: INVALID_STABLE_BORROW_ENABLED'
+    );
+    require(
+      config.isActive == expectedConfig.isActive,
+      '_validateConfigsInAave: INVALID_IS_ACTIVE'
+    );
+    require(
+      config.isFrozen == expectedConfig.isFrozen,
+      '_validateConfigsInAave: INVALID_IS_FROZEN'
+    );
+    require(
+      config.isSiloed == expectedConfig.isSiloed,
+      '_validateConfigsInAave: INVALID_IS_SILOED'
+    );
+    require(
+      config.supplyCap == expectedConfig.supplyCap,
+      '_validateConfigsInAave: INVALID_SUPPLY_CAP'
+    );
+    require(
+      config.borrowCap == expectedConfig.borrowCap,
+      '_validateConfigsInAave: INVALID_BORROW_CAP'
+    );
+    require(
+      config.debtCeiling == expectedConfig.debtCeiling,
+      '_validateConfigsInAave: INVALID_DEBT_CEILING'
+    );
+    require(
+      config.eModeCategory == expectedConfig.eModeCategory,
+      '_validateConfigsInAave: INVALID_EMODE_CATEGORY'
+    );
+    require(
+      config.interestRateStrategy == expectedConfig.interestRateStrategy,
+      '_validateConfigsInAave: INVALID_INTEREST_RATE_STRATEGY'
+    );
+  }
+
+  function _validateInterestRateStrategy(
+    address interestRateStrategyAddress,
+    address expectedStrategy,
+    InterestStrategyValues memory expectedStrategyValues
+  ) internal view {
+    IInterestRateStrategy strategy = IInterestRateStrategy(interestRateStrategyAddress);
+
+    require(
+      address(strategy) == expectedStrategy,
+      '_validateInterestRateStrategy() : INVALID_STRATEGY_ADDRESS'
+    );
+
+    require(
+      strategy.OPTIMAL_USAGE_RATIO() == expectedStrategyValues.optimalUsageRatio,
+      '_validateInterestRateStrategy() : INVALID_OPTIMAL_RATIO'
+    );
+    require(
+      strategy.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO() ==
+        expectedStrategyValues.optimalStableToTotalDebtRatio,
+      '_validateInterestRateStrategy() : INVALID_OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO'
+    );
+    require(
+      address(strategy.ADDRESSES_PROVIDER()) == expectedStrategyValues.addressesProvider,
+      '_validateInterestRateStrategy() : INVALID_ADDRESSES_PROVIDER'
+    );
+    require(
+      strategy.getBaseVariableBorrowRate() == expectedStrategyValues.baseVariableBorrowRate,
+      '_validateInterestRateStrategy() : INVALID_BASE_VARIABLE_BORROW'
+    );
+    require(
+      strategy.getBaseStableBorrowRate() == expectedStrategyValues.baseStableBorrowRate,
+      '_validateInterestRateStrategy() : INVALID_BASE_VARIABLE_BORROW'
+    );
+    require(
+      strategy.getStableRateSlope1() == expectedStrategyValues.stableRateSlope1,
+      '_validateInterestRateStrategy() : INVALID_STABLE_SLOPE_1'
+    );
+    require(
+      strategy.getStableRateSlope2() == expectedStrategyValues.stableRateSlope2,
+      '_validateInterestRateStrategy() : INVALID_STABLE_SLOPE_2'
+    );
+    require(
+      strategy.getVariableRateSlope1() == expectedStrategyValues.variableRateSlope1,
+      '_validateInterestRateStrategy() : INVALID_VARIABLE_SLOPE_1'
+    );
+    require(
+      strategy.getVariableRateSlope2() == expectedStrategyValues.variableRateSlope2,
+      '_validateInterestRateStrategy() : INVALID_VARIABLE_SLOPE_2'
+    );
+  }
+
+  function _noReservesConfigsChangesApartNewListings(
+    ReserveConfig[] memory allConfigsBefore,
+    ReserveConfig[] memory allConfigsAfter
+  ) internal pure {
+    for (uint256 i = 0; i < allConfigsBefore.length; i++) {
+      _requireNoChangeInConfigs(allConfigsBefore[i], allConfigsAfter[i]);
+    }
+  }
+
+  function _noReservesConfigsChangesApartFrom(
+    ReserveConfig[] memory allConfigsBefore,
+    ReserveConfig[] memory allConfigsAfter,
+    address assetChangedUnderlying
+  ) internal pure {
+    require(allConfigsBefore.length == allConfigsAfter.length, 'A_UNEXPECTED_NEW_LISTING_HAPPENED');
+
+    for (uint256 i = 0; i < allConfigsBefore.length; i++) {
+      if (assetChangedUnderlying != allConfigsBefore[i].underlying) {
+        _requireNoChangeInConfigs(allConfigsBefore[i], allConfigsAfter[i]);
+      }
+    }
+  }
+
+  function _requireNoChangeInConfigs(ReserveConfig memory config1, ReserveConfig memory config2)
+    internal
+    pure
+  {
+    require(
+      keccak256(abi.encodePacked(config1.symbol)) == keccak256(abi.encodePacked(config2.symbol)),
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_SYMBOL_CHANGED'
+    );
+    require(
+      config1.underlying == config2.underlying,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_UNDERLYING_CHANGED'
+    );
+    require(
+      config1.decimals == config2.decimals,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_DECIMALS_CHANGED'
+    );
+    require(
+      config1.ltv == config2.ltv,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_LTV_CHANGED'
+    );
+    require(
+      config1.liquidationThreshold == config2.liquidationThreshold,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_LIQ_THRESHOLD_CHANGED'
+    );
+    require(
+      config1.liquidationBonus == config2.liquidationBonus,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_LIQ_BONUS_CHANGED'
+    );
+    require(
+      config1.reserveFactor == config2.reserveFactor,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_RESERVE_FACTOR_CHANGED'
+    );
+    require(
+      config1.usageAsCollateralEnabled == config2.usageAsCollateralEnabled,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_USAGE_AS_COLLATERAL_ENABLED_CHANGED'
+    );
+    require(
+      config1.borrowingEnabled == config2.borrowingEnabled,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_BORROWING_ENABLED_CHANGED'
+    );
+
+    require(
+      config1.stableBorrowRateEnabled == config2.stableBorrowRateEnabled,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_STABLE_BORROWING_CHANGED'
+    );
+    require(
+      config1.isActive == config2.isActive,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_IS_ACTIVE_CHANGED'
+    );
+    require(
+      config1.isFrozen == config2.isFrozen,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_IS_FROZEN_CHANGED'
+    );
+  }
+
+  function _validateCountOfListings(
+    uint256 count,
+    ReserveConfig[] memory allConfigsBefore,
+    ReserveConfig[] memory allConfigsAfter
+  ) internal pure {
+    require(
+      allConfigsBefore.length == allConfigsAfter.length - count,
+      '_validateCountOfListings() : INVALID_COUNT_OF_LISTINGS'
+    );
+  }
+
+  function _validateReserveTokensImpls(
+    address poolConfigurator,
+    ReserveConfig memory config,
+    ReserveTokens memory expectedImpls
+  ) internal {
+    vm.startPrank(poolConfigurator);
+    require(
+      IInitializableAdminUpgradeabilityProxy(config.aToken).implementation() ==
+        expectedImpls.aToken,
+      '_validateReserveTokensImpls() : INVALID_ATOKEN_IMPL'
+    );
+    require(
+      IInitializableAdminUpgradeabilityProxy(config.variableDebtToken).implementation() ==
+        expectedImpls.variableDebtToken,
+      '_validateReserveTokensImpls() : INVALID_ATOKEN_IMPL'
+    );
+    require(
+      IInitializableAdminUpgradeabilityProxy(config.stableDebtToken).implementation() ==
+        expectedImpls.stableDebtToken,
+      '_validateReserveTokensImpls() : INVALID_ATOKEN_IMPL'
+    );
+    vm.stopPrank();
+  }
+
+  function _validateAssetSourceOnOracle(
+    IPoolAddressesProvider addressProvider,
+    address asset,
+    address expectedSource
+  ) external view {
+    IAaveOracle oracle = IAaveOracle(addressProvider.getPriceOracle());
+
+    require(
+      oracle.getSourceOfAsset(asset) == expectedSource,
+      '_validateAssetSourceOnOracle() : INVALID_PRICE_SOURCE'
+    );
   }
 }
