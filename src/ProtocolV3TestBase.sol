@@ -778,10 +778,11 @@ contract ProtocolV3TestBase is Test {
   }
 
   function _validateReserveTokensImpls(
-    address poolConfigurator,
+    IPoolAddressesProvider addressProvider,
     ReserveConfig memory config,
     ReserveTokens memory expectedImpls
   ) internal {
+    address poolConfigurator = addressProvider.getPoolConfigurator();
     vm.startPrank(poolConfigurator);
     require(
       IInitializableAdminUpgradeabilityProxy(config.aToken).implementation() ==
