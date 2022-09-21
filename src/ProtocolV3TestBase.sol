@@ -685,6 +685,18 @@ contract ProtocolV3TestBase is Test {
       '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_UNDERLYING_CHANGED'
     );
     require(
+      config1.aToken == config2.aToken,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_A_TOKEN_CHANGED'
+    );
+    require(
+      config1.stableDebtToken == config2.stableDebtToken,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_STABLE_DEBT_TOKEN_CHANGED'
+    );
+    require(
+      config1.variableDebtToken == config2.variableDebtToken,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_VARIABLE_DEBT_TOKEN_CHANGED'
+    );
+    require(
       config1.decimals == config2.decimals,
       '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_DECIMALS_CHANGED'
     );
@@ -701,6 +713,10 @@ contract ProtocolV3TestBase is Test {
       '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_LIQ_BONUS_CHANGED'
     );
     require(
+      config1.liquidationProtocolFee == config2.liquidationProtocolFee,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_LIQ_PROTOCOL_FEE_CHANGED'
+    );
+    require(
       config1.reserveFactor == config2.reserveFactor,
       '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_RESERVE_FACTOR_CHANGED'
     );
@@ -712,7 +728,10 @@ contract ProtocolV3TestBase is Test {
       config1.borrowingEnabled == config2.borrowingEnabled,
       '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_BORROWING_ENABLED_CHANGED'
     );
-
+    require(
+      config1.interestRateStrategy == config2.interestRateStrategy,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_INTEREST_RATE_STRATEGY_CHANGED'
+    );
     require(
       config1.stableBorrowRateEnabled == config2.stableBorrowRateEnabled,
       '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_STABLE_BORROWING_CHANGED'
@@ -724,6 +743,26 @@ contract ProtocolV3TestBase is Test {
     require(
       config1.isFrozen == config2.isFrozen,
       '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_IS_FROZEN_CHANGED'
+    );
+    require(
+      config1.isSiloed == config2.isSiloed,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_IS_SILOED_CHANGED'
+    );
+    require(
+      config1.supplyCap == config2.supplyCap,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_SUPPLY_CAP_CHANGED'
+    );
+    require(
+      config1.borrowCap == config2.borrowCap,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_BORROW_CAP_CHANGED'
+    );
+    require(
+      config1.debtCeiling == config2.debtCeiling,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_DEBT_CEILING_CHANGED'
+    );
+    require(
+      config1.eModeCategory == config2.eModeCategory,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_E_MODE_CATEGORY_CHANGED'
     );
   }
 
