@@ -206,11 +206,7 @@ interface IBridgeExecutor {
 }
 
 library BridgeExecutorHelpers {
-  function waitAndExecuteLatest(
-    Vm vm,
-    address bridgeExecutor,
-    address bridgeAdmin
-  ) internal {
+  function waitAndExecuteLatest(Vm vm, address bridgeExecutor) internal {
     uint256 latestActionSet = IBridgeExecutor(bridgeExecutor).getActionsSetCount() - 1;
     require(
       IBridgeExecutor(bridgeExecutor).getCurrentState(latestActionSet) ==
@@ -218,8 +214,6 @@ library BridgeExecutorHelpers {
       'ERROR: action not queued'
     );
     vm.warp(block.timestamp + IBridgeExecutor(bridgeExecutor).getDelay() + 1);
-    vm.startPrank(bridgeAdmin);
     IBridgeExecutor(bridgeExecutor).execute(latestActionSet);
-    vm.stopPrank();
   }
 }
