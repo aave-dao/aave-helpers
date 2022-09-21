@@ -66,6 +66,8 @@ interface IInitializableAdminUpgradeabilityProxy {
 contract ProtocolV3TestBase is Test {
   address public constant ETH_MOCK_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
+  address public constant EOA = 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045;
+
   function createConfigurationSnapshot(string memory reportName, IPool pool) public {
     string memory path = string.concat(
       './reports/',
@@ -154,6 +156,7 @@ contract ProtocolV3TestBase is Test {
     for (uint256 i = 0; i < configs.length; i++) {
       uint256 amount = 10**configs[i].decimals;
       if (configs[i].borrowingEnabled) {
+        _deposit(configs[i], pool, EOA, amount * 2);
         this._borrow(configs[i], pool, user, amount, false);
       } else {
         console.log('SKIP: BORROWING_DISABLED %s', configs[i].symbol);
@@ -175,6 +178,7 @@ contract ProtocolV3TestBase is Test {
     for (uint256 i = 0; i < configs.length; i++) {
       uint256 amount = 10**configs[i].decimals;
       if (configs[i].borrowingEnabled && configs[i].stableBorrowRateEnabled) {
+        _deposit(configs[i], pool, EOA, amount * 2);
         this._borrow(configs[i], pool, user, amount, true);
       } else {
         console.log('SKIP: STABLE_BORROWING_DISABLED %s', configs[i].symbol);
