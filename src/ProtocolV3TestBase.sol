@@ -146,7 +146,7 @@ contract ProtocolV3TestBase is Test {
     for (uint256 i = 0; i < configs.length; i++) {
       uint256 amount = 10**configs[i].decimals;
       if (configs[i].borrowingEnabled) {
-        _borrow(configs[i], pool, amount, false);
+        this._borrow(configs[i], pool, amount, false);
       } else {
         console.log('SKIP: BORROWING_DISABLED %s', configs[i].symbol);
       }
@@ -163,7 +163,7 @@ contract ProtocolV3TestBase is Test {
     for (uint256 i = 0; i < configs.length; i++) {
       uint256 amount = 10**configs[i].decimals;
       if (configs[i].borrowingEnabled && configs[i].stableBorrowRateEnabled) {
-        _borrow(configs[i], pool, amount, true);
+        this._borrow(configs[i], pool, amount, true);
       } else {
         console.log('SKIP: STABLE_BORROWING_DISABLED %s', configs[i].symbol);
       }
@@ -201,9 +201,21 @@ contract ProtocolV3TestBase is Test {
     IPool pool,
     uint256 amount,
     bool stable
-  ) internal {
+  ) external {
     console.log('BORROW: %s, Amount %s, Stable: %s', config.symbol, amount, stable);
     pool.borrow(config.underlying, amount, stable ? 1 : 2, 0, address(this));
+  }
+
+  function _repay(
+    ReserveConfig memory config,
+    IPool pool,
+    uint256 amount,
+    bool stable
+  ) internal {
+    deal(config.underlying, address(this), amount);
+    IERC20(config.underlying).approve(address(pool), amount);
+    console.log('REPAY: %s, Amount: %s', config.symbol, amount);
+    pool.repay(config.underlying, amount, stable ? 1 : 2, address(this));
   }
 
   function _isInUint256Array(uint256[] memory haystack, uint256 needle)
@@ -854,6 +866,15 @@ contract ProtocolV3TestBase is Test {
     }
     if (countCategory < expectedAssets.length) {
       revert('_getAssetOnEmodeCategory(): LESS_ASSETS_IN_CATEGORY_THAN_EXPECTED');
+    }
+  }
+
+  /// @dev To contemplate +1/-1 precision issues when rounding, mainly on aTokens
+  function _almostEqual(uint256 a, uint256 b) internal pure returns (bool) {
+    if (b == 0) {
+      return (a == b) || (a == (b + 1));
+    } else {
+      return (a == b) || (a == (b + 1)) || (a == (b - 1));
     }
   }
 }
