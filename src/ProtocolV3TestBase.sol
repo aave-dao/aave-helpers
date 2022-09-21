@@ -175,10 +175,13 @@ contract ProtocolV3TestBase is Test {
     IPool pool,
     uint256 amount
   ) internal {
+    uint256 aTokenBefore = IERC20(config.aToken).balanceOf(address(this));
     deal(config.underlying, address(this), amount);
     IERC20(config.underlying).approve(address(pool), amount);
     console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
     pool.deposit(config.underlying, amount, address(this), 0);
+    uint256 aTokenAfter = IERC20(config.aToken).balanceOf(address(this));
+    require(_almostEqual(aTokenAfter, aTokenBefore + amount), '_deposit() : ERROR');
   }
 
   function _withdraw(
@@ -187,12 +190,18 @@ contract ProtocolV3TestBase is Test {
     uint256 amount,
     bool max
   ) internal returns (uint256) {
+    uint256 aTokenBefore = IERC20(config.aToken).balanceOf(address(this));
     uint256 amountOut = pool.withdraw(
       config.underlying,
       max ? type(uint256).max : amount,
       address(this)
     );
     console.log('WITHDRAW: %s, Amount: %s', config.symbol, amountOut);
+    uint256 aTokenAfter = IERC20(config.aToken).balanceOf(address(this));
+    require(
+      aTokenAfter == ((aTokenBefore > amount) ? aTokenBefore - amount : 0),
+      '_withdraw() : INCONSISTENT_ATOKEN_BALANCE_AFTER'
+    );
     return amountOut;
   }
 
@@ -202,8 +211,12 @@ contract ProtocolV3TestBase is Test {
     uint256 amount,
     bool stable
   ) external {
+    address debtToken = stable ? config.stableDebtToken : config.variableDebtToken;
+    uint256 debtBefore = IERC20(debtToken).balanceOf(address(this));
     console.log('BORROW: %s, Amount %s, Stable: %s', config.symbol, amount, stable);
     pool.borrow(config.underlying, amount, stable ? 1 : 2, 0, address(this));
+    uint256 debtAfter = IERC20(debtToken).balanceOf(address(this));
+    require(_almostEqual(debtAfter, debtBefore + amount), '_borrow() : ERROR');
   }
 
   function _repay(
@@ -212,10 +225,14 @@ contract ProtocolV3TestBase is Test {
     uint256 amount,
     bool stable
   ) internal {
+    address debtToken = stable ? config.stableDebtToken : config.variableDebtToken;
+    uint256 debtBefore = IERC20(debtToken).balanceOf(address(this));
     deal(config.underlying, address(this), amount);
     IERC20(config.underlying).approve(address(pool), amount);
     console.log('REPAY: %s, Amount: %s', config.symbol, amount);
     pool.repay(config.underlying, amount, stable ? 1 : 2, address(this));
+    uint256 debtAfter = IERC20(debtToken).balanceOf(address(this));
+    require(debtAfter == ((debtBefore > amount) ? debtBefore - amount : 0), '_repay() : ERROR');
   }
 
   function _isInUint256Array(uint256[] memory haystack, uint256 needle)
