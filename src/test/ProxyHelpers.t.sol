@@ -17,4 +17,12 @@ contract ProxyHelpersTest is Test {
     );
     assertEq(admin, GovHelpers.LONG_EXECUTOR);
   }
+
+  function testImplementation() public {
+    address implementation = ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+      vm,
+      0x41A08648C3766F9F9d85598fF102a08f4ef84F84
+    );
+    assertEq(implementation, 0xadC74A134082eA85105258407159FBB428a73782);
+  }
 }
