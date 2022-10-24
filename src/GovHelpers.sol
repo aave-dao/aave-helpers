@@ -16,11 +16,11 @@ library GovHelpers {
     bytes32 ipfsHash;
   }
 
-  IAaveGovernanceV2 internal constant GOV = AaveGovernanceV2.GOV;
+  IAaveGovernanceV2 internal constant GOV = IAaveGovernanceV2(0xEC568fffba86c094cf06b22134B23074DFE2252c);
 
-  address public constant SHORT_EXECUTOR = AaveGovernanceV2.SHORT_EXECUTOR;
+  address public constant SHORT_EXECUTOR = 0xEE56e2B3D491590B5b31738cC34d5232F378a8D5;
 
-  address public constant LONG_EXECUTOR = AaveGovernanceV2.LONG_EXECUTOR;
+  address public constant LONG_EXECUTOR = 0x79426A1c24B2978D90d7A5070a46C65B07bC4299;
 
   address public constant AAVE = 0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9;
 
