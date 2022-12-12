@@ -30,6 +30,7 @@ struct ReserveConfig {
   bool isActive;
   bool isFrozen;
   bool isSiloed;
+  bool isBorrowableInIsolation;
   uint256 supplyCap;
   uint256 borrowCap;
   uint256 debtCeiling;
@@ -543,6 +544,13 @@ contract ProtocolV3TestBase is Test {
     localConfig.eModeCategory = pdp.getReserveEModeCategory(reserve.tokenAddress);
     localConfig.liquidationProtocolFee = pdp.getLiquidationProtocolFee(reserve.tokenAddress);
 
+    // TODO this should be improved, but at the moment is simpler to avoid importing the
+    // ReserveConfiguration library
+    localConfig.isBorrowableInIsolation =
+      (pool.getConfiguration(reserve.tokenAddress).data &
+        ~uint256(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDFFFFFFFFFFFFFFF)) !=
+      0;
+
     return localConfig;
   }
 
@@ -597,6 +605,7 @@ contract ProtocolV3TestBase is Test {
     console.log('Is active ', (config.isActive) ? 'Yes' : 'No');
     console.log('Is frozen ', (config.isFrozen) ? 'Yes' : 'No');
     console.log('Is siloed ', (config.isSiloed) ? 'Yes' : 'No');
+    console.log('Is borrowable in isolation ', (config.isBorrowableInIsolation) ? 'Yes' : 'No');
     console.log('-----');
     console.log('-----');
   }
@@ -656,6 +665,10 @@ contract ProtocolV3TestBase is Test {
     require(
       config.isSiloed == expectedConfig.isSiloed,
       '_validateConfigsInAave: INVALID_IS_SILOED'
+    );
+    require(
+      config.isBorrowableInIsolation == expectedConfig.isBorrowableInIsolation,
+      '_validateConfigsInAave: INVALID_IS_BORROWABLE_IN_ISOLATION'
     );
     require(
       config.supplyCap == expectedConfig.supplyCap,
@@ -887,7 +900,7 @@ contract ProtocolV3TestBase is Test {
     IPoolAddressesProvider addressProvider,
     address asset,
     address expectedSource
-  ) external view {
+  ) internal view {
     IAaveOracle oracle = IAaveOracle(addressProvider.getPriceOracle());
 
     require(
