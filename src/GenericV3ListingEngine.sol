@@ -106,23 +106,29 @@ contract GenericV3ListingEngine is IGenericV3ListingEngine {
         underlyingAsset: ids[i],
         treasury: COLLECTOR,
         incentivesController: REWARDS_CONTROLLER,
-        aTokenName: string(
-          abi.encodePacked('Aave ', context.networkName, ' ', basics[i].assetSymbol)
-        ), // TODO change to string.concat
-        aTokenSymbol: string(
-          abi.encodePacked('a', context.networkAbbreviation, basics[i].assetSymbol)
+        aTokenName: string.concat('Aave ', context.networkName, ' ', basics[i].assetSymbol),
+        aTokenSymbol: string.concat('a', context.networkAbbreviation, basics[i].assetSymbol),
+        variableDebtTokenName: string.concat(
+          'Aave ',
+          context.networkName,
+          ' Variable Debt ',
+          basics[i].assetSymbol
         ),
-        variableDebtTokenName: string(
-          abi.encodePacked('Aave ', context.networkName, ' Variable Debt ', basics[i].assetSymbol)
+        variableDebtTokenSymbol: string.concat(
+          'variableDebt',
+          context.networkAbbreviation,
+          basics[i].assetSymbol
         ),
-        variableDebtTokenSymbol: string(
-          abi.encodePacked('variableDebt', context.networkAbbreviation, basics[i].assetSymbol)
+        stableDebtTokenName: string.concat(
+          'Aave ',
+          context.networkName,
+          ' Stable Debt ',
+          basics[i].assetSymbol
         ),
-        stableDebtTokenName: string(
-          abi.encodePacked('Aave ', context.networkName, ' Stable Debt ', basics[i].assetSymbol)
-        ),
-        stableDebtTokenSymbol: string(
-          abi.encodePacked('stableDebt', context.networkAbbreviation, basics[i].assetSymbol)
+        stableDebtTokenSymbol: string.concat(
+          'stableDebt',
+          context.networkAbbreviation,
+          basics[i].assetSymbol
         ),
         params: bytes('')
       });
