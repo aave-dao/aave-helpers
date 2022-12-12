@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.0;
 
 import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
-import {IGenericV3ListingEngine} from './interfaces/IGenericV3ListingEngine.sol';
+import {IGenericV3ListingEngine} from './IGenericV3ListingEngine.sol';
 
 /**
  * @dev Base smart contract for an Aave v3.0.1 listing.

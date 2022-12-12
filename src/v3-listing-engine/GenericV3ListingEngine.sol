@@ -2,9 +2,9 @@
 pragma solidity ^0.8.12;
 
 import {IPoolConfigurator, IAaveOracle, ConfiguratorInputTypes} from 'aave-address-book/AaveV3.sol';
-import {IERC20} from './interfaces/IERC20.sol';
-import {IChainlinkAggregator} from './interfaces/IChainlinkAggregator.sol';
-import {IGenericV3ListingEngine} from './interfaces/IGenericV3ListingEngine.sol';
+import {IERC20} from '../interfaces/IERC20.sol';
+import {IChainlinkAggregator} from '../interfaces/IChainlinkAggregator.sol';
+import {IGenericV3ListingEngine} from './IGenericV3ListingEngine.sol';
 
 /**
  * @dev Helper smart contract implementing a generalized Aave v3 listing flow for a set of assets

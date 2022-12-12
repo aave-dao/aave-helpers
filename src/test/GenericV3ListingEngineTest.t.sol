@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity 0.8.17;
 
 import 'forge-std/Test.sol';
 
-import {AaveV3PolygonMockListing} from './mocks/AaveV3PolygonMockListing.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
-import {GenericV3ListingEngine} from '../GenericV3ListingEngine.sol';
 import {ProtocolV3TestBase, ReserveTokens, ReserveConfig} from '../ProtocolV3TestBase.sol';
+import {GenericV3ListingEngine} from '../v3-listing-engine/GenericV3ListingEngine.sol';
+import {AaveV3PolygonMockListing} from './mocks/AaveV3PolygonMockListing.sol';
 
 contract GenericV3ListingEngineTest is ProtocolV3TestBase {
   using stdStorage for StdStorage;
@@ -84,7 +84,7 @@ contract GenericV3ListingEngineTest is ProtocolV3TestBase {
       0x443C5116CdF663Eb387e72C688D276e702135C87
     );
 
-    // impl should be same as e.g. USDC
+    // impl should be same as e.g. WBTC
     _validateReserveTokensImpls(
       AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
       _findReserveConfigBySymbol(allConfigsAfter, 'WBTC'),

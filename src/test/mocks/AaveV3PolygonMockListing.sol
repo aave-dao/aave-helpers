@@ -1,17 +1,16 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.0;
 
-import {AaveV3ListingBase} from '../../AaveV3ListingBase.sol';
-import {IGenericV3ListingEngine} from '../../interfaces/IGenericV3ListingEngine.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
+import {AaveV3ListingPolygon, IGenericV3ListingEngine} from '../../v3-listing-engine/AaveV3ListingPolygon.sol';
 
 /**
  * @dev Smart contract for a mock listing, to be able to test without having a v3 instance on Ethereum
  * IMPORTANT Parameters are pseudo-random, DON'T USE THIS ANYHOW IN PRODUCTION
  * @author BGD Labs
  */
-contract AaveV3PolygonMockListing is AaveV3ListingBase {
-  constructor(IGenericV3ListingEngine listingEngine) AaveV3ListingBase(listingEngine) {}
+contract AaveV3PolygonMockListing is AaveV3ListingPolygon {
+  constructor(IGenericV3ListingEngine listingEngine) AaveV3ListingPolygon(listingEngine) {}
 
   function getAllConfigs() public pure override returns (IGenericV3ListingEngine.Listing[] memory) {
     IGenericV3ListingEngine.Listing[] memory listings = new IGenericV3ListingEngine.Listing[](1);
@@ -35,15 +34,5 @@ contract AaveV3PolygonMockListing is AaveV3ListingBase {
     });
 
     return listings;
-  }
-
-  function getPoolContext()
-    public
-    pure
-    override
-    returns (IGenericV3ListingEngine.PoolContext memory)
-  {
-    return
-      IGenericV3ListingEngine.PoolContext({networkName: 'Polygon', networkAbbreviation: 'Pol'});
   }
 }
