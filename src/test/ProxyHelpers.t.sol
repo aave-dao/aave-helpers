@@ -7,7 +7,7 @@ import {GovHelpers} from '../GovHelpers.sol';
 
 contract ProxyHelpersTest is Test {
   function setUp() public {
-    vm.createSelectFork('ethereum', 15816947);
+    vm.createSelectFork('mainnet', 15816947);
   }
 
   function testAdmin() public {
