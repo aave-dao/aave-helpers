@@ -31,6 +31,7 @@ struct ReserveConfig {
   bool isFrozen;
   bool isSiloed;
   bool isBorrowableInIsolation;
+  bool isFlashloanable;
   uint256 supplyCap;
   uint256 borrowCap;
   uint256 debtCeiling;
@@ -395,7 +396,7 @@ contract ProtocolV3TestBase is Test {
       string.concat(
         '| symbol | underlying | aToken | stableDebtToken | variableDebtToken | decimals | ltv | liquidationThreshold | liquidationBonus | ',
         'liquidationProtocolFee | reserveFactor | usageAsCollateralEnabled | borrowingEnabled | stableBorrowRateEnabled | supplyCap | borrowCap | debtCeiling | eModeCategory | ',
-        'interestRateStrategy | isActive | isFrozen | isSiloed |'
+        'interestRateStrategy | isActive | isFrozen | isSiloed | isBorrowableInIsolation | isFlashloanable |'
       )
     );
     vm.writeLine(
@@ -403,7 +404,7 @@ contract ProtocolV3TestBase is Test {
       string.concat(
         '|---|---|---|---|---|---|---|---|---',
         '|---|---|---|---|---|---|---|---|---',
-        '|---|---|---|---|'
+        '|---|---|---|---|---|---|'
       )
     );
     for (uint256 i = 0; i < configs.length; i++) {
@@ -460,6 +461,10 @@ contract ProtocolV3TestBase is Test {
             vm.toString(config.isFrozen),
             ' | ',
             vm.toString(config.isSiloed),
+            ' |',
+            vm.toString(config.isBorrowableInIsolation),
+            ' |',
+            vm.toString(config.isFlashloanable),
             ' |'
           )
         )
@@ -551,6 +556,8 @@ contract ProtocolV3TestBase is Test {
         ~uint256(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDFFFFFFFFFFFFFFF)) !=
       0;
 
+    localConfig.isFlashloanable = false; // TODO pdp.getFlashLoanEnabled(reserve.tokenAddress) once updated address book
+
     return localConfig;
   }
 
@@ -606,6 +613,7 @@ contract ProtocolV3TestBase is Test {
     console.log('Is frozen ', (config.isFrozen) ? 'Yes' : 'No');
     console.log('Is siloed ', (config.isSiloed) ? 'Yes' : 'No');
     console.log('Is borrowable in isolation ', (config.isBorrowableInIsolation) ? 'Yes' : 'No');
+    console.log('Is flashloanable ', (config.isFlashloanable) ? 'Yes' : 'No');
     console.log('-----');
     console.log('-----');
   }
@@ -669,6 +677,10 @@ contract ProtocolV3TestBase is Test {
     require(
       config.isBorrowableInIsolation == expectedConfig.isBorrowableInIsolation,
       '_validateConfigsInAave: INVALID_IS_BORROWABLE_IN_ISOLATION'
+    );
+    require(
+      config.isFlashloanable == expectedConfig.isFlashloanable,
+      '_validateConfigsInAave: INVALID_IS_FLASHLOANABLE'
     );
     require(
       config.supplyCap == expectedConfig.supplyCap,
@@ -841,6 +853,14 @@ contract ProtocolV3TestBase is Test {
     require(
       config1.isSiloed == config2.isSiloed,
       '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_IS_SILOED_CHANGED'
+    );
+    require(
+      config1.isBorrowableInIsolation == config2.isBorrowableInIsolation,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_IS_BORROWABLE_IN_ISOLATION_CHANGED'
+    );
+    require(
+      config1.isFlashloanable == config2.isFlashloanable,
+      '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_IS_FLASHLOANABLE_CHANGED'
     );
     require(
       config1.supplyCap == config2.supplyCap,

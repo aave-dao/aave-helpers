@@ -43,6 +43,7 @@ interface IGenericV3ListingEngine {
     bool enabledToBorrow;
     bool stableRateModeEnabled; // Only considered is enabledToBorrow == true
     bool borrowableInIsolation; // Only considered is enableToBorrow == true
+    bool flashloanable; // Independent from enabled to borrow: an asset can be flashloanble and not enabled to borrow
     uint256 ltv; // Only considered if liqThreshold > 0
     uint256 liqThreshold; // If `0`, the asset will not be enabled as collateral
     uint256 liqBonus; // Only considered if liqThreshold > 0

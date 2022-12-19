@@ -58,6 +58,7 @@ contract GenericV3ListingEngineTest is ProtocolV3TestBase {
       isFrozen: false,
       isSiloed: false,
       isBorrowableInIsolation: false,
+      isFlashloanable: false,
       supplyCap: 85_000,
       borrowCap: 60_000,
       debtCeiling: 0,
