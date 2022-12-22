@@ -2,7 +2,7 @@
 pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
-import {IAaveOracle, IPool, IPoolAddressesProvider, IAaveProtocolDataProvider, TokenData, IInterestRateStrategy, DataTypes} from 'aave-address-book/AaveV3.sol';
+import {IAaveOracle, IPool, IPoolAddressesProvider, IAaveProtocolDataProvider, IInterestRateStrategy, DataTypes} from 'aave-address-book/AaveV3.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 
 struct ReserveTokens {
@@ -39,7 +39,7 @@ struct ReserveConfig {
 }
 
 struct LocalVars {
-  TokenData[] reserves;
+  IAaveProtocolDataProvider.TokenData[] reserves;
   ReserveConfig[] configs;
 }
 
@@ -513,7 +513,7 @@ contract ProtocolV3TestBase is Test {
   function _getStructReserveConfig(
     IPool pool,
     IAaveProtocolDataProvider pdp,
-    TokenData memory reserve
+    IAaveProtocolDataProvider.TokenData memory reserve
   ) internal view returns (ReserveConfig memory) {
     ReserveConfig memory localConfig;
     (
