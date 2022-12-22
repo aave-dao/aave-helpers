@@ -8,3 +8,7 @@
 	path = lib/aave-v3-core
 	url = https://github.com/aave/aave-v3-core
 	branch = feat/3.0.1
+[submodule "lib/aave-address-book"]
+	path = lib/aave-address-book
+	url = https://github.com/bgd-labs/aave-address-book
+	branch = fix/backwards-compatibility
