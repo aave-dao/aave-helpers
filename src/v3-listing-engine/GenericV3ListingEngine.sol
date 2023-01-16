@@ -8,6 +8,7 @@ import {IGenericV3ListingEngine} from './IGenericV3ListingEngine.sol';
 
 /**
  * @dev Helper smart contract implementing a generalized Aave v3 listing flow for a set of assets
+ * Version 0.1
  * It is planned to be used via delegatecall, by any contract having appropriate permissions to
  * do a listing, or any other granular config
  * Assumptions:
@@ -56,18 +57,18 @@ contract GenericV3ListingEngine is IGenericV3ListingEngine {
 
     AssetsConfig memory configs = _repackListing(listings);
 
-    setPriceFeeds(configs.ids, configs.basics);
+    _setPriceFeeds(configs.ids, configs.basics);
 
-    initAssets(context, configs.ids, configs.basics);
+    _initAssets(context, configs.ids, configs.basics);
 
-    configureCaps(configs.ids, configs.caps);
+    _configureCaps(configs.ids, configs.caps);
 
-    configBorrowSide(configs.ids, configs.borrows);
+    _configBorrowSide(configs.ids, configs.borrows);
 
-    configCollateralSide(configs.ids, configs.collaterals);
+    _configCollateralSide(configs.ids, configs.collaterals);
   }
 
-  function setPriceFeeds(address[] memory ids, Basic[] memory basics) public {
+  function _setPriceFeeds(address[] memory ids, Basic[] memory basics) internal {
     address[] memory assets = new address[](ids.length);
     address[] memory sources = new address[](ids.length);
 
@@ -85,11 +86,11 @@ contract GenericV3ListingEngine is IGenericV3ListingEngine {
   }
 
   /// @dev mandatory configurations for any asset getting listed, including oracle config and basic init
-  function initAssets(
+  function _initAssets(
     PoolContext memory context,
     address[] memory ids,
     Basic[] memory basics
-  ) public {
+  ) internal {
     ConfiguratorInputTypes.InitReserveInput[]
       memory initReserveInputs = new ConfiguratorInputTypes.InitReserveInput[](ids.length);
     for (uint256 i = 0; i < ids.length; i++) {
@@ -136,7 +137,7 @@ contract GenericV3ListingEngine is IGenericV3ListingEngine {
     POOL_CONFIGURATOR.initReserves(initReserveInputs);
   }
 
-  function configureCaps(address[] memory ids, Caps[] memory caps) public {
+  function _configureCaps(address[] memory ids, Caps[] memory caps) internal {
     for (uint256 i = 0; i < ids.length; i++) {
       if (caps[i].supplyCap != 0) {
         POOL_CONFIGURATOR.setSupplyCap(ids[i], caps[i].supplyCap);
@@ -148,7 +149,7 @@ contract GenericV3ListingEngine is IGenericV3ListingEngine {
     }
   }
 
-  function configBorrowSide(address[] memory ids, Borrow[] memory borrows) public {
+  function _configBorrowSide(address[] memory ids, Borrow[] memory borrows) internal {
     for (uint256 i = 0; i < ids.length; i++) {
       if (borrows[i].enabledToBorrow) {
         POOL_CONFIGURATOR.setReserveBorrowing(ids[i], true);
@@ -179,7 +180,7 @@ contract GenericV3ListingEngine is IGenericV3ListingEngine {
     }
   }
 
-  function configCollateralSide(address[] memory ids, Collateral[] memory collaterals) public {
+  function _configCollateralSide(address[] memory ids, Collateral[] memory collaterals) internal {
     for (uint256 i = 0; i < ids.length; i++) {
       if (collaterals[i].liqThreshold != 0) {
         require(
