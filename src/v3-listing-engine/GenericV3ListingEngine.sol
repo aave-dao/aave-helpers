@@ -8,7 +8,6 @@ import {IGenericV3ListingEngine} from './IGenericV3ListingEngine.sol';
 
 /**
  * @dev Helper smart contract implementing a generalized Aave v3 listing flow for a set of assets
- * Version 0.1
  * It is planned to be used via delegatecall, by any contract having appropriate permissions to
  * do a listing, or any other granular config
  * Assumptions:
@@ -52,6 +51,7 @@ contract GenericV3ListingEngine is IGenericV3ListingEngine {
     COLLECTOR = collector;
   }
 
+  /// @inheritdoc IGenericV3ListingEngine
   function listAssets(PoolContext memory context, Listing[] memory listings) public {
     require(listings.length != 0, 'AT_LEAST_ONE_ASSET_REQUIRED');
 
@@ -193,7 +193,9 @@ contract GenericV3ListingEngine is IGenericV3ListingEngine {
           ids[i],
           collaterals[i].ltv,
           collaterals[i].liqThreshold,
-          100_00 + collaterals[i].liqBonus // Opinionated, seems more correct to define liqBonus as 5_00 for 5%
+          // For reference, this is to simplify the interaction with the Aave protocol,
+          // as there the definition is as e.g. 105% (5% bonus for liquidators)
+          100_00 + collaterals[i].liqBonus
         );
 
         POOL_CONFIGURATOR.setLiquidationProtocolFee(ids[i], collaterals[i].liqProtocolFee);
@@ -217,6 +219,7 @@ contract GenericV3ListingEngine is IGenericV3ListingEngine {
     Caps[] memory caps = new Caps[](listings.length);
 
     for (uint256 i = 0; i < listings.length; i++) {
+      require(listings[i].asset != address(0), 'INVALID_ASSET');
       ids[i] = listings[i].asset;
       basics[i] = Basic({
         assetSymbol: listings[i].assetSymbol,
