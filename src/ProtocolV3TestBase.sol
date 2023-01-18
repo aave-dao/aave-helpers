@@ -561,6 +561,36 @@ contract ProtocolV3TestBase is Test {
     return localConfig;
   }
 
+  // TODO This should probably be simplified with assembly, too much boilerplate
+  function _clone(ReserveConfig memory config) internal pure returns (ReserveConfig memory) {
+    return ReserveConfig({
+      symbol: config.symbol,
+      underlying: config.underlying,
+      aToken: config.aToken,
+      stableDebtToken: config.stableDebtToken,
+      variableDebtToken: config.variableDebtToken,
+      decimals: config.decimals,
+      ltv: config.ltv,
+      liquidationThreshold: config.liquidationThreshold,
+      liquidationBonus: config.liquidationBonus,
+      liquidationProtocolFee: config.liquidationProtocolFee,
+      reserveFactor: config.reserveFactor,
+      usageAsCollateralEnabled: config.usageAsCollateralEnabled,
+      borrowingEnabled: config.borrowingEnabled,
+      interestRateStrategy: config.interestRateStrategy,
+      stableBorrowRateEnabled: config.stableBorrowRateEnabled,
+      isActive: config.isActive,
+      isFrozen: config.isFrozen,
+      isSiloed: config.isSiloed,
+      isBorrowableInIsolation: config.isBorrowableInIsolation,
+      isFlashloanable: config.isFlashloanable,
+      supplyCap: config.supplyCap,
+      borrowCap: config.borrowCap,
+      debtCeiling: config.debtCeiling,
+      eModeCategory: config. eModeCategory
+    });
+  }
+
   function _findReserveConfig(ReserveConfig[] memory configs, address underlying)
     internal
     pure
@@ -568,7 +598,8 @@ contract ProtocolV3TestBase is Test {
   {
     for (uint256 i = 0; i < configs.length; i++) {
       if (configs[i].underlying == underlying) {
-        return configs[i];
+        // Important to clone the struct, to avoid unexpected side effect if modifying the returned config
+        return _clone(configs[i]);
       }
     }
     revert('RESERVE_CONFIG_NOT_FOUND');
@@ -583,7 +614,7 @@ contract ProtocolV3TestBase is Test {
         keccak256(abi.encodePacked(configs[i].symbol)) ==
         keccak256(abi.encodePacked(symbolOfUnderlying))
       ) {
-        return configs[i];
+        return _clone(configs[i]);
       }
     }
     revert('RESERVE_CONFIG_NOT_FOUND');
