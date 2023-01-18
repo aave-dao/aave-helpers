@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.5](https://github.com/bgd-labs/aave-helpers/compare/v1.2.3...v1.2.5) (2023-01-18)
+
+
+### Bug Fixes
+
+* add _clone() of ReserveConfig for _findReserveConfigBySymbol() and _findReserveConfig() ([#27](https://github.com/bgd-labs/aave-helpers/issues/27)) ([043e0cc](https://github.com/bgd-labs/aave-helpers/commit/043e0cc275882f44410bedd56f0d173c254e403c))
+
 ### [1.2.4](https://github.com/bgd-labs/aave-helpers/compare/v1.2.3...v1.2.4) (2023-01-17)
 
 ### [1.2.3](https://github.com/bgd-labs/aave-helpers/compare/v1.2.2...v1.2.3) (2022-12-22)
