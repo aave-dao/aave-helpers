@@ -12,7 +12,7 @@ on:
 
 jobs:
   test:
-    uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@a217dafb227aea4e25546ce24fe8241aa5a8a4cc
+    uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@4b1ca79965bd12f0ac705dbd8a885daf3addb69b
     secrets:
       RPC_POLYGON: ${{secrets.RPC_POLYGON}}
       RPC_MAINNET: ${{secrets.RPC_MAINNET}}
