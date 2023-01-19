@@ -514,7 +514,7 @@ contract ProtocolV3TestBase is Test {
     IPool pool,
     IPoolDataProvider pdp,
     IPoolDataProvider.TokenData memory reserve
-  ) internal view returns (ReserveConfig memory) {
+  ) internal view virtual returns (ReserveConfig memory) {
     ReserveConfig memory localConfig;
     (
       uint256 decimals,
@@ -563,32 +563,33 @@ contract ProtocolV3TestBase is Test {
 
   // TODO This should probably be simplified with assembly, too much boilerplate
   function _clone(ReserveConfig memory config) internal pure returns (ReserveConfig memory) {
-    return ReserveConfig({
-      symbol: config.symbol,
-      underlying: config.underlying,
-      aToken: config.aToken,
-      stableDebtToken: config.stableDebtToken,
-      variableDebtToken: config.variableDebtToken,
-      decimals: config.decimals,
-      ltv: config.ltv,
-      liquidationThreshold: config.liquidationThreshold,
-      liquidationBonus: config.liquidationBonus,
-      liquidationProtocolFee: config.liquidationProtocolFee,
-      reserveFactor: config.reserveFactor,
-      usageAsCollateralEnabled: config.usageAsCollateralEnabled,
-      borrowingEnabled: config.borrowingEnabled,
-      interestRateStrategy: config.interestRateStrategy,
-      stableBorrowRateEnabled: config.stableBorrowRateEnabled,
-      isActive: config.isActive,
-      isFrozen: config.isFrozen,
-      isSiloed: config.isSiloed,
-      isBorrowableInIsolation: config.isBorrowableInIsolation,
-      isFlashloanable: config.isFlashloanable,
-      supplyCap: config.supplyCap,
-      borrowCap: config.borrowCap,
-      debtCeiling: config.debtCeiling,
-      eModeCategory: config. eModeCategory
-    });
+    return
+      ReserveConfig({
+        symbol: config.symbol,
+        underlying: config.underlying,
+        aToken: config.aToken,
+        stableDebtToken: config.stableDebtToken,
+        variableDebtToken: config.variableDebtToken,
+        decimals: config.decimals,
+        ltv: config.ltv,
+        liquidationThreshold: config.liquidationThreshold,
+        liquidationBonus: config.liquidationBonus,
+        liquidationProtocolFee: config.liquidationProtocolFee,
+        reserveFactor: config.reserveFactor,
+        usageAsCollateralEnabled: config.usageAsCollateralEnabled,
+        borrowingEnabled: config.borrowingEnabled,
+        interestRateStrategy: config.interestRateStrategy,
+        stableBorrowRateEnabled: config.stableBorrowRateEnabled,
+        isActive: config.isActive,
+        isFrozen: config.isFrozen,
+        isSiloed: config.isSiloed,
+        isBorrowableInIsolation: config.isBorrowableInIsolation,
+        isFlashloanable: config.isFlashloanable,
+        supplyCap: config.supplyCap,
+        borrowCap: config.borrowCap,
+        debtCeiling: config.debtCeiling,
+        eModeCategory: config.eModeCategory
+      });
   }
 
   function _findReserveConfig(ReserveConfig[] memory configs, address underlying)
@@ -996,5 +997,58 @@ contract ProtocolV3TestBase is Test {
     } else {
       return (a == b) || (a == (b + 1)) || (a == (b - 1));
     }
+  }
+}
+
+contract ProtocolV3_0_1TestBase is ProtocolV3TestBase {
+  function _getStructReserveConfig(
+    IPool pool,
+    IPoolDataProvider pdp,
+    IPoolDataProvider.TokenData memory reserve
+  ) internal view override returns (ReserveConfig memory) {
+    ReserveConfig memory localConfig;
+    (
+      uint256 decimals,
+      uint256 ltv,
+      uint256 liquidationThreshold,
+      uint256 liquidationBonus,
+      uint256 reserveFactor,
+      bool usageAsCollateralEnabled,
+      bool borrowingEnabled,
+      bool stableBorrowRateEnabled,
+      bool isActive,
+      bool isFrozen
+    ) = pdp.getReserveConfigurationData(reserve.tokenAddress);
+    localConfig.symbol = reserve.symbol;
+    localConfig.underlying = reserve.tokenAddress;
+    localConfig.decimals = decimals;
+    localConfig.ltv = ltv;
+    localConfig.liquidationThreshold = liquidationThreshold;
+    localConfig.liquidationBonus = liquidationBonus;
+    localConfig.reserveFactor = reserveFactor;
+    localConfig.usageAsCollateralEnabled = usageAsCollateralEnabled;
+    localConfig.borrowingEnabled = borrowingEnabled;
+    localConfig.stableBorrowRateEnabled = stableBorrowRateEnabled;
+    localConfig.interestRateStrategy = pool
+      .getReserveData(reserve.tokenAddress)
+      .interestRateStrategyAddress;
+    localConfig.isActive = isActive;
+    localConfig.isFrozen = isFrozen;
+    localConfig.isSiloed = pdp.getSiloedBorrowing(reserve.tokenAddress);
+    (localConfig.borrowCap, localConfig.supplyCap) = pdp.getReserveCaps(reserve.tokenAddress);
+    localConfig.debtCeiling = pdp.getDebtCeiling(reserve.tokenAddress);
+    localConfig.eModeCategory = pdp.getReserveEModeCategory(reserve.tokenAddress);
+    localConfig.liquidationProtocolFee = pdp.getLiquidationProtocolFee(reserve.tokenAddress);
+
+    // TODO this should be improved, but at the moment is simpler to avoid importing the
+    // ReserveConfiguration library
+    localConfig.isBorrowableInIsolation =
+      (pool.getConfiguration(reserve.tokenAddress).data &
+        ~uint256(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDFFFFFFFFFFFFFFF)) !=
+      0;
+
+    localConfig.isFlashloanable = pdp.getFlashLoanEnabled(reserve.tokenAddress);
+
+    return localConfig;
   }
 }
