@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/bgd-labs/aave-helpers/compare/v1.2.3...v1.4.0) (2023-01-19)
+
+
+### Features
+
+* add 3_0_1 snapshot ([#32](https://github.com/bgd-labs/aave-helpers/issues/32)) ([3a17bb9](https://github.com/bgd-labs/aave-helpers/commit/3a17bb9ec62f30ce14126e6585d8a66c27ded5e0))
+* added TestWithExecutor contract to GovHelpers ([5449659](https://github.com/bgd-labs/aave-helpers/commit/5449659a6599af29d367e3753acfb056747f53a3))
+
+
+### Bug Fixes
+
+* add _clone() of ReserveConfig for _findReserveConfigBySymbol() and _findReserveConfig() ([#27](https://github.com/bgd-labs/aave-helpers/issues/27)) ([043e0cc](https://github.com/bgd-labs/aave-helpers/commit/043e0cc275882f44410bedd56f0d173c254e403c))
+
 ## [1.3.0](https://github.com/bgd-labs/aave-helpers/compare/v1.2.3...v1.3.0) (2023-01-19)
 
 
