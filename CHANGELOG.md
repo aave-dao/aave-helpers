@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/bgd-labs/aave-helpers/compare/v1.4.0...v1.5.0) (2023-01-26)
+
+
+### Features
+
+* add generic executor ([#34](https://github.com/bgd-labs/aave-helpers/issues/34)) ([8f5f9d3](https://github.com/bgd-labs/aave-helpers/commit/8f5f9d3e3b9bbf09cf90625d0f568f0025724f68))
+
 ## [1.4.0](https://github.com/bgd-labs/aave-helpers/compare/v1.2.3...v1.4.0) (2023-01-19)
 
 
