@@ -76,12 +76,8 @@ contract ProtocolV3TestBase is Test {
    * @param pool the pool to be snapshotted
    */
   function createConfigurationSnapshot(string memory reportName, IPool pool) public {
-    string memory path = string.concat(
-      './reports/',
-      vm.toString(address(pool)),
-      '_',
-      reportName,
-      '.md'
+    string memory path = string(
+      abi.encodePacked('./reports/', vm.toString(address(pool)), '_', reportName, '.md')
     );
     vm.writeFile(path, '# Report\n\n');
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
@@ -316,20 +312,22 @@ contract ProtocolV3TestBase is Test {
         );
         vm.writeLine(
           path,
-          string.concat(
-            '| ',
-            vm.toString(configs[i].eModeCategory),
-            ' | ',
-            category.label,
-            ' | ',
-            vm.toString(category.ltv),
-            ' | ',
-            vm.toString(category.liquidationThreshold),
-            ' | ',
-            vm.toString(category.liquidationBonus),
-            ' | ',
-            vm.toString(category.priceSource),
-            ' |'
+          string(
+            abi.encodePacked(
+              '| ',
+              vm.toString(configs[i].eModeCategory),
+              ' | ',
+              category.label,
+              ' | ',
+              vm.toString(category.ltv),
+              ' | ',
+              vm.toString(category.liquidationThreshold),
+              ' | ',
+              vm.toString(category.liquidationBonus),
+              ' | ',
+              vm.toString(category.priceSource),
+              ' |'
+            )
           )
         );
       }
@@ -341,9 +339,11 @@ contract ProtocolV3TestBase is Test {
     vm.writeLine(path, '## InterestRateStrategies\n');
     vm.writeLine(
       path,
-      string.concat(
-        '| strategy | getBaseStableBorrowRate | getStableRateSlope1 | getStableRateSlope2 | optimalStableToTotal | maxStabletoTotalExcess ',
-        '| getBaseVariableBorrowRate | getVariableRateSlope1 | getVariableRateSlope2 | optimalUsageRatio | maxExcessUsageRatio |'
+      string(
+        abi.encodePacked(
+          '| strategy | getBaseStableBorrowRate | getStableRateSlope1 | getStableRateSlope2 | optimalStableToTotal | maxStabletoTotalExcess ',
+          '| getBaseVariableBorrowRate | getVariableRateSlope1 | getVariableRateSlope2 | optimalUsageRatio | maxExcessUsageRatio |'
+        )
       )
     );
     vm.writeLine(path, '|---|---|---|---|---|---|---|---|---|---|---|');
@@ -356,33 +356,35 @@ contract ProtocolV3TestBase is Test {
         );
         vm.writeLine(
           path,
-          string.concat(
-            string.concat(
-              '| ',
-              vm.toString(address(strategy)),
-              ' | ',
-              vm.toString(strategy.getBaseStableBorrowRate()),
-              ' | ',
-              vm.toString(strategy.getStableRateSlope1()),
-              ' | ',
-              vm.toString(strategy.getStableRateSlope2()),
-              ' | ',
-              vm.toString(strategy.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO()),
-              ' | ',
-              vm.toString(strategy.MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO()),
-              ' | '
-            ),
-            string.concat(
-              vm.toString(strategy.getBaseVariableBorrowRate()),
-              ' | ',
-              vm.toString(strategy.getVariableRateSlope1()),
-              ' | ',
-              vm.toString(strategy.getVariableRateSlope2()),
-              ' | ',
-              vm.toString(strategy.OPTIMAL_USAGE_RATIO()),
-              ' | ',
-              vm.toString(strategy.MAX_EXCESS_USAGE_RATIO()),
-              ' |'
+          string(
+            abi.encodePacked(
+              abi.encodePacked(
+                '| ',
+                vm.toString(address(strategy)),
+                ' | ',
+                vm.toString(strategy.getBaseStableBorrowRate()),
+                ' | ',
+                vm.toString(strategy.getStableRateSlope1()),
+                ' | ',
+                vm.toString(strategy.getStableRateSlope2()),
+                ' | ',
+                vm.toString(strategy.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO()),
+                ' | ',
+                vm.toString(strategy.MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO()),
+                ' | '
+              ),
+              abi.encodePacked(
+                vm.toString(strategy.getBaseVariableBorrowRate()),
+                ' | ',
+                vm.toString(strategy.getVariableRateSlope1()),
+                ' | ',
+                vm.toString(strategy.getVariableRateSlope2()),
+                ' | ',
+                vm.toString(strategy.OPTIMAL_USAGE_RATIO()),
+                ' | ',
+                vm.toString(strategy.MAX_EXCESS_USAGE_RATIO()),
+                ' |'
+              )
             )
           )
         );
@@ -395,79 +397,87 @@ contract ProtocolV3TestBase is Test {
     vm.writeLine(path, '## Reserve Configurations\n');
     vm.writeLine(
       path,
-      string.concat(
-        '| symbol | underlying | aToken | stableDebtToken | variableDebtToken | decimals | ltv | liquidationThreshold | liquidationBonus | ',
-        'liquidationProtocolFee | reserveFactor | usageAsCollateralEnabled | borrowingEnabled | stableBorrowRateEnabled | supplyCap | borrowCap | debtCeiling | eModeCategory | ',
-        'interestRateStrategy | isActive | isFrozen | isSiloed | isBorrowableInIsolation | isFlashloanable |'
+      string(
+        abi.encodePacked(
+          '| symbol | underlying | aToken | stableDebtToken | variableDebtToken | decimals | ltv | liquidationThreshold | liquidationBonus | ',
+          'liquidationProtocolFee | reserveFactor | usageAsCollateralEnabled | borrowingEnabled | stableBorrowRateEnabled | supplyCap | borrowCap | debtCeiling | eModeCategory | ',
+          'interestRateStrategy | isActive | isFrozen | isSiloed | isBorrowableInIsolation | isFlashloanable |'
+        )
       )
     );
     vm.writeLine(
       path,
-      string.concat(
-        '|---|---|---|---|---|---|---|---|---',
-        '|---|---|---|---|---|---|---|---|---',
-        '|---|---|---|---|---|---|'
+      string(
+        abi.encodePacked(
+          '|---|---|---|---|---|---|---|---|---',
+          '|---|---|---|---|---|---|---|---|---',
+          '|---|---|---|---|---|---|'
+        )
       )
     );
     for (uint256 i = 0; i < configs.length; i++) {
       ReserveConfig memory config = configs[i];
       vm.writeLine(
         path,
-        string.concat(
-          string.concat(
-            '| ',
-            config.symbol,
-            ' | ',
-            vm.toString(config.underlying),
-            ' | ',
-            vm.toString(config.aToken),
-            ' | ',
-            vm.toString(config.stableDebtToken),
-            ' | ',
-            vm.toString(config.variableDebtToken),
-            ' | ',
-            vm.toString(config.decimals),
-            ' | ',
-            vm.toString(config.ltv),
-            ' | ',
-            vm.toString(config.liquidationThreshold),
-            ' | ',
-            vm.toString(config.liquidationBonus),
-            ' | '
-          ),
-          string.concat(
-            vm.toString(config.liquidationProtocolFee),
-            ' | ',
-            vm.toString(config.reserveFactor),
-            ' | ',
-            vm.toString(config.usageAsCollateralEnabled),
-            ' | ',
-            vm.toString(config.borrowingEnabled),
-            ' | ',
-            vm.toString(config.stableBorrowRateEnabled),
-            ' | ',
-            vm.toString(config.supplyCap),
-            ' | ',
-            vm.toString(config.borrowCap),
-            ' | ',
-            vm.toString(config.debtCeiling),
-            ' | ',
-            vm.toString(config.eModeCategory),
-            ' | '
-          ),
-          string.concat(
-            vm.toString(config.interestRateStrategy),
-            ' | ',
-            vm.toString(config.isActive),
-            ' | ',
-            vm.toString(config.isFrozen),
-            ' | ',
-            vm.toString(config.isSiloed),
-            ' |',
-            vm.toString(config.isBorrowableInIsolation),
-            ' |',
-            vm.toString(config.isFlashloanable),
-            ' |'
+        string(
+          abi.encodePacked(
+            abi.encodePacked(
+              '| ',
+              config.symbol,
+              ' | ',
+              vm.toString(config.underlying),
+              ' | ',
+              vm.toString(config.aToken),
+              ' | ',
+              vm.toString(config.stableDebtToken),
+              ' | ',
+              vm.toString(config.variableDebtToken),
+              ' | ',
+              vm.toString(config.decimals),
+              ' | '
+            ),
+            abi.encodePacked(
+              vm.toString(config.ltv),
+              ' | ',
+              vm.toString(config.liquidationThreshold),
+              ' | ',
+              vm.toString(config.liquidationBonus),
+              ' | ',
+              vm.toString(config.liquidationProtocolFee),
+              ' | ',
+              vm.toString(config.reserveFactor),
+              ' | ',
+              vm.toString(config.usageAsCollateralEnabled),
+              ' | '
+            ),
+            abi.encodePacked(
+              vm.toString(config.borrowingEnabled),
+              ' | ',
+              vm.toString(config.stableBorrowRateEnabled),
+              ' | ',
+              vm.toString(config.supplyCap),
+              ' | ',
+              vm.toString(config.borrowCap),
+              ' | ',
+              vm.toString(config.debtCeiling),
+              ' | ',
+              vm.toString(config.eModeCategory),
+              ' | '
+            ),
+            abi.encodePacked(
+              vm.toString(config.interestRateStrategy),
+              ' | ',
+              vm.toString(config.isActive),
+              ' | ',
+              vm.toString(config.isFrozen),
+              ' | ',
+              vm.toString(config.isSiloed),
+              ' |',
+              vm.toString(config.isBorrowableInIsolation),
+              ' |',
+              vm.toString(config.isFlashloanable),
+              ' |'
+            )
           )
         )
       );
