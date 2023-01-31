@@ -5,6 +5,18 @@ import 'forge-std/Test.sol';
 import {IAaveOracle, ILendingPool, ILendingPoolAddressesProvider, IAaveProtocolDataProvider, DataTypes, TokenData} from 'aave-address-book/AaveV2.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 
+interface ILendingRateOracle {
+  /**
+    @dev returns the market borrow rate in ray
+    **/
+  function getMarketBorrowRate(address asset) external view returns (uint256);
+
+  /**
+    @dev sets the market borrow rate. Rate value must be in ray
+    **/
+  function setMarketBorrowRate(address asset, uint256 rate) external;
+}
+
 interface IDefaultInterestRateStrategy {
   function EXCESS_UTILIZATION_RATE() external view returns (uint256);
 
@@ -74,8 +86,6 @@ struct LocalVars {
 struct InterestStrategyValues {
   address addressesProvider;
   uint256 optimalUsageRatio;
-  // uint256 optimalStableToTotalDebtRatio;
-  // uint256 baseStableBorrowRate;
   uint256 stableRateSlope1;
   uint256 stableRateSlope2;
   uint256 baseVariableBorrowRate;
@@ -109,7 +119,11 @@ contract ProtocolV2TestBase is Test {
     );
     vm.writeFile(path, '# Report\n\n');
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    _writeReserveConfigs(path, configs);
+    ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(
+      pool.getAddressesProvider()
+    );
+    ILendingRateOracle oracle = ILendingRateOracle(addressesProvider.getLendingRateOracle());
+    _writeReserveConfigs(path, configs, oracle);
     _writeStrategyConfigs(path, configs);
   }
 
@@ -325,12 +339,12 @@ contract ProtocolV2TestBase is Test {
       path,
       string(
         abi.encodePacked(
-          '| strategy | getBaseStableBorrowRate | getStableRateSlope1 | getStableRateSlope2 ',
+          '| strategy | getStableRateSlope1 | getStableRateSlope2 ',
           '| getBaseVariableBorrowRate | getVariableRateSlope1 | getVariableRateSlope2 | optimalUtilizationRatio | excessUtilizationRatio |'
         )
       )
     );
-    vm.writeLine(path, '|---|---|---|---|---|---|---|---|---|');
+    vm.writeLine(path, '|---|---|---|---|---|---|---|---|');
     address[] memory usedStrategies = new address[](configs.length);
     for (uint256 i = 0; i < configs.length; i++) {
       if (!_isInAddressArray(usedStrategies, configs[i].interestRateStrategy)) {
@@ -345,8 +359,6 @@ contract ProtocolV2TestBase is Test {
               abi.encodePacked(
                 '| ',
                 vm.toString(address(strategy)),
-                ' | ',
-                'TODO',
                 ' | ',
                 vm.toString(strategy.stableRateSlope1()),
                 ' | ',
@@ -373,7 +385,11 @@ contract ProtocolV2TestBase is Test {
     vm.writeLine(path, '\n');
   }
 
-  function _writeReserveConfigs(string memory path, ReserveConfig[] memory configs) internal {
+  function _writeReserveConfigs(
+    string memory path,
+    ReserveConfig[] memory configs,
+    ILendingRateOracle oracle
+  ) internal {
     vm.writeLine(path, '## Reserve Configurations\n');
     vm.writeLine(
       path,
@@ -381,14 +397,17 @@ contract ProtocolV2TestBase is Test {
         abi.encodePacked(
           '| symbol | underlying | aToken | stableDebtToken | variableDebtToken | decimals | ltv | liquidationThreshold | liquidationBonus | ',
           'reserveFactor | usageAsCollateralEnabled | borrowingEnabled | stableBorrowRateEnabled | ',
-          'interestRateStrategy | isActive | isFrozen |'
+          'interestRateStrategy | isActive | isFrozen | baseStableBorrowRate |'
         )
       )
     );
     vm.writeLine(
       path,
       string(
-        abi.encodePacked('|---|---|---|---|---|---|---|---', '|---|---|---|---|---|---|---|---|')
+        abi.encodePacked(
+          '|---|---|---|---|---|---|---|---',
+          '|---|---|---|---|---|---|---|---|---|'
+        )
       )
     );
     for (uint256 i = 0; i < configs.length; i++) {
@@ -436,6 +455,8 @@ contract ProtocolV2TestBase is Test {
               vm.toString(config.isActive),
               ' | ',
               vm.toString(config.isFrozen),
+              ' | ',
+              vm.toString(oracle.getMarketBorrowRate(config.underlying)),
               ' |'
             )
           )
@@ -676,11 +697,6 @@ contract ProtocolV2TestBase is Test {
       strategy.baseVariableBorrowRate() == expectedStrategyValues.baseVariableBorrowRate,
       '_validateInterestRateStrategy() : INVALID_BASE_VARIABLE_BORROW'
     );
-    // TODO:
-    // require(
-    //   strategy.baseStableBorrowRate() == expectedStrategyValues.baseStableBorrowRate,
-    //   '_validateInterestRateStrategy() : INVALID_BASE_VARIABLE_BORROW'
-    // );
     require(
       strategy.stableRateSlope1() == expectedStrategyValues.stableRateSlope1,
       '_validateInterestRateStrategy() : INVALID_STABLE_SLOPE_1'
