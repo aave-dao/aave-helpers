@@ -4,6 +4,7 @@ pragma solidity >=0.7.5 <0.9.0;
 import 'forge-std/Test.sol';
 import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes} from 'aave-address-book/AaveV3.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 
 struct ReserveTokens {
   address aToken;
@@ -53,16 +54,6 @@ struct InterestStrategyValues {
   uint256 baseVariableBorrowRate;
   uint256 variableRateSlope1;
   uint256 variableRateSlope2;
-}
-
-interface IInitializableAdminUpgradeabilityProxy {
-  function upgradeTo(address newImplementation) external;
-
-  function upgradeToAndCall(address newImplementation, bytes calldata data) external payable;
-
-  function admin() external returns (address);
-
-  function implementation() external returns (address);
 }
 
 contract ProtocolV3TestBase is Test {

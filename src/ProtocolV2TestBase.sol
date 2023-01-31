@@ -2,56 +2,9 @@
 pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
-import {IAaveOracle, ILendingPool, ILendingPoolAddressesProvider, IAaveProtocolDataProvider, DataTypes, TokenData} from 'aave-address-book/AaveV2.sol';
+import {IAaveOracle, ILendingPool, ILendingPoolAddressesProvider, IAaveProtocolDataProvider, DataTypes, TokenData, ILendingRateOracle, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV2.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
-
-interface ILendingRateOracle {
-  /**
-    @dev returns the market borrow rate in ray
-    **/
-  function getMarketBorrowRate(address asset) external view returns (uint256);
-
-  /**
-    @dev sets the market borrow rate. Rate value must be in ray
-    **/
-  function setMarketBorrowRate(address asset, uint256 rate) external;
-}
-
-interface IDefaultInterestRateStrategy {
-  function EXCESS_UTILIZATION_RATE() external view returns (uint256);
-
-  function OPTIMAL_UTILIZATION_RATE() external view returns (uint256);
-
-  function addressesProvider() external view returns (address);
-
-  function baseVariableBorrowRate() external view returns (uint256);
-
-  function calculateInterestRates(
-    address reserve,
-    uint256 availableLiquidity,
-    uint256 totalStableDebt,
-    uint256 totalVariableDebt,
-    uint256 averageStableBorrowRate,
-    uint256 reserveFactor
-  )
-    external
-    view
-    returns (
-      uint256,
-      uint256,
-      uint256
-    );
-
-  function getMaxVariableBorrowRate() external view returns (uint256);
-
-  function stableRateSlope1() external view returns (uint256);
-
-  function stableRateSlope2() external view returns (uint256);
-
-  function variableRateSlope1() external view returns (uint256);
-
-  function variableRateSlope2() external view returns (uint256);
-}
+import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 
 struct ReserveTokens {
   address aToken;
@@ -91,16 +44,6 @@ struct InterestStrategyValues {
   uint256 baseVariableBorrowRate;
   uint256 variableRateSlope1;
   uint256 variableRateSlope2;
-}
-
-interface IInitializableAdminUpgradeabilityProxy {
-  function upgradeTo(address newImplementation) external;
-
-  function upgradeToAndCall(address newImplementation, bytes calldata data) external payable;
-
-  function admin() external returns (address);
-
-  function implementation() external returns (address);
 }
 
 contract ProtocolV2TestBase is Test {
