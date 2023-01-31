@@ -214,7 +214,7 @@ contract ProtocolV3TestBase is Test {
     console.log('WITHDRAW: %s, Amount: %s', config.symbol, amountOut);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
     if (aTokenBefore < amount) {
-      require(aTokenAfter == 0, '_widthdraw(): DUST_AFTER_WITHDRAW_ALL');
+      require(aTokenAfter == 0, '_withdraw(): DUST_AFTER_WITHDRAW_ALL');
     } else {
       require(
         _almostEqual(aTokenAfter, aTokenBefore - amount),
