@@ -198,7 +198,7 @@ contract ProtocolV3TestBase is Test {
     console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
     pool.deposit(config.underlying, amount, user, 0);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
-    require(_almostEqual(aTokenAfter, aTokenBefore + amount), '_deposit() : ERROR');
+    assertApproxEqAbs(aTokenAfter, aTokenBefore + amount, 1);
     vm.stopPrank();
   }
 
@@ -216,10 +216,7 @@ contract ProtocolV3TestBase is Test {
     if (aTokenBefore < amount) {
       require(aTokenAfter == 0, '_withdraw(): DUST_AFTER_WITHDRAW_ALL');
     } else {
-      require(
-        _almostEqual(aTokenAfter, aTokenBefore - amount),
-        '_withdraw() : INCONSISTENT_ATOKEN_BALANCE_AFTER'
-      );
+      assertApproxEqAbs(aTokenAfter, aTokenBefore - amount, 1);
     }
     vm.stopPrank();
     return amountOut;
@@ -238,7 +235,7 @@ contract ProtocolV3TestBase is Test {
     console.log('BORROW: %s, Amount %s, Stable: %s', config.symbol, amount, stable);
     pool.borrow(config.underlying, amount, stable ? 1 : 2, 0, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
-    require(_almostEqual(debtAfter, debtBefore + amount), '_borrow() : ERROR');
+    assertApproxEqAbs(debtAfter, debtBefore + amount, 1);
     vm.stopPrank();
   }
 
@@ -988,15 +985,6 @@ contract ProtocolV3TestBase is Test {
     }
     if (countCategory < expectedAssets.length) {
       revert('_getAssetOnEmodeCategory(): LESS_ASSETS_IN_CATEGORY_THAN_EXPECTED');
-    }
-  }
-
-  /// @dev To contemplate +1/-1 precision issues when rounding, mainly on aTokens
-  function _almostEqual(uint256 a, uint256 b) internal pure returns (bool) {
-    if (b == 0) {
-      return (a == b) || (a == (b + 1));
-    } else {
-      return (a == b) || (a == (b + 1)) || (a == (b - 1));
     }
   }
 }
