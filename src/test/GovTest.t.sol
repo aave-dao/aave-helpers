@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {DelegatecallProposalCreationHelper, GovHelpers} from '../GovHelpers.sol';
 
-contract ProtocolV2TestBaseTest is Test {
+contract GovernanceTest is Test {
   function setUp() public {
     vm.createSelectFork('mainnet', 16526807);
   }
@@ -19,10 +19,4 @@ contract ProtocolV2TestBaseTest is Test {
     DelegatecallProposalCreationHelper.createProposal(delegateCalls, bytes32('ipfs'));
     vm.stopPrank();
   }
-
-  // commented out as it is insanely slow with public rpcs
-  // function testE2E() public {
-  //   address user = address(3);
-  //   this.e2eTest(AaveV3Polygon.POOL, user);
-  // }
 }
