@@ -390,7 +390,7 @@ contract ProtocolV3TestBase is Test {
         abi.encodePacked(
           '| symbol | underlying | aToken | stableDebtToken | variableDebtToken | decimals | ltv | liquidationThreshold | liquidationBonus | ',
           'liquidationProtocolFee | reserveFactor | usageAsCollateralEnabled | borrowingEnabled | stableBorrowRateEnabled | supplyCap | borrowCap | debtCeiling | eModeCategory | ',
-          'interestRateStrategy | isActive | isFrozen | isSiloed | isBorrowableInIsolation | isFlashloanable | aTokenImpl | sTokenImpl | vTokenImpl |'
+          'interestRateStrategy | isActive | isFrozen | isSiloed | isBorrowableInIsolation | isFlashloanable | aTokenImpl | stableDebtTokenImpl | variableDebtTokenImpl |'
         )
       )
     );
