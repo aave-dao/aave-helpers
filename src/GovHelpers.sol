@@ -6,9 +6,20 @@ import {Vm} from 'forge-std/Vm.sol';
 import {Test} from 'forge-std/Test.sol';
 import {AaveGovernanceV2, IAaveGovernanceV2, IExecutorWithTimelock} from 'aave-address-book/AaveGovernanceV2.sol';
 import {IPoolAddressesProvider} from 'aave-address-book/AaveV3.sol';
+import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 
-library DelegatecallProposalCreationHelper {
+library GovHelpers {
+  struct SPropCreateParams {
+    address executor;
+    address[] targets;
+    uint256[] values;
+    string[] signatures;
+    bytes[] calldatas;
+    bool[] withDelegatecalls;
+    bytes32 ipfsHash;
+  }
+
   struct DelegateCallProposal {
     address target;
     string signature;
@@ -58,7 +69,7 @@ library DelegatecallProposalCreationHelper {
       });
   }
 
-  function createProposal(DelegateCallProposal[] memory delegateCalls, bytes32 ipfsHash)
+  function createDelegateCallProposal(DelegateCallProposal[] memory delegateCalls, bytes32 ipfsHash)
     internal
     returns (uint256)
   {
@@ -86,37 +97,17 @@ library DelegatecallProposalCreationHelper {
         ipfsHash
       );
   }
-}
-
-library GovHelpers {
-  struct SPropCreateParams {
-    address executor;
-    address[] targets;
-    uint256[] values;
-    string[] signatures;
-    bytes[] calldatas;
-    bool[] withDelegatecalls;
-    bytes32 ipfsHash;
-  }
-
-  IAaveGovernanceV2 internal constant GOV =
-    IAaveGovernanceV2(0xEC568fffba86c094cf06b22134B23074DFE2252c);
-
-  address public constant SHORT_EXECUTOR = 0xEE56e2B3D491590B5b31738cC34d5232F378a8D5;
-
-  address public constant LONG_EXECUTOR = 0x79426A1c24B2978D90d7A5070a46C65B07bC4299;
-
-  address public constant AAVE = 0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9;
-
-  address internal constant AAVE_WHALE = address(0x25F2226B597E8F9514B3F68F00f494cF4f286491);
 
   /**
    * Impersonate the ecosystem reserve and created the proposal.
    */
-  function createProposal(Vm vm, SPropCreateParams memory params) internal returns (uint256) {
-    vm.deal(AAVE_WHALE, 1 ether);
-    vm.startPrank(AAVE_WHALE);
-    uint256 proposalId = GOV.create(
+  function createProposalAsWhale(Vm vm, SPropCreateParams memory params)
+    internal
+    returns (uint256)
+  {
+    vm.deal(AaveMisc.ECOSYSTEM_RESERVE, 1 ether);
+    vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
+    uint256 proposalId = AaveGovernanceV2.GOV.create(
       IExecutorWithTimelock(params.executor),
       params.targets,
       params.values,
@@ -140,13 +131,13 @@ library GovHelpers {
   function passVoteAndExecute(Vm vm, uint256 proposalId) internal {
     uint256 power = 5000000 ether;
     vm.roll(block.number + 1);
-    vm.store(address(GOV), _getProposalSlot(proposalId), bytes32(power));
-    uint256 endBlock = GOV.getProposalById(proposalId).endBlock;
+    vm.store(address(AaveGovernanceV2.GOV), _getProposalSlot(proposalId), bytes32(power));
+    uint256 endBlock = AaveGovernanceV2.GOV.getProposalById(proposalId).endBlock;
     vm.roll(endBlock + 1);
-    GOV.queue(proposalId);
-    uint256 executionTime = GOV.getProposalById(proposalId).executionTime;
+    AaveGovernanceV2.GOV.queue(proposalId);
+    uint256 executionTime = AaveGovernanceV2.GOV.getProposalById(proposalId).executionTime;
     vm.warp(executionTime + 1);
-    GOV.execute(proposalId);
+    AaveGovernanceV2.GOV.execute(proposalId);
   }
 
   function getProposalById(uint256 proposalId)
@@ -154,7 +145,7 @@ library GovHelpers {
     view
     returns (IAaveGovernanceV2.ProposalWithoutVotes memory)
   {
-    return GOV.getProposalById(proposalId);
+    return AaveGovernanceV2.GOV.getProposalById(proposalId);
   }
 }
 

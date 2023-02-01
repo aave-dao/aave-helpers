@@ -2,8 +2,8 @@
 pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
+import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {ProxyHelpers} from '../ProxyHelpers.sol';
-import {GovHelpers} from '../GovHelpers.sol';
 
 contract ProxyHelpersTest is Test {
   function setUp() public {
@@ -15,7 +15,7 @@ contract ProxyHelpersTest is Test {
       vm,
       0x41A08648C3766F9F9d85598fF102a08f4ef84F84
     );
-    assertEq(admin, GovHelpers.SHORT_EXECUTOR);
+    assertEq(admin, AaveGovernanceV2.SHORT_EXECUTOR);
   }
 
   function testImplementation() public {
