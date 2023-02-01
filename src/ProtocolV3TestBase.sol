@@ -5,6 +5,7 @@ import 'forge-std/Test.sol';
 import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes} from 'aave-address-book/AaveV3.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
+import {ProxyHelpers} from './ProxyHelpers.sol';
 
 struct ReserveTokens {
   address aToken;
@@ -389,7 +390,7 @@ contract ProtocolV3TestBase is Test {
         abi.encodePacked(
           '| symbol | underlying | aToken | stableDebtToken | variableDebtToken | decimals | ltv | liquidationThreshold | liquidationBonus | ',
           'liquidationProtocolFee | reserveFactor | usageAsCollateralEnabled | borrowingEnabled | stableBorrowRateEnabled | supplyCap | borrowCap | debtCeiling | eModeCategory | ',
-          'interestRateStrategy | isActive | isFrozen | isSiloed | isBorrowableInIsolation | isFlashloanable |'
+          'interestRateStrategy | isActive | isFrozen | isSiloed | isBorrowableInIsolation | isFlashloanable | aTokenImpl | sTokenImpl | vTokenImpl |'
         )
       )
     );
@@ -399,7 +400,7 @@ contract ProtocolV3TestBase is Test {
         abi.encodePacked(
           '|---|---|---|---|---|---|---|---|---',
           '|---|---|---|---|---|---|---|---|---',
-          '|---|---|---|---|---|---|'
+          '|---|---|---|---|---|---|---|---|---|'
         )
       )
     );
@@ -460,10 +461,33 @@ contract ProtocolV3TestBase is Test {
               vm.toString(config.isFrozen),
               ' | ',
               vm.toString(config.isSiloed),
-              ' |',
+              ' | ',
               vm.toString(config.isBorrowableInIsolation),
-              ' |',
+              ' | ',
               vm.toString(config.isFlashloanable),
+              ' | '
+            ),
+            abi.encodePacked(
+              vm.toString(
+                ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+                  vm,
+                  config.aToken
+                )
+              ),
+              ' | ',
+              vm.toString(
+                ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+                  vm,
+                  config.stableDebtToken
+                )
+              ),
+              ' | ',
+              vm.toString(
+                ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+                  vm,
+                  config.variableDebtToken
+                )
+              ),
               ' |'
             )
           )
