@@ -8,6 +8,86 @@ import {AaveGovernanceV2, IAaveGovernanceV2, IExecutorWithTimelock} from 'aave-a
 import {IPoolAddressesProvider} from 'aave-address-book/AaveV3.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 
+library DelegatecallProposalCreationHelper {
+  struct DelegateCallProposal {
+    address target;
+    string signature;
+    bytes callData;
+  }
+
+  function createMainnetDelegateCall(address payloadAddress)
+    internal
+    returns (DelegateCallProposal memory)
+  {
+    return DelegateCallProposal({target: payloadAddress, signature: 'execute()', callData: ''});
+  }
+
+  function createOptimismDelegateCall(address payloadAddress)
+    internal
+    returns (DelegateCallProposal memory)
+  {
+    return
+      DelegateCallProposal({
+        target: AaveGovernanceV2.CROSSCHAIN_FORWARDER_OPTIMISM,
+        signature: 'execute(address)',
+        callData: abi.encode(payloadAddress)
+      });
+  }
+
+  function createArbitrumDelegateCall(address payloadAddress)
+    internal
+    returns (DelegateCallProposal memory)
+  {
+    return
+      DelegateCallProposal({
+        target: AaveGovernanceV2.CROSSCHAIN_FORWARDER_ARBITRUM,
+        signature: 'execute(address)',
+        callData: abi.encode(payloadAddress)
+      });
+  }
+
+  function createPolygonDelegateCall(address payloadAddress)
+    internal
+    returns (DelegateCallProposal memory)
+  {
+    return
+      DelegateCallProposal({
+        target: AaveGovernanceV2.CROSSCHAIN_FORWARDER_POLYGON,
+        signature: 'execute(address)',
+        callData: abi.encode(payloadAddress)
+      });
+  }
+
+  function createProposal(DelegateCallProposal[] memory delegateCalls, bytes32 ipfsHash)
+    internal
+    returns (uint256)
+  {
+    address[] memory targets = new address[](delegateCalls.length);
+    uint256[] memory values = new uint256[](delegateCalls.length);
+    string[] memory signatures = new string[](delegateCalls.length);
+    bytes[] memory calldatas = new bytes[](delegateCalls.length);
+    bool[] memory withDelegatecalls = new bool[](delegateCalls.length);
+    for (uint256 i = 0; i < delegateCalls.length; i++) {
+      targets[i] = delegateCalls[i].target;
+      signatures[i] = delegateCalls[i].signature;
+      calldatas[i] = delegateCalls[i].callData;
+      values[i] = 0;
+      withDelegatecalls[i] = true;
+    }
+
+    return
+      AaveGovernanceV2.GOV.create(
+        IExecutorWithTimelock(AaveGovernanceV2.SHORT_EXECUTOR),
+        targets,
+        values,
+        signatures,
+        calldatas,
+        withDelegatecalls,
+        ipfsHash
+      );
+  }
+}
+
 library GovHelpers {
   struct SPropCreateParams {
     address executor;
