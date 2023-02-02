@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/bgd-labs/aave-helpers/compare/v1.6.0...v2.0.0) (2023-02-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* - gov helpers no longer re-exports addresses, fetch them from address-book instead (https://github.com/bgd-labs/aave-address-book/blob/main/src/AaveGovernanceV2.sol)
+- `createProposal` was renamed to `createTestProposal`
+- the new `createProposal` is intended to be used for actual proposal creation and enforces delegatecall style proposals
+
+### Features
+
+* add implementation snapshots to v3 configurationSnapshots ([#43](https://github.com/bgd-labs/aave-helpers/issues/43)) ([e10aa98](https://github.com/bgd-labs/aave-helpers/commit/e10aa98d42b5cafa862671fee189e0d54a2fddfa))
+
+
+* !feat: proposal creation helpers (#42) ([13a9871](https://github.com/bgd-labs/aave-helpers/commit/13a987167450a65fe27d9df940628c26b6780b33)), closes [#42](https://github.com/bgd-labs/aave-helpers/issues/42)
+
 ## [1.6.0](https://github.com/bgd-labs/aave-helpers/compare/v1.5.0...v1.6.0) (2023-01-31)
 
 
