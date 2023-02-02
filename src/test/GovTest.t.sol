@@ -11,14 +11,12 @@ contract GovernanceTest is Test {
   }
 
   function testCreateProposal() public {
-    GovHelpers.DelegateCallProposal[] memory delegateCalls = new GovHelpers.DelegateCallProposal[](
-      2
-    );
-    delegateCalls[0] = GovHelpers.createMainnetDelegateCall(address(1));
-    delegateCalls[1] = GovHelpers.createPolygonDelegateCall(address(2));
+    GovHelpers.Payload[] memory payloads = new GovHelpers.Payload[](2);
+    payloads[0] = GovHelpers.buildMainnet(address(1));
+    payloads[1] = GovHelpers.buildPolygon(address(2));
 
     vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
-    GovHelpers.createDelegateCallProposal(delegateCalls, bytes32('ipfs'));
+    GovHelpers.createProposal(payloads, bytes32('ipfs'));
     vm.stopPrank();
   }
 }

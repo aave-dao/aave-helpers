@@ -20,59 +20,61 @@ library GovHelpers {
     bytes32 ipfsHash;
   }
 
-  struct DelegateCallProposal {
+  struct Payload {
     address target;
     string signature;
     bytes callData;
   }
 
-  function createMainnetDelegateCall(address payloadAddress)
-    internal
-    returns (DelegateCallProposal memory)
-  {
-    return DelegateCallProposal({target: payloadAddress, signature: 'execute()', callData: ''});
+  function buildMainnet(address payloadAddress) internal returns (Payload memory) {
+    require(
+      payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_OPTIMISM &&
+        payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_ARBITRUM &&
+        payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_POLYGON,
+      'PAYLOAD_CANT_BE_FORWARDER'
+    );
+
+    return Payload({target: payloadAddress, signature: 'execute()', callData: ''});
   }
 
-  function createOptimismDelegateCall(address payloadAddress)
-    internal
-    returns (DelegateCallProposal memory)
-  {
+  function buildOptimism(address payloadAddress) internal returns (Payload memory) {
     return
-      DelegateCallProposal({
-        target: AaveGovernanceV2.CROSSCHAIN_FORWARDER_OPTIMISM,
+      _buildL2({
+        forwarder: AaveGovernanceV2.CROSSCHAIN_FORWARDER_OPTIMISM,
+        payloadAddress: payloadAddress
+      });
+  }
+
+  function buildArbitrum(address payloadAddress) internal returns (Payload memory) {
+    return
+      _buildL2({
+        forwarder: AaveGovernanceV2.CROSSCHAIN_FORWARDER_ARBITRUM,
+        payloadAddress: payloadAddress
+      });
+  }
+
+  function buildPolygon(address payloadAddress) internal returns (Payload memory) {
+    return
+      _buildL2({
+        forwarder: AaveGovernanceV2.CROSSCHAIN_FORWARDER_POLYGON,
+        payloadAddress: payloadAddress
+      });
+  }
+
+  function _buildL2(address forwarder, address payloadAddress) private returns (Payload memory) {
+    return
+      Payload({
+        target: forwarder,
         signature: 'execute(address)',
         callData: abi.encode(payloadAddress)
       });
   }
 
-  function createArbitrumDelegateCall(address payloadAddress)
-    internal
-    returns (DelegateCallProposal memory)
-  {
-    return
-      DelegateCallProposal({
-        target: AaveGovernanceV2.CROSSCHAIN_FORWARDER_ARBITRUM,
-        signature: 'execute(address)',
-        callData: abi.encode(payloadAddress)
-      });
-  }
-
-  function createPolygonDelegateCall(address payloadAddress)
-    internal
-    returns (DelegateCallProposal memory)
-  {
-    return
-      DelegateCallProposal({
-        target: AaveGovernanceV2.CROSSCHAIN_FORWARDER_POLYGON,
-        signature: 'execute(address)',
-        callData: abi.encode(payloadAddress)
-      });
-  }
-
-  function createDelegateCallProposal(DelegateCallProposal[] memory delegateCalls, bytes32 ipfsHash)
+  function createProposal(Payload[] memory delegateCalls, bytes32 ipfsHash)
     internal
     returns (uint256)
   {
+    require(block.chainid == 1, 'mainnet only');
     address[] memory targets = new address[](delegateCalls.length);
     uint256[] memory values = new uint256[](delegateCalls.length);
     string[] memory signatures = new string[](delegateCalls.length);
@@ -99,12 +101,9 @@ library GovHelpers {
   }
 
   /**
-   * Impersonate the ecosystem reserve and created the proposal.
+   * @dev Impersonate the ecosystem reserve and creates the proposal.
    */
-  function createProposalAsWhale(Vm vm, SPropCreateParams memory params)
-    internal
-    returns (uint256)
-  {
+  function createTestProposal(Vm vm, SPropCreateParams memory params) internal returns (uint256) {
     vm.deal(AaveMisc.ECOSYSTEM_RESERVE, 1 ether);
     vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
     uint256 proposalId = AaveGovernanceV2.GOV.create(
