@@ -74,6 +74,22 @@ library GovHelpers {
     internal
     returns (uint256)
   {
+    return _createProposal(AaveGovernanceV2.SHORT_EXECUTOR, delegateCalls, ipfsHash);
+  }
+
+  function createProposal(
+    address executor,
+    Payload[] memory delegateCalls,
+    bytes32 ipfsHash
+  ) internal returns (uint256) {
+    return _createProposal(executor, delegateCalls, ipfsHash);
+  }
+
+  function _createProposal(
+    address executor,
+    Payload[] memory delegateCalls,
+    bytes32 ipfsHash
+  ) private returns (uint256) {
     require(block.chainid == 1, 'MAINNET_ONLY');
     require(delegateCalls.length != 0, 'MINIMUM_ONE_PAYLOAD');
     require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
@@ -84,6 +100,7 @@ library GovHelpers {
     bytes[] memory calldatas = new bytes[](delegateCalls.length);
     bool[] memory withDelegatecalls = new bool[](delegateCalls.length);
     for (uint256 i = 0; i < delegateCalls.length; i++) {
+      require(delegateCalls[i].target != address(0), 'NON_ZERO_TARGET');
       targets[i] = delegateCalls[i].target;
       signatures[i] = delegateCalls[i].signature;
       calldatas[i] = delegateCalls[i].callData;
@@ -93,7 +110,7 @@ library GovHelpers {
 
     return
       AaveGovernanceV2.GOV.create(
-        IExecutorWithTimelock(AaveGovernanceV2.SHORT_EXECUTOR),
+        IExecutorWithTimelock(executor),
         targets,
         values,
         signatures,
