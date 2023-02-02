@@ -74,7 +74,10 @@ library GovHelpers {
     internal
     returns (uint256)
   {
-    require(block.chainid == 1, 'mainnet only');
+    require(block.chainid == 1, 'MAINNET_ONLY');
+    require(delegateCalls.length != 0, 'MINIMUM_ONE_PAYLOAD');
+    require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
+
     address[] memory targets = new address[](delegateCalls.length);
     uint256[] memory values = new uint256[](delegateCalls.length);
     string[] memory signatures = new string[](delegateCalls.length);
