@@ -11,7 +11,7 @@ contract ProtocolV2TestBaseTest is ProtocolV2TestBase {
   }
 
   function testSnpashot() public {
-    this.createConfigurationSnapshot('report', AaveV2Ethereum.POOL);
+    this.createConfigurationSnapshot('v2-report', AaveV2Ethereum.POOL);
   }
 
   // commented out as it is insanely slow with public rpcs

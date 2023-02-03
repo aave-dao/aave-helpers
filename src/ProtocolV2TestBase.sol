@@ -7,12 +7,6 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 
-struct ReserveTokens {
-  address aToken;
-  address stableDebtToken;
-  address variableDebtToken;
-}
-
 struct ReserveConfig {
   string symbol;
   address underlying;
@@ -54,7 +48,7 @@ contract ProtocolV2TestBase is CommonTestBase {
    * @param pool the pool to be snapshotted
    */
   function createConfigurationSnapshot(string memory reportName, ILendingPool pool) public {
-    string memory path = string(abi.encodePacked('./reports/', reportName, '_v2.md'));
+    string memory path = string(abi.encodePacked('./reports/', reportName, '.md'));
     vm.writeFile(path, '# Report\n\n');
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(

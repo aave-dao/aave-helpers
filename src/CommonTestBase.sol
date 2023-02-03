@@ -36,11 +36,8 @@ contract CommonTestBase is Test {
         ' ',
         afterPath,
         '`"',
-        "'```' > ./diffs/",
-        reportBefore,
-        '_',
-        reportAfter,
-        '.md'
+        "'```' > ",
+        outPath
       )
     );
     vm.ffi(inputs);

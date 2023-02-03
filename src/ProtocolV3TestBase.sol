@@ -59,7 +59,7 @@ contract ProtocolV3TestBase is CommonTestBase {
    * @param pool the pool to be snapshotted
    */
   function createConfigurationSnapshot(string memory reportName, IPool pool) public {
-    string memory path = string(abi.encodePacked('./reports/', reportName, '_v3.md'));
+    string memory path = string(abi.encodePacked('./reports/', reportName, '.md'));
     vm.writeFile(path, '# Report\n\n');
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     _writeReserveConfigs(path, configs);
