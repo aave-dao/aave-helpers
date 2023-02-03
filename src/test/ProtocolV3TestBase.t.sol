@@ -12,6 +12,8 @@ contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
 
   function testSnpashot() public {
     this.createConfigurationSnapshot('report', AaveV3Polygon.POOL);
+
+    diffReports('report_v2', 'report_v3');
   }
 
   // commented out as it is insanely slow with public rpcs

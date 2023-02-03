@@ -6,12 +6,7 @@ import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultI
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
-
-struct ReserveTokens {
-  address aToken;
-  address stableDebtToken;
-  address variableDebtToken;
-}
+import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -57,20 +52,14 @@ struct InterestStrategyValues {
   uint256 variableRateSlope2;
 }
 
-contract ProtocolV3TestBase is Test {
-  address public constant ETH_MOCK_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-
-  address public constant EOA = 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045;
-
+contract ProtocolV3TestBase is CommonTestBase {
   /**
    * @dev Generates a markdown compatible snapshot of the whole pool configuration into `/reports`.
    * @param reportName filename suffix for the generated reports.
    * @param pool the pool to be snapshotted
    */
   function createConfigurationSnapshot(string memory reportName, IPool pool) public {
-    string memory path = string(
-      abi.encodePacked('./reports/', vm.toString(address(pool)), '_', reportName, '.md')
-    );
+    string memory path = string(abi.encodePacked('./reports/', reportName, '_v3.md'));
     vm.writeFile(path, '# Report\n\n');
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     _writeReserveConfigs(path, configs);
@@ -93,14 +82,6 @@ contract ProtocolV3TestBase is Test {
     vm.revertTo(snapshot);
     _stableBorrowFlow(configs, pool, user);
     vm.revertTo(snapshot);
-  }
-
-  /**
-   * @dev forwards time by x blocks
-   */
-  function _skipBlocks(uint128 blocks) private {
-    vm.roll(block.number + blocks);
-    vm.warp(block.timestamp + blocks * 12); // assuming a block is around 12seconds
   }
 
   /**
@@ -257,28 +238,6 @@ contract ProtocolV3TestBase is Test {
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
     require(debtAfter == ((debtBefore > amount) ? debtBefore - amount : 0), '_repay() : ERROR');
     vm.stopPrank();
-  }
-
-  function _isInUint256Array(uint256[] memory haystack, uint256 needle)
-    private
-    pure
-    returns (bool)
-  {
-    for (uint256 i = 0; i < haystack.length; i++) {
-      if (haystack[i] == needle) return true;
-    }
-    return false;
-  }
-
-  function _isInAddressArray(address[] memory haystack, address needle)
-    private
-    pure
-    returns (bool)
-  {
-    for (uint256 i = 0; i < haystack.length; i++) {
-      if (haystack[i] == needle) return true;
-    }
-    return false;
   }
 
   function _writeEModeConfigs(
