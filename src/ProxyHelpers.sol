@@ -6,6 +6,7 @@ import 'forge-std/Vm.sol';
 library ProxyHelpers {
   function getInitializableAdminUpgradeabilityProxyAdmin(Vm vm, address proxy)
     internal
+    view
     returns (address)
   {
     address slot = address(
@@ -18,6 +19,7 @@ library ProxyHelpers {
 
   function getInitializableAdminUpgradeabilityProxyImplementation(Vm vm, address proxy)
     internal
+    view
     returns (address)
   {
     address slot = address(

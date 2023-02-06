@@ -26,7 +26,7 @@ library GovHelpers {
     bytes callData;
   }
 
-  function buildMainnet(address payloadAddress) internal returns (Payload memory) {
+  function buildMainnet(address payloadAddress) internal pure returns (Payload memory) {
     require(
       payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_OPTIMISM &&
         payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_ARBITRUM &&
@@ -37,7 +37,7 @@ library GovHelpers {
     return Payload({target: payloadAddress, signature: 'execute()', callData: ''});
   }
 
-  function buildOptimism(address payloadAddress) internal returns (Payload memory) {
+  function buildOptimism(address payloadAddress) internal pure returns (Payload memory) {
     return
       _buildL2({
         forwarder: AaveGovernanceV2.CROSSCHAIN_FORWARDER_OPTIMISM,
@@ -45,7 +45,7 @@ library GovHelpers {
       });
   }
 
-  function buildArbitrum(address payloadAddress) internal returns (Payload memory) {
+  function buildArbitrum(address payloadAddress) internal pure returns (Payload memory) {
     return
       _buildL2({
         forwarder: AaveGovernanceV2.CROSSCHAIN_FORWARDER_ARBITRUM,
@@ -53,7 +53,7 @@ library GovHelpers {
       });
   }
 
-  function buildPolygon(address payloadAddress) internal returns (Payload memory) {
+  function buildPolygon(address payloadAddress) internal pure returns (Payload memory) {
     return
       _buildL2({
         forwarder: AaveGovernanceV2.CROSSCHAIN_FORWARDER_POLYGON,
@@ -61,7 +61,11 @@ library GovHelpers {
       });
   }
 
-  function _buildL2(address forwarder, address payloadAddress) private returns (Payload memory) {
+  function _buildL2(address forwarder, address payloadAddress)
+    private
+    pure
+    returns (Payload memory)
+  {
     return
       Payload({
         target: forwarder,
