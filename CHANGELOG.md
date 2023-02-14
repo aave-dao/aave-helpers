@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/bgd-labs/aave-helpers/compare/v2.0.0...v2.1.0) (2023-02-14)
+
+
+### Features
+
+* add listing engines to helpers ([#52](https://github.com/bgd-labs/aave-helpers/issues/52)) ([b063743](https://github.com/bgd-labs/aave-helpers/commit/b063743a0b206a0e2cf073740ea2d94e4cc4cb6e))
+* report diffing `diffReports` ([#48](https://github.com/bgd-labs/aave-helpers/issues/48)) ([ca99238](https://github.com/bgd-labs/aave-helpers/commit/ca992385b8542254494463ca005603b42f9f1119))
+
+
+### Bug Fixes
+
+* enforce non zero targets on executor ([#47](https://github.com/bgd-labs/aave-helpers/issues/47)) ([23fb586](https://github.com/bgd-labs/aave-helpers/commit/23fb58612dc7b08829a137983577c85b919581a7))
+
 ## [2.0.0](https://github.com/bgd-labs/aave-helpers/compare/v1.6.0...v2.0.0) (2023-02-02)
 
 
