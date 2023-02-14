@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {AaveV3ListingBase, IGenericV3ListingEngine} from './AaveV3ListingBase.sol';
 
 /**
- * @dev Base smart contract for an Aave v3.0.1 listing (or other change of configs) on v3 Polygon.
+ * @dev Base smart contract for an Aave v3.0.1 (compatible with 3.0.0) listing on v3 Polygon.
  * @author BGD Labs
  */
 abstract contract AaveV3ListingPolygon is AaveV3ListingBase {
