@@ -94,7 +94,7 @@ library GovHelpers {
     Payload[] memory delegateCalls,
     bytes32 ipfsHash
   ) private returns (uint256) {
-    // require(block.chainid == 1, 'MAINNET_ONLY');
+    require(block.chainid == 1, 'MAINNET_ONLY');
     require(delegateCalls.length != 0, 'MINIMUM_ONE_PAYLOAD');
     require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
 
