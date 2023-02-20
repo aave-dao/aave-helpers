@@ -94,7 +94,7 @@ library GovHelpers {
     Payload[] memory delegateCalls,
     bytes32 ipfsHash
   ) private returns (uint256) {
-    require(block.chainid == 1, 'MAINNET_ONLY');
+    // require(block.chainid == 1, 'MAINNET_ONLY');
     require(delegateCalls.length != 0, 'MINIMUM_ONE_PAYLOAD');
     require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
 
@@ -152,15 +152,23 @@ library GovHelpers {
    * Alter storage slots so the proposal passes
    */
   function passVoteAndExecute(Vm vm, uint256 proposalId) internal {
+    passVoteAndQueue(vm, proposalId);
+    uint256 executionTime = AaveGovernanceV2.GOV.getProposalById(proposalId).executionTime;
+    vm.warp(executionTime + 1);
+    AaveGovernanceV2.GOV.execute(proposalId);
+  }
+
+  function passVoteAndQueue(Vm vm, uint256 proposalId) internal {
+    passVote(vm, proposalId);
+    AaveGovernanceV2.GOV.queue(proposalId);
+  }
+
+  function passVote(Vm vm, uint256 proposalId) internal {
     uint256 power = 5000000 ether;
     vm.roll(block.number + 1);
     vm.store(address(AaveGovernanceV2.GOV), _getProposalSlot(proposalId), bytes32(power));
     uint256 endBlock = AaveGovernanceV2.GOV.getProposalById(proposalId).endBlock;
     vm.roll(endBlock + 1);
-    AaveGovernanceV2.GOV.queue(proposalId);
-    uint256 executionTime = AaveGovernanceV2.GOV.getProposalById(proposalId).executionTime;
-    vm.warp(executionTime + 1);
-    AaveGovernanceV2.GOV.execute(proposalId);
   }
 
   function getProposalById(uint256 proposalId)
