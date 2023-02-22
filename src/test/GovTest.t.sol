@@ -2,8 +2,9 @@
 pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
-import {GovHelpers} from '../GovHelpers.sol';
+import {GovHelpers, TestWithExecutor} from '../GovHelpers.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 
 contract GovernanceTest is Test {
   function setUp() public {
@@ -18,5 +19,16 @@ contract GovernanceTest is Test {
     vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
     GovHelpers.createProposal(payloads, bytes32('ipfs'));
     vm.stopPrank();
+  }
+}
+
+contract GovernanceExistingProposalTest is TestWithExecutor {
+  function setUp() public {
+    vm.createSelectFork('polygon', 39582255);
+    _selectPayloadExecutor(AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
+  }
+
+  function testCreateProposal() public {
+    _executor.execute(15);
   }
 }
