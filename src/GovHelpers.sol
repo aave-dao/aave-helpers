@@ -4,6 +4,7 @@ pragma abicoder v2;
 
 import {Vm} from 'forge-std/Vm.sol';
 import {Test} from 'forge-std/Test.sol';
+import {console2} from 'forge-std/console2.sol';
 import {AaveGovernanceV2, IAaveGovernanceV2, IExecutorWithTimelock} from 'aave-address-book/AaveGovernanceV2.sol';
 import {IPoolAddressesProvider} from 'aave-address-book/AaveV3.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
@@ -111,6 +112,19 @@ library GovHelpers {
       values[i] = 0;
       withDelegatecalls[i] = true;
     }
+
+    console2.logBytes(
+      abi.encodeWithSelector(
+        AaveGovernanceV2.GOV.create.selector,
+        IExecutorWithTimelock(executor),
+        targets,
+        values,
+        signatures,
+        calldatas,
+        withDelegatecalls,
+        ipfsHash
+      )
+    );
 
     return
       AaveGovernanceV2.GOV.create(
