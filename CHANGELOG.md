@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/bgd-labs/aave-helpers/compare/v2.1.0...v2.2.0) (2023-02-22)
+
+
+### Features
+
+* added few methods to gov helpers ([#54](https://github.com/bgd-labs/aave-helpers/issues/54)) ([fd8f23f](https://github.com/bgd-labs/aave-helpers/commit/fd8f23fe701324d202599e3255fd7d52fb611321))
+* emit logs ([#56](https://github.com/bgd-labs/aave-helpers/issues/56)) ([c8ef834](https://github.com/bgd-labs/aave-helpers/commit/c8ef8348647a33a38562ba35892366afde0d93b4))
+
 ## [2.1.0](https://github.com/bgd-labs/aave-helpers/compare/v2.0.0...v2.1.0) (2023-02-14)
 
 
