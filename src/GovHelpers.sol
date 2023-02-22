@@ -208,6 +208,38 @@ contract MockExecutor {
   error EmptyTargets();
 
   /**
+   * @dev Emitted when an ActionsSet is queued
+   * @param id Id of the ActionsSet
+   * @param targets Array of targets to be called by the actions set
+   * @param values Array of values to pass in each call by the actions set
+   * @param signatures Array of function signatures to encode in each call by the actions set
+   * @param calldatas Array of calldata to pass in each call by the actions set
+   * @param withDelegatecalls Array of whether to delegatecall for each call of the actions set
+   * @param executionTime The timestamp at which this actions set can be executed
+   **/
+  event ActionsSetQueued(
+    uint256 indexed id,
+    address[] targets,
+    uint256[] values,
+    string[] signatures,
+    bytes[] calldatas,
+    bool[] withDelegatecalls,
+    uint256 executionTime
+  );
+
+  /**
+   * @dev Emitted when an ActionsSet is successfully executed
+   * @param id Id of the ActionsSet
+   * @param initiatorExecution The address that triggered the ActionsSet execution
+   * @param returnedData The returned data from the ActionsSet execution
+   **/
+  event ActionsSetExecuted(
+    uint256 indexed id,
+    address indexed initiatorExecution,
+    bytes[] returnedData
+  );
+
+  /**
    * @notice This struct contains the data needed to execute a specified set of actions
    * @param targets Array of targets to call
    * @param values Array of values to pass in each call
@@ -278,6 +310,8 @@ contract MockExecutor {
         ++i;
       }
     }
+
+    emit ActionsSetExecuted(actionsSetId, msg.sender, returnedData);
   }
 
   /**
@@ -344,6 +378,16 @@ contract MockExecutor {
     actionsSet.calldatas = calldatas;
     actionsSet.withDelegatecalls = withDelegatecalls;
     actionsSet.executionTime = executionTime;
+
+    emit ActionsSetQueued(
+      actionsSetId,
+      targets,
+      values,
+      signatures,
+      calldatas,
+      withDelegatecalls,
+      executionTime
+    );
   }
 
   function getCurrentState(uint256 actionsSetId) public view returns (ActionsSetState) {
