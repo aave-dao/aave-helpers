@@ -239,9 +239,6 @@ contract MockExecutor {
     Expired
   }
 
-  // Minimum allowed grace period, which reduces the risk of having an actions set expire due to network congestion
-  uint256 constant MINIMUM_GRACE_PERIOD = 10 minutes;
-
   // Time between queuing and execution
   uint256 private _delay;
   // Time after the execution time during which the actions set can be executed
