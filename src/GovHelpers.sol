@@ -79,7 +79,15 @@ library GovHelpers {
     internal
     returns (uint256)
   {
-    return _createProposal(AaveGovernanceV2.SHORT_EXECUTOR, delegateCalls, ipfsHash);
+    return _createProposal(AaveGovernanceV2.SHORT_EXECUTOR, delegateCalls, ipfsHash, false);
+  }
+
+  function createProposal(
+    Payload[] memory delegateCalls,
+    bytes32 ipfsHash,
+    bool emitLog
+  ) internal returns (uint256) {
+    return _createProposal(AaveGovernanceV2.SHORT_EXECUTOR, delegateCalls, ipfsHash, emitLog);
   }
 
   function createProposal(
@@ -87,13 +95,23 @@ library GovHelpers {
     Payload[] memory delegateCalls,
     bytes32 ipfsHash
   ) internal returns (uint256) {
-    return _createProposal(executor, delegateCalls, ipfsHash);
+    return _createProposal(executor, delegateCalls, ipfsHash, false);
+  }
+
+  function createProposal(
+    address executor,
+    Payload[] memory delegateCalls,
+    bytes32 ipfsHash,
+    bool emitLog
+  ) internal returns (uint256) {
+    return _createProposal(executor, delegateCalls, ipfsHash, emitLog);
   }
 
   function _createProposal(
     address executor,
     Payload[] memory delegateCalls,
-    bytes32 ipfsHash
+    bytes32 ipfsHash,
+    bool emitLog
   ) private returns (uint256) {
     require(block.chainid == 1, 'MAINNET_ONLY');
     require(delegateCalls.length != 0, 'MINIMUM_ONE_PAYLOAD');
@@ -113,18 +131,20 @@ library GovHelpers {
       withDelegatecalls[i] = true;
     }
 
-    console2.logBytes(
-      abi.encodeWithSelector(
-        AaveGovernanceV2.GOV.create.selector,
-        IExecutorWithTimelock(executor),
-        targets,
-        values,
-        signatures,
-        calldatas,
-        withDelegatecalls,
-        ipfsHash
-      )
-    );
+    if (emitLog) {
+      console2.logBytes(
+        abi.encodeWithSelector(
+          AaveGovernanceV2.GOV.create.selector,
+          IExecutorWithTimelock(executor),
+          targets,
+          values,
+          signatures,
+          calldatas,
+          withDelegatecalls,
+          ipfsHash
+        )
+      );
+    }
 
     return
       AaveGovernanceV2.GOV.create(
