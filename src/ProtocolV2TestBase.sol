@@ -290,6 +290,36 @@ contract ProtocolV2TestBase is CommonTestBase {
     vm.writeLine(path, '\n');
   }
 
+  function _logStrategyPreviewUrlParams(ReserveConfig memory config, ILendingPool pool) internal {
+    IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
+      config.interestRateStrategy
+    );
+    ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(
+      pool.getAddressesProvider()
+    );
+    ILendingRateOracle oracle = ILendingRateOracle(addressesProvider.getLendingRateOracle());
+
+    emit log_named_string(
+      config.symbol,
+      string.concat(
+        '?variableRateSlope1=',
+        vm.toString(strategy.variableRateSlope1()),
+        '&variableRateSlope2=',
+        vm.toString(strategy.variableRateSlope2()),
+        '&stableRateSlope1=',
+        vm.toString(strategy.stableRateSlope1()),
+        '&stableRateSlope2=',
+        vm.toString(strategy.stableRateSlope2()),
+        '&optimalUsageRatio=',
+        vm.toString(strategy.OPTIMAL_UTILIZATION_RATE()),
+        '&baseVariableBorrowRate=',
+        vm.toString(strategy.baseVariableBorrowRate()),
+        '&baseStableBorrowRate=',
+        vm.toString(oracle.getMarketBorrowRate(config.underlying))
+      )
+    );
+  }
+
   function _writeReserveConfigs(
     string memory path,
     ReserveConfig[] memory configs,

@@ -347,6 +347,32 @@ contract ProtocolV3TestBase is CommonTestBase {
     vm.writeLine(path, '\n');
   }
 
+  function _logStrategyPreviewUrlParams(ReserveConfig memory config) internal {
+    IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
+      config.interestRateStrategy
+    );
+
+    emit log_named_string(
+      config.symbol,
+      string.concat(
+        '?variableRateSlope1=',
+        vm.toString(strategy.getVariableRateSlope1()),
+        '&variableRateSlope2=',
+        vm.toString(strategy.getVariableRateSlope2()),
+        '&stableRateSlope1=',
+        vm.toString(strategy.getStableRateSlope1()),
+        '&stableRateSlope2=',
+        vm.toString(strategy.getStableRateSlope2()),
+        '&optimalUsageRatio=',
+        vm.toString(strategy.OPTIMAL_USAGE_RATIO()),
+        '&baseVariableBorrowRate=',
+        vm.toString(strategy.getBaseVariableBorrowRate()),
+        '&baseStableBorrowRate=',
+        vm.toString(strategy.getBaseStableBorrowRate())
+      )
+    );
+  }
+
   function _writeReserveConfigs(string memory path, ReserveConfig[] memory configs) internal {
     vm.writeLine(path, '## Reserve Configurations\n');
     vm.writeLine(
