@@ -9,7 +9,8 @@ update:; forge update
 build  :; forge build
 test   :; forge test -vvv
 test-gauntlet-strategies-update:; forge test -vvv --match-path src/test/AaveV3ConfigEngineGauntletProposal.t.sol --gas-report
-
+test-v2-rate-engine:; forge test -vvv --match-path src/test/AaveV2RatePayloadBase.t.sol --gas-report
+test-v2-rates-factory:; forge test -vvv --match-path src/test/V2RateStrategyFactory.t.sol --gas-report
 
 # Scripts
 deploy-engine-opt :;  forge script script/AaveV3ConfigEngine.s.sol:DeployEngineOpt --rpc-url optimism --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
