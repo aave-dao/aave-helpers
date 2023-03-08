@@ -57,14 +57,20 @@ contract ProtocolV3TestBase is CommonTestBase {
    * @dev Generates a markdown compatible snapshot of the whole pool configuration into `/reports`.
    * @param reportName filename suffix for the generated reports.
    * @param pool the pool to be snapshotted
+   * @return ReserveConfig[] list of configs
    */
-  function createConfigurationSnapshot(string memory reportName, IPool pool) public {
+  function createConfigurationSnapshot(string memory reportName, IPool pool)
+    public
+    returns (ReserveConfig[] memory)
+  {
     string memory path = string(abi.encodePacked('./reports/', reportName, '.md'));
     vm.writeFile(path, '# Report\n\n');
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     _writeReserveConfigs(path, configs);
     _writeStrategyConfigs(path, configs);
     _writeEModeConfigs(path, configs, pool);
+
+    return configs;
   }
 
   /**
@@ -788,6 +794,28 @@ contract ProtocolV3TestBase is CommonTestBase {
 
     for (uint256 i = 0; i < allConfigsBefore.length; i++) {
       if (assetChangedUnderlying != allConfigsBefore[i].underlying) {
+        _requireNoChangeInConfigs(allConfigsBefore[i], allConfigsAfter[i]);
+      }
+    }
+  }
+
+  /// @dev Version in batch, useful when multiple asset changes are expected
+  function _noReservesConfigsChangesApartFrom(
+    ReserveConfig[] memory allConfigsBefore,
+    ReserveConfig[] memory allConfigsAfter,
+    address[] memory assetChangedUnderlying
+  ) internal pure {
+    require(allConfigsBefore.length == allConfigsAfter.length, 'A_UNEXPECTED_NEW_LISTING_HAPPENED');
+
+    for (uint256 i = 0; i < allConfigsBefore.length; i++) {
+      bool isAssetExpectedToChange;
+      for (uint256 j = 0; j < assetChangedUnderlying.length; j++) {
+        if (assetChangedUnderlying[j] == allConfigsBefore[i].underlying) {
+          isAssetExpectedToChange = true;
+          break;
+        }
+      }
+      if (!isAssetExpectedToChange) {
         _requireNoChangeInConfigs(allConfigsBefore[i], allConfigsAfter[i]);
       }
     }
