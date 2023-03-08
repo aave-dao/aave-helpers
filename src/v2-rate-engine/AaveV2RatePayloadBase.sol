@@ -94,7 +94,7 @@ abstract contract AaveV2RatePayloadBase is IAaveV2RatePayloadBase {
 
   function _formatStrategies(RateStrategyUpdate[] memory strategies) internal pure returns (Rates.RateStrategyParams[] memory) {
     Rates.RateStrategyParams[] memory ratesParams = new Rates.RateStrategyParams[](strategies.length);
-    for (uint256 i=0; i< strategies.length; i++) {
+    for (uint256 i = 0; i < strategies.length; i++) {
       ratesParams[i] = strategies[i].params;
     }
     return ratesParams;
