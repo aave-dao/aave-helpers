@@ -20,6 +20,9 @@ abstract contract AaveV2RatePayloadBase is IAaveV2RatePayloadBase {
     Rates ratesFactory,
     ILendingPoolConfigurator configurator
   ) {
+    require(address(ratesFactory) != address(0), 'ONLY_NONZERO_RATES_FACTORY');
+    require(address(configurator) != address(0), 'ONLY_NONZERO_CONFIGURATOR');
+
     RATE_STRATEGIES_FACTORY = ratesFactory;
     POOL_CONFIGURATOR = configurator;
   }
@@ -34,6 +37,7 @@ abstract contract AaveV2RatePayloadBase is IAaveV2RatePayloadBase {
     _preExecute();
 
     RateStrategyUpdate[] memory strategies = updateRateStrategies();
+    require(strategies.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
     if (strategies.length != 0) {
       for (uint256 i = 0; i < strategies.length; i++) {
