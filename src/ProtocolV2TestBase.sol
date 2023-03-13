@@ -301,21 +301,23 @@ contract ProtocolV2TestBase is CommonTestBase {
 
     emit log_named_string(
       config.symbol,
-      abi.encodePacked(
-        '?variableRateSlope1=',
-        vm.toString(strategy.variableRateSlope1()),
-        '&variableRateSlope2=',
-        vm.toString(strategy.variableRateSlope2()),
-        '&stableRateSlope1=',
-        vm.toString(strategy.stableRateSlope1()),
-        '&stableRateSlope2=',
-        vm.toString(strategy.stableRateSlope2()),
-        '&optimalUsageRatio=',
-        vm.toString(strategy.OPTIMAL_UTILIZATION_RATE()),
-        '&baseVariableBorrowRate=',
-        vm.toString(strategy.baseVariableBorrowRate()),
-        '&baseStableBorrowRate=',
-        vm.toString(oracle.getMarketBorrowRate(config.underlying))
+      string(
+        abi.encodePacked(
+          '?variableRateSlope1=',
+          vm.toString(strategy.variableRateSlope1()),
+          '&variableRateSlope2=',
+          vm.toString(strategy.variableRateSlope2()),
+          '&stableRateSlope1=',
+          vm.toString(strategy.stableRateSlope1()),
+          '&stableRateSlope2=',
+          vm.toString(strategy.stableRateSlope2()),
+          '&optimalUsageRatio=',
+          vm.toString(strategy.OPTIMAL_UTILIZATION_RATE()),
+          '&baseVariableBorrowRate=',
+          vm.toString(strategy.baseVariableBorrowRate()),
+          '&baseStableBorrowRate=',
+          vm.toString(oracle.getMarketBorrowRate(config.underlying))
+        )
       )
     );
   }

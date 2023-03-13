@@ -354,21 +354,23 @@ contract ProtocolV3TestBase is CommonTestBase {
 
     emit log_named_string(
       config.symbol,
-      abi.encodePacked(
-        '?variableRateSlope1=',
-        vm.toString(strategy.getVariableRateSlope1()),
-        '&variableRateSlope2=',
-        vm.toString(strategy.getVariableRateSlope2()),
-        '&stableRateSlope1=',
-        vm.toString(strategy.getStableRateSlope1()),
-        '&stableRateSlope2=',
-        vm.toString(strategy.getStableRateSlope2()),
-        '&optimalUsageRatio=',
-        vm.toString(strategy.OPTIMAL_USAGE_RATIO()),
-        '&baseVariableBorrowRate=',
-        vm.toString(strategy.getBaseVariableBorrowRate()),
-        '&baseStableBorrowRate=',
-        vm.toString(strategy.getBaseStableBorrowRate())
+      string(
+        abi.encodePacked(
+          '?variableRateSlope1=',
+          vm.toString(strategy.getVariableRateSlope1()),
+          '&variableRateSlope2=',
+          vm.toString(strategy.getVariableRateSlope2()),
+          '&stableRateSlope1=',
+          vm.toString(strategy.getStableRateSlope1()),
+          '&stableRateSlope2=',
+          vm.toString(strategy.getStableRateSlope2()),
+          '&optimalUsageRatio=',
+          vm.toString(strategy.OPTIMAL_USAGE_RATIO()),
+          '&baseVariableBorrowRate=',
+          vm.toString(strategy.getBaseVariableBorrowRate()),
+          '&baseStableBorrowRate=',
+          vm.toString(strategy.getBaseStableBorrowRate())
+        )
       )
     );
   }
