@@ -354,7 +354,7 @@ contract ProtocolV3TestBase is CommonTestBase {
 
     emit log_named_string(
       config.symbol,
-      string.concat(
+      abi.encodePacked(
         '?variableRateSlope1=',
         vm.toString(strategy.getVariableRateSlope1()),
         '&variableRateSlope2=',
