@@ -8,6 +8,22 @@ import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializabl
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 
+// TODO: expose from address book
+interface AggregatorInterface {
+  function latestAnswer() external view returns (int256);
+
+  function latestTimestamp() external view returns (uint256);
+
+  function latestRound() external view returns (uint256);
+
+  function getAnswer(uint256 roundId) external view returns (int256);
+
+  function getTimestamp(uint256 roundId) external view returns (uint256);
+
+  event AnswerUpdated(int256 indexed current, uint256 indexed roundId, uint256 updatedAt);
+  event NewRound(uint256 indexed roundId, address indexed startedBy, uint256 startedAt);
+}
+
 struct ReserveConfig {
   string symbol;
   address underlying;
@@ -67,7 +83,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     // overwrite with empty json to later be extended
     vm.writeFile(path, '{ "eModes": [], "reserves": [], "strategies": [] }');
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    _writeReserveConfigs(path, configs);
+    _writeReserveConfigs(path, configs, pool);
     _writeStrategyConfigs(path, configs);
     _writeEModeConfigs(path, configs, pool);
 
@@ -362,11 +378,20 @@ contract ProtocolV3TestBase is CommonTestBase {
     );
   }
 
-  function _writeReserveConfigs(string memory path, ReserveConfig[] memory configs) internal {
+  function _writeReserveConfigs(
+    string memory path,
+    ReserveConfig[] memory configs,
+    IPool pool
+  ) internal {
+    IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
+    IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
     string[] memory reserves = new string[](configs.length);
 
     for (uint256 i = 0; i < configs.length; i++) {
       ReserveConfig memory config = configs[i];
+      AggregatorInterface assetOracle = AggregatorInterface(
+        oracle.getSourceOfAsset(config.underlying)
+      );
       string memory reserve = 'reserve';
       reserves[i] = vm.serializeString(reserve, 'symbol', config.symbol);
       vm.serializeUint(reserve, 'ltv', config.ltv);
@@ -412,6 +437,14 @@ contract ProtocolV3TestBase is CommonTestBase {
           config.variableDebtToken
         )
       );
+      string memory oracleKey = 'oracleKey';
+      vm.serializeAddress(oracleKey, 'address', address(assetOracle));
+      string memory out = vm.serializeUint(
+        oracleKey,
+        'latestAnswer',
+        uint256(assetOracle.latestAnswer())
+      );
+      vm.serializeString(reserve, 'oracle', out);
     }
     string memory output = vm.serializeString('root', 'reserves', reserves);
     vm.writeJson(output, path);
@@ -915,11 +948,11 @@ contract ProtocolV3TestBase is CommonTestBase {
   }
 
   function _validateAssetSourceOnOracle(
-    IPoolAddressesProvider addressProvider,
+    IPoolAddressesProvider addressesProvider,
     address asset,
     address expectedSource
   ) internal view {
-    IAaveOracle oracle = IAaveOracle(addressProvider.getPriceOracle());
+    IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
 
     require(
       oracle.getSourceOfAsset(asset) == expectedSource,

@@ -7,3 +7,5 @@ file.strategies = JSON.parse(
   file.strategies.replace(/"{/g, '{').replace(/}"/g, '}').replace(/"/g, '"')
 );
 file.eModes = JSON.parse(file.eModes.replace(/"{/g, '{').replace(/}"/g, '}').replace(/"/g, '"'));
+
+console.log(JSON.stringify(file, null, 2));
