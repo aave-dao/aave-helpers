@@ -52,7 +52,7 @@ contract ProtocolV2TestBase is CommonTestBase {
     public
     returns (ReserveConfig[] memory)
   {
-    string memory path = string(abi.encodePacked('./reports/', reportName, '.md'));
+    string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
     vm.writeFile(path, '# Report\n\n');
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(

@@ -63,7 +63,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     public
     returns (ReserveConfig[] memory)
   {
-    string memory path = string(abi.encodePacked('./reports/', reportName, '.md'));
+    string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
     // overwrite with empty json to later be extended
     vm.writeFile(path, '{ "eModes": [], "reserves": [], "strategies": [] }');
     ReserveConfig[] memory configs = _getReservesConfigs(pool);

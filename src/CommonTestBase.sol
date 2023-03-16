@@ -22,10 +22,10 @@ contract CommonTestBase is Test {
    */
   function diffReports(string memory reportBefore, string memory reportAfter) internal {
     string memory outPath = string(
-      abi.encodePacked('./diffs/', reportBefore, '_', reportAfter, '.md')
+      abi.encodePacked('./diffs/', reportBefore, '_', reportAfter, '.json')
     );
-    string memory beforePath = string(abi.encodePacked('./reports/', reportBefore, '.md'));
-    string memory afterPath = string(abi.encodePacked('./reports/', reportAfter, '.md'));
+    string memory beforePath = string(abi.encodePacked('./reports/', reportBefore, '.json'));
+    string memory afterPath = string(abi.encodePacked('./reports/', reportAfter, '.json'));
 
     string[] memory inputs = new string[](3);
     inputs[0] = 'sh';
