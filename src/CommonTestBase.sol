@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity >=0.7.5 <0.9.0;
 
+import 'forge-std/StdJson.sol';
 import 'forge-std/Test.sol';
 
 struct ReserveTokens {
@@ -10,6 +11,8 @@ struct ReserveTokens {
 }
 
 contract CommonTestBase is Test {
+  using stdJson for string;
+
   address public constant ETH_MOCK_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
   address public constant EOA = 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045;

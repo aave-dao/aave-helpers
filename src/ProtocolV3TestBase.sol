@@ -64,10 +64,12 @@ contract ProtocolV3TestBase is CommonTestBase {
     returns (ReserveConfig[] memory)
   {
     string memory path = string(abi.encodePacked('./reports/', reportName, '.md'));
-    vm.writeFile(path, '# Report\n\n');
+    // overwrite with empty json to later be extended
+    vm.writeFile(path, '{ "ok": "asd" }');
+    // vm.writeFile(path, '# Report\n\n');
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    _writeReserveConfigs(path, configs);
-    _writeStrategyConfigs(path, configs);
+    // _writeReserveConfigs(path, configs);
+    // _writeStrategyConfigs(path, configs);
     _writeEModeConfigs(path, configs, pool);
 
     return configs;
@@ -251,42 +253,38 @@ contract ProtocolV3TestBase is CommonTestBase {
     ReserveConfig[] memory configs,
     IPool pool
   ) internal {
-    vm.writeLine(path, '## EMode categories\n\n');
-    vm.writeLine(
-      path,
-      '| id | label | ltv | liquidationThreshold | liquidationBonus | priceSource |'
-    );
-    vm.writeLine(path, '|---|---|---|---|---|---|');
+    string memory prev = vm.readFile(path);
+    // string memory result = 'root';
+    string[] memory eModes = new string[](configs.length);
+
     uint256[] memory usedCategories = new uint256[](configs.length);
+    uint256 categoriesLength = 0;
     for (uint256 i = 0; i < configs.length; i++) {
       if (!_isInUint256Array(usedCategories, configs[i].eModeCategory)) {
         usedCategories[i] = configs[i].eModeCategory;
         DataTypes.EModeCategory memory category = pool.getEModeCategoryData(
           uint8(configs[i].eModeCategory)
         );
-        vm.writeLine(
-          path,
-          string(
-            abi.encodePacked(
-              '| ',
-              vm.toString(configs[i].eModeCategory),
-              ' | ',
-              category.label,
-              ' | ',
-              vm.toString(category.ltv),
-              ' | ',
-              vm.toString(category.liquidationThreshold),
-              ' | ',
-              vm.toString(category.liquidationBonus),
-              ' | ',
-              vm.toString(category.priceSource),
-              ' |'
-            )
-          )
+        string memory eMode = 'emode';
+        eModes[categoriesLength] = vm.serializeUint(
+          eMode,
+          'eModeCategory',
+          configs[i].eModeCategory
         );
+        vm.serializeString(eMode, 'label', category.label);
+        vm.serializeUint(eMode, 'ltv', category.ltv);
+        vm.serializeUint(eMode, 'liquidationThreshold', category.liquidationThreshold);
+        vm.serializeUint(eMode, 'liquidationBonus', category.liquidationBonus);
+        vm.serializeAddress(eMode, 'priceSource', category.priceSource);
+        categoriesLength++;
       }
     }
-    vm.writeLine(path, '\n');
+    assembly {
+      mstore(eModes, categoriesLength)
+    }
+
+    string memory output = vm.serializeString(prev, 'eModes', eModes);
+    vm.writeJson(output, path);
   }
 
   function _writeStrategyConfigs(string memory path, ReserveConfig[] memory configs) internal {
