@@ -65,10 +65,10 @@ contract ProtocolV3TestBase is CommonTestBase {
   {
     string memory path = string(abi.encodePacked('./reports/', reportName, '.md'));
     // overwrite with empty json to later be extended
-    vm.writeFile(path, '{ "ok": "asd" }');
+    vm.writeFile(path, '{ "eModes": [], "reserves": [] }');
     // vm.writeFile(path, '# Report\n\n');
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    // _writeReserveConfigs(path, configs);
+    _writeReserveConfigs(path, configs);
     // _writeStrategyConfigs(path, configs);
     _writeEModeConfigs(path, configs, pool);
 
@@ -253,12 +253,10 @@ contract ProtocolV3TestBase is CommonTestBase {
     ReserveConfig[] memory configs,
     IPool pool
   ) internal {
-    string memory prev = vm.readFile(path);
-    // string memory result = 'root';
     string[] memory eModes = new string[](configs.length);
 
     uint256[] memory usedCategories = new uint256[](configs.length);
-    uint256 categoriesLength = 0;
+    uint256 categoriesCounter = 0;
     for (uint256 i = 0; i < configs.length; i++) {
       if (!_isInUint256Array(usedCategories, configs[i].eModeCategory)) {
         usedCategories[i] = configs[i].eModeCategory;
@@ -266,7 +264,7 @@ contract ProtocolV3TestBase is CommonTestBase {
           uint8(configs[i].eModeCategory)
         );
         string memory eMode = 'emode';
-        eModes[categoriesLength] = vm.serializeUint(
+        eModes[categoriesCounter] = vm.serializeUint(
           eMode,
           'eModeCategory',
           configs[i].eModeCategory
@@ -276,73 +274,65 @@ contract ProtocolV3TestBase is CommonTestBase {
         vm.serializeUint(eMode, 'liquidationThreshold', category.liquidationThreshold);
         vm.serializeUint(eMode, 'liquidationBonus', category.liquidationBonus);
         vm.serializeAddress(eMode, 'priceSource', category.priceSource);
-        categoriesLength++;
+        categoriesCounter++;
       }
     }
     assembly {
-      mstore(eModes, categoriesLength)
+      mstore(eModes, categoriesCounter)
     }
 
-    string memory output = vm.serializeString(prev, 'eModes', eModes);
+    string memory output = vm.serializeString('root', 'eModes', eModes);
     vm.writeJson(output, path);
   }
 
   function _writeStrategyConfigs(string memory path, ReserveConfig[] memory configs) internal {
-    vm.writeLine(path, '## InterestRateStrategies\n');
-    vm.writeLine(
-      path,
-      string(
-        abi.encodePacked(
-          '| strategy | getBaseStableBorrowRate | getStableRateSlope1 | getStableRateSlope2 | optimalStableToTotal | maxStabletoTotalExcess ',
-          '| getBaseVariableBorrowRate | getVariableRateSlope1 | getVariableRateSlope2 | optimalUsageRatio | maxExcessUsageRatio |'
-        )
-      )
-    );
-    vm.writeLine(path, '|---|---|---|---|---|---|---|---|---|---|---|');
+    string[] memory strategies = new string[](configs.length);
+
     address[] memory usedStrategies = new address[](configs.length);
+    uint256 strategyCounter = 0;
     for (uint256 i = 0; i < configs.length; i++) {
       if (!_isInAddressArray(usedStrategies, configs[i].interestRateStrategy)) {
         usedStrategies[i] = configs[i].interestRateStrategy;
         IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
           configs[i].interestRateStrategy
         );
-        vm.writeLine(
-          path,
-          string(
-            abi.encodePacked(
-              abi.encodePacked(
-                '| ',
-                vm.toString(address(strategy)),
-                ' | ',
-                vm.toString(strategy.getBaseStableBorrowRate()),
-                ' | ',
-                vm.toString(strategy.getStableRateSlope1()),
-                ' | ',
-                vm.toString(strategy.getStableRateSlope2()),
-                ' | ',
-                vm.toString(strategy.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO()),
-                ' | ',
-                vm.toString(strategy.MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO()),
-                ' | '
-              ),
-              abi.encodePacked(
-                vm.toString(strategy.getBaseVariableBorrowRate()),
-                ' | ',
-                vm.toString(strategy.getVariableRateSlope1()),
-                ' | ',
-                vm.toString(strategy.getVariableRateSlope2()),
-                ' | ',
-                vm.toString(strategy.OPTIMAL_USAGE_RATIO()),
-                ' | ',
-                vm.toString(strategy.MAX_EXCESS_USAGE_RATIO()),
-                ' |'
-              )
-            )
-          )
+        string memory strategyKey = 'stategy';
+        strategies[strategyCounter] = vm.serializeAddress(
+          strategyKey,
+          'address',
+          address(strategy)
         );
+        vm.serializeUint(strategyKey, 'baseStableBorrowRate', strategy.getBaseStableBorrowRate());
+        vm.serializeUint(strategyKey, 'stableRateSlope1', strategy.getStableRateSlope1());
+        vm.serializeUint(strategyKey, 'stableRateSlope2', strategy.getStableRateSlope2());
+        vm.serializeUint(
+          strategyKey,
+          'baseVariableBorrowRate',
+          strategy.getBaseVariableBorrowRate()
+        );
+        vm.serializeUint(strategyKey, 'variableRateSlope1', strategy.getVariableRateSlope1());
+        vm.serializeUint(strategyKey, 'variableRateSlope2', strategy.getVariableRateSlope2());
+        vm.serializeUint(
+          strategyKey,
+          'optimalStableToTotalDebtRatio',
+          strategy.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO()
+        );
+        vm.serializeUint(
+          strategyKey,
+          'maxExcessStableToTotalDebtRatio',
+          strategy.MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO()
+        );
+        vm.serializeUint(strategyKey, 'optimalUsageRatio', strategy.OPTIMAL_USAGE_RATIO());
+        vm.serializeUint(strategyKey, 'maxExcessUsageRatio', strategy.MAX_EXCESS_USAGE_RATIO());
+
+        strategyCounter++;
       }
     }
-    vm.writeLine(path, '\n');
+    assembly {
+      mstore(strategies, strategyCounter)
+    }
+    string memory output = vm.serializeString('root', 'strategies', strategies);
+    vm.writeJson(output, path);
   }
 
   function _logStrategyPreviewUrlParams(ReserveConfig memory config) internal {
@@ -374,118 +364,58 @@ contract ProtocolV3TestBase is CommonTestBase {
   }
 
   function _writeReserveConfigs(string memory path, ReserveConfig[] memory configs) internal {
-    vm.writeLine(path, '## Reserve Configurations\n');
-    vm.writeLine(
-      path,
-      string(
-        abi.encodePacked(
-          '| symbol | underlying | aToken | stableDebtToken | variableDebtToken | decimals | ltv | liquidationThreshold | liquidationBonus | ',
-          'liquidationProtocolFee | reserveFactor | usageAsCollateralEnabled | borrowingEnabled | stableBorrowRateEnabled | supplyCap | borrowCap | debtCeiling | eModeCategory | ',
-          'interestRateStrategy | isActive | isFrozen | isSiloed | isBorrowableInIsolation | isFlashloanable | aTokenImpl | stableDebtTokenImpl | variableDebtTokenImpl |'
-        )
-      )
-    );
-    vm.writeLine(
-      path,
-      string(
-        abi.encodePacked(
-          '|---|---|---|---|---|---|---|---|---',
-          '|---|---|---|---|---|---|---|---|---',
-          '|---|---|---|---|---|---|---|---|---|'
-        )
-      )
-    );
+    string[] memory reserves = new string[](configs.length);
+
     for (uint256 i = 0; i < configs.length; i++) {
       ReserveConfig memory config = configs[i];
-      vm.writeLine(
-        path,
-        string(
-          abi.encodePacked(
-            abi.encodePacked(
-              '| ',
-              config.symbol,
-              ' | ',
-              vm.toString(config.underlying),
-              ' | ',
-              vm.toString(config.aToken),
-              ' | ',
-              vm.toString(config.stableDebtToken),
-              ' | ',
-              vm.toString(config.variableDebtToken),
-              ' | ',
-              vm.toString(config.decimals),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(config.ltv),
-              ' | ',
-              vm.toString(config.liquidationThreshold),
-              ' | ',
-              vm.toString(config.liquidationBonus),
-              ' | ',
-              vm.toString(config.liquidationProtocolFee),
-              ' | ',
-              vm.toString(config.reserveFactor),
-              ' | ',
-              vm.toString(config.usageAsCollateralEnabled),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(config.borrowingEnabled),
-              ' | ',
-              vm.toString(config.stableBorrowRateEnabled),
-              ' | ',
-              vm.toString(config.supplyCap),
-              ' | ',
-              vm.toString(config.borrowCap),
-              ' | ',
-              vm.toString(config.debtCeiling),
-              ' | ',
-              vm.toString(config.eModeCategory),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(config.interestRateStrategy),
-              ' | ',
-              vm.toString(config.isActive),
-              ' | ',
-              vm.toString(config.isFrozen),
-              ' | ',
-              vm.toString(config.isSiloed),
-              ' | ',
-              vm.toString(config.isBorrowableInIsolation),
-              ' | ',
-              vm.toString(config.isFlashloanable),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(
-                ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
-                  vm,
-                  config.aToken
-                )
-              ),
-              ' | ',
-              vm.toString(
-                ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
-                  vm,
-                  config.stableDebtToken
-                )
-              ),
-              ' | ',
-              vm.toString(
-                ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
-                  vm,
-                  config.variableDebtToken
-                )
-              ),
-              ' |'
-            )
-          )
+      string memory reserve = 'reserve';
+      reserves[i] = vm.serializeString(reserve, 'symbol', config.symbol);
+      vm.serializeUint(reserve, 'ltv', config.ltv);
+      vm.serializeUint(reserve, 'liquidationThreshold', config.liquidationThreshold);
+      vm.serializeUint(reserve, 'liquidationBonus', config.liquidationBonus);
+      vm.serializeUint(reserve, 'liquidationProtocolFee', config.liquidationProtocolFee);
+      vm.serializeUint(reserve, 'reserveFactor', config.reserveFactor);
+      vm.serializeUint(reserve, 'decimals', config.decimals);
+      vm.serializeUint(reserve, 'borrowCap', config.borrowCap);
+      vm.serializeUint(reserve, 'supplyCap', config.supplyCap);
+      vm.serializeUint(reserve, 'debtCeiling', config.debtCeiling);
+      vm.serializeUint(reserve, 'eModeCategory', config.eModeCategory);
+      vm.serializeBool(reserve, 'usageAsCollateralEnabled', config.usageAsCollateralEnabled);
+      vm.serializeBool(reserve, 'borrowingEnabled', config.borrowingEnabled);
+      vm.serializeBool(reserve, 'stableBorrowRateEnabled', config.stableBorrowRateEnabled);
+      vm.serializeBool(reserve, 'isActive', config.isActive);
+      vm.serializeBool(reserve, 'isFrozen', config.isFrozen);
+      vm.serializeBool(reserve, 'isSiloed', config.isSiloed);
+      vm.serializeBool(reserve, 'isBorrowableInIsolation', config.isBorrowableInIsolation);
+      vm.serializeBool(reserve, 'isFlashloanable', config.isFlashloanable);
+      vm.serializeAddress(reserve, 'underlying', config.underlying);
+      vm.serializeAddress(reserve, 'aToken', config.aToken);
+      vm.serializeAddress(reserve, 'stableDebtToken', config.stableDebtToken);
+      vm.serializeAddress(reserve, 'variableDebtToken', config.variableDebtToken);
+      vm.serializeAddress(
+        reserve,
+        'aTokenImpl',
+        ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, config.aToken)
+      );
+      vm.serializeAddress(
+        reserve,
+        'stableDebtTokenImpl',
+        ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+          vm,
+          config.stableDebtToken
+        )
+      );
+      vm.serializeAddress(
+        reserve,
+        'variableDebtTokenImpl',
+        ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+          vm,
+          config.variableDebtToken
         )
       );
     }
-    vm.writeLine(path, '\n');
+    string memory output = vm.serializeString('root', 'reserves', reserves);
+    vm.writeJson(output, path);
   }
 
   function _getReservesConfigs(IPool pool) internal view returns (ReserveConfig[] memory) {
