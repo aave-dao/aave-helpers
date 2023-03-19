@@ -268,114 +268,72 @@ contract ProtocolV3TestBase is CommonTestBase {
     ReserveConfig[] memory configs,
     IPool pool
   ) internal {
-    string[] memory eModes = new string[](configs.length);
+    // keys for json stringification
+    string memory eModesKey = 'emodes';
+    string memory content;
 
     uint256[] memory usedCategories = new uint256[](configs.length);
-    uint256 categoriesCounter = 0;
     for (uint256 i = 0; i < configs.length; i++) {
       if (!_isInUint256Array(usedCategories, configs[i].eModeCategory)) {
         usedCategories[i] = configs[i].eModeCategory;
         DataTypes.EModeCategory memory category = pool.getEModeCategoryData(
           uint8(configs[i].eModeCategory)
         );
-        string memory eMode = 'emode';
-        eModes[categoriesCounter] = vm.serializeUint(
-          eMode,
-          'eModeCategory',
-          configs[i].eModeCategory
-        );
-        vm.serializeString(eMode, 'label', category.label);
-        vm.serializeUint(eMode, 'ltv', category.ltv);
-        vm.serializeUint(eMode, 'liquidationThreshold', category.liquidationThreshold);
-        vm.serializeUint(eMode, 'liquidationBonus', category.liquidationBonus);
-        vm.serializeAddress(eMode, 'priceSource', category.priceSource);
-        categoriesCounter++;
+        string memory key = vm.toString(configs[i].eModeCategory);
+        vm.serializeUint(key, 'eModeCategory', configs[i].eModeCategory);
+        vm.serializeString(key, 'label', category.label);
+        vm.serializeUint(key, 'ltv', category.ltv);
+        vm.serializeUint(key, 'liquidationThreshold', category.liquidationThreshold);
+        vm.serializeUint(key, 'liquidationBonus', category.liquidationBonus);
+        string memory object = vm.serializeAddress(key, 'priceSource', category.priceSource);
+        content = vm.serializeString(eModesKey, key, object);
       }
     }
-    assembly {
-      mstore(eModes, categoriesCounter)
-    }
-
-    string memory output = vm.serializeString('root', 'eModes', eModes);
+    string memory output = vm.serializeString('root', 'eModes', content);
     vm.writeJson(output, path);
   }
 
   function _writeStrategyConfigs(string memory path, ReserveConfig[] memory configs) internal {
-    string[] memory strategies = new string[](configs.length);
+    // keys for json stringification
+    string memory strategiesKey = 'stategies';
+    string memory content;
 
     address[] memory usedStrategies = new address[](configs.length);
-    uint256 strategyCounter = 0;
     for (uint256 i = 0; i < configs.length; i++) {
       if (!_isInAddressArray(usedStrategies, configs[i].interestRateStrategy)) {
         usedStrategies[i] = configs[i].interestRateStrategy;
         IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
           configs[i].interestRateStrategy
         );
-        string memory strategyKey = 'stategy';
-        strategies[strategyCounter] = vm.serializeAddress(
-          strategyKey,
-          'address',
-          address(strategy)
-        );
-        vm.serializeUint(strategyKey, 'baseStableBorrowRate', strategy.getBaseStableBorrowRate());
-        vm.serializeUint(strategyKey, 'stableRateSlope1', strategy.getStableRateSlope1());
-        vm.serializeUint(strategyKey, 'stableRateSlope2', strategy.getStableRateSlope2());
+        string memory key = vm.toString(address(strategy));
+        vm.serializeAddress(key, 'address', address(strategy));
+        vm.serializeUint(key, 'baseStableBorrowRate', strategy.getBaseStableBorrowRate());
+        vm.serializeUint(key, 'stableRateSlope1', strategy.getStableRateSlope1());
+        vm.serializeUint(key, 'stableRateSlope2', strategy.getStableRateSlope2());
+        vm.serializeUint(key, 'baseVariableBorrowRate', strategy.getBaseVariableBorrowRate());
+        vm.serializeUint(key, 'variableRateSlope1', strategy.getVariableRateSlope1());
+        vm.serializeUint(key, 'variableRateSlope2', strategy.getVariableRateSlope2());
         vm.serializeUint(
-          strategyKey,
-          'baseVariableBorrowRate',
-          strategy.getBaseVariableBorrowRate()
-        );
-        vm.serializeUint(strategyKey, 'variableRateSlope1', strategy.getVariableRateSlope1());
-        vm.serializeUint(strategyKey, 'variableRateSlope2', strategy.getVariableRateSlope2());
-        vm.serializeUint(
-          strategyKey,
+          key,
           'optimalStableToTotalDebtRatio',
           strategy.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO()
         );
         vm.serializeUint(
-          strategyKey,
+          key,
           'maxExcessStableToTotalDebtRatio',
           strategy.MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO()
         );
-        vm.serializeUint(strategyKey, 'optimalUsageRatio', strategy.OPTIMAL_USAGE_RATIO());
-        vm.serializeUint(strategyKey, 'maxExcessUsageRatio', strategy.MAX_EXCESS_USAGE_RATIO());
-
-        strategyCounter++;
+        vm.serializeUint(key, 'optimalUsageRatio', strategy.OPTIMAL_USAGE_RATIO());
+        string memory object = vm.serializeUint(
+          key,
+          'maxExcessUsageRatio',
+          strategy.MAX_EXCESS_USAGE_RATIO()
+        );
+        content = vm.serializeString(strategiesKey, key, object);
       }
     }
-    assembly {
-      mstore(strategies, strategyCounter)
-    }
-    string memory output = vm.serializeString('root', 'strategies', strategies);
+    string memory output = vm.serializeString('root', 'strategies', content);
     vm.writeJson(output, path);
-  }
-
-  function _logStrategyPreviewUrlParams(ReserveConfig memory config) internal {
-    IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
-      config.interestRateStrategy
-    );
-
-    emit log_named_string(
-      config.symbol,
-      string(
-        abi.encodePacked(
-          '?variableRateSlope1=',
-          vm.toString(strategy.getVariableRateSlope1()),
-          '&variableRateSlope2=',
-          vm.toString(strategy.getVariableRateSlope2()),
-          '&stableRateSlope1=',
-          vm.toString(strategy.getStableRateSlope1()),
-          '&stableRateSlope2=',
-          vm.toString(strategy.getStableRateSlope2()),
-          '&optimalUsageRatio=',
-          vm.toString(strategy.OPTIMAL_USAGE_RATIO()),
-          '&baseVariableBorrowRate=',
-          vm.toString(strategy.getBaseVariableBorrowRate()),
-          '&baseStableBorrowRate=',
-          vm.toString(strategy.getBaseStableBorrowRate())
-        )
-      )
-    );
   }
 
   function _writeReserveConfigs(
@@ -383,46 +341,48 @@ contract ProtocolV3TestBase is CommonTestBase {
     ReserveConfig[] memory configs,
     IPool pool
   ) internal {
+    // keys for json stringification
+    string memory reservesKey = 'reserves';
+    string memory content;
+
     IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
     IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
-    string[] memory reserves = new string[](configs.length);
-
     for (uint256 i = 0; i < configs.length; i++) {
       ReserveConfig memory config = configs[i];
       AggregatorInterface assetOracle = AggregatorInterface(
         oracle.getSourceOfAsset(config.underlying)
       );
-      string memory reserve = 'reserve';
-      reserves[i] = vm.serializeString(reserve, 'symbol', config.symbol);
-      vm.serializeUint(reserve, 'ltv', config.ltv);
-      vm.serializeUint(reserve, 'liquidationThreshold', config.liquidationThreshold);
-      vm.serializeUint(reserve, 'liquidationBonus', config.liquidationBonus);
-      vm.serializeUint(reserve, 'liquidationProtocolFee', config.liquidationProtocolFee);
-      vm.serializeUint(reserve, 'reserveFactor', config.reserveFactor);
-      vm.serializeUint(reserve, 'decimals', config.decimals);
-      vm.serializeUint(reserve, 'borrowCap', config.borrowCap);
-      vm.serializeUint(reserve, 'supplyCap', config.supplyCap);
-      vm.serializeUint(reserve, 'debtCeiling', config.debtCeiling);
-      vm.serializeUint(reserve, 'eModeCategory', config.eModeCategory);
-      vm.serializeBool(reserve, 'usageAsCollateralEnabled', config.usageAsCollateralEnabled);
-      vm.serializeBool(reserve, 'borrowingEnabled', config.borrowingEnabled);
-      vm.serializeBool(reserve, 'stableBorrowRateEnabled', config.stableBorrowRateEnabled);
-      vm.serializeBool(reserve, 'isActive', config.isActive);
-      vm.serializeBool(reserve, 'isFrozen', config.isFrozen);
-      vm.serializeBool(reserve, 'isSiloed', config.isSiloed);
-      vm.serializeBool(reserve, 'isBorrowableInIsolation', config.isBorrowableInIsolation);
-      vm.serializeBool(reserve, 'isFlashloanable', config.isFlashloanable);
-      vm.serializeAddress(reserve, 'underlying', config.underlying);
-      vm.serializeAddress(reserve, 'aToken', config.aToken);
-      vm.serializeAddress(reserve, 'stableDebtToken', config.stableDebtToken);
-      vm.serializeAddress(reserve, 'variableDebtToken', config.variableDebtToken);
+      string memory key = vm.toString(config.underlying);
+      vm.serializeString(key, 'symbol', config.symbol);
+      vm.serializeUint(key, 'ltv', config.ltv);
+      vm.serializeUint(key, 'liquidationThreshold', config.liquidationThreshold);
+      vm.serializeUint(key, 'liquidationBonus', config.liquidationBonus);
+      vm.serializeUint(key, 'liquidationProtocolFee', config.liquidationProtocolFee);
+      vm.serializeUint(key, 'reserveFactor', config.reserveFactor);
+      vm.serializeUint(key, 'decimals', config.decimals);
+      vm.serializeUint(key, 'borrowCap', config.borrowCap);
+      vm.serializeUint(key, 'supplyCap', config.supplyCap);
+      vm.serializeUint(key, 'debtCeiling', config.debtCeiling);
+      vm.serializeUint(key, 'eModeCategory', config.eModeCategory);
+      vm.serializeBool(key, 'usageAsCollateralEnabled', config.usageAsCollateralEnabled);
+      vm.serializeBool(key, 'borrowingEnabled', config.borrowingEnabled);
+      vm.serializeBool(key, 'stableBorrowRateEnabled', config.stableBorrowRateEnabled);
+      vm.serializeBool(key, 'isActive', config.isActive);
+      vm.serializeBool(key, 'isFrozen', config.isFrozen);
+      vm.serializeBool(key, 'isSiloed', config.isSiloed);
+      vm.serializeBool(key, 'isBorrowableInIsolation', config.isBorrowableInIsolation);
+      vm.serializeBool(key, 'isFlashloanable', config.isFlashloanable);
+      vm.serializeAddress(key, 'underlying', config.underlying);
+      vm.serializeAddress(key, 'aToken', config.aToken);
+      vm.serializeAddress(key, 'stableDebtToken', config.stableDebtToken);
+      vm.serializeAddress(key, 'variableDebtToken', config.variableDebtToken);
       vm.serializeAddress(
-        reserve,
+        key,
         'aTokenImpl',
         ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, config.aToken)
       );
       vm.serializeAddress(
-        reserve,
+        key,
         'stableDebtTokenImpl',
         ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
           vm,
@@ -430,7 +390,7 @@ contract ProtocolV3TestBase is CommonTestBase {
         )
       );
       vm.serializeAddress(
-        reserve,
+        key,
         'variableDebtTokenImpl',
         ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
           vm,
@@ -444,9 +404,10 @@ contract ProtocolV3TestBase is CommonTestBase {
         'latestAnswer',
         uint256(assetOracle.latestAnswer())
       );
-      vm.serializeString(reserve, 'oracle', out);
+      string memory object = vm.serializeString(key, 'oracle', out);
+      content = vm.serializeString(reservesKey, key, object);
     }
-    string memory output = vm.serializeString('root', 'reserves', reserves);
+    string memory output = vm.serializeString('root', 'reserves', content);
     vm.writeJson(output, path);
   }
 

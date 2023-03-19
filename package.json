@@ -24,5 +24,8 @@
   "devDependencies": {
     "prettier": "^2.7.1",
     "prettier-plugin-solidity": "^1.0.0-beta.19"
+  },
+  "dependencies": {
+    "diffler": "^2.0.4"
   }
 }

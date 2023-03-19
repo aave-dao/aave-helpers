@@ -19,6 +19,11 @@ antlr4ts@^0.5.0-alpha.4:
   resolved "https://registry.npmjs.org/antlr4ts/-/antlr4ts-0.5.0-alpha.4.tgz"
   integrity sha512-WPQDt1B74OfPv/IMS2ekXAKkTZIHl88uMetg6q3OTqgFxZ/dxDXI0EWLyZid/1Pe6hTftyg5N7gel5wNAGxXyQ==
 
+diffler@^2.0.4:
+  version "2.0.4"
+  resolved "https://registry.yarnpkg.com/diffler/-/diffler-2.0.4.tgz#1d00f4e773fa21a89a07db3140e65012d15e046b"
+  integrity sha512-RSKaYX48q/qdMT5pK7EurV4n1iBjTwe/92exZ9JeX+yXvDmRMKUHl1CAhLTEzrZ9HWj/utuDBaV/fuAzsDrtoA==
+
 emoji-regex@^10.1.0:
   version "10.1.0"
   resolved "https://registry.npmjs.org/emoji-regex/-/emoji-regex-10.1.0.tgz"
