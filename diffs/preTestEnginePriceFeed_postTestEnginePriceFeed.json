@@ -1,16 +1,16 @@
 ```diff
 diff --git a/./reports/preTestEnginePriceFeed.json b/./reports/postTestEnginePriceFeed.json
-index e50489f..2160109 100644
+index 24e816b..faf9866 100644
 --- a/./reports/preTestEnginePriceFeed.json
 +++ b/./reports/postTestEnginePriceFeed.json
-@@ -326,8 +326,8 @@
-     "0xD6DF932A45C0f255f85145f286eA0b292B21C90B": {
-       "underlying": "0xD6DF932A45C0f255f85145f286eA0b292B21C90B",
+@@ -661,8 +661,8 @@
+       "stableDebtTokenImpl": "0x52A1CeB68Ee6b7B5D13E0376A1E0E4423A8cE26e",
+       "variableDebtToken": "0xE80761Ea617F66F96274eA5e8c37f03960ecC679",
        "oracle": {
--        "latestAnswer": 7673000000,
--        "address": "0x72484B12719E23115761D5DA1646945632979bB6"
-+        "latestAnswer": 99994500,
-+        "address": "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7"
+-        "address": "0x72484B12719E23115761D5DA1646945632979bB6",
+-        "latestAnswer": 7673000000
++        "address": "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7",
++        "latestAnswer": 99994500
        },
-       "liquidationBonus": 10750,
+       "decimals": 18,
        "borrowCap": 0,```

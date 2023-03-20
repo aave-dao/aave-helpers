@@ -1,14 +1,14 @@
 ```diff
 diff --git a/./reports/preTestEngineCaps.json b/./reports/postTestEngineCaps.json
-index bbae8fb..9d9c20c 100644
+index f7fe26f..d7c7eb5 100644
 --- a/./reports/preTestEngineCaps.json
 +++ b/./reports/postTestEngineCaps.json
-@@ -160,7 +160,7 @@
-     "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9": {
-       "isSiloed": false,
-       "liquidationProtocolFee": 1000,
+@@ -318,7 +318,7 @@
+       "liquidationBonus": 10750,
+       "usageAsCollateralEnabled": true,
+       "ltv": 6000,
 -      "supplyCap": 1850000,
 +      "supplyCap": 1000000,
-       "symbol": "AAVE",
-       "eModeCategory": 0,
-       "stableBorrowRateEnabled": false,```
+       "decimals": 18,
+       "debtCeiling": 0,
+       "isActive": true,```

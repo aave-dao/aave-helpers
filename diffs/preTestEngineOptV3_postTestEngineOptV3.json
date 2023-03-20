@@ -1,34 +1,52 @@
 ```diff
 diff --git a/./reports/preTestEngineOptV3.json b/./reports/postTestEngineOptV3.json
-index 33b194c..b2496af 100644
+index 8f8342d..392ddd3 100644
 --- a/./reports/preTestEngineOptV3.json
 +++ b/./reports/postTestEngineOptV3.json
-@@ -310,7 +310,7 @@
-       "isFlashloanable": false,
-       "underlying": "0x4200000000000000000000000000000000000006",
-       "stableDebtToken": "0xD8Ad37849950903571df17049516a5CD4cbE55F6",
--      "reserveFactor": 1000,
-+      "reserveFactor": 1500,
-       "variableDebtTokenImpl": "0x81387c40EB75acB02757C1Ae55D5936E78c9dEd3",
-       "ltv": 8000,
-       "oracle": {
-@@ -371,6 +371,19 @@
-       "stableRateSlope2": 600000000000000000000000000,
-       "address": "0x41B66b4b6b4c9dab039d96528D1b88f7BAF8C5A4"
+@@ -13,6 +13,19 @@
+       "stableRateSlope1": 45000000000000000000000000,
+       "optimalStableToTotalDebtRatio": 200000000000000000000000000
      },
 +    "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD": {
-+      "maxExcessUsageRatio": 200000000000000000000000000,
-+      "stableRateSlope1": 40000000000000000000000000,
-+      "variableRateSlope2": 800000000000000000000000000,
-+      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
 +      "variableRateSlope1": 38000000000000000000000000,
 +      "stableRateSlope2": 800000000000000000000000000,
 +      "baseStableBorrowRate": 68000000000000000000000000,
-+      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
 +      "optimalUsageRatio": 800000000000000000000000000,
++      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
++      "baseVariableBorrowRate": 10000000000000000000000000,
 +      "address": "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD",
-+      "baseVariableBorrowRate": 10000000000000000000000000
++      "stableRateSlope1": 40000000000000000000000000,
++      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
++      "variableRateSlope2": 800000000000000000000000000,
++      "maxExcessUsageRatio": 200000000000000000000000000
 +    },
-     "0x6BA97468e2e6a3711a6DD05F0075d48E878c910e": {
-       "baseVariableBorrowRate": 2500000000000000000000000,
-       "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,```
+     "0xeE1BAc9355EaAfCD1B68d272d640d870bC9b4b5C": {
+       "baseStableBorrowRate": 90000000000000000000000000,
+       "maxExcessUsageRatio": 550000000000000000000000000,
+@@ -283,7 +296,7 @@
+       "isFrozen": false,
+       "symbol": "WETH",
+       "ltv": 8000,
+-      "reserveFactor": 1000,
++      "reserveFactor": 1500,
+       "liquidationThreshold": 8250,
+       "decimals": 18,
+       "isBorrowableInIsolation": false,
+@@ -293,7 +306,7 @@
+       "stableBorrowRateEnabled": false,
+       "isSiloed": false,
+       "isFlashloanable": false,
+-      "interestRateStrategy": "0xeE1BAc9355EaAfCD1B68d272d640d870bC9b4b5C",
++      "interestRateStrategy": "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD",
+       "aToken": "0xe50fA9b3c56FfB159cB0FCA61F5c9D750e8128c8",
+       "variableDebtToken": "0x0c84331e39d6658Cd6e6b9ba04736cC4c4734351"
+     },
+@@ -372,7 +385,7 @@
+       "variableDebtTokenImpl": "0x81387c40EB75acB02757C1Ae55D5936E78c9dEd3",
+       "isActive": true,
+       "isBorrowableInIsolation": true,
+-      "interestRateStrategy": "0x41B66b4b6b4c9dab039d96528D1b88f7BAF8C5A4",
++      "interestRateStrategy": "0xA9F3C3caE095527061e6d270DBE163693e6fda9D",
+       "variableDebtToken": "0xfb00AC187a8Eb5AFAE4eACE434F493Eb62672df7",
+       "aTokenImpl": "0xa5ba6E5EC19a1Bf23C857991c857dB62b2Aa187B",
+       "oracle": {```

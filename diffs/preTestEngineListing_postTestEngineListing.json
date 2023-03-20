@@ -1,44 +1,45 @@
 ```diff
 diff --git a/./reports/preTestEngineListing.json b/./reports/postTestEngineListing.json
-index afe3aee..ac23b3d 100644
+index b0be8fe..ededc6d 100644
 --- a/./reports/preTestEngineListing.json
 +++ b/./reports/postTestEngineListing.json
-@@ -576,6 +576,38 @@
-       "usageAsCollateralEnabled": true,
-       "isSiloed": false
+@@ -581,6 +581,39 @@
+       "supplyCap": 7500000,
+       "eModeCategory": 2
      },
 +    "0x9c2C5fd7b07E95EE044DDeba0E97a665F142394f": {
-+      "isBorrowableInIsolation": false,
-+      "liquidationProtocolFee": 1000,
-+      "decimals": 18,
-+      "isFlashloanable": false,
-+      "stableDebtToken": "0x173e54325AE58B072985DbF232436961981EA000",
-+      "variableDebtToken": "0x77fA66882a8854d883101Fb8501BD3CaD347Fc32",
-+      "stableDebtTokenImpl": "0x52A1CeB68Ee6b7B5D13E0376A1E0E4423A8cE26e",
-+      "aToken": "0xf59036CAEBeA7dC4b86638DFA2E3C97dA9FcCd40",
-+      "ltv": 8250,
-+      "usageAsCollateralEnabled": true,
-+      "symbol": "1INCH",
-+      "isActive": true,
-+      "isFrozen": false,
-+      "variableDebtTokenImpl": "0x81387c40EB75acB02757C1Ae55D5936E78c9dEd3",
 +      "borrowCap": 60000,
 +      "debtCeiling": 0,
++      "usageAsCollateralEnabled": true,
++      "isActive": true,
++      "aToken": "0xf59036CAEBeA7dC4b86638DFA2E3C97dA9FcCd40",
++      "variableDebtTokenImpl": "0x81387c40EB75acB02757C1Ae55D5936E78c9dEd3",
++      "isBorrowableInIsolation": false,
++      "variableDebtToken": "0x77fA66882a8854d883101Fb8501BD3CaD347Fc32",
 +      "aTokenImpl": "0xa5ba6E5EC19a1Bf23C857991c857dB62b2Aa187B",
++      "borrowingEnabled": true,
++      "eModeCategory": 0,
++      "ltv": 8250,
++      "supplyCap": 85000,
++      "liquidationBonus": 10500,
++      "liquidationProtocolFee": 1000,
++      "symbol": "1INCH",
++      "decimals": 18,
++      "isSiloed": false,
++      "interestRateStrategy": "0x03733F4E008d36f2e37F0080fF1c8DF756622E6F",
++      "stableDebtTokenImpl": "0x52A1CeB68Ee6b7B5D13E0376A1E0E4423A8cE26e",
 +      "oracle": {
 +        "latestAnswer": 52690564,
 +        "address": "0x443C5116CdF663Eb387e72C688D276e702135C87"
 +      },
-+      "isSiloed": false,
-+      "underlying": "0x9c2C5fd7b07E95EE044DDeba0E97a665F142394f",
++      "stableDebtToken": "0x173e54325AE58B072985DbF232436961981EA000",
++      "isFrozen": false,
 +      "reserveFactor": 1000,
-+      "eModeCategory": 0,
-+      "liquidationBonus": 10500,
-+      "stableBorrowRateEnabled": false,
-+      "supplyCap": 85000,
-+      "borrowingEnabled": true,
-+      "liquidationThreshold": 8600
++      "liquidationThreshold": 8600,
++      "isFlashloanable": false,
++      "underlying": "0x9c2C5fd7b07E95EE044DDeba0E97a665F142394f",
++      "stableBorrowRateEnabled": false
 +    },
-     "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270": {
-       "aTokenImpl": "0xa5ba6E5EC19a1Bf23C857991c857dB62b2Aa187B",
-       "symbol": "WMATIC",```
+     "0x0b3F868E0BE5597D5DB7fEB59E1CADBb0fdDa50a": {
+       "isFrozen": false,
+       "isBorrowableInIsolation": false,```

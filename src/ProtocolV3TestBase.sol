@@ -82,6 +82,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
     // overwrite with empty json to later be extended
     vm.writeFile(path, '{ "eModes": [], "reserves": [], "strategies": [] }');
+    vm.serializeUint('root', 'chainId', block.chainid);
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     _writeReserveConfigs(path, configs, pool);
     _writeStrategyConfigs(path, configs);
@@ -307,27 +308,43 @@ contract ProtocolV3TestBase is CommonTestBase {
         );
         string memory key = vm.toString(address(strategy));
         vm.serializeAddress(key, 'address', address(strategy));
-        vm.serializeUint(key, 'baseStableBorrowRate', strategy.getBaseStableBorrowRate());
-        vm.serializeUint(key, 'stableRateSlope1', strategy.getStableRateSlope1());
-        vm.serializeUint(key, 'stableRateSlope2', strategy.getStableRateSlope2());
-        vm.serializeUint(key, 'baseVariableBorrowRate', strategy.getBaseVariableBorrowRate());
-        vm.serializeUint(key, 'variableRateSlope1', strategy.getVariableRateSlope1());
-        vm.serializeUint(key, 'variableRateSlope2', strategy.getVariableRateSlope2());
-        vm.serializeUint(
+        vm.serializeString(
+          key,
+          'baseStableBorrowRate',
+          vm.toString(strategy.getBaseStableBorrowRate())
+        );
+        vm.serializeString(key, 'stableRateSlope1', vm.toString(strategy.getStableRateSlope1()));
+        vm.serializeString(key, 'stableRateSlope2', vm.toString(strategy.getStableRateSlope2()));
+        vm.serializeString(
+          key,
+          'baseVariableBorrowRate',
+          vm.toString(strategy.getBaseVariableBorrowRate())
+        );
+        vm.serializeString(
+          key,
+          'variableRateSlope1',
+          vm.toString(strategy.getVariableRateSlope1())
+        );
+        vm.serializeString(
+          key,
+          'variableRateSlope2',
+          vm.toString(strategy.getVariableRateSlope2())
+        );
+        vm.serializeString(
           key,
           'optimalStableToTotalDebtRatio',
-          strategy.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO()
+          vm.toString(strategy.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO())
         );
-        vm.serializeUint(
+        vm.serializeString(
           key,
           'maxExcessStableToTotalDebtRatio',
-          strategy.MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO()
+          vm.toString(strategy.MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO())
         );
-        vm.serializeUint(key, 'optimalUsageRatio', strategy.OPTIMAL_USAGE_RATIO());
-        string memory object = vm.serializeUint(
+        vm.serializeString(key, 'optimalUsageRatio', vm.toString(strategy.OPTIMAL_USAGE_RATIO()));
+        string memory object = vm.serializeString(
           key,
           'maxExcessUsageRatio',
-          strategy.MAX_EXCESS_USAGE_RATIO()
+          vm.toString(strategy.MAX_EXCESS_USAGE_RATIO())
         );
         content = vm.serializeString(strategiesKey, key, object);
       }
@@ -372,6 +389,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       vm.serializeBool(key, 'isSiloed', config.isSiloed);
       vm.serializeBool(key, 'isBorrowableInIsolation', config.isBorrowableInIsolation);
       vm.serializeBool(key, 'isFlashloanable', config.isFlashloanable);
+      vm.serializeAddress(key, 'interestRateStrategy', config.interestRateStrategy);
       vm.serializeAddress(key, 'underlying', config.underlying);
       vm.serializeAddress(key, 'aToken', config.aToken);
       vm.serializeAddress(key, 'stableDebtToken', config.stableDebtToken);
