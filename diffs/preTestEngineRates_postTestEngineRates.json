@@ -1,14 +1,14 @@
 ```diff
 diff --git a/./reports/preTestEngineRates.json b/./reports/postTestEngineRates.json
-index f8d0c3b..21f1721 100644
+index b7b6818..89ad7e2 100644
 --- a/./reports/preTestEngineRates.json
 +++ b/./reports/postTestEngineRates.json
-@@ -311,7 +311,7 @@
+@@ -21,7 +21,7 @@
        "usageAsCollateralEnabled": true,
-       "isFrozen": false,
+       "liquidationThreshold": 8000,
        "eModeCategory": 1,
 -      "interestRateStrategy": "0x41B66b4b6b4c9dab039d96528D1b88f7BAF8C5A4",
 +      "interestRateStrategy": "0xA9F3C3caE095527061e6d270DBE163693e6fda9D",
-       "debtCeiling": 500000000,
-       "liquidationThreshold": 8000,
-       "isBorrowableInIsolation": true,```
+       "isFlashloanable": false,
+       "stableBorrowRateEnabled": true,
+       "isActive": true,```

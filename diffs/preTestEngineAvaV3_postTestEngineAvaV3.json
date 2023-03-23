@@ -1,76 +1,111 @@
 ```diff
 diff --git a/./reports/preTestEngineAvaV3.json b/./reports/postTestEngineAvaV3.json
-index 7bd91ba..7446280 100644
+index 1d394d9..5116176 100644
 --- a/./reports/preTestEngineAvaV3.json
 +++ b/./reports/postTestEngineAvaV3.json
-@@ -1,5 +1,18 @@
- {
-   "strategies": {
-+    "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD": {
-+      "variableRateSlope1": 38000000000000000000000000,
-+      "baseVariableBorrowRate": 10000000000000000000000000,
-+      "address": "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD",
-+      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
-+      "stableRateSlope1": 40000000000000000000000000,
-+      "maxExcessUsageRatio": 200000000000000000000000000,
-+      "stableRateSlope2": 800000000000000000000000000,
-+      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
-+      "optimalUsageRatio": 800000000000000000000000000,
-+      "baseStableBorrowRate": 68000000000000000000000000,
-+      "variableRateSlope2": 800000000000000000000000000
-+    },
-     "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6": {
-       "baseStableBorrowRate": 90000000000000000000000000,
-       "maxExcessUsageRatio": 550000000000000000000000000,
-@@ -49,14 +62,14 @@
-       "aTokenImpl": "0xa5ba6E5EC19a1Bf23C857991c857dB62b2Aa187B",
-       "liquidationThreshold": 8000,
-       "liquidationProtocolFee": 1000,
+@@ -43,7 +43,7 @@
+       "eModeCategory": 1,
+       "liquidationThreshold": 8100,
+       "supplyCap": 2000000000,
 -      "interestRateStrategy": "0xf4a0039F2d4a2EaD5216AbB6Ae4C4C3AA2dB9b82",
 +      "interestRateStrategy": "0xfab05a6aF585da2F96e21452F91E812452996BD3",
+       "stableDebtToken": "0x70eFfc565DB6EEf7B927610155602d31b670e802",
+       "liquidationBonus": 10500,
+       "stableDebtTokenImpl": "0x52A1CeB68Ee6b7B5D13E0376A1E0E4423A8cE26e",
+@@ -102,7 +102,7 @@
+       "isFrozen": false,
+       "ltv": 7500,
+       "liquidationProtocolFee": 1000,
+-      "reserveFactor": 1000,
++      "reserveFactor": 2000,
+       "debtCeiling": 200000000,
+       "liquidationThreshold": 8000,
        "stableBorrowRateEnabled": false,
-       "borrowCap": 2000000,
-       "supplyCap": 50000000,
+@@ -119,7 +119,7 @@
+         "address": "0x5D1F504211c17365CA66353442a74D4435A8b778"
+       },
+       "isSiloed": false,
+-      "interestRateStrategy": "0xf4a0039F2d4a2EaD5216AbB6Ae4C4C3AA2dB9b82",
++      "interestRateStrategy": "0xfab05a6aF585da2F96e21452F91E812452996BD3",
+       "usageAsCollateralEnabled": true,
+       "underlying": "0x5c49b268c9841AFF1Cc3B0a418ff5c3442eE3F3b",
+       "aTokenImpl": "0xa5ba6E5EC19a1Bf23C857991c857dB62b2Aa187B",
+@@ -176,13 +176,13 @@
+         "latestAnswer": 157050000000,
+         "address": "0x976B3D034E162d8bD72D6b9C989d545b839003b0"
+       },
+-      "interestRateStrategy": "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6",
++      "interestRateStrategy": "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD",
+       "ltv": 8000,
+       "liquidationThreshold": 8250,
        "liquidationBonus": 10500,
        "isFrozen": false,
        "isFlashloanable": false,
 -      "reserveFactor": 1000,
-+      "reserveFactor": 2000,
-       "underlying": "0x5c49b268c9841AFF1Cc3B0a418ff5c3442eE3F3b",
-       "usageAsCollateralEnabled": true,
-       "variableDebtToken": "0xCE186F6Cccb0c955445bb9d10C59caE488Fea559",
-@@ -115,7 +128,7 @@
-       "reserveFactor": 1000,
-       "aToken": "0xc45A479877e1e9Dfe9FcD4056c699575a1045dAA",
-       "stableBorrowRateEnabled": false,
++      "reserveFactor": 1500,
+       "liquidationProtocolFee": 1000,
+       "decimals": 18,
+       "supplyCap": 113000,
+@@ -211,7 +211,7 @@
+       "liquidationProtocolFee": 1000,
+       "ltv": 7500,
+       "isFlashloanable": false,
 -      "interestRateStrategy": "0xf4a0039F2d4a2EaD5216AbB6Ae4C4C3AA2dB9b82",
 +      "interestRateStrategy": "0xfab05a6aF585da2F96e21452F91E812452996BD3",
        "underlying": "0xD24C2Ad096400B6FBcd2ad8B24E7acBc21A1da64",
-       "ltv": 7500,
-       "isSiloed": false,
-@@ -287,14 +300,14 @@
-       "isSiloed": false,
-       "eModeCategory": 0,
-       "isFlashloanable": false,
--      "interestRateStrategy": "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6",
-+      "interestRateStrategy": "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD",
-       "isBorrowableInIsolation": false,
-       "borrowCap": 62150,
-       "variableDebtToken": "0x0c84331e39d6658Cd6e6b9ba04736cC4c4734351",
-       "isActive": true,
-       "aTokenImpl": "0xa5ba6E5EC19a1Bf23C857991c857dB62b2Aa187B",
-       "decimals": 18,
--      "reserveFactor": 1000,
-+      "reserveFactor": 1500,
-       "ltv": 8000,
-       "liquidationThreshold": 8250,
-       "borrowingEnabled": true,
-@@ -315,7 +328,7 @@
-       "eModeCategory": 1,
-       "liquidationProtocolFee": 1000,
-       "isActive": true,
--      "interestRateStrategy": "0xf4a0039F2d4a2EaD5216AbB6Ae4C4C3AA2dB9b82",
-+      "interestRateStrategy": "0xfab05a6aF585da2F96e21452F91E812452996BD3",
-       "aToken": "0x6ab707Aca953eDAeFBc4fD23bA73294241490620",
-       "variableDebtToken": "0xfb00AC187a8Eb5AFAE4eACE434F493Eb62672df7",
-       "variableDebtTokenImpl": "0x81387c40EB75acB02757C1Ae55D5936E78c9dEd3",```
+       "borrowCap": 2000000,
+       "supplyCap": 50000000,
+@@ -426,6 +426,32 @@
+   },
+   "chainId": 43114,
+   "strategies": {
++    "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD": {
++      "baseVariableBorrowRate": 10000000000000000000000000,
++      "stableRateSlope1": 40000000000000000000000000,
++      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
++      "optimalUsageRatio": 800000000000000000000000000,
++      "maxExcessUsageRatio": 200000000000000000000000000,
++      "stableRateSlope2": 800000000000000000000000000,
++      "baseStableBorrowRate": 68000000000000000000000000,
++      "address": "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD",
++      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
++      "variableRateSlope2": 800000000000000000000000000,
++      "variableRateSlope1": 38000000000000000000000000
++    },
++    "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6": {
++      "optimalUsageRatio": 450000000000000000000000000,
++      "baseVariableBorrowRate": 0,
++      "variableRateSlope1": 70000000000000000000000000,
++      "stableRateSlope1": 0,
++      "stableRateSlope2": 0,
++      "baseStableBorrowRate": 90000000000000000000000000,
++      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
++      "variableRateSlope2": 3000000000000000000000000000,
++      "address": "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6",
++      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
++      "maxExcessUsageRatio": 550000000000000000000000000
++    },
+     "0xfab05a6aF585da2F96e21452F91E812452996BD3": {
+       "address": "0xfab05a6aF585da2F96e21452F91E812452996BD3",
+       "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
+@@ -451,19 +477,6 @@
+       "stableRateSlope1": 5000000000000000000000000,
+       "variableRateSlope2": 600000000000000000000000000,
+       "variableRateSlope1": 40000000000000000000000000
+-    },
+-    "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6": {
+-      "optimalUsageRatio": 450000000000000000000000000,
+-      "baseVariableBorrowRate": 0,
+-      "variableRateSlope1": 70000000000000000000000000,
+-      "stableRateSlope1": 0,
+-      "stableRateSlope2": 0,
+-      "baseStableBorrowRate": 90000000000000000000000000,
+-      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
+-      "variableRateSlope2": 3000000000000000000000000000,
+-      "address": "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6",
+-      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
+-      "maxExcessUsageRatio": 550000000000000000000000000
+     }
+   }
+ }
+\ No newline at end of file```

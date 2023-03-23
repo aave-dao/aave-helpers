@@ -2,7 +2,7 @@
 pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
-import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes} from 'aave-address-book/AaveV3.sol';
+import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
@@ -81,12 +81,16 @@ contract ProtocolV3TestBase is CommonTestBase {
   {
     string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
     // overwrite with empty json to later be extended
-    vm.writeFile(path, '{ "eModes": [], "reserves": [], "strategies": [] }');
+    vm.writeFile(
+      path,
+      '{ "eModes": {}, "reserves": {}, "strategies": {}, "poolConfiguration": {} }'
+    );
     vm.serializeUint('root', 'chainId', block.chainid);
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     _writeReserveConfigs(path, configs, pool);
     _writeStrategyConfigs(path, configs);
     _writeEModeConfigs(path, configs, pool);
+    _writePoolConfiguration(path, pool);
 
     return configs;
   }
@@ -426,6 +430,43 @@ contract ProtocolV3TestBase is CommonTestBase {
       content = vm.serializeString(reservesKey, key, object);
     }
     string memory output = vm.serializeString('root', 'reserves', content);
+    vm.writeJson(output, path);
+  }
+
+  function _writePoolConfiguration(string memory path, IPool pool) internal {
+    // keys for json stringification
+    string memory poolConfigKey = 'poolConfig';
+
+    // addresses provider
+    IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
+    vm.serializeAddress(poolConfigKey, 'poolAddressesProvider', address(addressesProvider));
+
+    // oracle
+    IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
+    vm.serializeAddress(poolConfigKey, 'oracle', address(oracle));
+
+    // pool configurator
+    IPoolConfigurator configurator = IPoolConfigurator(addressesProvider.getPoolConfigurator());
+    vm.serializeAddress(poolConfigKey, 'poolConfigurator', address(configurator));
+    vm.serializeAddress(
+      poolConfigKey,
+      'poolConfiguratorImpl',
+      ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, address(configurator))
+    );
+
+    // PoolDaraProvider
+    IPoolDataProvider pdp = IPoolDataProvider(addressesProvider.getPoolDataProvider());
+    vm.serializeAddress(poolConfigKey, 'protocolDataProvider', address(pdp));
+
+    // pool
+    vm.serializeAddress(
+      poolConfigKey,
+      'poolImpl',
+      ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, address(pool))
+    );
+    string memory content = vm.serializeAddress(poolConfigKey, 'pool', address(pool));
+
+    string memory output = vm.serializeString('root', 'poolConfig', content);
     vm.writeJson(output, path);
   }
 

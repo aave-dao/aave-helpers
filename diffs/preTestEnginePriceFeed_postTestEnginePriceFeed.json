@@ -1,16 +1,16 @@
 ```diff
 diff --git a/./reports/preTestEnginePriceFeed.json b/./reports/postTestEnginePriceFeed.json
-index 24e816b..faf9866 100644
+index 92c995a..e13efcd 100644
 --- a/./reports/preTestEnginePriceFeed.json
 +++ b/./reports/postTestEnginePriceFeed.json
-@@ -661,8 +661,8 @@
-       "stableDebtTokenImpl": "0x52A1CeB68Ee6b7B5D13E0376A1E0E4423A8cE26e",
-       "variableDebtToken": "0xE80761Ea617F66F96274eA5e8c37f03960ecC679",
+@@ -371,8 +371,8 @@
+       "debtCeiling": 0,
+       "isSiloed": false,
        "oracle": {
--        "address": "0x72484B12719E23115761D5DA1646945632979bB6",
--        "latestAnswer": 7673000000
-+        "address": "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7",
-+        "latestAnswer": 99994500
+-        "latestAnswer": 7673000000,
+-        "address": "0x72484B12719E23115761D5DA1646945632979bB6"
++        "latestAnswer": 99994500,
++        "address": "0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7"
        },
-       "decimals": 18,
-       "borrowCap": 0,```
+       "interestRateStrategy": "0x03733F4E008d36f2e37F0080fF1c8DF756622E6F",
+       "aTokenImpl": "0xa5ba6E5EC19a1Bf23C857991c857dB62b2Aa187B",```

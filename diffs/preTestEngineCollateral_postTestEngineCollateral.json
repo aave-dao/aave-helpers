@@ -1,28 +1,25 @@
 ```diff
 diff --git a/./reports/preTestEngineCollateral.json b/./reports/postTestEngineCollateral.json
-index 9ceb032..660dd06 100644
+index e03a879..bb0314b 100644
 --- a/./reports/preTestEngineCollateral.json
 +++ b/./reports/postTestEngineCollateral.json
-@@ -430,11 +430,11 @@
-       "reserveFactor": 0,
-       "debtCeiling": 0,
-       "stableBorrowRateEnabled": false,
+@@ -268,8 +268,8 @@
+       "stableDebtToken": "0x70eFfc565DB6EEf7B927610155602d31b670e802"
+     },
+     "0x63a72806098Bd3D9520cC43356dD78afe5D386D9": {
+-      "ltv": 6000,
+-      "liquidationThreshold": 7130,
++      "ltv": 6200,
++      "liquidationThreshold": 7200,
+       "interestRateStrategy": "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6",
+       "stableDebtToken": "0xfAeF6A702D15428E588d4C0614AEFb4348D83D48",
+       "variableDebtToken": "0xE80761Ea617F66F96274eA5e8c37f03960ecC679",
+@@ -288,7 +288,7 @@
+       "borrowCap": 0,
+       "isSiloed": false,
+       "stableDebtTokenImpl": "0x52A1CeB68Ee6b7B5D13E0376A1E0E4423A8cE26e",
 -      "liquidationBonus": 10750,
 +      "liquidationBonus": 10600,
-       "isFrozen": false,
-       "stableDebtToken": "0xfAeF6A702D15428E588d4C0614AEFb4348D83D48",
-       "symbol": "AAVE.e",
--      "liquidationThreshold": 7130,
-+      "liquidationThreshold": 7200,
        "decimals": 18,
-       "variableDebtToken": "0xE80761Ea617F66F96274eA5e8c37f03960ecC679",
-       "stableDebtTokenImpl": "0x52A1CeB68Ee6b7B5D13E0376A1E0E4423A8cE26e",
-@@ -450,7 +450,7 @@
-       "borrowCap": 0,
-       "eModeCategory": 0,
-       "isBorrowableInIsolation": false,
--      "ltv": 6000,
-+      "ltv": 6200,
-       "interestRateStrategy": "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6",
-       "isFlashloanable": false,
-       "aTokenImpl": "0xa5ba6E5EC19a1Bf23C857991c857dB62b2Aa187B",```
+       "borrowingEnabled": false,
+       "isFlashloanable": false,```

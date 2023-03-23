@@ -1,14 +1,14 @@
 ```diff
 diff --git a/./reports/preTestEngineCaps.json b/./reports/postTestEngineCaps.json
-index f7fe26f..d7c7eb5 100644
+index 7048774..48955d3 100644
 --- a/./reports/preTestEngineCaps.json
 +++ b/./reports/postTestEngineCaps.json
-@@ -318,7 +318,7 @@
-       "liquidationBonus": 10750,
-       "usageAsCollateralEnabled": true,
-       "ltv": 6000,
+@@ -273,7 +273,7 @@
+       "stableBorrowRateEnabled": false,
+       "isFrozen": false,
+       "interestRateStrategy": "0x24701A6368Ff6D2874d6b8cDadd461552B8A5283",
 -      "supplyCap": 1850000,
 +      "supplyCap": 1000000,
-       "decimals": 18,
-       "debtCeiling": 0,
-       "isActive": true,```
+       "stableDebtToken": "0x268497bF083388B1504270d0E717222d3A87D6F2",
+       "symbol": "AAVE",
+       "stableDebtTokenImpl": "0x15C5620dfFaC7c7366EED66C20Ad222DDbB1eD57",```

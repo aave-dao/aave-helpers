@@ -1,23 +1,23 @@
 ```diff
 diff --git a/./reports/preTestEngineBorrow.json b/./reports/postTestEngineBorrow.json
-index de54665..3902c9e 100644
+index 5ae069a..1866324 100644
 --- a/./reports/preTestEngineBorrow.json
 +++ b/./reports/postTestEngineBorrow.json
-@@ -400,7 +400,7 @@
-       "supplyCap": 36820,
-       "stableDebtToken": "0xfAeF6A702D15428E588d4C0614AEFb4348D83D48",
-       "eModeCategory": 0,
+@@ -692,7 +692,7 @@
+     "0xD6DF932A45C0f255f85145f286eA0b292B21C90B": {
+       "debtCeiling": 0,
+       "liquidationThreshold": 7000,
 -      "reserveFactor": 0,
 +      "reserveFactor": 1500,
-       "isSiloed": false,
-       "liquidationThreshold": 7000,
-       "isFrozen": false,
-@@ -409,7 +409,7 @@
-       "underlying": "0xD6DF932A45C0f255f85145f286eA0b292B21C90B",
-       "aTokenImpl": "0xa5ba6E5EC19a1Bf23C857991c857dB62b2Aa187B",
-       "stableDebtTokenImpl": "0x52A1CeB68Ee6b7B5D13E0376A1E0E4423A8cE26e",
+       "eModeCategory": 0,
+       "liquidationProtocolFee": 1000,
+       "isBorrowableInIsolation": false,
+@@ -716,7 +716,7 @@
+       "interestRateStrategy": "0x03733F4E008d36f2e37F0080fF1c8DF756622E6F",
+       "decimals": 18,
+       "borrowCap": 0,
 -      "borrowingEnabled": false,
 +      "borrowingEnabled": true,
-       "isActive": true,
        "usageAsCollateralEnabled": true,
-       "stableBorrowRateEnabled": false,```
+       "isActive": true,
+       "isSiloed": false,```
