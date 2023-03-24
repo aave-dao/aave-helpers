@@ -2,27 +2,11 @@
 pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
-import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
+import {AggregatorInterface, IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
-
-// TODO: expose from address book
-interface AggregatorInterface {
-  function latestAnswer() external view returns (int256);
-
-  function latestTimestamp() external view returns (uint256);
-
-  function latestRound() external view returns (uint256);
-
-  function getAnswer(uint256 roundId) external view returns (int256);
-
-  function getTimestamp(uint256 roundId) external view returns (uint256);
-
-  event AnswerUpdated(int256 indexed current, uint256 indexed roundId, uint256 updatedAt);
-  event NewRound(uint256 indexed roundId, address indexed startedBy, uint256 startedAt);
-}
 
 struct ReserveConfig {
   string symbol;
@@ -373,6 +357,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       AggregatorInterface assetOracle = AggregatorInterface(
         oracle.getSourceOfAsset(config.underlying)
       );
+
       string memory key = vm.toString(config.underlying);
       vm.serializeString(key, 'symbol', config.symbol);
       vm.serializeUint(key, 'ltv', config.ltv);
@@ -424,7 +409,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       string memory out = vm.serializeUint(
         oracleKey,
         'latestAnswer',
-        uint256(assetOracle.latestAnswer())
+        uint256(oracle.getAssetPrice(config.underlying))
       );
       string memory object = vm.serializeString(key, 'oracle', out);
       content = vm.serializeString(reservesKey, key, object);

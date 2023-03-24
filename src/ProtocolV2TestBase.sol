@@ -2,10 +2,11 @@
 pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
-import {IAaveOracle, ILendingPool, ILendingPoolAddressesProvider, IAaveProtocolDataProvider, DataTypes, TokenData, ILendingRateOracle, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV2.sol';
+import {AggregatorInterface, IAaveOracle, ILendingPool, ILendingPoolAddressesProvider, ILendingPoolConfigurator, IAaveProtocolDataProvider, DataTypes, TokenData, ILendingRateOracle, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV2.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
+import {ProxyHelpers} from './ProxyHelpers.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -53,14 +54,15 @@ contract ProtocolV2TestBase is CommonTestBase {
     returns (ReserveConfig[] memory)
   {
     string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
-    vm.writeFile(path, '# Report\n\n');
+    vm.writeFile(path, '{ "reserves": {}, "strategies": {}, "poolConfiguration": {} }');
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(
       pool.getAddressesProvider()
     );
     ILendingRateOracle oracle = ILendingRateOracle(addressesProvider.getLendingRateOracle());
-    _writeReserveConfigs(path, configs, oracle);
+    _writeReserveConfigs(path, configs, pool, oracle);
     _writeStrategyConfigs(path, configs);
+    _writePoolConfiguration(path, pool);
 
     return configs;
   }
@@ -239,17 +241,10 @@ contract ProtocolV2TestBase is CommonTestBase {
   }
 
   function _writeStrategyConfigs(string memory path, ReserveConfig[] memory configs) internal {
-    vm.writeLine(path, '## InterestRateStrategies\n');
-    vm.writeLine(
-      path,
-      string(
-        abi.encodePacked(
-          '| strategy | getStableRateSlope1 | getStableRateSlope2 ',
-          '| getBaseVariableBorrowRate | getVariableRateSlope1 | getVariableRateSlope2 | optimalUtilizationRatio | excessUtilizationRatio |'
-        )
-      )
-    );
-    vm.writeLine(path, '|---|---|---|---|---|---|---|---|');
+    // keys for json stringification
+    string memory strategiesKey = 'stategies';
+    string memory content;
+
     address[] memory usedStrategies = new address[](configs.length);
     for (uint256 i = 0; i < configs.length; i++) {
       if (!_isInAddressArray(usedStrategies, configs[i].interestRateStrategy)) {
@@ -257,150 +252,155 @@ contract ProtocolV2TestBase is CommonTestBase {
         IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
           configs[i].interestRateStrategy
         );
-        vm.writeLine(
-          path,
-          string(
-            abi.encodePacked(
-              abi.encodePacked(
-                '| ',
-                vm.toString(address(strategy)),
-                ' | ',
-                vm.toString(strategy.stableRateSlope1()),
-                ' | ',
-                vm.toString(strategy.stableRateSlope2()),
-                ' | '
-              ),
-              abi.encodePacked(
-                vm.toString(strategy.baseVariableBorrowRate()),
-                ' | ',
-                vm.toString(strategy.variableRateSlope1()),
-                ' | ',
-                vm.toString(strategy.variableRateSlope2()),
-                ' | ',
-                vm.toString(strategy.OPTIMAL_UTILIZATION_RATE()),
-                ' | ',
-                vm.toString(strategy.EXCESS_UTILIZATION_RATE()),
-                ' |'
-              )
-            )
-          )
+        string memory key = vm.toString(address(strategy));
+        vm.serializeAddress(key, 'address', address(strategy));
+        vm.serializeString(key, 'stableRateSlope1', vm.toString(strategy.stableRateSlope1()));
+        vm.serializeString(key, 'stableRateSlope2', vm.toString(strategy.stableRateSlope2()));
+        vm.serializeString(
+          key,
+          'baseVariableBorrowRate',
+          vm.toString(strategy.baseVariableBorrowRate())
         );
+        vm.serializeString(key, 'variableRateSlope1', vm.toString(strategy.variableRateSlope1()));
+        vm.serializeString(key, 'variableRateSlope2', vm.toString(strategy.variableRateSlope2()));
+        vm.serializeString(
+          key,
+          'optimalUsageRatio',
+          vm.toString(strategy.OPTIMAL_UTILIZATION_RATE())
+        );
+        string memory object = vm.serializeString(
+          key,
+          'maxExcessUsageRatio',
+          vm.toString(strategy.EXCESS_UTILIZATION_RATE())
+        );
+        content = vm.serializeString(strategiesKey, key, object);
       }
     }
-    vm.writeLine(path, '\n');
+    string memory output = vm.serializeString('root', 'strategies', content);
+    vm.writeJson(output, path);
   }
 
-  function _logStrategyPreviewUrlParams(ReserveConfig memory config, ILendingPool pool) internal {
-    IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
-      config.interestRateStrategy
-    );
+  function _writePoolConfiguration(string memory path, ILendingPool pool) internal {
+    // keys for json stringification
+    string memory poolConfigKey = 'poolConfig';
+
+    // addresses provider
     ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(
       pool.getAddressesProvider()
     );
-    ILendingRateOracle oracle = ILendingRateOracle(addressesProvider.getLendingRateOracle());
+    vm.serializeAddress(poolConfigKey, 'poolAddressesProvider', address(addressesProvider));
 
-    emit log_named_string(
-      config.symbol,
-      string(
-        abi.encodePacked(
-          '?variableRateSlope1=',
-          vm.toString(strategy.variableRateSlope1()),
-          '&variableRateSlope2=',
-          vm.toString(strategy.variableRateSlope2()),
-          '&stableRateSlope1=',
-          vm.toString(strategy.stableRateSlope1()),
-          '&stableRateSlope2=',
-          vm.toString(strategy.stableRateSlope2()),
-          '&optimalUsageRatio=',
-          vm.toString(strategy.OPTIMAL_UTILIZATION_RATE()),
-          '&baseVariableBorrowRate=',
-          vm.toString(strategy.baseVariableBorrowRate()),
-          '&baseStableBorrowRate=',
-          vm.toString(oracle.getMarketBorrowRate(config.underlying))
-        )
+    // oracle
+    IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
+    vm.serializeAddress(poolConfigKey, 'oracle', address(oracle));
+
+    // pool configurator
+    ILendingPoolConfigurator configurator = ILendingPoolConfigurator(
+      addressesProvider.getLendingPoolConfigurator()
+    );
+    vm.serializeAddress(poolConfigKey, 'poolConfigurator', address(configurator));
+    vm.serializeAddress(
+      poolConfigKey,
+      'poolConfiguratorImpl',
+      ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, address(configurator))
+    );
+
+    // PoolDaraProvider
+    IAaveProtocolDataProvider pdp = IAaveProtocolDataProvider(
+      addressesProvider.getAddress(
+        0x0100000000000000000000000000000000000000000000000000000000000000
       )
     );
+    vm.serializeAddress(poolConfigKey, 'protocolDataProvider', address(pdp));
+
+    // pool
+    vm.serializeAddress(
+      poolConfigKey,
+      'poolImpl',
+      ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, address(pool))
+    );
+    string memory content = vm.serializeAddress(poolConfigKey, 'pool', address(pool));
+
+    string memory output = vm.serializeString('root', 'poolConfig', content);
+    vm.writeJson(output, path);
   }
 
   function _writeReserveConfigs(
     string memory path,
     ReserveConfig[] memory configs,
-    ILendingRateOracle oracle
+    ILendingPool pool,
+    ILendingRateOracle rateOracle
   ) internal {
-    vm.writeLine(path, '## Reserve Configurations\n');
-    vm.writeLine(
-      path,
-      string(
-        abi.encodePacked(
-          '| symbol | underlying | aToken | stableDebtToken | variableDebtToken | decimals | ltv | liquidationThreshold | liquidationBonus | ',
-          'reserveFactor | usageAsCollateralEnabled | borrowingEnabled | stableBorrowRateEnabled | ',
-          'interestRateStrategy | isActive | isFrozen | baseStableBorrowRate |'
-        )
-      )
+    // keys for json stringification
+    string memory reservesKey = 'reserves';
+    string memory content;
+
+    ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(
+      pool.getAddressesProvider()
     );
-    vm.writeLine(
-      path,
-      string(
-        abi.encodePacked(
-          '|---|---|---|---|---|---|---|---',
-          '|---|---|---|---|---|---|---|---|---|'
-        )
-      )
-    );
+    IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
+
     for (uint256 i = 0; i < configs.length; i++) {
       ReserveConfig memory config = configs[i];
-      vm.writeLine(
-        path,
-        string(
-          abi.encodePacked(
-            abi.encodePacked(
-              '| ',
-              config.symbol,
-              ' | ',
-              vm.toString(config.underlying),
-              ' | ',
-              vm.toString(config.aToken),
-              ' | ',
-              vm.toString(config.stableDebtToken),
-              ' | ',
-              vm.toString(config.variableDebtToken),
-              ' | ',
-              vm.toString(config.decimals),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(config.ltv),
-              ' | ',
-              vm.toString(config.liquidationThreshold),
-              ' | ',
-              vm.toString(config.liquidationBonus),
-              ' | ',
-              vm.toString(config.reserveFactor),
-              ' | ',
-              vm.toString(config.usageAsCollateralEnabled),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(config.borrowingEnabled),
-              ' | ',
-              vm.toString(config.stableBorrowRateEnabled),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(config.interestRateStrategy),
-              ' | ',
-              vm.toString(config.isActive),
-              ' | ',
-              vm.toString(config.isFrozen),
-              ' | ',
-              vm.toString(oracle.getMarketBorrowRate(config.underlying)),
-              ' |'
-            )
-          )
+      AggregatorInterface assetOracle = AggregatorInterface(
+        oracle.getSourceOfAsset(config.underlying)
+      );
+
+      string memory key = vm.toString(config.underlying);
+      vm.serializeString(key, 'symbol', config.symbol);
+      vm.serializeString(
+        key,
+        'baseStableBorrowRate',
+        vm.toString(rateOracle.getMarketBorrowRate(config.underlying))
+      );
+      vm.serializeUint(key, 'ltv', config.ltv);
+      vm.serializeUint(key, 'liquidationThreshold', config.liquidationThreshold);
+      vm.serializeUint(key, 'liquidationBonus', config.liquidationBonus);
+      vm.serializeUint(key, 'reserveFactor', config.reserveFactor);
+      vm.serializeUint(key, 'decimals', config.decimals);
+      vm.serializeBool(key, 'usageAsCollateralEnabled', config.usageAsCollateralEnabled);
+      vm.serializeBool(key, 'borrowingEnabled', config.borrowingEnabled);
+      vm.serializeBool(key, 'stableBorrowRateEnabled', config.stableBorrowRateEnabled);
+      vm.serializeBool(key, 'isActive', config.isActive);
+      vm.serializeBool(key, 'isFrozen', config.isFrozen);
+      vm.serializeAddress(key, 'interestRateStrategy', config.interestRateStrategy);
+      vm.serializeAddress(key, 'underlying', config.underlying);
+      vm.serializeAddress(key, 'aToken', config.aToken);
+      vm.serializeAddress(key, 'stableDebtToken', config.stableDebtToken);
+      vm.serializeAddress(key, 'variableDebtToken', config.variableDebtToken);
+      vm.serializeAddress(
+        key,
+        'aTokenImpl',
+        ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, config.aToken)
+      );
+      vm.serializeAddress(
+        key,
+        'stableDebtTokenImpl',
+        ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+          vm,
+          config.stableDebtToken
         )
       );
+      vm.serializeAddress(
+        key,
+        'variableDebtTokenImpl',
+        ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+          vm,
+          config.variableDebtToken
+        )
+      );
+      string memory oracleKey = 'oracleKey';
+      vm.serializeAddress(oracleKey, 'address', address(assetOracle));
+      string memory out = vm.serializeUint(
+        oracleKey,
+        'latestAnswer',
+        uint256(oracle.getAssetPrice(config.underlying))
+      );
+      string memory object = vm.serializeString(key, 'oracle', out);
+      content = vm.serializeString(reservesKey, key, object);
     }
-    vm.writeLine(path, '\n');
+    string memory output = vm.serializeString('root', 'reserves', content);
+    vm.writeJson(output, path);
   }
 
   function _getReservesConfigs(ILendingPool pool) internal view returns (ReserveConfig[] memory) {
