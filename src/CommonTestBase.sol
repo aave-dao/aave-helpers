@@ -34,7 +34,7 @@ contract CommonTestBase is Test {
       abi.encodePacked(
         'printf ',
         "'```diff\n'",
-        '"`git diff --no-index --diff-algorithm=patience --ignore-space-at-eol ',
+        '"`git diff --no-index --diff-algorithm=patience --ignore-space-at-eol -U1000 ',
         beforePath,
         ' ',
         afterPath,
