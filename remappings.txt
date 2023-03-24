@@ -6,3 +6,4 @@ aave-v3-periphery/=lib/aave-address-book/lib/aave-v3-periphery/
 ds-test/=lib/forge-std/lib/ds-test/src/
 forge-std/=lib/forge-std/src/
 solidity-utils/=lib/solidity-utils/src/
+governance-crosschain-bridges/=lib/governance-crosschain-bridges/
