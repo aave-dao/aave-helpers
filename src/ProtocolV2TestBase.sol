@@ -55,6 +55,7 @@ contract ProtocolV2TestBase is CommonTestBase {
   {
     string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
     vm.writeFile(path, '{ "reserves": {}, "strategies": {}, "poolConfiguration": {} }');
+    vm.serializeUint('root', 'chainId', block.chainid);
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(
       pool.getAddressesProvider()
