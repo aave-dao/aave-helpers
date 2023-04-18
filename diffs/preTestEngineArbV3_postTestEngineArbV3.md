@@ -56,7 +56,6 @@
     "0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F": {
       "from": null,
       "to": {
-        "address": "0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F",
         "baseStableBorrowRate": "68000000000000000000000000",
         "baseVariableBorrowRate": "10000000000000000000000000",
         "maxExcessStableToTotalDebtRatio": "800000000000000000000000000",

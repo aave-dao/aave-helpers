@@ -658,7 +658,6 @@
   },
   "strategies": {
     "0x03733F4E008d36f2e37F0080fF1c8DF756622E6F": {
-      "address": "0x03733F4E008d36f2e37F0080fF1c8DF756622E6F",
       "baseStableBorrowRate": 90000000000000000000000000,
       "baseVariableBorrowRate": 0,
       "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
@@ -671,7 +670,6 @@
       "variableRateSlope2": 3000000000000000000000000000
     },
     "0x41B66b4b6b4c9dab039d96528D1b88f7BAF8C5A4": {
-      "address": "0x41B66b4b6b4c9dab039d96528D1b88f7BAF8C5A4",
       "baseStableBorrowRate": 50000000000000000000000000,
       "baseVariableBorrowRate": 0,
       "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
@@ -684,7 +682,6 @@
       "variableRateSlope2": 600000000000000000000000000
     },
     "0x4b8D3277d49E114C8F2D6E0B2eD310e29226fe16": {
-      "address": "0x4b8D3277d49E114C8F2D6E0B2eD310e29226fe16",
       "baseStableBorrowRate": 160000000000000000000000000,
       "baseVariableBorrowRate": 30000000000000000000000000,
       "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
@@ -697,7 +694,6 @@
       "variableRateSlope2": 1500000000000000000000000000
     },
     "0xA9F3C3caE095527061e6d270DBE163693e6fda9D": {
-      "address": "0xA9F3C3caE095527061e6d270DBE163693e6fda9D",
       "baseStableBorrowRate": 50000000000000000000000000,
       "baseVariableBorrowRate": 0,
       "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
@@ -710,7 +706,6 @@
       "variableRateSlope2": 750000000000000000000000000
     },
     "0xFB0898dCFb69DF9E01DBE625A5988D6542e5BdC5": {
-      "address": "0xFB0898dCFb69DF9E01DBE625A5988D6542e5BdC5",
       "baseStableBorrowRate": 81000000000000000000000000,
       "baseVariableBorrowRate": 0,
       "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
