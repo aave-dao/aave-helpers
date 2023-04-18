@@ -255,7 +255,6 @@ contract ProtocolV2TestBase is CommonTestBase {
           configs[i].interestRateStrategy
         );
         string memory key = vm.toString(address(strategy));
-        vm.serializeAddress(key, 'address', address(strategy));
         vm.serializeString(key, 'stableRateSlope1', vm.toString(strategy.stableRateSlope1()));
         vm.serializeString(key, 'stableRateSlope2', vm.toString(strategy.stableRateSlope2()));
         vm.serializeString(

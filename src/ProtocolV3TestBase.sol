@@ -296,7 +296,6 @@ contract ProtocolV3TestBase is CommonTestBase {
           configs[i].interestRateStrategy
         );
         string memory key = vm.toString(address(strategy));
-        vm.serializeAddress(key, 'address', address(strategy));
         vm.serializeString(
           key,
           'baseStableBorrowRate',
