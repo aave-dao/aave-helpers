@@ -114,7 +114,7 @@ contract CapsPlusRiskSteward_Test is Test {
       require(false, 'MUST_FAIL');
     } catch Error(string memory reason) {
       require(
-        keccak256(bytes(reason)) == keccak256(bytes(CapsPlusRiskStewardErrors.UPDATE_BIGGER_MAX))
+        keccak256(bytes(reason)) == keccak256(bytes(CapsPlusRiskStewardErrors.UPDATE_ABOVE_MAX))
       );
     }
   }
@@ -135,7 +135,7 @@ contract CapsPlusRiskSteward_Test is Test {
       require(false, 'MUST_FAIL');
     } catch Error(string memory reason) {
       require(
-        keccak256(bytes(reason)) == keccak256(bytes(CapsPlusRiskStewardErrors.UPDATE_BIGGER_MAX))
+        keccak256(bytes(reason)) == keccak256(bytes(CapsPlusRiskStewardErrors.UPDATE_ABOVE_MAX))
       );
     }
   }
@@ -157,7 +157,7 @@ contract CapsPlusRiskSteward_Test is Test {
       require(false, 'MUST_FAIL');
     } catch Error(string memory reason) {
       require(
-        keccak256(bytes(reason)) == keccak256(bytes(CapsPlusRiskStewardErrors.NOT_STICTLY_HIGHER))
+        keccak256(bytes(reason)) == keccak256(bytes(CapsPlusRiskStewardErrors.NOT_STRICTLY_HIGHER))
       );
     }
 
@@ -167,7 +167,7 @@ contract CapsPlusRiskSteward_Test is Test {
       require(false, 'MUST_FAIL');
     } catch Error(string memory reason) {
       require(
-        keccak256(bytes(reason)) == keccak256(bytes(CapsPlusRiskStewardErrors.NOT_STICTLY_HIGHER))
+        keccak256(bytes(reason)) == keccak256(bytes(CapsPlusRiskStewardErrors.NOT_STRICTLY_HIGHER))
       );
     }
   }
@@ -189,7 +189,7 @@ contract CapsPlusRiskSteward_Test is Test {
       require(false, 'MUST_FAIL');
     } catch Error(string memory reason) {
       require(
-        keccak256(bytes(reason)) == keccak256(bytes(CapsPlusRiskStewardErrors.NOT_STICTLY_HIGHER))
+        keccak256(bytes(reason)) == keccak256(bytes(CapsPlusRiskStewardErrors.NOT_STRICTLY_HIGHER))
       );
     }
 
@@ -199,7 +199,7 @@ contract CapsPlusRiskSteward_Test is Test {
       require(false, 'MUST_FAIL');
     } catch Error(string memory reason) {
       require(
-        keccak256(bytes(reason)) == keccak256(bytes(CapsPlusRiskStewardErrors.NOT_STICTLY_HIGHER))
+        keccak256(bytes(reason)) == keccak256(bytes(CapsPlusRiskStewardErrors.NOT_STRICTLY_HIGHER))
       );
     }
   }
@@ -225,11 +225,28 @@ contract CapsPlusRiskSteward_Test is Test {
     } catch Error(string memory reason) {
       require(
         keccak256(bytes(reason)) ==
-          keccak256(bytes(CapsPlusRiskStewardErrors.DECOUNCE_NOT_RESPECTED))
+          keccak256(bytes(CapsPlusRiskStewardErrors.DEBOUNCE_NOT_RESPECTED))
       );
     }
 
     vm.warp(block.timestamp + steward.MINIMUM_DELAY() + 1);
     steward.updateCaps(capUpdates);
+  }
+
+  function test_unlisted() public {
+    address unlistedAsset = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84; // stETH
+
+    IAaveV3ConfigEngine.CapsUpdate[] memory capUpdates = new IAaveV3ConfigEngine.CapsUpdate[](1);
+    capUpdates[0] = IAaveV3ConfigEngine.CapsUpdate(unlistedAsset, 100, 100);
+
+    vm.startPrank(user);
+
+    try steward.updateCaps(capUpdates) {
+      require(false, 'MUST_FAIL');
+    } catch Error(string memory reason) {
+      require(
+        keccak256(bytes(reason)) == keccak256(bytes(CapsPlusRiskStewardErrors.NO_CAP_INITIALIZE))
+      );
+    }
   }
 }

@@ -7,11 +7,30 @@ import {EngineFlags} from '../v3-config-engine/EngineFlags.sol';
 import {IAaveV3ConfigEngine} from '../v3-config-engine/IAaveV3ConfigEngine.sol';
 
 library CapsPlusRiskStewardErrors {
+  /**
+   * @notice Only the permissioned council is allowed to call methods on the steward.
+   */
   string public constant INVALID_CALLER = 'INVALID_CALLER';
-  string public constant NOT_STICTLY_HIGHER = 'NOT_STICTLY_HIGHER';
-  string public constant DECOUNCE_NOT_RESPECTED = 'DECOUNCE_NOT_RESPECTED';
-  string public constant UPDATE_BIGGER_MAX = 'UPDATE_BIGGER_MAX';
-  string public constant ZERO_UPDATES = 'ZERO_UPDATES';
+  /**
+   * @notice The steward only allows cap increases.
+   */
+  string public constant NOT_STRICTLY_HIGHER = 'NOT_STRICTLY_HIGHER';
+  /**
+   * @notice A single cap can only be increased once every 5 days
+   */
+  string public constant DEBOUNCE_NOT_RESPECTED = 'DEBOUNCE_NOT_RESPECTED';
+  /**
+   * @notice A single cap increase must not increase the cap by more than 100%
+   */
+  string public constant UPDATE_ABOVE_MAX = 'UPDATE_ABOVE_MAX';
+  /**
+   * @notice There must be at least one cap update per execution
+   */
+  string public constant NO_ZERO_UPDATES = 'NO_ZERO_UPDATES';
+  /**
+   * @notice The steward does allow updates of caps, but not the initialization of non existing caps.
+   */
+  string public constant NO_CAP_INITIALIZE = 'NO_CAP_INITIALIZE';
 }
 
 /**
@@ -56,39 +75,25 @@ contract CapsPlusRiskSteward {
    * @param capUpdates caps to be updated
    */
   function updateCaps(IAaveV3ConfigEngine.CapsUpdate[] memory capUpdates) public onlyRiskCouncil {
-    require(capUpdates.length > 0, CapsPlusRiskStewardErrors.ZERO_UPDATES);
+    require(capUpdates.length > 0, CapsPlusRiskStewardErrors.NO_ZERO_UPDATES);
     for (uint256 i = 0; i < capUpdates.length; i++) {
       (uint256 currentBorrowCap, uint256 currentSupplyCap) = POOL_DATA_PROVIDER.getReserveCaps(
         capUpdates[i].asset
       );
       Debounce memory debounce = timelocks[capUpdates[i].asset];
       if (capUpdates[i].supplyCap != EngineFlags.KEEP_CURRENT) {
-        require(
-          capUpdates[i].supplyCap > currentSupplyCap,
-          CapsPlusRiskStewardErrors.NOT_STICTLY_HIGHER
-        );
-        require(
-          block.timestamp - debounce.supplyCapLastUpdated > MINIMUM_DELAY,
-          CapsPlusRiskStewardErrors.DECOUNCE_NOT_RESPECTED
-        );
-        require(
-          capsIncreaseWithinAllowedRange(currentSupplyCap, capUpdates[i].supplyCap),
-          CapsPlusRiskStewardErrors.UPDATE_BIGGER_MAX
+        _validateCapIncrease(
+          currentSupplyCap,
+          capUpdates[i].supplyCap,
+          debounce.supplyCapLastUpdated
         );
         timelocks[capUpdates[i].asset].supplyCapLastUpdated = uint40(block.timestamp);
       }
       if (capUpdates[i].borrowCap != EngineFlags.KEEP_CURRENT) {
-        require(
-          capUpdates[i].borrowCap > currentBorrowCap,
-          CapsPlusRiskStewardErrors.NOT_STICTLY_HIGHER
-        );
-        require(
-          block.timestamp - debounce.borrowCapLastUpdated > MINIMUM_DELAY,
-          CapsPlusRiskStewardErrors.DECOUNCE_NOT_RESPECTED
-        );
-        require(
-          capsIncreaseWithinAllowedRange(currentBorrowCap, capUpdates[i].borrowCap),
-          CapsPlusRiskStewardErrors.UPDATE_BIGGER_MAX
+        _validateCapIncrease(
+          currentBorrowCap,
+          capUpdates[i].borrowCap,
+          debounce.borrowCapLastUpdated
         );
         timelocks[capUpdates[i].asset].borrowCapLastUpdated = uint40(block.timestamp);
       }
@@ -98,13 +103,30 @@ contract CapsPlusRiskSteward {
     );
   }
 
+  function _validateCapIncrease(
+    uint256 currentCap,
+    uint256 newCap,
+    uint40 lastUpdated
+  ) internal view {
+    require(currentCap != 0, CapsPlusRiskStewardErrors.NO_CAP_INITIALIZE);
+    require(newCap > currentCap, CapsPlusRiskStewardErrors.NOT_STRICTLY_HIGHER);
+    require(
+      block.timestamp - lastUpdated > MINIMUM_DELAY,
+      CapsPlusRiskStewardErrors.DEBOUNCE_NOT_RESPECTED
+    );
+    require(
+      _capsIncreaseWithinAllowedRange(currentCap, newCap),
+      CapsPlusRiskStewardErrors.UPDATE_ABOVE_MAX
+    );
+  }
+
   /**
    * Ensures the cap increase is within the allowed range.
    * @param from current cap
    * @param to new cap
    * @return bool true, if difference is within the max 100% increase window
    */
-  function capsIncreaseWithinAllowedRange(uint256 from, uint256 to) public pure returns (bool) {
+  function _capsIncreaseWithinAllowedRange(uint256 from, uint256 to) internal pure returns (bool) {
     return to - from <= from;
   }
 }
