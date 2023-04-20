@@ -28,7 +28,7 @@ contract CrosschainForwarderMetis {
   address public constant METIS_BRIDGE_EXECUTOR =
     0x8EC77963068474a45016938Deb95E603Ca82a029;
 
-  uint32 public constant MAX_GAS_LIMIT = 5000000;
+  uint32 public constant MAX_GAS_LIMIT = 5_000_000;
 
   /**
    * @dev this function will be executed once the proposal passes the mainnet vote.
