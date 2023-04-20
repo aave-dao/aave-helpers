@@ -9,7 +9,7 @@ import {IL2BridgeExecutor} from 'governance-crosschain-bridges/contracts/interfa
  * @author BGD Labs
  * @notice You can **only** use this executor when the metis payload has a `execute()` signature without parameters
  * @notice You can **only** use this executor when the metis payload is expected to be executed via `DELEGATECALL`
- * @notice The L2CrossDomainMessenger can **only** queue payloads on metis with up to a max gas which is specified in `MAX_GAS_LIMIT`.
+ * @notice The L2CrossDomainMessenger can **only** queue an action on metis with up to a max gas which is specified in `MAX_GAS_LIMIT`.
  * It encodes and sends via the L2CrossDomainMessenger a message to queue for execution an action on L2, in the Aave METIS_BRIDGE_EXECUTOR.
  */
 contract CrosschainForwarderMetis {
