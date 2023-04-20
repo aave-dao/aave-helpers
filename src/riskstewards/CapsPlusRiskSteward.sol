@@ -58,11 +58,7 @@ contract CapsPlusRiskSteward {
     _;
   }
 
-  constructor(
-    IPoolDataProvider poolDataProvider,
-    IAaveV3ConfigEngine engine,
-    address riskCouncil
-  ) {
+  constructor(IPoolDataProvider poolDataProvider, IAaveV3ConfigEngine engine, address riskCouncil) {
     POOL_DATA_PROVIDER = poolDataProvider;
     RISK_COUNCIL = riskCouncil;
     CONFIG_ENGINE = engine;
@@ -74,13 +70,15 @@ contract CapsPlusRiskSteward {
    * @dev A cap increase is only allowed to increase the cap by 50%
    * @param capUpdates caps to be updated
    */
-  function updateCaps(IAaveV3ConfigEngine.CapsUpdate[] memory capUpdates) public onlyRiskCouncil {
+  function updateCaps(
+    IAaveV3ConfigEngine.CapsUpdate[] calldata capUpdates
+  ) external onlyRiskCouncil {
     require(capUpdates.length > 0, CapsPlusRiskStewardErrors.NO_ZERO_UPDATES);
     for (uint256 i = 0; i < capUpdates.length; i++) {
       (uint256 currentBorrowCap, uint256 currentSupplyCap) = POOL_DATA_PROVIDER.getReserveCaps(
         capUpdates[i].asset
       );
-      Debounce memory debounce = timelocks[capUpdates[i].asset];
+      Debounce storage debounce = timelocks[capUpdates[i].asset];
       if (capUpdates[i].supplyCap != EngineFlags.KEEP_CURRENT) {
         _validateCapIncrease(
           currentSupplyCap,
