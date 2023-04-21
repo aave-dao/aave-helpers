@@ -9,6 +9,7 @@ import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
+import {IPool, IPoolConfigurator, IAaveOracle} from 'aave-address-book/AaveV3.sol';
 
 library DeployEngineEthLib {
   function deploy() internal returns (address) {
@@ -105,6 +106,25 @@ library DeployEngineAvaLib {
   }
 }
 
+library DeployEngineMetLib {
+  function deploy() internal returns (address) {
+    return
+      address(
+        new AaveV3ConfigEngine(
+          IPool(0xb4bcdE07701494925455967814BFFA7eD5B4d568), // TODO: update from address book
+          IPoolConfigurator(0x311ACE634E6AbfFf83480B9Ba328a89503932258), // TODO:
+          IAaveOracle(0x5859B57b919035D82ED2Dd3F1f708dB13302614e), // TODO:
+          0x2954c4494B3De43C69a38EfaE076507F31a385C5, // TODO: 
+          0xAF3CcbaA1E30B61235ead8E056E0F2B4B5A73851, // TODO: 
+          0x0B0c10cBD39D449F0FC6522E8eb1Cf734BD8daB7, // TODO:
+          0xf33A80b8810bC56D574316ff17B91e1C06D6289D, // TODO:
+          0x90dA620955B942613A6Fae754aE66F0C37a364e0, // TODO:
+          IV3RateStrategyFactory(0x59ED955e3a34479F4a35dCBD794BA70D6319CFcC) // TODO
+        )
+      );
+  }
+}
+
 contract DeployEngineEth is EthereumScript {
   function run() external broadcast {
     DeployEngineEthLib.deploy();
@@ -132,5 +152,11 @@ contract DeployEnginePol is PolygonScript {
 contract DeployEngineAva is AvalancheScript {
   function run() external broadcast {
     DeployEngineAvaLib.deploy();
+  }
+}
+
+contract DeployEngineMet is MetisScript {
+  function run() external broadcast {
+    DeployEngineMetLib.deploy();
   }
 }

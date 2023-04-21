@@ -128,6 +128,17 @@ library DeployRatesFactoryAvaLib {
   }
 }
 
+library DeployRatesFactoryMetLib {
+  function deploy() internal returns (address, address[] memory) {
+    return
+      DeployRatesFactoryLib._createAndSetupRatesFactory(
+        IPoolAddressesProvider(0x632bf4054334F263F49a7039Cce25f0294f3f667), // TODO: add from address book
+        0x1dad86dC5990BCE5bFe3A150A4E0ece990d6EBcB, // TODO:
+        0x1CabD986cBAbDf12E00128DFf03C80ee62C4fd97 // TODO:
+      );
+  }
+}
+
 contract DeployRatesFactoryEth is EthereumScript {
   function run() external broadcast {
     DeployRatesFactoryEthLib.deploy();
@@ -155,5 +166,11 @@ contract DeployRatesFactoryPol is PolygonScript {
 contract DeployRatesFactoryAva is AvalancheScript {
   function run() external broadcast {
     DeployRatesFactoryAvaLib.deploy();
+  }
+}
+
+contract DeployRatesFactoryMet is MetisScript {
+  function run() external broadcast {
+    DeployRatesFactoryMetLib.deploy();
   }
 }
