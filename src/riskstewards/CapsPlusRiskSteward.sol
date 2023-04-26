@@ -50,19 +50,13 @@ contract CapsPlusRiskSteward is ICapsPlusRiskSteward {
   /// @inheritdoc ICapsPlusRiskSteward
   uint256 public constant MINIMUM_DELAY = 5 days;
 
-  /**
-   * @notice The config engine used to perform the cap update via delegatecall
-   */
+  /// @inheritdoc ICapsPlusRiskSteward
   IAaveV3ConfigEngine public immutable CONFIG_ENGINE;
 
-  /**
-   * @notice The pool data provider of the POOL the steward controls
-   */
+  /// @inheritdoc ICapsPlusRiskSteward
   IPoolDataProvider public immutable POOL_DATA_PROVIDER;
 
-  /**
-   * @notice The safe controlling the steward
-   */
+  /// @inheritdoc ICapsPlusRiskSteward
   address public immutable RISK_COUNCIL;
 
   mapping(address => Debounce) internal _timelocks;

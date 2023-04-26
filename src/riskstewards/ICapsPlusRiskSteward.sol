@@ -26,6 +26,21 @@ interface ICapsPlusRiskSteward {
   function MINIMUM_DELAY() external pure returns (uint256);
 
   /**
+   * @notice The config engine used to perform the cap update via delegatecall
+   */
+  function CONFIG_ENGINE() external view returns (IAaveV3ConfigEngine);
+
+  /**
+   * @notice The pool data provider of the POOL the steward controls
+   */
+  function POOL_DATA_PROVIDER() external view returns (IPoolDataProvider);
+
+  /**
+   * @notice The safe controlling the steward
+   */
+  function RISK_COUNCIL() external view returns (address);
+
+  /**
    * @notice Allows increasing borrow and supply caps accross multiple assets
    * @dev A cap increase is only possible ever 5 days per asset
    * @dev A cap increase is only allowed to increase the cap by 50%
