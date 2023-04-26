@@ -18,6 +18,7 @@ import {EngineFlags} from './EngineFlags.sol';
  *   - Updates of price feeds
  *   - Updates of borrow parameters (flashloanable, stableRateModeEnabled, borrowableInIsolation, withSiloedBorrowing, reserveFactor)
  *   - Updates of collateral parameters (ltv, liq threshold, liq bonus, liq protocol fee, debt ceiling)
+ *   - Updates of emode category parameters (ltv, liq threshold, liq bonus, price source, label)
  * @author BGD Labs
  */
 abstract contract AaveV3PayloadBase {
@@ -45,6 +46,7 @@ abstract contract AaveV3PayloadBase {
     IEngine.BorrowUpdate[] memory borrows = borrowsUpdates();
     IEngine.PriceFeedUpdate[] memory priceFeeds = priceFeedsUpdates();
     IEngine.RateStrategyUpdate[] memory rates = rateStrategiesUpdates();
+    IEngine.EModeUpdate[] memory eModeCategories = eModeCategoryUpdates();
 
     if (listings.length != 0) {
       address(LISTING_ENGINE).functionDelegateCall(
@@ -92,6 +94,12 @@ abstract contract AaveV3PayloadBase {
       );
     }
 
+    if (eModeCategories.length != 0) {
+      address(LISTING_ENGINE).functionDelegateCall(
+        abi.encodeWithSelector(LISTING_ENGINE.updateEModeCategories.selector, eModeCategories)
+      );
+    }
+
     _postExecute();
   }
 
@@ -124,6 +132,9 @@ abstract contract AaveV3PayloadBase {
 
   /// @dev to be defined in the child with a list of priceFeeds to update
   function priceFeedsUpdates() public view virtual returns (IEngine.PriceFeedUpdate[] memory) {}
+
+  /// @dev to be defined in the child with a list of eMode categories to update
+  function eModeCategoryUpdates() public view virtual returns (IEngine.EModeUpdate[] memory) {}
 
   /// @dev to be defined in the child with a list of set of parameters of rate strategies
   function rateStrategiesUpdates()

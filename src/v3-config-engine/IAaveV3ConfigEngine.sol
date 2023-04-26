@@ -157,6 +157,26 @@ interface IAaveV3ConfigEngine {
 
   /**
    * @dev Example (mock):
+   * EModeUpdate({
+   *   eModeCategory: 1, // STABLECOINS
+   *   ltv: 60_00,
+   *   liqThreshold: 70_00,
+   *   liqBonus: EngineFlags.KEEP_CURRENT,
+   *   priceSource: EngineFlags.KEEP_CURRENT_ADDRESS,
+   *   label: EngineFlags.KEEP_CURRENT_STRING
+   * })
+   */
+  struct EModeUpdate {
+    uint8 eModeCategory;
+    uint256 ltv;
+    uint256 liqThreshold;
+    uint256 liqBonus;
+    address priceSource;
+    string label;
+  }
+
+  /**
+   * @dev Example (mock):
    * RateStrategyUpdate({
    *   asset: AaveV3OptimismAssets.USDT_UNDERLYING,
    *   params: Rates.RateStrategyParams({
@@ -232,6 +252,13 @@ interface IAaveV3ConfigEngine {
    *   More information on the documentation of the struct.
    */
   function updateBorrowSide(BorrowUpdate[] memory updates) external;
+
+  /**
+   * @notice Performs an update of the borrow-related params of the assets, in the Aave pool configured in this engine instance
+   * @param updates `BorrowUpdate[]` list of declarative updates containing the new parameters
+   *   More information on the documentation of the struct.
+   */
+  function updateEModeCategories(EModeUpdate[] memory updates) external;
 
   function RATE_STRATEGIES_FACTORY() external view returns (IV3RateStrategyFactory);
 

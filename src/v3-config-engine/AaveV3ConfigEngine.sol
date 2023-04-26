@@ -29,6 +29,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     Collateral[] collaterals;
     Caps[] caps;
     IV3RateStrategyFactory.RateStrategyParams[] rates;
+    EModeCategories[] eModeCategories;
   }
 
   struct Basic {
@@ -59,6 +60,15 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   struct Caps {
     uint256 supplyCap; // Always configured. In "big units" of the asset, and no decimals. 100 for 100 ETH supply cap
     uint256 borrowCap; // Always configured, no matter if enabled for borrowing or not. Same format as supply cap
+  }
+
+  struct EModeCategories {
+    uint8 eModeCategory;
+    uint256 ltv; // Only considered if liqThreshold > 0. With 2 digits precision, `10_00` for 10%. Should be lower than liquidationThreshold
+    uint256 liqThreshold; // If `0`, the asset will not be enabled as collateral. Same format as ltv, and should be higher
+    uint256 liqBonus; // Only considered if liqThreshold > 0. Same format as ltv
+    address priceSource; // A custom price oracle for the eMode category
+    string label; // The label for the eMode category
   }
 
   IPool public immutable POOL;
@@ -184,6 +194,15 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     AssetsConfig memory configs = _repackRatesUpdate(updates);
 
     _configRateStrategies(configs.ids, configs.rates);
+  }
+
+  /// @inheritdoc IAaveV3ConfigEngine
+  function updateEModeCategories(EModeUpdate[] memory updates) public {
+    require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
+
+    AssetsConfig memory configs = _repackEModeUpdate(updates);
+
+    _configEModeCategories(configs.eModeCategories);
   }
 
   function _setPriceFeeds(address[] memory ids, Basic[] memory basics) internal {
@@ -453,6 +472,59 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     }
   }
 
+  function _configEModeCategories(EModeCategories[] memory updates) internal {
+    for (uint256 i = 0; i < updates.length; i++) {
+        if (
+          updates[i].ltv == EngineFlags.KEEP_CURRENT ||
+          updates[i].liqThreshold == EngineFlags.KEEP_CURRENT ||
+          updates[i].liqBonus == EngineFlags.KEEP_CURRENT ||
+          updates[i].priceSource == EngineFlags.KEEP_CURRENT_ADDRESS ||
+          keccak256(abi.encode(updates[i].label)) == keccak256(abi.encode(EngineFlags.KEEP_CURRENT_STRING))
+        ) {
+          DataTypes.EModeCategory memory configuration = POOL.getEModeCategoryData(updates[i].eModeCategory);
+          uint256 currentLtv= configuration.ltv;
+          uint256 currentLiqThreshold = configuration.liquidationThreshold;
+          uint256 currentLiqBonus = configuration.liquidationBonus;
+          address currentPriceSource = configuration.priceSource;
+          string memory currentLabel = configuration.label;
+
+          if (updates[i].ltv == EngineFlags.KEEP_CURRENT) {
+            updates[i].ltv = currentLtv;
+          }
+
+          if (updates[i].liqThreshold == EngineFlags.KEEP_CURRENT) {
+            updates[i].liqThreshold = currentLiqThreshold;
+          }
+
+          if (updates[i].liqBonus == EngineFlags.KEEP_CURRENT) {
+            updates[i].liqBonus = currentLiqBonus;
+          }
+
+          if (updates[i].priceSource == EngineFlags.KEEP_CURRENT_ADDRESS) {
+            updates[i].priceSource = currentPriceSource;
+          }
+
+          if (keccak256(abi.encode(updates[i].label)) == keccak256(abi.encode(EngineFlags.KEEP_CURRENT_STRING))) {
+            updates[i].label = currentLabel;
+          }
+        }
+
+      require(
+        updates[i].liqThreshold + updates[i].liqBonus < 100_00,
+        'INVALID_LIQ_PARAMS_ABOVE_100'
+      );
+
+      POOL_CONFIGURATOR.setEModeCategory(
+        updates[i].eModeCategory,
+        uint16(updates[i].ltv),
+        uint16(updates[i].liqThreshold),
+        uint16(updates[i].liqBonus),
+        updates[i].priceSource,
+        updates[i].label
+      );
+    }
+  }
+
   function _repackListing(ListingWithCustomImpl[] memory listings)
     internal
     pure
@@ -505,7 +577,8 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         borrows: borrows,
         collaterals: collaterals,
         caps: caps,
-        rates: rates
+        rates: rates,
+        eModeCategories: new EModeCategories[](0)
       });
   }
 
@@ -529,7 +602,8 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         basics: new Basic[](0),
         borrows: new Borrow[](0),
         collaterals: new Collateral[](0),
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0)
+        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
+        eModeCategories: new EModeCategories[](0)
       });
   }
 
@@ -554,7 +628,8 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         basics: new Basic[](0),
         borrows: new Borrow[](0),
         caps: new Caps[](0),
-        collaterals: new Collateral[](0)
+        collaterals: new Collateral[](0),
+        eModeCategories: new EModeCategories[](0)
       });
   }
 
@@ -585,7 +660,8 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         basics: new Basic[](0),
         borrows: new Borrow[](0),
         collaterals: collaterals,
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0)
+        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
+        eModeCategories: new EModeCategories[](0)
       });
   }
 
@@ -616,7 +692,8 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         basics: new Basic[](0),
         borrows: borrows,
         collaterals: new Collateral[](0),
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0)
+        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
+        eModeCategories: new EModeCategories[](0)
       });
   }
 
@@ -645,7 +722,38 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         basics: basics,
         borrows: new Borrow[](0),
         collaterals: new Collateral[](0),
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0)
+        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
+        eModeCategories: new EModeCategories[](0)
+      });
+  }
+
+  function _repackEModeUpdate(EModeUpdate[] memory updates)
+    internal
+    pure
+    returns (AssetsConfig memory)
+  {
+    EModeCategories[] memory eModeCategories = new EModeCategories[](updates.length);
+
+    for (uint256 i = 0; i < updates.length; i++) {
+      eModeCategories[i] = EModeCategories({
+        eModeCategory: updates[i].eModeCategory,
+        ltv: updates[i].ltv,
+        liqThreshold: updates[i].liqThreshold,
+        liqBonus: updates[i].liqBonus,
+        priceSource: updates[i].priceSource,
+        label: updates[i].label
+      });
+    }
+
+    return
+      AssetsConfig({
+        ids: new address[](0),
+        caps: new Caps[](0),
+        basics: new Basic[](0),
+        borrows: new Borrow[](0),
+        collaterals: new Collateral[](0),
+        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
+        eModeCategories: eModeCategories
       });
   }
 
