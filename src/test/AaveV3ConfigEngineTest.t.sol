@@ -10,6 +10,7 @@ import {AaveV3AvalancheCollateralUpdateNoChange} from './mocks/AaveV3AvalancheCo
 import {AaveV3AvalancheCollateralUpdateWrongBonus, AaveV3AvalancheCollateralUpdateCorrectBonus} from './mocks/AaveV3AvalancheCollateralUpdateEdgeBonus.sol';
 import {AaveV3PolygonBorrowUpdate} from './mocks/AaveV3PolygonBorrowUpdate.sol';
 import {AaveV3PolygonPriceFeedUpdate} from './mocks/AaveV3PolygonPriceFeedUpdate.sol';
+import {AaveV3PolygonEModeCategoryUpdate} from './mocks/AaveV3PolygonEModeCategoryUpdate.sol';
 import {AaveV3OptimismMockRatesUpdate} from './mocks/AaveV3OptimismMockRatesUpdate.sol';
 import {DeployRatesFactoryPolLib, DeployRatesFactoryEthLib, DeployRatesFactoryAvaLib, DeployRatesFactoryArbLib, DeployRatesFactoryOptLib} from '../../scripts/V3RateStrategyFactory.s.sol';
 import {DeployEnginePolLib, DeployEngineEthLib, DeployEngineAvaLib, DeployEngineOptLib, DeployEngineArbLib} from '../../scripts/AaveV3ConfigEngine.s.sol';
@@ -663,6 +664,27 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
       AaveV3PolygonAssets.USDC_UNDERLYING,
       AaveV3PolygonAssets.USDC_ORACLE
     );
+  }
+
+  function testEModeCategoryUpdates() public {
+    vm.createSelectFork(vm.rpcUrl('polygon'), 40037250);
+
+    IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEnginePolLib.deploy());
+    AaveV3PolygonEModeCategoryUpdate payload = new AaveV3PolygonEModeCategoryUpdate(engine);
+
+    vm.startPrank(AaveV3Polygon.ACL_ADMIN);
+    AaveV3Polygon.ACL_MANAGER.addPoolAdmin(address(payload));
+    vm.stopPrank();
+
+    createConfigurationSnapshot('preTestEngineEModeCategoryUpdate', AaveV3Polygon.POOL);
+
+    payload.execute();
+
+    createConfigurationSnapshot('postTestEngineEModeCategoryUpdate', AaveV3Polygon.POOL);
+
+    diffReports('preTestEngineEModeCategoryUpdate', 'postTestEngineEModeCategoryUpdate');
+
+    // TODO: Add validation function
   }
 
   function _bpsToRay(uint256 amount) internal pure returns (uint256) {
