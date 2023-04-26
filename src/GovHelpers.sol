@@ -346,7 +346,7 @@ contract MockExecutor {
    * @notice Non-standard functionality used to skip governance and just execute a payload.
    */
   function execute(address payload) public {
-    (bool success, ) = address(payload).delegatecall(abi.encodeWithSignature('execute()'));
+    (bool success, ) = payload.delegatecall(abi.encodeWithSignature('execute()'));
     require(success, 'PROPOSAL_EXECUTION_FAILED');
   }
 

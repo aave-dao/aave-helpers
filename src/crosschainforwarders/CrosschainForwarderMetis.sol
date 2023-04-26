@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {ICrossDomainMessenger} from 'governance-crosschain-bridges/contracts/dependencies/optimism/interfaces/ICrossDomainMessenger.sol';
 import {IL2BridgeExecutor} from 'governance-crosschain-bridges/contracts/interfaces/IL2BridgeExecutor.sol';
 
@@ -25,8 +26,7 @@ contract CrosschainForwarderMetis {
    * This contract allows queuing of proposals by allow listed addresses (in this case the L1 short executor).
    * https://andromeda-explorer.metis.io/address/0x8EC77963068474a45016938Deb95E603Ca82a029
    */
-  address public constant METIS_BRIDGE_EXECUTOR =
-    0x8EC77963068474a45016938Deb95E603Ca82a029;
+  address public constant METIS_BRIDGE_EXECUTOR = AaveGovernanceV2.METIS_BRIDGE_EXECUTOR;
 
   /**
    * @dev The gas limit of the queue transaction by the L2CrossDomainMessenger on L2.
