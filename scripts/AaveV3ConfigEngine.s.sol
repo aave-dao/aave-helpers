@@ -9,6 +9,8 @@ import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
+import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
+import {IPool, IPoolConfigurator, IAaveOracle} from 'aave-address-book/AaveV3.sol';
 
 library DeployEngineEthLib {
   function deploy() internal returns (address) {
@@ -22,7 +24,7 @@ library DeployEngineEthLib {
           AaveV3Ethereum.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3Ethereum.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER,
-          AaveV3Ethereum.COLLECTOR,
+          address(AaveV3Ethereum.COLLECTOR),
           IV3RateStrategyFactory(AaveV3Ethereum.RATES_FACTORY)
         )
       );
@@ -41,7 +43,7 @@ library DeployEngineOptLib {
           AaveV3Optimism.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3Optimism.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3Optimism.DEFAULT_INCENTIVES_CONTROLLER,
-          AaveV3Optimism.COLLECTOR,
+          address(AaveV3Optimism.COLLECTOR),
           IV3RateStrategyFactory(AaveV3Optimism.RATES_FACTORY)
         )
       );
@@ -60,7 +62,7 @@ library DeployEngineArbLib {
           AaveV3Arbitrum.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3Arbitrum.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3Arbitrum.DEFAULT_INCENTIVES_CONTROLLER,
-          AaveV3Arbitrum.COLLECTOR,
+          address(AaveV3Arbitrum.COLLECTOR),
           IV3RateStrategyFactory(AaveV3Arbitrum.RATES_FACTORY)
         )
       );
@@ -79,7 +81,7 @@ library DeployEnginePolLib {
           AaveV3Polygon.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3Polygon.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3Polygon.DEFAULT_INCENTIVES_CONTROLLER,
-          AaveV3Polygon.COLLECTOR,
+          address(AaveV3Polygon.COLLECTOR),
           IV3RateStrategyFactory(AaveV3Polygon.RATES_FACTORY)
         )
       );
@@ -98,8 +100,27 @@ library DeployEngineAvaLib {
           AaveV3Avalanche.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3Avalanche.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3Avalanche.DEFAULT_INCENTIVES_CONTROLLER,
-          AaveV3Avalanche.COLLECTOR,
+          address(AaveV3Avalanche.COLLECTOR),
           IV3RateStrategyFactory(AaveV3Avalanche.RATES_FACTORY)
+        )
+      );
+  }
+}
+
+library DeployEngineMetLib {
+  function deploy() internal returns (address) {
+    return
+      address(
+        new AaveV3ConfigEngine(
+          AaveV3Metis.POOL,
+          AaveV3Metis.POOL_CONFIGURATOR,
+          AaveV3Metis.ORACLE,
+          AaveV3Metis.DEFAULT_A_TOKEN_IMPL_REV_1,
+          AaveV3Metis.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
+          AaveV3Metis.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
+          AaveV3Metis.DEFAULT_INCENTIVES_CONTROLLER,
+          address(AaveV3Metis.COLLECTOR),
+          IV3RateStrategyFactory(AaveV3Metis.RATES_FACTORY)
         )
       );
   }
@@ -132,5 +153,11 @@ contract DeployEnginePol is PolygonScript {
 contract DeployEngineAva is AvalancheScript {
   function run() external broadcast {
     DeployEngineAvaLib.deploy();
+  }
+}
+
+contract DeployEngineMet is MetisScript {
+  function run() external broadcast {
+    DeployEngineMetLib.deploy();
   }
 }

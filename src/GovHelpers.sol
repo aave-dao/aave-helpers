@@ -62,6 +62,14 @@ library GovHelpers {
       });
   }
 
+  function buildMetis(address payloadAddress) internal pure returns (Payload memory) {
+    return
+      _buildL2({
+        forwarder: AaveGovernanceV2.CROSSCHAIN_FORWARDER_METIS,
+        payloadAddress: payloadAddress
+      });
+  }
+
   function _buildL2(address forwarder, address payloadAddress)
     private
     pure
@@ -338,7 +346,7 @@ contract MockExecutor {
    * @notice Non-standard functionality used to skip governance and just execute a payload.
    */
   function execute(address payload) public {
-    (bool success, ) = address(payload).delegatecall(abi.encodeWithSignature('execute()'));
+    (bool success, ) = payload.delegatecall(abi.encodeWithSignature('execute()'));
     require(success, 'PROPOSAL_EXECUTION_FAILED');
   }
 

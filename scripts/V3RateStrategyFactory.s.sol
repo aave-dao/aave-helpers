@@ -10,6 +10,7 @@ import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
+import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
 import {ITransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/interfaces/ITransparentProxyFactory.sol';
 import {V3RateStrategyFactory} from '../src/v3-config-engine/V3RateStrategyFactory.sol';
 
@@ -128,6 +129,17 @@ library DeployRatesFactoryAvaLib {
   }
 }
 
+library DeployRatesFactoryMetLib {
+  function deploy() internal returns (address, address[] memory) {
+    return
+      DeployRatesFactoryLib._createAndSetupRatesFactory(
+        AaveV3Metis.POOL_ADDRESSES_PROVIDER,
+        AaveMisc.TRANSPARENT_PROXY_FACTORY_METIS,
+        AaveMisc.PROXY_ADMIN_METIS
+      );
+  }
+}
+
 contract DeployRatesFactoryEth is EthereumScript {
   function run() external broadcast {
     DeployRatesFactoryEthLib.deploy();
@@ -155,5 +167,11 @@ contract DeployRatesFactoryPol is PolygonScript {
 contract DeployRatesFactoryAva is AvalancheScript {
   function run() external broadcast {
     DeployRatesFactoryAvaLib.deploy();
+  }
+}
+
+contract DeployRatesFactoryMet is MetisScript {
+  function run() external broadcast {
+    DeployRatesFactoryMetLib.deploy();
   }
 }

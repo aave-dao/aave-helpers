@@ -45,3 +45,7 @@ abstract contract FantomScript is WithChainIdValidation {
 abstract contract HarmonyScript is WithChainIdValidation {
   constructor() WithChainIdValidation(1666600000) {}
 }
+
+abstract contract MetisScript is WithChainIdValidation {
+  constructor() WithChainIdValidation(1088) {}
+}
