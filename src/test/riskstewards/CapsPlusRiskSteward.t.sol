@@ -44,13 +44,13 @@ contract CapsPlusRiskSteward_Test is Test {
       .AAVE_PROTOCOL_DATA_PROVIDER
       .getReserveCaps(AaveV3EthereumAssets.DAI_UNDERLYING);
 
-    (uint40 supplyCapLastUpdated, uint40 borrowCapLastUpdated) = steward.timelocks(
+    CapsPlusRiskSteward.Debounce memory lastUpdated = steward.getTimelock(
       AaveV3EthereumAssets.DAI_UNDERLYING
     );
     assertEq(daiBorrowCapAfter, capUpdates[0].borrowCap);
     assertEq(daiSupplyCapAfter, capUpdates[0].supplyCap);
-    assertEq(supplyCapLastUpdated, block.timestamp);
-    assertEq(borrowCapLastUpdated, block.timestamp);
+    assertEq(lastUpdated.supplyCapLastUpdated, block.timestamp);
+    assertEq(lastUpdated.borrowCapLastUpdated, block.timestamp);
   }
 
   function test_keepCurrent() public {
@@ -72,13 +72,13 @@ contract CapsPlusRiskSteward_Test is Test {
       .AAVE_PROTOCOL_DATA_PROVIDER
       .getReserveCaps(AaveV3EthereumAssets.DAI_UNDERLYING);
 
-    (uint40 supplyCapLastUpdated, uint40 borrowCapLastUpdated) = steward.timelocks(
+    CapsPlusRiskSteward.Debounce memory lastUpdated = steward.getTimelock(
       AaveV3EthereumAssets.DAI_UNDERLYING
     );
     assertEq(daiBorrowCapAfter, daiBorrowCapBefore);
     assertEq(daiSupplyCapAfter, daiSupplyCapBefore);
-    assertEq(supplyCapLastUpdated, 0);
-    assertEq(borrowCapLastUpdated, 0);
+    assertEq(lastUpdated.supplyCapLastUpdated, 0);
+    assertEq(lastUpdated.borrowCapLastUpdated, 0);
   }
 
   function test_invalidCaller() public {

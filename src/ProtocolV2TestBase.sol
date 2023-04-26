@@ -2,9 +2,10 @@
 pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
-import {AggregatorInterface, IAaveOracle, ILendingPool, ILendingPoolAddressesProvider, ILendingPoolConfigurator, IAaveProtocolDataProvider, DataTypes, TokenData, ILendingRateOracle, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV2.sol';
+import {IAaveOracle, ILendingPool, ILendingPoolAddressesProvider, ILendingPoolConfigurator, IAaveProtocolDataProvider, DataTypes, TokenData, ILendingRateOracle, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV2.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
+import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 
@@ -49,10 +50,10 @@ contract ProtocolV2TestBase is CommonTestBase {
    * @param pool the pool to be snapshotted
    * @return ReserveConfig[] list of configs
    */
-  function createConfigurationSnapshot(string memory reportName, ILendingPool pool)
-    public
-    returns (ReserveConfig[] memory)
-  {
+  function createConfigurationSnapshot(
+    string memory reportName,
+    ILendingPool pool
+  ) public returns (ReserveConfig[] memory) {
     string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
     vm.writeFile(path, '{ "reserves": {}, "strategies": {}, "poolConfiguration": {} }');
     vm.serializeUint('root', 'chainId', block.chainid);
@@ -88,11 +89,9 @@ contract ProtocolV2TestBase is CommonTestBase {
   /**
    * @dev returns the first collateral in the list that cannot be borrowed in stable mode
    */
-  function _getFirstCollateral(ReserveConfig[] memory configs)
-    private
-    pure
-    returns (ReserveConfig memory config)
-  {
+  function _getFirstCollateral(
+    ReserveConfig[] memory configs
+  ) private pure returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
       if (configs[i].usageAsCollateralEnabled && !configs[i].stableBorrowRateEnabled)
         return configs[i];
@@ -110,7 +109,7 @@ contract ProtocolV2TestBase is CommonTestBase {
   ) internal {
     // test all basic interactions
     for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 100 * 10**configs[i].decimals;
+      uint256 amount = 100 * 10 ** configs[i].decimals;
       if (!configs[i].isFrozen) {
         _deposit(configs[i], pool, user, amount);
         _skipBlocks(1000);
@@ -136,7 +135,7 @@ contract ProtocolV2TestBase is CommonTestBase {
     ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
     _deposit(collateralConfig, pool, user, 1000000 ether);
     for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 10**configs[i].decimals;
+      uint256 amount = 10 ** configs[i].decimals;
       if (configs[i].borrowingEnabled) {
         _deposit(configs[i], pool, EOA, amount * 2);
         this._borrow(configs[i], pool, user, amount, false);
@@ -158,7 +157,7 @@ contract ProtocolV2TestBase is CommonTestBase {
     ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
     _deposit(collateralConfig, pool, user, 1000000 ether);
     for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 10**configs[i].decimals;
+      uint256 amount = 10 ** configs[i].decimals;
       if (configs[i].borrowingEnabled && configs[i].stableBorrowRateEnabled) {
         _deposit(configs[i], pool, EOA, amount * 2);
         this._borrow(configs[i], pool, user, amount, true);
@@ -244,7 +243,7 @@ contract ProtocolV2TestBase is CommonTestBase {
   function _writeStrategyConfigs(string memory path, ReserveConfig[] memory configs) internal {
     // keys for json stringification
     string memory strategiesKey = 'stategies';
-    string memory content;
+    string memory content = '{}';
 
     address[] memory usedStrategies = new address[](configs.length);
     for (uint256 i = 0; i < configs.length; i++) {
@@ -254,7 +253,6 @@ contract ProtocolV2TestBase is CommonTestBase {
           configs[i].interestRateStrategy
         );
         string memory key = vm.toString(address(strategy));
-        vm.serializeAddress(key, 'address', address(strategy));
         vm.serializeString(key, 'stableRateSlope1', vm.toString(strategy.stableRateSlope1()));
         vm.serializeString(key, 'stableRateSlope2', vm.toString(strategy.stableRateSlope2()));
         vm.serializeString(
@@ -334,7 +332,7 @@ contract ProtocolV2TestBase is CommonTestBase {
   ) internal {
     // keys for json stringification
     string memory reservesKey = 'reserves';
-    string memory content;
+    string memory content = '{}';
 
     ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(
       pool.getAddressesProvider()
@@ -343,7 +341,7 @@ contract ProtocolV2TestBase is CommonTestBase {
 
     for (uint256 i = 0; i < configs.length; i++) {
       ReserveConfig memory config = configs[i];
-      AggregatorInterface assetOracle = AggregatorInterface(
+      ExtendedAggregatorV2V3Interface assetOracle = ExtendedAggregatorV2V3Interface(
         oracle.getSourceOfAsset(config.underlying)
       );
 
@@ -391,6 +389,18 @@ contract ProtocolV2TestBase is CommonTestBase {
         )
       );
       vm.serializeAddress(key, 'oracle', address(assetOracle));
+      if (address(assetOracle) != address(0)) {
+        try assetOracle.description() returns (string memory name) {
+          vm.serializeString(key, 'oracleDescription', name);
+        } catch {
+          try assetOracle.name() returns (string memory name) {
+            vm.serializeString(key, 'oracleName', name);
+          } catch {}
+        }
+        try assetOracle.decimals() returns (uint8 decimals) {
+          vm.serializeUint(key, 'oracleDecimals', decimals);
+        } catch {}
+      }
       string memory out = vm.serializeUint(
         key,
         'oracleLatestAnswer',
@@ -431,11 +441,10 @@ contract ProtocolV2TestBase is CommonTestBase {
     return vars.configs;
   }
 
-  function _getStructReserveTokens(IAaveProtocolDataProvider pdp, address underlyingAddress)
-    internal
-    view
-    returns (ReserveTokens memory)
-  {
+  function _getStructReserveTokens(
+    IAaveProtocolDataProvider pdp,
+    address underlyingAddress
+  ) internal view returns (ReserveTokens memory) {
     ReserveTokens memory reserveTokens;
     (reserveTokens.aToken, reserveTokens.stableDebtToken, reserveTokens.variableDebtToken) = pdp
       .getReserveTokensAddresses(underlyingAddress);
@@ -503,11 +512,10 @@ contract ProtocolV2TestBase is CommonTestBase {
       });
   }
 
-  function _findReserveConfig(ReserveConfig[] memory configs, address underlying)
-    internal
-    pure
-    returns (ReserveConfig memory)
-  {
+  function _findReserveConfig(
+    ReserveConfig[] memory configs,
+    address underlying
+  ) internal pure returns (ReserveConfig memory) {
     for (uint256 i = 0; i < configs.length; i++) {
       if (configs[i].underlying == underlying) {
         // Important to clone the struct, to avoid unexpected side effect if modifying the returned config
@@ -696,10 +704,10 @@ contract ProtocolV2TestBase is CommonTestBase {
     }
   }
 
-  function _requireNoChangeInConfigs(ReserveConfig memory config1, ReserveConfig memory config2)
-    internal
-    pure
-  {
+  function _requireNoChangeInConfigs(
+    ReserveConfig memory config1,
+    ReserveConfig memory config2
+  ) internal pure {
     require(
       keccak256(abi.encodePacked(config1.symbol)) == keccak256(abi.encodePacked(config2.symbol)),
       '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_SYMBOL_CHANGED'

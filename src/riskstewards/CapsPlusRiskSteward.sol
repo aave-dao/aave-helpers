@@ -6,6 +6,11 @@ import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
 import {EngineFlags} from '../v3-config-engine/EngineFlags.sol';
 import {IAaveV3ConfigEngine} from '../v3-config-engine/IAaveV3ConfigEngine.sol';
 
+/**
+ * @title CapsPlusRiskStewardErrors
+ * @author BGD labs
+ * @notice Library with all the potential errors to be thrown by the steward
+ */
 library CapsPlusRiskStewardErrors {
   /**
    * @notice Only the permissioned council is allowed to call methods on the steward.
@@ -36,7 +41,7 @@ library CapsPlusRiskStewardErrors {
 /**
  * @title CapsPlusRiskSteward
  * @author BGD labs
- * @notice Contract managing caps on an aave v3 pool
+ * @notice Contract managing caps increasing on an aave v3 pool
  */
 contract CapsPlusRiskSteward {
   using Address for address;
@@ -51,41 +56,51 @@ contract CapsPlusRiskSteward {
   IPoolDataProvider public immutable POOL_DATA_PROVIDER;
   address public immutable RISK_COUNCIL;
 
-  mapping(address => Debounce) public timelocks;
+  mapping(address => Debounce) internal _timelocks;
 
   modifier onlyRiskCouncil() {
     require(RISK_COUNCIL == msg.sender, CapsPlusRiskStewardErrors.INVALID_CALLER);
     _;
   }
 
-  constructor(IPoolDataProvider poolDataProvider, IAaveV3ConfigEngine engine, address riskCouncil) {
+  /**
+   * @param poolDataProvider The pool data provider of the pool to be controlled by the steward
+   * @param engine the config engine to be used by the steward
+   * @param riskCouncil the safe address of the council being able to interact with the steward
+   */
+  constructor(
+    IPoolDataProvider poolDataProvider,
+    IAaveV3ConfigEngine engine,
+    address riskCouncil
+  ) {
     POOL_DATA_PROVIDER = poolDataProvider;
     RISK_COUNCIL = riskCouncil;
     CONFIG_ENGINE = engine;
   }
 
   /**
-   * Allows increasing borrow and supply caps accross multiple assets
+   * @notice Allows increasing borrow and supply caps accross multiple assets
    * @dev A cap increase is only possible ever 5 days per asset
    * @dev A cap increase is only allowed to increase the cap by 50%
    * @param capUpdates caps to be updated
    */
-  function updateCaps(
-    IAaveV3ConfigEngine.CapsUpdate[] calldata capUpdates
-  ) external onlyRiskCouncil {
+  function updateCaps(IAaveV3ConfigEngine.CapsUpdate[] calldata capUpdates)
+    external
+    onlyRiskCouncil
+  {
     require(capUpdates.length > 0, CapsPlusRiskStewardErrors.NO_ZERO_UPDATES);
     for (uint256 i = 0; i < capUpdates.length; i++) {
       (uint256 currentBorrowCap, uint256 currentSupplyCap) = POOL_DATA_PROVIDER.getReserveCaps(
         capUpdates[i].asset
       );
-      Debounce storage debounce = timelocks[capUpdates[i].asset];
+      Debounce storage debounce = _timelocks[capUpdates[i].asset];
       if (capUpdates[i].supplyCap != EngineFlags.KEEP_CURRENT) {
         _validateCapIncrease(
           currentSupplyCap,
           capUpdates[i].supplyCap,
           debounce.supplyCapLastUpdated
         );
-        timelocks[capUpdates[i].asset].supplyCapLastUpdated = uint40(block.timestamp);
+        debounce.supplyCapLastUpdated = uint40(block.timestamp);
       }
       if (capUpdates[i].borrowCap != EngineFlags.KEEP_CURRENT) {
         _validateCapIncrease(
@@ -93,7 +108,7 @@ contract CapsPlusRiskSteward {
           capUpdates[i].borrowCap,
           debounce.borrowCapLastUpdated
         );
-        timelocks[capUpdates[i].asset].borrowCapLastUpdated = uint40(block.timestamp);
+        debounce.borrowCapLastUpdated = uint40(block.timestamp);
       }
     }
     address(CONFIG_ENGINE).functionDelegateCall(
@@ -101,6 +116,23 @@ contract CapsPlusRiskSteward {
     );
   }
 
+  /**
+   * @notice Returns the timelock for a specific asset
+   * @param asset for which to fetch the timelock
+   */
+  function getTimelock(address asset) external view returns (Debounce memory) {
+    return _timelocks[asset];
+  }
+
+  /**
+   * @notice A cap increase is valid, when it:
+   * - respects the debounce duration (5 day pause between updates must be respected)
+   * - the asset already had a cap (the steward can increase caps, but not initialize them)
+   * - the increase increases by a maximum of 100% of the current cap
+   * @param currentCap the current cap
+   * @param newCap the new cap
+   * @param lastUpdated the timestamp of the last update
+   */
   function _validateCapIncrease(
     uint256 currentCap,
     uint256 newCap,
@@ -119,7 +151,7 @@ contract CapsPlusRiskSteward {
   }
 
   /**
-   * Ensures the cap increase is within the allowed range.
+   * @notice Ensures the cap increase is within the allowed range.
    * @param from current cap
    * @param to new cap
    * @return bool true, if difference is within the max 100% increase window

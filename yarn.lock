@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@adraffy/ens-normalize/-/ens-normalize-1.9.0.tgz#223572538f6bea336750039bb43a4016dcc8182d"
   integrity sha512-iowxq3U30sghZotgl4s/oJRci6WPBfNO5YYgk2cIOMCHr3LeGPcsZjCEr+33Q4N+oV3OABDAtA+pyvWjbvBifQ==
 
-"@bgd-labs/report-engine@^0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@bgd-labs/report-engine/-/report-engine-0.0.8.tgz#bfbf3455717ded9b3d1412b1e7bc9720e9861830"
-  integrity sha512-Ctzi09ppp4RX9+RN59HNB67CyRHIoHJpQcRAQK3zH38IjsdKKJg7Po0+EZ3E9OIaL30tGRY9H/b+pnGMaUdq2w==
+"@bgd-labs/report-engine@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@bgd-labs/report-engine/-/report-engine-0.0.9.tgz#610493e2962bcbbf692d06e8ebdd88eb2f40b8fc"
+  integrity sha512-YtQxcPhAopTQh1NNcl+338ubSHBdf48MbeKGlI2XF/eWPQCGxNHsLW62osc7gSZYqLKM1wz2vYTGkjFNifSeVA==
   dependencies:
     json-bigint "^1.0.0"
     node-fetch "^2.6.9"
@@ -224,9 +224,9 @@ tr46@~0.0.3:
   integrity sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==
 
 viem@^0.3.0:
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/viem/-/viem-0.3.3.tgz#74463ac3f5ad6b491de1888a67fcc6ca3fba1d15"
-  integrity sha512-w7PiRjMi9wwV7DmednDOTD0MGHtLp7W32wUUGko8vZWJvkplr3S3CHnRBK6zNKPWDmgFMe4V+65Btkrn4bw8wA==
+  version "0.3.11"
+  resolved "https://registry.yarnpkg.com/viem/-/viem-0.3.11.tgz#436b47d66f0b9190ed24c0164294df6b84825acb"
+  integrity sha512-Z7AXS31B/hukJyrDD9GhdE9j2OtsoTdNNJgLNC3sNPMgBcF90y8u+t+uiHSxLivXia+JLCer5M+LC+edPXV6tw==
   dependencies:
     "@adraffy/ens-normalize" "1.9.0"
     "@noble/curves" "0.9.0"
