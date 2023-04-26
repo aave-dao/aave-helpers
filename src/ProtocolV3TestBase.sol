@@ -71,7 +71,6 @@ contract ProtocolV3TestBase is CommonTestBase {
       '{ "eModes": {}, "reserves": {}, "strategies": {}, "poolConfiguration": {} }'
     );
     vm.serializeUint('root', 'chainId', block.chainid);
-    vm.serializeUint('root', 'blocknumber', block.number);
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     _writeReserveConfigs(path, configs, pool);
     _writeStrategyConfigs(path, configs);
