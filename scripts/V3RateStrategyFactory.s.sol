@@ -10,6 +10,7 @@ import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
+import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
 import {ITransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/interfaces/ITransparentProxyFactory.sol';
 import {V3RateStrategyFactory} from '../src/v3-config-engine/V3RateStrategyFactory.sol';
 
@@ -132,9 +133,9 @@ library DeployRatesFactoryMetLib {
   function deploy() internal returns (address, address[] memory) {
     return
       DeployRatesFactoryLib._createAndSetupRatesFactory(
-        IPoolAddressesProvider(0x632bf4054334F263F49a7039Cce25f0294f3f667), // TODO: add from address book
-        0x1dad86dC5990BCE5bFe3A150A4E0ece990d6EBcB, // TODO:
-        0x1CabD986cBAbDf12E00128DFf03C80ee62C4fd97 // TODO:
+        AaveV3Metis.POOL_ADDRESSES_PROVIDER,
+        AaveMisc.TRANSPARENT_PROXY_FACTORY_METIS,
+        AaveMisc.PROXY_ADMIN_METIS
       );
   }
 }
