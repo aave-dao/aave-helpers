@@ -5,6 +5,7 @@ import {IACLManager, IPoolConfigurator, IPoolDataProvider} from 'aave-address-bo
 import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
 import {EngineFlags} from '../v3-config-engine/EngineFlags.sol';
 import {IAaveV3ConfigEngine} from '../v3-config-engine/IAaveV3ConfigEngine.sol';
+import {ICapsPlusRiskSteward} from './ICapsPlusRiskSteward.sol';
 
 /**
  * @title CapsPlusRiskStewardErrors
@@ -43,16 +44,10 @@ library CapsPlusRiskStewardErrors {
  * @author BGD labs
  * @notice Contract managing caps increasing on an aave v3 pool
  */
-contract CapsPlusRiskSteward {
+contract CapsPlusRiskSteward is ICapsPlusRiskSteward {
   using Address for address;
-  struct Debounce {
-    uint40 supplyCapLastUpdated;
-    uint40 borrowCapLastUpdated;
-  }
 
-  /**
-   * @notice The minimum delay that must be respected between updating a specific cap twice
-   */
+  /// @inheritdoc ICapsPlusRiskSteward
   uint256 public constant MINIMUM_DELAY = 5 days;
 
   /**
@@ -95,12 +90,7 @@ contract CapsPlusRiskSteward {
     CONFIG_ENGINE = engine;
   }
 
-  /**
-   * @notice Allows increasing borrow and supply caps accross multiple assets
-   * @dev A cap increase is only possible ever 5 days per asset
-   * @dev A cap increase is only allowed to increase the cap by 50%
-   * @param capUpdates caps to be updated
-   */
+  /// @inheritdoc ICapsPlusRiskSteward
   function updateCaps(IAaveV3ConfigEngine.CapsUpdate[] calldata capUpdates)
     external
     onlyRiskCouncil
@@ -133,10 +123,7 @@ contract CapsPlusRiskSteward {
     );
   }
 
-  /**
-   * @notice Returns the timelock for a specific asset
-   * @param asset for which to fetch the timelock
-   */
+  /// @inheritdoc ICapsPlusRiskSteward
   function getTimelock(address asset) external view returns (Debounce memory) {
     return _timelocks[asset];
   }
