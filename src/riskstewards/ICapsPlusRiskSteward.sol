@@ -12,6 +12,9 @@ import {IAaveV3ConfigEngine} from '../v3-config-engine/IAaveV3ConfigEngine.sol';
  * @notice Contract managing caps increasing on an aave v3 pool
  */
 interface ICapsPlusRiskSteward {
+  /**
+   * @notice Stuct storing the last update of a specific cap
+   */
   struct Debounce {
     uint40 supplyCapLastUpdated;
     uint40 borrowCapLastUpdated;
@@ -21,21 +24,6 @@ interface ICapsPlusRiskSteward {
    * @notice The minimum delay that must be respected between updating a specific cap twice
    */
   function MINIMUM_DELAY() external pure returns (uint256);
-
-  /**
-   * @notice The config engine used to perform the cap update via delegatecall
-   */
-  function CONFIG_ENGINE() external view returns (IAaveV3ConfigEngine);
-
-  // /**
-  //  * @notice The pool data provider of the POOL the steward controls
-  //  */
-  // IPoolDataProvider public immutable POOL_DATA_PROVIDER;
-
-  // /**
-  //  * @notice The safe controlling the steward
-  //  */
-  // address public immutable RISK_COUNCIL;
 
   /**
    * @notice Allows increasing borrow and supply caps accross multiple assets
