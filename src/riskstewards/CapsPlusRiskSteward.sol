@@ -50,14 +50,31 @@ contract CapsPlusRiskSteward {
     uint40 borrowCapLastUpdated;
   }
 
+  /**
+   * @notice The minimum delay that must be respected between updating a specific cap twice
+   */
   uint256 public constant MINIMUM_DELAY = 5 days;
 
+  /**
+   * @notice The config engine used to perform the cap update via delegatecall
+   */
   IAaveV3ConfigEngine public immutable CONFIG_ENGINE;
+
+  /**
+   * @notice The pool data provider of the POOL the steward controls
+   */
   IPoolDataProvider public immutable POOL_DATA_PROVIDER;
+
+  /**
+   * @notice The safe controlling the steward
+   */
   address public immutable RISK_COUNCIL;
 
   mapping(address => Debounce) internal _timelocks;
 
+  /**
+   * @dev Modifier preventing anyone, but the council to update caps.
+   */
   modifier onlyRiskCouncil() {
     require(RISK_COUNCIL == msg.sender, CapsPlusRiskStewardErrors.INVALID_CALLER);
     _;
