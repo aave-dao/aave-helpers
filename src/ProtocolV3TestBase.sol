@@ -401,7 +401,11 @@ contract ProtocolV3TestBase is CommonTestBase {
         }
         try assetOracle.decimals() returns (uint8 decimals) {
           vm.serializeUint(key, 'oracleDecimals', decimals);
-        } catch {}
+        } catch {
+          try assetOracle.DECIMALS() returns (uint8 decimals) {
+            vm.serializeUint(key, 'oracleDecimals', decimals);
+          } catch {}
+        }
       }
       string memory out = vm.serializeUint(
         key,

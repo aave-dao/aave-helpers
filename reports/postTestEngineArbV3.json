@@ -80,6 +80,7 @@
       "liquidationThreshold": 7900,
       "ltv": 7000,
       "oracle": "0x230E0321Cf38F09e247e50Afc7801EA2351fe56F",
+      "oracleDecimals": 8,
       "oracleLatestAnswer": 174617740755,
       "oracleName": "wstETH/stETH/USD",
       "reserveFactor": 1500,

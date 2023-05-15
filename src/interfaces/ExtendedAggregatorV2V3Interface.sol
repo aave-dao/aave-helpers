@@ -14,6 +14,8 @@ interface ExtendedAggregatorV2V3Interface {
 
   function decimals() external view returns (uint8);
 
+  function DECIMALS() external view returns (uint8);
+
   function description() external view returns (string memory);
 
   function version() external view returns (uint256);

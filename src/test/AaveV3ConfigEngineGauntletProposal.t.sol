@@ -30,13 +30,13 @@ contract AaveV3PolygonConfigEngineRatesTest is ProtocolV3TestBase, TestWithExecu
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(0xE202F2fc4b6A37Ba53cfD15bE42a762A645FCA07);
     AaveV3PolygonRatesUpdates070322 payload = new AaveV3PolygonRatesUpdates070322(engine);
 
-    createConfigurationSnapshot('preTestEnginePolV3', AaveV3Polygon.POOL);
+    createConfigurationSnapshot('preTestEnginePolV3Gauntlet', AaveV3Polygon.POOL);
 
     _executePayload(address(payload));
 
-    createConfigurationSnapshot('postTestEnginePolV3', AaveV3Polygon.POOL);
+    createConfigurationSnapshot('postTestEnginePolV3Gauntlet', AaveV3Polygon.POOL);
 
-    diffReports('preTestEnginePolV3', 'postTestEnginePolV3');
+    diffReports('preTestEnginePolV3Gauntlet', 'postTestEnginePolV3Gauntlet');
   }
 }
 
@@ -52,13 +52,13 @@ contract AaveV3AvalancheConfigEngineRatesTest is ProtocolV3TestBase, TestWithExe
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(0x49581e5575F49263f556b91daf8fb41D7854D94B);
     AaveV3AvalancheRatesUpdates070322 payload = new AaveV3AvalancheRatesUpdates070322(engine);
 
-    createConfigurationSnapshot('preTestEngineAvaV3', AaveV3Avalanche.POOL);
+    createConfigurationSnapshot('preTestEngineAvaV3Gauntlet', AaveV3Avalanche.POOL);
 
     _executePayload(address(payload));
 
-    createConfigurationSnapshot('postTestEngineAvaV3', AaveV3Avalanche.POOL);
+    createConfigurationSnapshot('postTestEngineAvaV3Gauntlet', AaveV3Avalanche.POOL);
 
-    diffReports('preTestEngineAvaV3', 'postTestEngineAvaV3');
+    diffReports('preTestEngineAvaV3Gauntlet', 'postTestEngineAvaV3Gauntlet');
   }
 }
 
@@ -74,13 +74,13 @@ contract AaveV3OptimismConfigEngineRatesTest is ProtocolV3TestBase, TestWithExec
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(0x7A9A9c14B35E58ffa1cC84aB421acE0FdcD289E3);
     AaveV3OptimismRatesUpdates070322 payload = new AaveV3OptimismRatesUpdates070322(engine);
 
-    createConfigurationSnapshot('preTestEngineOptV3', AaveV3Optimism.POOL);
+    createConfigurationSnapshot('preTestEngineOptV3Gauntlet', AaveV3Optimism.POOL);
 
     _executePayload(address(payload));
 
-    createConfigurationSnapshot('postTestEngineOptV3', AaveV3Optimism.POOL);
+    createConfigurationSnapshot('postTestEngineOptV3Gauntlet', AaveV3Optimism.POOL);
 
-    diffReports('preTestEngineOptV3', 'postTestEngineOptV3');
+    diffReports('preTestEngineOptV3Gauntlet', 'postTestEngineOptV3Gauntlet');
   }
 }
 
@@ -100,12 +100,12 @@ contract AaveV3ArbitrumConfigEngineRatesTest is ProtocolV3TestBase, TestWithExec
     AaveV3Arbitrum.ACL_MANAGER.addPoolAdmin(address(payload));
     vm.stopPrank();
 
-    createConfigurationSnapshot('preTestEngineArbV3', AaveV3Arbitrum.POOL);
+    createConfigurationSnapshot('preTestEngineArbV3Gauntlet', AaveV3Arbitrum.POOL);
 
     payload.execute();
 
-    createConfigurationSnapshot('postTestEngineArbV3', AaveV3Arbitrum.POOL);
+    createConfigurationSnapshot('postTestEngineArbV3Gauntlet', AaveV3Arbitrum.POOL);
 
-    diffReports('preTestEngineArbV3', 'postTestEngineArbV3');
+    diffReports('preTestEngineArbV3Gauntlet', 'postTestEngineArbV3Gauntlet');
   }
 }
