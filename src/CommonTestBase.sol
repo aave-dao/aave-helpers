@@ -37,22 +37,6 @@ contract CommonTestBase is Test {
     vm.ffi(inputs);
   }
 
-  function ipfsHashFile(string memory filePath, bool upload) internal returns (bytes32) {
-    string[] memory inputs = new string[](5);
-    inputs[0] = 'aave-report-engine';
-    inputs[1] = 'ipfs';
-    inputs[2] = filePath;
-    inputs[3] = '-u';
-    inputs[4] = vm.toString(upload);
-    bytes memory bs58Hash = vm.ffi(inputs);
-    emit log_bytes(bs58Hash);
-    return bytes32(bs58Hash);
-  }
-
-  function ipfsHashFile(string memory filePath) internal returns (bytes32) {
-    return ipfsHashFile(filePath, false);
-  }
-
   /**
    * @dev forwards time by x blocks
    */
