@@ -25,7 +25,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
   using stdStorage for StdStorage;
 
   function testListings() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 40037250);
+    vm.createSelectFork(vm.rpcUrl('polygon'), 42811924);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEnginePolLib.deploy());
     AaveV3PolygonMockListing payload = new AaveV3PolygonMockListing(engine);
@@ -345,7 +345,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
   }
 
   function testRateStrategiesUpdates() public {
-    vm.createSelectFork(vm.rpcUrl('optimism'), 78907810);
+    vm.createSelectFork(vm.rpcUrl('optimism'), 99066171);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineOptLib.deploy());
     AaveV3OptimismMockRatesUpdate payload = new AaveV3OptimismMockRatesUpdate(engine);

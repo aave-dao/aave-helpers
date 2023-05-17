@@ -6,8 +6,8 @@
 
 | description | value before | value after |
 | --- | --- | --- |
-| interestRateStrategy | [0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6](https://snowtrace.io/address/0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6) | [0xc76EF342898f1AE7E6C4632627Df683FAD8563DD](https://snowtrace.io/address/0xc76EF342898f1AE7E6C4632627Df683FAD8563DD) |
 | reserveFactor | 10 % | 15 % |
+| interestRateStrategy | [0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6](https://snowtrace.io/address/0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6) | [0xc76EF342898f1AE7E6C4632627Df683FAD8563DD](https://snowtrace.io/address/0xc76EF342898f1AE7E6C4632627Df683FAD8563DD) |
 | optimalUsageRatio | 45 % | 80 % |
 | maxExcessUsageRatio | 55 % | 20 % |
 | baseVariableBorrowRate | 0 % | 1 % |
@@ -22,8 +22,8 @@
 
 | description | value before | value after |
 | --- | --- | --- |
-| interestRateStrategy | [0xf4a0039F2d4a2EaD5216AbB6Ae4C4C3AA2dB9b82](https://snowtrace.io/address/0xf4a0039F2d4a2EaD5216AbB6Ae4C4C3AA2dB9b82) | [0xfab05a6aF585da2F96e21452F91E812452996BD3](https://snowtrace.io/address/0xfab05a6aF585da2F96e21452F91E812452996BD3) |
 | reserveFactor | 10 % | 20 % |
+| interestRateStrategy | [0xf4a0039F2d4a2EaD5216AbB6Ae4C4C3AA2dB9b82](https://snowtrace.io/address/0xf4a0039F2d4a2EaD5216AbB6Ae4C4C3AA2dB9b82) | [0xfab05a6aF585da2F96e21452F91E812452996BD3](https://snowtrace.io/address/0xfab05a6aF585da2F96e21452F91E812452996BD3) |
 | optimalUsageRatio | 90 % | 80 % |
 | maxExcessUsageRatio | 10 % | 20 % |
 | variableRateSlope2 | 60 % | 75 % |

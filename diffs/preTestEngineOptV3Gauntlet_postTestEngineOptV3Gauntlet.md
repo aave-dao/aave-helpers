@@ -6,8 +6,8 @@
 
 | description | value before | value after |
 | --- | --- | --- |
-| interestRateStrategy | [0xeE1BAc9355EaAfCD1B68d272d640d870bC9b4b5C](https://optimistic.etherscan.io/address/0xeE1BAc9355EaAfCD1B68d272d640d870bC9b4b5C) | [0xc76EF342898f1AE7E6C4632627Df683FAD8563DD](https://optimistic.etherscan.io/address/0xc76EF342898f1AE7E6C4632627Df683FAD8563DD) |
 | reserveFactor | 10 % | 15 % |
+| interestRateStrategy | [0xeE1BAc9355EaAfCD1B68d272d640d870bC9b4b5C](https://optimistic.etherscan.io/address/0xeE1BAc9355EaAfCD1B68d272d640d870bC9b4b5C) | [0xc76EF342898f1AE7E6C4632627Df683FAD8563DD](https://optimistic.etherscan.io/address/0xc76EF342898f1AE7E6C4632627Df683FAD8563DD) |
 | optimalUsageRatio | 45 % | 80 % |
 | maxExcessUsageRatio | 55 % | 20 % |
 | baseVariableBorrowRate | 0 % | 1 % |

@@ -6,35 +6,35 @@
 
 | description | value |
 | --- | --- |
+| decimals | 18 |
+| isActive | true |
+| isFrozen | false |
 | supplyCap | 85,000 1INCH |
 | borrowCap | 60,000 1INCH |
+| debtCeiling | 0 $ |
+| isSiloed | false |
+| isFlashloanable | false |
+| eModeCategory | 0 |
 | oracle | [0x443C5116CdF663Eb387e72C688D276e702135C87](https://polygonscan.com/address/0x443C5116CdF663Eb387e72C688D276e702135C87) |
 | oracleDecimals | 8 |
 | oracleDescription | 1INCH / USD |
-| oracleLatestAnswer | 0.52690564 |
-| aToken | [0xf59036CAEBeA7dC4b86638DFA2E3C97dA9FcCd40](https://polygonscan.com/address/0xf59036CAEBeA7dC4b86638DFA2E3C97dA9FcCd40) |
-| aTokenImpl | [0xa5ba6E5EC19a1Bf23C857991c857dB62b2Aa187B](https://polygonscan.com/address/0xa5ba6E5EC19a1Bf23C857991c857dB62b2Aa187B) |
-| borrowingEnabled | true |
-| debtCeiling | 0 |
-| decimals | 18 |
-| eModeCategory | 0 |
-| interestRateStrategy | [0x03733F4E008d36f2e37F0080fF1c8DF756622E6F](https://polygonscan.com/address/0x03733F4E008d36f2e37F0080fF1c8DF756622E6F) |
-| isActive | true |
-| isBorrowableInIsolation | false |
-| isFlashloanable | false |
-| isFrozen | false |
-| isSiloed | false |
+| oracleLatestAnswer | 0.41296368 |
+| usageAsCollateralEnabled | true |
+| ltv | 82.5 % |
+| liquidationThreshold | 86 % |
 | liquidationBonus | 5 % |
 | liquidationProtocolFee | 10 % |
-| liquidationThreshold | 86 % |
-| ltv | 82.5 % |
 | reserveFactor | 10 % |
+| aToken | [0xA4D94019934D8333Ef880ABFFbF2FDd611C762BD](https://polygonscan.com/address/0xA4D94019934D8333Ef880ABFFbF2FDd611C762BD) |
+| aTokenImpl | [0xCf85FF1c37c594a10195F7A9Ab85CBb0a03f69dE](https://polygonscan.com/address/0xCf85FF1c37c594a10195F7A9Ab85CBb0a03f69dE) |
+| variableDebtToken | [0xE701126012EC0290822eEA17B794454d1AF8b030](https://polygonscan.com/address/0xE701126012EC0290822eEA17B794454d1AF8b030) |
+| variableDebtTokenImpl | [0x79b5e91037AE441dE0d9e6fd3Fd85b96B83d4E93](https://polygonscan.com/address/0x79b5e91037AE441dE0d9e6fd3Fd85b96B83d4E93) |
+| stableDebtToken | [0xc889e9f8370D14A428a9857205d99BFdB400b757](https://polygonscan.com/address/0xc889e9f8370D14A428a9857205d99BFdB400b757) |
+| stableDebtTokenImpl | [0x50ddd0Cd4266299527d25De9CBb55fE0EB8dAc30](https://polygonscan.com/address/0x50ddd0Cd4266299527d25De9CBb55fE0EB8dAc30) |
+| borrowingEnabled | true |
 | stableBorrowRateEnabled | false |
-| stableDebtToken | [0x173e54325AE58B072985DbF232436961981EA000](https://polygonscan.com/address/0x173e54325AE58B072985DbF232436961981EA000) |
-| stableDebtTokenImpl | [0x52A1CeB68Ee6b7B5D13E0376A1E0E4423A8cE26e](https://polygonscan.com/address/0x52A1CeB68Ee6b7B5D13E0376A1E0E4423A8cE26e) |
-| usageAsCollateralEnabled | true |
-| variableDebtToken | [0x77fA66882a8854d883101Fb8501BD3CaD347Fc32](https://polygonscan.com/address/0x77fA66882a8854d883101Fb8501BD3CaD347Fc32) |
-| variableDebtTokenImpl | [0x81387c40EB75acB02757C1Ae55D5936E78c9dEd3](https://polygonscan.com/address/0x81387c40EB75acB02757C1Ae55D5936E78c9dEd3) |
+| isBorrowableInIsolation | false |
+| interestRateStrategy | [0x03733F4E008d36f2e37F0080fF1c8DF756622E6F](https://polygonscan.com/address/0x03733F4E008d36f2e37F0080fF1c8DF756622E6F) |
 | optimalUsageRatio | 45 % |
 | maxExcessUsageRatio | 55 % |
 | baseVariableBorrowRate | 0 % |
@@ -55,8 +55,8 @@
     "0x9c2C5fd7b07E95EE044DDeba0E97a665F142394f": {
       "from": null,
       "to": {
-        "aToken": "0xf59036CAEBeA7dC4b86638DFA2E3C97dA9FcCd40",
-        "aTokenImpl": "0xa5ba6E5EC19a1Bf23C857991c857dB62b2Aa187B",
+        "aToken": "0xA4D94019934D8333Ef880ABFFbF2FDd611C762BD",
+        "aTokenImpl": "0xCf85FF1c37c594a10195F7A9Ab85CBb0a03f69dE",
         "borrowCap": 60000,
         "borrowingEnabled": true,
         "debtCeiling": 0,
@@ -75,17 +75,17 @@
         "oracle": "0x443C5116CdF663Eb387e72C688D276e702135C87",
         "oracleDecimals": 8,
         "oracleDescription": "1INCH / USD",
-        "oracleLatestAnswer": 52690564,
+        "oracleLatestAnswer": 41296368,
         "reserveFactor": 1000,
         "stableBorrowRateEnabled": false,
-        "stableDebtToken": "0x173e54325AE58B072985DbF232436961981EA000",
-        "stableDebtTokenImpl": "0x52A1CeB68Ee6b7B5D13E0376A1E0E4423A8cE26e",
+        "stableDebtToken": "0xc889e9f8370D14A428a9857205d99BFdB400b757",
+        "stableDebtTokenImpl": "0x50ddd0Cd4266299527d25De9CBb55fE0EB8dAc30",
         "supplyCap": 85000,
         "symbol": "1INCH",
         "underlying": "0x9c2C5fd7b07E95EE044DDeba0E97a665F142394f",
         "usageAsCollateralEnabled": true,
-        "variableDebtToken": "0x77fA66882a8854d883101Fb8501BD3CaD347Fc32",
-        "variableDebtTokenImpl": "0x81387c40EB75acB02757C1Ae55D5936E78c9dEd3"
+        "variableDebtToken": "0xE701126012EC0290822eEA17B794454d1AF8b030",
+        "variableDebtTokenImpl": "0x79b5e91037AE441dE0d9e6fd3Fd85b96B83d4E93"
       }
     }
   }

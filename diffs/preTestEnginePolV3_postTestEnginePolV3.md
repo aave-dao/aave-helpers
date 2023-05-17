@@ -13,8 +13,8 @@
 
 | description | value before | value after |
 | --- | --- | --- |
-| interestRateStrategy | [0x03733F4E008d36f2e37F0080fF1c8DF756622E6F](https://polygonscan.com/address/0x03733F4E008d36f2e37F0080fF1c8DF756622E6F) | [0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F](https://polygonscan.com/address/0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F) |
 | reserveFactor | 10 % | 15 % |
+| interestRateStrategy | [0x03733F4E008d36f2e37F0080fF1c8DF756622E6F](https://polygonscan.com/address/0x03733F4E008d36f2e37F0080fF1c8DF756622E6F) | [0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F](https://polygonscan.com/address/0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F) |
 | optimalUsageRatio | 45 % | 80 % |
 | maxExcessUsageRatio | 55 % | 20 % |
 | baseVariableBorrowRate | 0 % | 1 % |
@@ -58,8 +58,8 @@
 
 | description | value before | value after |
 | --- | --- | --- |
-| interestRateStrategy | [0x41B66b4b6b4c9dab039d96528D1b88f7BAF8C5A4](https://polygonscan.com/address/0x41B66b4b6b4c9dab039d96528D1b88f7BAF8C5A4) | [0xA9F3C3caE095527061e6d270DBE163693e6fda9D](https://polygonscan.com/address/0xA9F3C3caE095527061e6d270DBE163693e6fda9D) |
 | reserveFactor | 10 % | 20 % |
+| interestRateStrategy | [0x41B66b4b6b4c9dab039d96528D1b88f7BAF8C5A4](https://polygonscan.com/address/0x41B66b4b6b4c9dab039d96528D1b88f7BAF8C5A4) | [0xA9F3C3caE095527061e6d270DBE163693e6fda9D](https://polygonscan.com/address/0xA9F3C3caE095527061e6d270DBE163693e6fda9D) |
 | optimalUsageRatio | 90 % | 80 % |
 | maxExcessUsageRatio | 10 % | 20 % |
 | variableRateSlope2 | 60 % | 75 % |
