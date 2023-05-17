@@ -25,6 +25,7 @@
     "poolConfigurator": "0x8145eddDf43f50276641b55bd3AD95944510021E",
     "poolConfiguratorImpl": "0xD6FA681E22306b0F4E605B979b7c9a1dFa865ade",
     "poolImpl": "0x270d4C1b6F0bB172A9fd628E29530Ca484190013",
+    "priceOracleSentinel": "0xF876d26041a4Fdc7A787d209DC3D2795dDc74f1e",
     "protocolDataProvider": "0x69FA688f1Dc47d4B5d8029D5a35FB7a548310654"
   },
   "reserves": {

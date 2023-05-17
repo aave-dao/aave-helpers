@@ -426,9 +426,13 @@ contract ProtocolV3TestBase is CommonTestBase {
     IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
     vm.serializeAddress(poolConfigKey, 'poolAddressesProvider', address(addressesProvider));
 
-    // oracle
-    IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
-    vm.serializeAddress(poolConfigKey, 'oracle', address(oracle));
+    // oracles
+    vm.serializeAddress(poolConfigKey, 'oracle', addressesProvider.getPriceOracle());
+    vm.serializeAddress(
+      poolConfigKey,
+      'priceOracleSentinel',
+      addressesProvider.getPriceOracleSentinel()
+    );
 
     // pool configurator
     IPoolConfigurator configurator = IPoolConfigurator(addressesProvider.getPoolConfigurator());
@@ -439,7 +443,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, address(configurator))
     );
 
-    // PoolDaraProvider
+    // PoolDataProvider
     IPoolDataProvider pdp = IPoolDataProvider(addressesProvider.getPoolDataProvider());
     vm.serializeAddress(poolConfigKey, 'protocolDataProvider', address(pdp));
 
