@@ -87,14 +87,24 @@ contract ProtocolV2TestBase is CommonTestBase {
   }
 
   /**
+   * Reserves that are frozen or not active should not be included in e2e test suite
+   */
+  function _includeInE2e(ReserveConfig memory config) internal pure returns (bool) {
+    return !config.isFrozen && config.isActive;
+  }
+
+  /**
    * @dev returns the first collateral in the list that cannot be borrowed in stable mode
    */
   function _getFirstCollateral(
     ReserveConfig[] memory configs
   ) private pure returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
-      if (configs[i].usageAsCollateralEnabled && !configs[i].stableBorrowRateEnabled)
-        return configs[i];
+      if (
+        _includeInE2e(configs[i]) &&
+        configs[i].usageAsCollateralEnabled &&
+        !configs[i].stableBorrowRateEnabled
+      ) return configs[i];
     }
     revert('ERROR: No collateral found');
   }
@@ -110,7 +120,7 @@ contract ProtocolV2TestBase is CommonTestBase {
     // test all basic interactions
     for (uint256 i = 0; i < configs.length; i++) {
       uint256 amount = 100 * 10 ** configs[i].decimals;
-      if (!configs[i].isFrozen) {
+      if (_includeInE2e(configs[i])) {
         _deposit(configs[i], pool, user, amount);
         _skipBlocks(1000);
         assertEq(_withdraw(configs[i], pool, user, amount), amount);
@@ -136,7 +146,7 @@ contract ProtocolV2TestBase is CommonTestBase {
     _deposit(collateralConfig, pool, user, 1000000 ether);
     for (uint256 i = 0; i < configs.length; i++) {
       uint256 amount = 10 ** configs[i].decimals;
-      if (configs[i].borrowingEnabled) {
+      if (_includeInE2e(configs[i]) && configs[i].borrowingEnabled) {
         _deposit(configs[i], pool, EOA, amount * 2);
         this._borrow(configs[i], pool, user, amount, false);
       } else {
@@ -158,7 +168,11 @@ contract ProtocolV2TestBase is CommonTestBase {
     _deposit(collateralConfig, pool, user, 1000000 ether);
     for (uint256 i = 0; i < configs.length; i++) {
       uint256 amount = 10 ** configs[i].decimals;
-      if (configs[i].borrowingEnabled && configs[i].stableBorrowRateEnabled) {
+      if (
+        _includeInE2e(configs[i]) &&
+        configs[i].borrowingEnabled &&
+        configs[i].stableBorrowRateEnabled
+      ) {
         _deposit(configs[i], pool, EOA, amount * 2);
         this._borrow(configs[i], pool, user, amount, true);
       } else {
