@@ -6,6 +6,7 @@ import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/co
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {IChainlinkAggregator} from '../interfaces/IChainlinkAggregator.sol';
 import {EngineFlags} from './EngineFlags.sol';
+import {PercentageMath} from './utils/PercentageMath.sol';
 import './IAaveV3ConfigEngine.sol';
 
 /**
@@ -21,6 +22,7 @@ import './IAaveV3ConfigEngine.sol';
  */
 contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
+  using PercentageMath for uint256;
 
   struct AssetsConfig {
     address[] ids;
@@ -421,9 +423,10 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
           }
         }
 
+        // LT*LB (in %) should never be above 100%, because it means instant undercollateralization
         require(
-          collaterals[i].liqThreshold + collaterals[i].liqBonus < 100_00,
-          'INVALID_LIQ_PARAMS_ABOVE_100'
+          collaterals[i].liqThreshold.percentMul(100_00 + collaterals[i].liqBonus) <= 100_00,
+          'INVALID_LT_LB_RATIO'
         );
 
         POOL_CONFIGURATOR.configureReserveAsCollateral(

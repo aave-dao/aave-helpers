@@ -6,6 +6,7 @@ import {AaveV3PolygonMockListing} from './mocks/AaveV3PolygonMockListing.sol';
 import {AaveV3EthereumMockCustomListing} from './mocks/AaveV3EthereumMockCustomListing.sol';
 import {AaveV3EthereumMockCapUpdate} from './mocks/AaveV3EthereumMockCapUpdate.sol';
 import {AaveV3AvalancheCollateralUpdate} from './mocks/AaveV3AvalancheCollateralUpdate.sol';
+import {AaveV3AvalancheCollateralUpdateWrongBonus, AaveV3AvalancheCollateralUpdateCorrectBonus} from './mocks/AaveV3AvalancheCollateralUpdateEdgeBonus.sol';
 import {AaveV3PolygonBorrowUpdate} from './mocks/AaveV3PolygonBorrowUpdate.sol';
 import {AaveV3PolygonPriceFeedUpdate} from './mocks/AaveV3PolygonPriceFeedUpdate.sol';
 import {AaveV3OptimismMockRatesUpdate} from './mocks/AaveV3OptimismMockRatesUpdate.sol';
@@ -272,6 +273,78 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
       ltv: 62_00,
       liquidationThreshold: 72_00,
       liquidationBonus: 106_00, // 100_00 + 6_00
+      liquidationProtocolFee: allConfigsBefore[6].liquidationProtocolFee,
+      reserveFactor: allConfigsBefore[6].reserveFactor,
+      usageAsCollateralEnabled: allConfigsBefore[6].usageAsCollateralEnabled,
+      borrowingEnabled: allConfigsBefore[6].borrowingEnabled,
+      interestRateStrategy: allConfigsBefore[6].interestRateStrategy,
+      stableBorrowRateEnabled: allConfigsBefore[6].stableBorrowRateEnabled,
+      isActive: allConfigsBefore[6].isActive,
+      isFrozen: allConfigsBefore[6].isFrozen,
+      isSiloed: allConfigsBefore[6].isSiloed,
+      isBorrowableInIsolation: allConfigsBefore[6].isBorrowableInIsolation,
+      isFlashloanable: allConfigsBefore[6].isFlashloanable,
+      supplyCap: allConfigsBefore[6].supplyCap,
+      borrowCap: allConfigsBefore[6].borrowCap,
+      debtCeiling: allConfigsBefore[6].debtCeiling,
+      eModeCategory: allConfigsBefore[6].eModeCategory
+    });
+
+    _validateReserveConfig(expectedAssetConfig, allConfigsAfter);
+  }
+
+  function testCollateralUpdateWrongBonus() public {
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 30344870);
+
+    IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
+    AaveV3AvalancheCollateralUpdateWrongBonus payload = new AaveV3AvalancheCollateralUpdateWrongBonus(
+        engine
+      );
+
+    vm.startPrank(AaveV3Avalanche.ACL_ADMIN);
+    AaveV3Avalanche.ACL_MANAGER.addPoolAdmin(address(payload));
+    vm.stopPrank();
+
+    ReserveConfig[] memory allConfigsBefore = _getReservesConfigs(AaveV3Avalanche.POOL);
+
+    vm.expectRevert(bytes('INVALID_LT_LB_RATIO'));
+    payload.execute();
+  }
+
+  function testCollateralUpdateCorrecBonus() public {
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 30344870);
+
+    IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
+    AaveV3AvalancheCollateralUpdateCorrectBonus payload = new AaveV3AvalancheCollateralUpdateCorrectBonus(
+        engine
+      );
+
+    vm.startPrank(AaveV3Avalanche.ACL_ADMIN);
+    AaveV3Avalanche.ACL_MANAGER.addPoolAdmin(address(payload));
+    vm.stopPrank();
+
+    ReserveConfig[] memory allConfigsBefore = _getReservesConfigs(AaveV3Avalanche.POOL);
+
+    createConfigurationSnapshot('preTestEngineCollateralEdgeBonus', AaveV3Avalanche.POOL);
+
+    payload.execute();
+
+    createConfigurationSnapshot('postTestEngineCollateralEdgeBonus', AaveV3Avalanche.POOL);
+
+    diffReports('preTestEngineCollateralEdgeBonus', 'postTestEngineCollateralEdgeBonus');
+
+    ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(AaveV3Avalanche.POOL);
+
+    ReserveConfig memory expectedAssetConfig = ReserveConfig({
+      symbol: allConfigsBefore[6].symbol,
+      underlying: allConfigsBefore[6].underlying,
+      aToken: allConfigsBefore[6].aToken,
+      variableDebtToken: allConfigsBefore[6].variableDebtToken,
+      stableDebtToken: allConfigsBefore[6].stableDebtToken,
+      decimals: allConfigsBefore[6].decimals,
+      ltv: 62_00,
+      liquidationThreshold: 90_00,
+      liquidationBonus: 111_00, // 100_00 + 11_00
       liquidationProtocolFee: allConfigsBefore[6].liquidationProtocolFee,
       reserveFactor: allConfigsBefore[6].reserveFactor,
       usageAsCollateralEnabled: allConfigsBefore[6].usageAsCollateralEnabled,
