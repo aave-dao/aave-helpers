@@ -424,19 +424,25 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
           }
         }
 
-        require(
-          collaterals[i].liqThreshold + collaterals[i].liqBonus < 100_00,
-          'INVALID_LIQ_PARAMS_ABOVE_100'
-        );
+        if (
+          !(collaterals[i].ltv == EngineFlags.KEEP_CURRENT &&
+            collaterals[i].liqThreshold == EngineFlags.KEEP_CURRENT &&
+            collaterals[i].liqBonus == EngineFlags.KEEP_CURRENT)
+        ) {
+          require(
+            collaterals[i].liqThreshold + collaterals[i].liqBonus < 100_00,
+            'INVALID_LIQ_PARAMS_ABOVE_100'
+          );
 
-        POOL_CONFIGURATOR.configureReserveAsCollateral(
-          ids[i],
-          collaterals[i].ltv,
-          collaterals[i].liqThreshold,
-          // For reference, this is to simplify the interaction with the Aave protocol,
-          // as there the definition is as e.g. 105% (5% bonus for liquidators)
-          100_00 + collaterals[i].liqBonus
-        );
+          POOL_CONFIGURATOR.configureReserveAsCollateral(
+            ids[i],
+            collaterals[i].ltv,
+            collaterals[i].liqThreshold,
+            // For reference, this is to simplify the interaction with the Aave protocol,
+            // as there the definition is as e.g. 105% (5% bonus for liquidators)
+            100_00 + collaterals[i].liqBonus
+          );
+        }
 
         if (collaterals[i].liqProtocolFee != EngineFlags.KEEP_CURRENT) {
           require(collaterals[i].liqProtocolFee < 100_00, 'INVALID_LIQ_PROTOCOL_FEE');
