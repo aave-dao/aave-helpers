@@ -4,11 +4,11 @@ pragma solidity ^0.8.0;
 import '../../v3-config-engine/AaveV3PayloadAvalanche.sol';
 
 /**
- * @dev Smart contract for a mock collateral update, for testing purposes
+ * @dev Smart contract for a mock collateral update with no changes, for testing purposes
  * IMPORTANT Parameters are pseudo-random, DON'T USE THIS ANYHOW IN PRODUCTION
  * @author BGD Labs
  */
-contract AaveV3AvalancheCollateralUpdate is AaveV3PayloadBase {
+contract AaveV3AvalancheCollateralUpdateNoChange is AaveV3PayloadBase {
   constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
 
   function collateralsUpdates() public pure override returns (IEngine.CollateralUpdate[] memory) {
@@ -16,9 +16,9 @@ contract AaveV3AvalancheCollateralUpdate is AaveV3PayloadBase {
 
     collateralsUpdate[0] = IEngine.CollateralUpdate({
       asset: AaveV3AvalancheAssets.AAVEe_UNDERLYING,
-      ltv: 62_00,
-      liqThreshold: 72_00,
-      liqBonus: 6_00,
+      ltv: EngineFlags.KEEP_CURRENT,
+      liqThreshold: EngineFlags.KEEP_CURRENT,
+      liqBonus: EngineFlags.KEEP_CURRENT,
       debtCeiling: EngineFlags.KEEP_CURRENT,
       liqProtocolFee: EngineFlags.KEEP_CURRENT,
       eModeCategory: EngineFlags.KEEP_CURRENT

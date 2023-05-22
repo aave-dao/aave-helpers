@@ -393,9 +393,12 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     for (uint256 i = 0; i < ids.length; i++) {
       if (collaterals[i].liqThreshold != 0) {
         if (
-          collaterals[i].ltv == EngineFlags.KEEP_CURRENT ||
-          collaterals[i].liqThreshold == EngineFlags.KEEP_CURRENT ||
-          collaterals[i].liqBonus == EngineFlags.KEEP_CURRENT
+          !(collaterals[i].ltv == EngineFlags.KEEP_CURRENT &&
+            collaterals[i].liqThreshold == EngineFlags.KEEP_CURRENT &&
+            collaterals[i].liqBonus == EngineFlags.KEEP_CURRENT) &&
+          (collaterals[i].ltv == EngineFlags.KEEP_CURRENT ||
+            collaterals[i].liqThreshold == EngineFlags.KEEP_CURRENT ||
+            collaterals[i].liqBonus == EngineFlags.KEEP_CURRENT)
         ) {
           DataTypes.ReserveConfigurationMap memory configuration = POOL.getConfiguration(ids[i]);
           (

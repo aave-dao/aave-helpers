@@ -6,6 +6,7 @@ import {AaveV3PolygonMockListing} from './mocks/AaveV3PolygonMockListing.sol';
 import {AaveV3EthereumMockCustomListing} from './mocks/AaveV3EthereumMockCustomListing.sol';
 import {AaveV3EthereumMockCapUpdate} from './mocks/AaveV3EthereumMockCapUpdate.sol';
 import {AaveV3AvalancheCollateralUpdate} from './mocks/AaveV3AvalancheCollateralUpdate.sol';
+import {AaveV3AvalancheCollateralUpdateNoChange} from './mocks/AaveV3AvalancheCollateralUpdateNoChange.sol';
 import {AaveV3PolygonBorrowUpdate} from './mocks/AaveV3PolygonBorrowUpdate.sol';
 import {AaveV3PolygonPriceFeedUpdate} from './mocks/AaveV3PolygonPriceFeedUpdate.sol';
 import {AaveV3OptimismMockRatesUpdate} from './mocks/AaveV3OptimismMockRatesUpdate.sol';
@@ -23,6 +24,13 @@ import '../ProtocolV3TestBase.sol';
 
 contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
   using stdStorage for StdStorage;
+
+  event CollateralConfigurationChanged(
+    address indexed asset,
+    uint256 ltv,
+    uint256 liquidationThreshold,
+    uint256 liquidationBonus
+  );
 
   function testListings() public {
     vm.createSelectFork(vm.rpcUrl('polygon'), 42811924);
@@ -254,6 +262,14 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
 
     createConfigurationSnapshot('preTestEngineCollateral', AaveV3Avalanche.POOL);
 
+    vm.expectEmit(true, true, true, true);
+    emit CollateralConfigurationChanged(
+      allConfigsBefore[6].underlying,
+      62_00,
+      72_00,
+      106_00
+    );
+
     payload.execute();
 
     createConfigurationSnapshot('postTestEngineCollateral', AaveV3Avalanche.POOL);
@@ -290,6 +306,37 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
     });
 
     _validateReserveConfig(expectedAssetConfig, allConfigsAfter);
+  }
+
+  // TODO manage this after testFail* deprecation.
+  // This should not be necessary, but there seems there is no other way
+  // of validating that when all collateral params are KEEP_CURRENT, the config
+  // engine doesn't call the POOL_CONFIGURATOR.
+  // So the solution is expecting the event emitted on the POOL_CONFIGURATOR,
+  // and as this doesn't happen, expect the failure of the test
+  function testFailCollateralsUpdatesNoChange() public {
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 27094357);
+
+    IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
+    AaveV3AvalancheCollateralUpdateNoChange payload = new AaveV3AvalancheCollateralUpdateNoChange(engine);
+
+    vm.startPrank(AaveV3Avalanche.ACL_ADMIN);
+    AaveV3Avalanche.ACL_MANAGER.addPoolAdmin(address(payload));
+    vm.stopPrank();
+
+    ReserveConfig[] memory allConfigsBefore = _getReservesConfigs(AaveV3Avalanche.POOL);
+
+    createConfigurationSnapshot('preTestEngineCollateral', AaveV3Avalanche.POOL);
+
+    vm.expectEmit(true, true, true, true);
+    emit CollateralConfigurationChanged(
+      allConfigsBefore[6].underlying,
+      allConfigsBefore[6].ltv,
+      allConfigsBefore[6].liquidationThreshold,
+      allConfigsBefore[6].liquidationBonus
+    );
+
+    payload.execute();
   }
 
   function testBorrowsUpdates() public {
