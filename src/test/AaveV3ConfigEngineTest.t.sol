@@ -263,12 +263,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
     createConfigurationSnapshot('preTestEngineCollateral', AaveV3Avalanche.POOL);
 
     vm.expectEmit(true, true, true, true);
-    emit CollateralConfigurationChanged(
-      allConfigsBefore[6].underlying,
-      62_00,
-      72_00,
-      106_00
-    );
+    emit CollateralConfigurationChanged(allConfigsBefore[6].underlying, 62_00, 72_00, 106_00);
 
     payload.execute();
 
@@ -318,15 +313,15 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
     vm.createSelectFork(vm.rpcUrl('avalanche'), 27094357);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
-    AaveV3AvalancheCollateralUpdateNoChange payload = new AaveV3AvalancheCollateralUpdateNoChange(engine);
+    AaveV3AvalancheCollateralUpdateNoChange payload = new AaveV3AvalancheCollateralUpdateNoChange(
+      engine
+    );
 
     vm.startPrank(AaveV3Avalanche.ACL_ADMIN);
     AaveV3Avalanche.ACL_MANAGER.addPoolAdmin(address(payload));
     vm.stopPrank();
 
     ReserveConfig[] memory allConfigsBefore = _getReservesConfigs(AaveV3Avalanche.POOL);
-
-    createConfigurationSnapshot('preTestEngineCollateral', AaveV3Avalanche.POOL);
 
     vm.expectEmit(true, true, true, true);
     emit CollateralConfigurationChanged(
@@ -337,6 +332,61 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
     );
 
     payload.execute();
+  }
+
+  // Same as testFailCollateralsUpdatesNoChange, but this time should work, as we are not expecting any event emitted
+  function testCollateralsUpdatesNoChange() public {
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 27094357);
+
+    IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
+    AaveV3AvalancheCollateralUpdateNoChange payload = new AaveV3AvalancheCollateralUpdateNoChange(
+      engine
+    );
+
+    vm.startPrank(AaveV3Avalanche.ACL_ADMIN);
+    AaveV3Avalanche.ACL_MANAGER.addPoolAdmin(address(payload));
+    vm.stopPrank();
+
+    ReserveConfig[] memory allConfigsBefore = _getReservesConfigs(AaveV3Avalanche.POOL);
+
+    createConfigurationSnapshot('preTestEngineCollateralNoChange', AaveV3Avalanche.POOL);
+
+    payload.execute();
+
+    createConfigurationSnapshot('postTestEngineCollateralNoChange', AaveV3Avalanche.POOL);
+
+    diffReports('preTestEngineCollateralNoChange', 'postTestEngineCollateralNoChange');
+
+    ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(AaveV3Avalanche.POOL);
+
+    ReserveConfig memory expectedAssetConfig = ReserveConfig({
+      symbol: allConfigsBefore[6].symbol,
+      underlying: allConfigsBefore[6].underlying,
+      aToken: allConfigsBefore[6].aToken,
+      variableDebtToken: allConfigsBefore[6].variableDebtToken,
+      stableDebtToken: allConfigsBefore[6].stableDebtToken,
+      decimals: allConfigsBefore[6].decimals,
+      ltv: allConfigsBefore[6].ltv,
+      liquidationThreshold: allConfigsBefore[6].liquidationThreshold,
+      liquidationBonus: allConfigsBefore[6].liquidationBonus,
+      liquidationProtocolFee: allConfigsBefore[6].liquidationProtocolFee,
+      reserveFactor: allConfigsBefore[6].reserveFactor,
+      usageAsCollateralEnabled: allConfigsBefore[6].usageAsCollateralEnabled,
+      borrowingEnabled: allConfigsBefore[6].borrowingEnabled,
+      interestRateStrategy: allConfigsBefore[6].interestRateStrategy,
+      stableBorrowRateEnabled: allConfigsBefore[6].stableBorrowRateEnabled,
+      isActive: allConfigsBefore[6].isActive,
+      isFrozen: allConfigsBefore[6].isFrozen,
+      isSiloed: allConfigsBefore[6].isSiloed,
+      isBorrowableInIsolation: allConfigsBefore[6].isBorrowableInIsolation,
+      isFlashloanable: allConfigsBefore[6].isFlashloanable,
+      supplyCap: allConfigsBefore[6].supplyCap,
+      borrowCap: allConfigsBefore[6].borrowCap,
+      debtCeiling: allConfigsBefore[6].debtCeiling,
+      eModeCategory: allConfigsBefore[6].eModeCategory
+    });
+
+    _validateReserveConfig(expectedAssetConfig, allConfigsAfter);
   }
 
   function testBorrowsUpdates() public {
