@@ -55,15 +55,15 @@
     "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD": {
       "from": null,
       "to": {
-        "stableRateSlope1": "40000000000000000000000000",
-        "optimalStableToTotalDebtRatio": "200000000000000000000000000",
         "baseStableBorrowRate": "68000000000000000000000000",
         "baseVariableBorrowRate": "10000000000000000000000000",
-        "maxExcessUsageRatio": "200000000000000000000000000",
-        "stableRateSlope2": "800000000000000000000000000",
         "maxExcessStableToTotalDebtRatio": "800000000000000000000000000",
-        "variableRateSlope1": "38000000000000000000000000",
+        "maxExcessUsageRatio": "200000000000000000000000000",
+        "optimalStableToTotalDebtRatio": "200000000000000000000000000",
         "optimalUsageRatio": "800000000000000000000000000",
+        "stableRateSlope1": "40000000000000000000000000",
+        "stableRateSlope2": "800000000000000000000000000",
+        "variableRateSlope1": "38000000000000000000000000",
         "variableRateSlope2": "800000000000000000000000000"
       }
     }
