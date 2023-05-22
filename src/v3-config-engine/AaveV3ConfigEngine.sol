@@ -3,10 +3,10 @@ pragma solidity ^0.8.12;
 
 import {ConfiguratorInputTypes, DataTypes} from 'aave-address-book/AaveV3.sol';
 import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {PercentageMath} from 'aave-v3-core/contracts/protocol/libraries/math/PercentageMath.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {IChainlinkAggregator} from '../interfaces/IChainlinkAggregator.sol';
 import {EngineFlags} from './EngineFlags.sol';
-import {PercentageMath} from './utils/PercentageMath.sol';
 import './IAaveV3ConfigEngine.sol';
 
 /**
