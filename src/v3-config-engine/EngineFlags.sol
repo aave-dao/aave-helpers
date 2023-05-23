@@ -7,8 +7,8 @@ library EngineFlags {
   uint256 internal constant KEEP_CURRENT = type(uint256).max - 42;
 
   /// @dev magic value to be used as flag to keep unchanged any current configuration
-  /// Strongly assumes that the value `AaveV3ConfigEngine.EngineFlags.KEEP_CURRENT_STRING` will never be used, which seems reasonable
-  string internal constant KEEP_CURRENT_STRING = 'AaveV3ConfigEngine.EngineFlags.KEEP_CURRENT_STRING';
+  /// Strongly assumes that the value `KEEP_CURRENT_STRING` will never be used, which seems reasonable
+  string internal constant KEEP_CURRENT_STRING = 'KEEP_CURRENT_STRING';
 
   /// @dev magic value to be used as flag to keep unchanged any current configuration
   /// Strongly assumes that the value `0x0000000000000000000000000000000000000050` will never be used, which seems reasonable
