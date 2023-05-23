@@ -15,8 +15,8 @@ contract ProtocolV2TestBaseTest is ProtocolV2TestBase {
   }
 
   // commented out as it is insanely slow with public rpcs
-  // function testE2E() public {
-  //   address user = address(3);
-  //   this.e2eTest(AaveV2Ethereum.POOL, user);
-  // }
+  function testE2E() public {
+    address user = address(3);
+    this.e2eTest(AaveV2Ethereum.POOL, user);
+  }
 }
