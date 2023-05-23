@@ -494,7 +494,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         keccak256(abi.encode(updates[i].label)) == keccak256(abi.encode(EngineFlags.KEEP_CURRENT_STRING))
       ) {
         DataTypes.EModeCategory memory configuration = POOL.getEModeCategoryData(updates[i].eModeCategory);
-        uint256 currentLtv= configuration.ltv;
+        uint256 currentLtv = configuration.ltv;
         uint256 currentLiqThreshold = configuration.liquidationThreshold;
         uint256 currentLiqBonus = configuration.liquidationBonus;
         address currentPriceSource = configuration.priceSource;
@@ -509,7 +509,8 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         }
 
         if (updates[i].liqBonus == EngineFlags.KEEP_CURRENT) {
-          updates[i].liqBonus = currentLiqBonus;
+          // Subtracting 100_00 to be consistent with the engine as 100_00 gets added while setting the liqBonus
+          updates[i].liqBonus = currentLiqBonus - 100_00;
         }
 
         if (updates[i].priceSource == EngineFlags.KEEP_CURRENT_ADDRESS) {
@@ -521,16 +522,19 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         }
       }
 
+      // LT*LB (in %) should never be above 100%, because it means instant undercollateralization
       require(
-        updates[i].liqThreshold + updates[i].liqBonus < 100_00,
-        'INVALID_LIQ_PARAMS_ABOVE_100'
+        updates[i].liqThreshold.percentMul(100_00 + updates[i].liqBonus) <= 100_00,
+        'INVALID_LT_LB_RATIO'
       );
 
       POOL_CONFIGURATOR.setEModeCategory(
         updates[i].eModeCategory,
         updates[i].ltv.toUint16(),
         updates[i].liqThreshold.toUint16(),
-        updates[i].liqBonus.toUint16(),
+        // For reference, this is to simplify the interaction with the Aave protocol,
+        // as there the definition is as e.g. 105% (5% bonus for liquidators)
+        100_00 + updates[i].liqBonus.toUint16(), 
         updates[i].priceSource,
         updates[i].label
       );
