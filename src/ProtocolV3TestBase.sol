@@ -1044,6 +1044,35 @@ contract ProtocolV3TestBase is CommonTestBase {
       revert('_getAssetOnEmodeCategory(): LESS_ASSETS_IN_CATEGORY_THAN_EXPECTED');
     }
   }
+
+  function _validateEmodeCategory(
+    IPoolAddressesProvider addressesProvider,
+    uint256 category,
+    DataTypes.EModeCategory memory expectedCategoryData
+  ) internal view {
+    address poolAddress = addressesProvider.getPool();
+    DataTypes.EModeCategory memory currentCategoryData = IPool(poolAddress).getEModeCategoryData(uint8(category));
+    require(
+      keccak256(bytes(currentCategoryData.label)) == keccak256(bytes(expectedCategoryData.label)),
+      '_validateEmodeCategory(): INVALID_LABEL'
+    );
+    require(
+      currentCategoryData.ltv == expectedCategoryData.ltv,
+      '_validateEmodeCategory(): INVALID_LTV'
+    );
+    require(
+      currentCategoryData.liquidationThreshold == expectedCategoryData.liquidationThreshold,
+      '_validateEmodeCategory(): INVALID_LT'
+    );
+    require(
+      currentCategoryData.liquidationBonus == expectedCategoryData.liquidationBonus,
+      '_validateEmodeCategory(): INVALID_LB'
+    );
+    require(
+      currentCategoryData.priceSource == expectedCategoryData.priceSource,
+      '_validateEmodeCategory(): INVALID_PRICE_SOURCE'
+    );
+  }
 }
 
 contract ProtocolV3_0_1TestBase is ProtocolV3TestBase {
