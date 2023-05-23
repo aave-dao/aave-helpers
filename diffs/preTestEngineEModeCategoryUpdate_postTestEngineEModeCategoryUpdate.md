@@ -4,6 +4,10 @@
 {
   "eModes": {
     "1": {
+      "liquidationBonus": {
+        "from": 10100,
+        "to": 10150
+      },
       "liquidationThreshold": {
         "from": 9750,
         "to": 9760

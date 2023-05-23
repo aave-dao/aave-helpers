@@ -10,7 +10,7 @@ import {AaveV3AvalancheCollateralUpdateNoChange} from './mocks/AaveV3AvalancheCo
 import {AaveV3AvalancheCollateralUpdateWrongBonus, AaveV3AvalancheCollateralUpdateCorrectBonus} from './mocks/AaveV3AvalancheCollateralUpdateEdgeBonus.sol';
 import {AaveV3PolygonBorrowUpdate} from './mocks/AaveV3PolygonBorrowUpdate.sol';
 import {AaveV3PolygonPriceFeedUpdate} from './mocks/AaveV3PolygonPriceFeedUpdate.sol';
-import {AaveV3PolygonEModeCategoryUpdate} from './mocks/AaveV3PolygonEModeCategoryUpdate.sol';
+import {AaveV3PolygonEModeCategoryUpdate, AaveV3AvalancheEModeCategoryUpdateEdgeBonus} from './mocks/AaveV3PolygonEModeCategoryUpdate.sol';
 import {AaveV3OptimismMockRatesUpdate} from './mocks/AaveV3OptimismMockRatesUpdate.sol';
 import {DeployRatesFactoryPolLib, DeployRatesFactoryEthLib, DeployRatesFactoryAvaLib, DeployRatesFactoryArbLib, DeployRatesFactoryOptLib} from '../../scripts/V3RateStrategyFactory.s.sol';
 import {DeployEnginePolLib, DeployEngineEthLib, DeployEngineAvaLib, DeployEngineOptLib, DeployEngineArbLib} from '../../scripts/AaveV3ConfigEngine.s.sol';
@@ -676,6 +676,8 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
     AaveV3Polygon.ACL_MANAGER.addPoolAdmin(address(payload));
     vm.stopPrank();
 
+    DataTypes.EModeCategory memory eModeCategoryDataBefore = AaveV3Polygon.POOL.getEModeCategoryData(1);
+
     createConfigurationSnapshot('preTestEngineEModeCategoryUpdate', AaveV3Polygon.POOL);
 
     payload.execute();
@@ -684,7 +686,31 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
 
     diffReports('preTestEngineEModeCategoryUpdate', 'postTestEngineEModeCategoryUpdate');
 
-    // TODO: Add validation function
+    eModeCategoryDataBefore.ltv = 97_40;
+    eModeCategoryDataBefore.liquidationThreshold = 97_60;
+    eModeCategoryDataBefore.liquidationBonus = 101_50; // 100_00 + 1_50
+
+    _validateEmodeCategory(
+      AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
+      1,
+      eModeCategoryDataBefore
+    );
+  }
+
+  function testEModeCategoryUpdatesWrongBonus() public {
+    vm.createSelectFork(vm.rpcUrl('avalanche'), 30344870);
+
+    IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
+    AaveV3AvalancheEModeCategoryUpdateEdgeBonus payload = new AaveV3AvalancheEModeCategoryUpdateEdgeBonus(
+        engine
+      );
+
+    vm.startPrank(AaveV3Avalanche.ACL_ADMIN);
+    AaveV3Avalanche.ACL_MANAGER.addPoolAdmin(address(payload));
+    vm.stopPrank();
+
+    vm.expectRevert(bytes('INVALID_LT_LB_RATIO'));
+    payload.execute();
   }
 
   function _bpsToRay(uint256 amount) internal pure returns (uint256) {
