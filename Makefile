@@ -35,7 +35,7 @@ deploy-steward-pol :; forge script scripts/RiskStewards.s.sol:DeployPol --rpc-ur
 deploy-steward-opt :; forge script scripts/RiskStewards.s.sol:DeployOpt --rpc-url optimism --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-steward-arb :; forge script scripts/RiskStewards.s.sol:DeployArb --rpc-url arbitrum --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-steward-ava :; forge script scripts/RiskStewards.s.sol:DeployAva --rpc-url avalanche --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
-deploy-steward-met :; forge script scripts/RiskStewards.s.sol:DeployMet --rpc-url metis --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
+deploy-steward-met :; forge script scripts/RiskStewards.s.sol:DeployMet --rpc-url metis --broadcast --ledger --legacy --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 # Utilities
 download :; cast etherscan-source --chain ${chain} -d src/etherscan/${chain}_${address} ${address}
 git-diff :
