@@ -406,7 +406,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
     payload.execute();
   }
 
-  function testCollateralUpdateCorrecBonus() public {
+function testCollateralUpdateCorrectBonus() public {
     vm.createSelectFork(vm.rpcUrl('avalanche'), 30344870);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());

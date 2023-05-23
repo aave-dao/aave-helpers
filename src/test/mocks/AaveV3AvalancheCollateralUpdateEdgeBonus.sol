@@ -28,7 +28,7 @@ contract AaveV3AvalancheCollateralUpdateWrongBonus is AaveV3PayloadBase {
   }
 
   function getPoolContext() public pure override returns (IEngine.PoolContext memory) {
-    return IEngine.PoolContext({networkName: 'Arbitrum', networkAbbreviation: 'Arb'});
+    return IEngine.PoolContext({networkName: 'Avalanche', networkAbbreviation: 'Ava'});
   }
 }
 
@@ -57,6 +57,6 @@ contract AaveV3AvalancheCollateralUpdateCorrectBonus is AaveV3PayloadBase {
   }
 
   function getPoolContext() public pure override returns (IEngine.PoolContext memory) {
-    return IEngine.PoolContext({networkName: 'Arbitrum', networkAbbreviation: 'Arb'});
+    return IEngine.PoolContext({networkName: 'Avalanche', networkAbbreviation: 'Ava'});
   }
 }
