@@ -6,6 +6,7 @@ import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/co
 import {PercentageMath} from 'aave-v3-core/contracts/protocol/libraries/math/PercentageMath.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {IChainlinkAggregator} from '../interfaces/IChainlinkAggregator.sol';
+import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
 import {EngineFlags} from './EngineFlags.sol';
 import './IAaveV3ConfigEngine.sol';
 
@@ -22,6 +23,7 @@ import './IAaveV3ConfigEngine.sol';
  */
 contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
+  using SafeCast for uint256;
   using PercentageMath for uint256;
 
   struct AssetsConfig {
@@ -56,7 +58,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     uint256 liqBonus; // Only considered if liqThreshold > 0. Same format as ltv
     uint256 debtCeiling; // Only considered if liqThreshold > 0. In USD and without decimals, so 100_000 for 100k USD debt ceiling
     uint256 liqProtocolFee; // Only considered if liqThreshold > 0. Same format as ltv
-    uint256 eModeCategory;
+    uint256 eModeCategory; // If `0` eMode will be disabled for the asset, else the eMode category will be set.
   }
 
   struct Caps {
@@ -477,47 +479,47 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
       }
 
       if (collaterals[i].eModeCategory != EngineFlags.KEEP_CURRENT) {
-        POOL_CONFIGURATOR.setAssetEModeCategory(ids[i], safeToUint8(collaterals[i].eModeCategory));
+        POOL_CONFIGURATOR.setAssetEModeCategory(ids[i], (collaterals[i].eModeCategory).toUint8());
       }
     }
   }
 
   function _configEModeCategories(EModeCategories[] memory updates) internal {
     for (uint256 i = 0; i < updates.length; i++) {
-        if (
-          updates[i].ltv == EngineFlags.KEEP_CURRENT ||
-          updates[i].liqThreshold == EngineFlags.KEEP_CURRENT ||
-          updates[i].liqBonus == EngineFlags.KEEP_CURRENT ||
-          updates[i].priceSource == EngineFlags.KEEP_CURRENT_ADDRESS ||
-          keccak256(abi.encode(updates[i].label)) == keccak256(abi.encode(EngineFlags.KEEP_CURRENT_STRING))
-        ) {
-          DataTypes.EModeCategory memory configuration = POOL.getEModeCategoryData(updates[i].eModeCategory);
-          uint256 currentLtv= configuration.ltv;
-          uint256 currentLiqThreshold = configuration.liquidationThreshold;
-          uint256 currentLiqBonus = configuration.liquidationBonus;
-          address currentPriceSource = configuration.priceSource;
-          string memory currentLabel = configuration.label;
+      if (
+        updates[i].ltv == EngineFlags.KEEP_CURRENT ||
+        updates[i].liqThreshold == EngineFlags.KEEP_CURRENT ||
+        updates[i].liqBonus == EngineFlags.KEEP_CURRENT ||
+        updates[i].priceSource == EngineFlags.KEEP_CURRENT_ADDRESS ||
+        keccak256(abi.encode(updates[i].label)) == keccak256(abi.encode(EngineFlags.KEEP_CURRENT_STRING))
+      ) {
+        DataTypes.EModeCategory memory configuration = POOL.getEModeCategoryData(updates[i].eModeCategory);
+        uint256 currentLtv= configuration.ltv;
+        uint256 currentLiqThreshold = configuration.liquidationThreshold;
+        uint256 currentLiqBonus = configuration.liquidationBonus;
+        address currentPriceSource = configuration.priceSource;
+        string memory currentLabel = configuration.label;
 
-          if (updates[i].ltv == EngineFlags.KEEP_CURRENT) {
-            updates[i].ltv = currentLtv;
-          }
-
-          if (updates[i].liqThreshold == EngineFlags.KEEP_CURRENT) {
-            updates[i].liqThreshold = currentLiqThreshold;
-          }
-
-          if (updates[i].liqBonus == EngineFlags.KEEP_CURRENT) {
-            updates[i].liqBonus = currentLiqBonus;
-          }
-
-          if (updates[i].priceSource == EngineFlags.KEEP_CURRENT_ADDRESS) {
-            updates[i].priceSource = currentPriceSource;
-          }
-
-          if (keccak256(abi.encode(updates[i].label)) == keccak256(abi.encode(EngineFlags.KEEP_CURRENT_STRING))) {
-            updates[i].label = currentLabel;
-          }
+        if (updates[i].ltv == EngineFlags.KEEP_CURRENT) {
+          updates[i].ltv = currentLtv;
         }
+
+        if (updates[i].liqThreshold == EngineFlags.KEEP_CURRENT) {
+          updates[i].liqThreshold = currentLiqThreshold;
+        }
+
+        if (updates[i].liqBonus == EngineFlags.KEEP_CURRENT) {
+          updates[i].liqBonus = currentLiqBonus;
+        }
+
+        if (updates[i].priceSource == EngineFlags.KEEP_CURRENT_ADDRESS) {
+          updates[i].priceSource = currentPriceSource;
+        }
+
+        if (keccak256(abi.encode(updates[i].label)) == keccak256(abi.encode(EngineFlags.KEEP_CURRENT_STRING))) {
+          updates[i].label = currentLabel;
+        }
+      }
 
       require(
         updates[i].liqThreshold + updates[i].liqBonus < 100_00,
@@ -526,9 +528,9 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
 
       POOL_CONFIGURATOR.setEModeCategory(
         updates[i].eModeCategory,
-        uint16(updates[i].ltv),
-        uint16(updates[i].liqThreshold),
-        uint16(updates[i].liqBonus),
+        updates[i].ltv.toUint16(),
+        updates[i].liqThreshold.toUint16(),
+        updates[i].liqBonus.toUint16(),
         updates[i].priceSource,
         updates[i].label
       );
@@ -755,10 +757,5 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
         eModeCategories: eModeCategories
       });
-  }
-
-  function safeToUint8(uint256 value) internal pure returns (uint8) {
-    require(value <= type(uint8).max, 'Value doesnt fit in 8 bits');
-    return uint8(value);
   }
 }
