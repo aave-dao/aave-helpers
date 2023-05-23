@@ -3,6 +3,7 @@ pragma solidity ^0.8.12;
 
 import {ConfiguratorInputTypes, DataTypes} from 'aave-address-book/AaveV3.sol';
 import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {PercentageMath} from 'aave-v3-core/contracts/protocol/libraries/math/PercentageMath.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {IChainlinkAggregator} from '../interfaces/IChainlinkAggregator.sol';
 import {EngineFlags} from './EngineFlags.sol';
@@ -21,6 +22,7 @@ import './IAaveV3ConfigEngine.sol';
  */
 contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
+  using PercentageMath for uint256;
 
   struct AssetsConfig {
     address[] ids;
@@ -429,9 +431,10 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
             collaterals[i].liqThreshold == EngineFlags.KEEP_CURRENT &&
             collaterals[i].liqBonus == EngineFlags.KEEP_CURRENT)
         ) {
+          // LT*LB (in %) should never be above 100%, because it means instant undercollateralization
           require(
-            collaterals[i].liqThreshold + collaterals[i].liqBonus < 100_00,
-            'INVALID_LIQ_PARAMS_ABOVE_100'
+            collaterals[i].liqThreshold.percentMul(100_00 + collaterals[i].liqBonus) <= 100_00,
+            'INVALID_LT_LB_RATIO'
           );
 
           POOL_CONFIGURATOR.configureReserveAsCollateral(
