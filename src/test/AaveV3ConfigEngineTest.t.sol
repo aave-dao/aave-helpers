@@ -402,8 +402,6 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
     AaveV3Avalanche.ACL_MANAGER.addPoolAdmin(address(payload));
     vm.stopPrank();
 
-    ReserveConfig[] memory allConfigsBefore = _getReservesConfigs(AaveV3Avalanche.POOL);
-
     vm.expectRevert(bytes('INVALID_LT_LB_RATIO'));
     payload.execute();
   }
