@@ -40,6 +40,7 @@ abstract contract AaveV3PayloadBase {
   function execute() external {
     _preExecute();
 
+    IEngine.EModeUpdate[] memory eModeCategories = eModeCategoryUpdates();
     IEngine.Listing[] memory listings = newListings();
     IEngine.ListingWithCustomImpl[] memory listingsCustom = newListingsCustom();
     IEngine.CapsUpdate[] memory caps = capsUpdates();
@@ -47,7 +48,12 @@ abstract contract AaveV3PayloadBase {
     IEngine.BorrowUpdate[] memory borrows = borrowsUpdates();
     IEngine.PriceFeedUpdate[] memory priceFeeds = priceFeedsUpdates();
     IEngine.RateStrategyUpdate[] memory rates = rateStrategiesUpdates();
-    IEngine.EModeUpdate[] memory eModeCategories = eModeCategoryUpdates();
+
+    if (eModeCategories.length != 0) {
+      address(LISTING_ENGINE).functionDelegateCall(
+        abi.encodeWithSelector(LISTING_ENGINE.updateEModeCategories.selector, eModeCategories)
+      );
+    }
 
     if (listings.length != 0) {
       address(LISTING_ENGINE).functionDelegateCall(
@@ -92,12 +98,6 @@ abstract contract AaveV3PayloadBase {
     if (caps.length != 0) {
       address(LISTING_ENGINE).functionDelegateCall(
         abi.encodeWithSelector(LISTING_ENGINE.updateCaps.selector, caps)
-      );
-    }
-
-    if (eModeCategories.length != 0) {
-      address(LISTING_ENGINE).functionDelegateCall(
-        abi.encodeWithSelector(LISTING_ENGINE.updateEModeCategories.selector, eModeCategories)
       );
     }
 
