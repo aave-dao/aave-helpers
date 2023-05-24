@@ -262,22 +262,4 @@ interface IAaveV3ConfigEngine {
    *   More information on the documentation of the struct.
    */
   function updateEModeCategories(EModeUpdate[] memory updates) external;
-
-  function RATE_STRATEGIES_FACTORY() external view returns (IV3RateStrategyFactory);
-
-  function POOL() external view returns (IPool);
-
-  function POOL_CONFIGURATOR() external view returns (IPoolConfigurator);
-
-  function ORACLE() external view returns (IAaveOracle);
-
-  function ATOKEN_IMPL() external view returns (address);
-
-  function VTOKEN_IMPL() external view returns (address);
-
-  function STOKEN_IMPL() external view returns (address);
-
-  function REWARDS_CONTROLLER() external view returns (address);
-
-  function COLLECTOR() external view returns (address);
 }

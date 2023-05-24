@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import '../../../v3-config-engine/AaveV3PayloadBase.sol';
+import {IV3RateStrategyFactory} from '../../../v3-config-engine/IV3RateStrategyFactory.sol';
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
 
 /**
@@ -20,22 +21,19 @@ contract AaveV3AvalancheRatesUpdates070322 is AaveV3PayloadBase {
   {
     IEngine.RateStrategyUpdate[] memory ratesUpdate = new IEngine.RateStrategyUpdate[](4);
 
-    Rates.RateStrategyParams memory usdt = LISTING_ENGINE
-      .RATE_STRATEGIES_FACTORY()
+    Rates.RateStrategyParams memory usdt = IV3RateStrategyFactory(AaveV3Avalanche.RATES_FACTORY)
       .getStrategyDataOfAsset(AaveV3AvalancheAssets.USDt_UNDERLYING);
     usdt.optimalUsageRatio = _bpsToRay(80_00);
     usdt.variableRateSlope2 = _bpsToRay(75_00);
     usdt.stableRateSlope2 = _bpsToRay(75_00);
 
-    Rates.RateStrategyParams memory frax = LISTING_ENGINE
-      .RATE_STRATEGIES_FACTORY()
+    Rates.RateStrategyParams memory frax = IV3RateStrategyFactory(AaveV3Avalanche.RATES_FACTORY)
       .getStrategyDataOfAsset(AaveV3AvalancheAssets.FRAX_UNDERLYING);
     frax.optimalUsageRatio = _bpsToRay(80_00);
     frax.variableRateSlope2 = _bpsToRay(75_00);
     frax.stableRateSlope2 = _bpsToRay(75_00);
 
-    Rates.RateStrategyParams memory mai = LISTING_ENGINE
-      .RATE_STRATEGIES_FACTORY()
+    Rates.RateStrategyParams memory mai = IV3RateStrategyFactory(AaveV3Avalanche.RATES_FACTORY)
       .getStrategyDataOfAsset(AaveV3AvalancheAssets.MAI_UNDERLYING);
     mai.optimalUsageRatio = _bpsToRay(80_00);
     mai.variableRateSlope2 = _bpsToRay(75_00);

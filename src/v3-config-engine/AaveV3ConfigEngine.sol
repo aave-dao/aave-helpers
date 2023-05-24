@@ -23,8 +23,6 @@ import './IAaveV3ConfigEngine.sol';
  */
 contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
-  using SafeCast for uint256;
-  using PercentageMath for uint256;
 
   struct AssetsConfig {
     address[] ids;
@@ -75,15 +73,15 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     string label; // The label for the eMode category
   }
 
-  IPool public immutable POOL;
-  IPoolConfigurator public immutable POOL_CONFIGURATOR;
-  IAaveOracle public immutable ORACLE;
-  address public immutable ATOKEN_IMPL;
-  address public immutable VTOKEN_IMPL;
-  address public immutable STOKEN_IMPL;
-  address public immutable REWARDS_CONTROLLER;
-  address public immutable COLLECTOR;
-  IV3RateStrategyFactory public immutable RATE_STRATEGIES_FACTORY;
+  IPool internal immutable POOL;
+  IPoolConfigurator internal immutable POOL_CONFIGURATOR;
+  IAaveOracle internal immutable ORACLE;
+  address internal immutable ATOKEN_IMPL;
+  address internal immutable VTOKEN_IMPL;
+  address internal immutable STOKEN_IMPL;
+  address internal immutable REWARDS_CONTROLLER;
+  address internal immutable COLLECTOR;
+  IV3RateStrategyFactory internal immutable RATE_STRATEGIES_FACTORY;
 
   constructor(
     IPool pool,
@@ -452,7 +450,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         if (notAllKeepCurrent) {
           // LT*LB (in %) should never be above 100%, because it means instant undercollateralization
           require(
-            collaterals[i].liqThreshold.percentMul(100_00 + collaterals[i].liqBonus) <= 100_00,
+            PercentageMath.percentMul(collaterals[i].liqThreshold, 100_00 + collaterals[i].liqBonus) <= 100_00,
             'INVALID_LT_LB_RATIO'
           );
 
@@ -480,7 +478,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
       }
 
       if (collaterals[i].eModeCategory != EngineFlags.KEEP_CURRENT) {
-        POOL_CONFIGURATOR.setAssetEModeCategory(ids[i], (collaterals[i].eModeCategory).toUint8());
+        POOL_CONFIGURATOR.setAssetEModeCategory(ids[i], SafeCast.toUint8(collaterals[i].eModeCategory));
       }
     }
   }
@@ -525,17 +523,17 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
 
       // LT*LB (in %) should never be above 100%, because it means instant undercollateralization
       require(
-        updates[i].liqThreshold.percentMul(100_00 + updates[i].liqBonus) <= 100_00,
+        PercentageMath.percentMul(updates[i].liqThreshold, 100_00 + updates[i].liqBonus) <= 100_00,
         'INVALID_LT_LB_RATIO'
       );
 
       POOL_CONFIGURATOR.setEModeCategory(
         updates[i].eModeCategory,
-        updates[i].ltv.toUint16(),
-        updates[i].liqThreshold.toUint16(),
+        SafeCast.toUint16(updates[i].ltv), //toUint16()
+        SafeCast.toUint16(updates[i].liqThreshold), // .toUint16()
         // For reference, this is to simplify the interaction with the Aave protocol,
         // as there the definition is as e.g. 105% (5% bonus for liquidators)
-        100_00 + updates[i].liqBonus.toUint16(), 
+        SafeCast.toUint16(100_00 + updates[i].liqBonus), //.toUint16() 
         updates[i].priceSource,
         updates[i].label
       );

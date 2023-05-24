@@ -2,6 +2,8 @@
 pragma solidity ^0.8.0;
 
 import '../../v3-config-engine/AaveV3PayloadEthereum.sol';
+import {IV3RateStrategyFactory} from '../../v3-config-engine/IV3RateStrategyFactory.sol';
+import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 
 /**
  * @dev Smart contract for a mock caps update, for testing purposes
@@ -24,7 +26,7 @@ contract AaveV3EthereumMockCustomListing is AaveV3PayloadBase {
         asset: 0x111111111117dC0aa78b770fA6A738034120C302,
         assetSymbol: '1INCH',
         priceFeed: 0x72AFAECF99C9d9C8215fF44C77B94B99C28741e8,
-        rateStrategyParams: LISTING_ENGINE.RATE_STRATEGIES_FACTORY().getStrategyDataOfAsset(
+        rateStrategyParams: IV3RateStrategyFactory(AaveV3Ethereum.RATES_FACTORY).getStrategyDataOfAsset(
           AaveV3EthereumAssets.AAVE_UNDERLYING
         ), // Quite common case, of setting the same rate strategy as an already listed asset
         enabledToBorrow: EngineFlags.ENABLED,

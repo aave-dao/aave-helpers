@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import '../../../v3-config-engine/AaveV3PayloadBase.sol';
+import {IV3RateStrategyFactory} from '../../../v3-config-engine/IV3RateStrategyFactory.sol';
 import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
 
 /**
@@ -20,15 +21,13 @@ contract AaveV3ArbitrumRatesUpdates070322 is AaveV3PayloadBase {
   {
     IEngine.RateStrategyUpdate[] memory ratesUpdate = new IEngine.RateStrategyUpdate[](3);
 
-    Rates.RateStrategyParams memory usdt = LISTING_ENGINE
-      .RATE_STRATEGIES_FACTORY()
+    Rates.RateStrategyParams memory usdt = IV3RateStrategyFactory(AaveV3Arbitrum.RATES_FACTORY)
       .getStrategyDataOfAsset(AaveV3ArbitrumAssets.USDT_UNDERLYING);
     usdt.optimalUsageRatio = _bpsToRay(80_00);
     usdt.variableRateSlope2 = _bpsToRay(75_00);
     usdt.stableRateSlope2 = _bpsToRay(75_00);
 
-    Rates.RateStrategyParams memory eurs = LISTING_ENGINE
-      .RATE_STRATEGIES_FACTORY()
+    Rates.RateStrategyParams memory eurs = IV3RateStrategyFactory(AaveV3Arbitrum.RATES_FACTORY)
       .getStrategyDataOfAsset(AaveV3ArbitrumAssets.EURS_UNDERLYING);
     eurs.optimalUsageRatio = _bpsToRay(80_00);
     eurs.variableRateSlope2 = _bpsToRay(75_00);

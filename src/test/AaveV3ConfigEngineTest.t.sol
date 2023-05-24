@@ -110,9 +110,9 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
       AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
       _findReserveConfigBySymbol(allConfigsAfter, '1INCH'),
       ReserveTokens({
-        aToken: engine.ATOKEN_IMPL(),
-        stableDebtToken: engine.STOKEN_IMPL(),
-        variableDebtToken: engine.VTOKEN_IMPL()
+        aToken: AaveV3Polygon.DEFAULT_A_TOKEN_IMPL_REV_2,
+        stableDebtToken: AaveV3Polygon.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
+        variableDebtToken: AaveV3Polygon.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2
       })
     );
 
@@ -127,9 +127,9 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
       AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
       _findReserveConfigBySymbol(allConfigsAfter, 'AAVE'),
       ReserveTokens({
-        aToken: engine.ATOKEN_IMPL(),
-        stableDebtToken: engine.STOKEN_IMPL(),
-        variableDebtToken: engine.VTOKEN_IMPL()
+        aToken: AaveV3Polygon.DEFAULT_A_TOKEN_IMPL_REV_2,
+        stableDebtToken: AaveV3Polygon.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
+        variableDebtToken: AaveV3Polygon.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2
       })
     );
   }
