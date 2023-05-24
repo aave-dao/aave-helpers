@@ -14,9 +14,12 @@ import {AaveV3PolygonEModeCategoryUpdate, AaveV3AvalancheEModeCategoryUpdateEdge
 import {AaveV3OptimismMockRatesUpdate} from './mocks/AaveV3OptimismMockRatesUpdate.sol';
 import {DeployRatesFactoryPolLib, DeployRatesFactoryEthLib, DeployRatesFactoryAvaLib, DeployRatesFactoryArbLib, DeployRatesFactoryOptLib} from '../../scripts/V3RateStrategyFactory.s.sol';
 import {DeployEnginePolLib, DeployEngineEthLib, DeployEngineAvaLib, DeployEngineOptLib, DeployEngineArbLib} from '../../scripts/AaveV3ConfigEngine.s.sol';
-import {AaveV3Ethereum, AaveV3Polygon, AaveV3Optimism, AaveV3Avalanche, AaveV3Arbitrum} from 'aave-address-book/AaveAddressBook.sol';
 import {AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
-import {AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
+import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
+import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
+import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
+import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
+import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {IDefaultInterestRateStrategy} from 'aave-address-book/AaveV3.sol';
 import {AaveV3PolygonRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3PolygonRatesUpdates070322.sol';
 import {AaveV3AvalancheRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3AvalancheRatesUpdates070322.sol';
@@ -27,6 +30,20 @@ import '../ProtocolV3TestBase.sol';
 contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   using stdStorage for StdStorage;
 
+  uint256 mainnetFork;
+  uint256 polygonFork;
+  uint256 optimismFork;
+  uint256 avalancheFork;
+  uint256 arbitrumFork;
+
+  function setUp() public {
+    mainnetFork = vm.createSelectFork(vm.rpcUrl('mainnet'), 17326583);
+    optimismFork = vm.createSelectFork(vm.rpcUrl('optimism'), 100960572);
+    polygonFork = vm.createSelectFork(vm.rpcUrl('polygon'), 42811924);
+    avalancheFork = vm.createSelectFork(vm.rpcUrl('avalanche'), 30323695);
+    arbitrumFork = vm.createSelectFork(vm.rpcUrl('arbitrum'), 92866839);
+  }
+
   event CollateralConfigurationChanged(
     address indexed asset,
     uint256 ltv,
@@ -35,7 +52,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   );
 
   function testListings() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 42811924);
+    vm.selectFork(polygonFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEnginePolLib.deploy());
     AaveV3PolygonMockListing payload = new AaveV3PolygonMockListing(engine);
@@ -118,7 +135,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   }
 
   function testListingsCustom() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 16775965);
+    vm.selectFork(mainnetFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineEthLib.deploy());
     AaveV3EthereumMockCustomListing payload = new AaveV3EthereumMockCustomListing(engine);
@@ -201,7 +218,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   }
 
   function testCapsUpdates() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 16775971);
+    vm.selectFork(mainnetFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineEthLib.deploy());
     AaveV3EthereumMockCapUpdate payload = new AaveV3EthereumMockCapUpdate(engine);
@@ -222,39 +239,15 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
 
     ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(AaveV3Ethereum.POOL);
 
-    ReserveConfig memory expectedAssetConfig = ReserveConfig({
-      symbol: allConfigsBefore[6].symbol,
-      underlying: allConfigsBefore[6].underlying,
-      aToken: allConfigsBefore[6].aToken,
-      variableDebtToken: allConfigsBefore[6].variableDebtToken,
-      stableDebtToken: allConfigsBefore[6].stableDebtToken,
-      decimals: allConfigsBefore[6].decimals,
-      ltv: allConfigsBefore[6].ltv,
-      liquidationThreshold: allConfigsBefore[6].liquidationThreshold,
-      liquidationBonus: allConfigsBefore[6].liquidationBonus,
-      liquidationProtocolFee: allConfigsBefore[6].liquidationProtocolFee,
-      reserveFactor: allConfigsBefore[6].reserveFactor,
-      usageAsCollateralEnabled: allConfigsBefore[6].usageAsCollateralEnabled,
-      borrowingEnabled: allConfigsBefore[6].borrowingEnabled,
-      interestRateStrategy: allConfigsBefore[6].interestRateStrategy,
-      stableBorrowRateEnabled: allConfigsBefore[6].stableBorrowRateEnabled,
-      isPaused: allConfigsBefore[6].isPaused,
-      isActive: allConfigsBefore[6].isActive,
-      isFrozen: allConfigsBefore[6].isFrozen,
-      isSiloed: allConfigsBefore[6].isSiloed,
-      isBorrowableInIsolation: allConfigsBefore[6].isBorrowableInIsolation,
-      isFlashloanable: allConfigsBefore[6].isFlashloanable,
-      supplyCap: 1_000_000,
-      borrowCap: allConfigsBefore[6].borrowCap,
-      debtCeiling: allConfigsBefore[6].debtCeiling,
-      eModeCategory: allConfigsBefore[6].eModeCategory
-    });
+    ReserveConfig memory expectedAssetConfig = _findReserveConfig(allConfigsBefore, AaveV3EthereumAssets.AAVE_UNDERLYING);
+
+    expectedAssetConfig.supplyCap = 1_000_000;
 
     _validateReserveConfig(expectedAssetConfig, allConfigsAfter);
   }
 
   function testCollateralsUpdates() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 27094357);
+    vm.selectFork(avalancheFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
     AaveV3AvalancheCollateralUpdate payload = new AaveV3AvalancheCollateralUpdate(engine);
@@ -278,33 +271,10 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
 
     ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(AaveV3Avalanche.POOL);
 
-    ReserveConfig memory expectedAssetConfig = ReserveConfig({
-      symbol: allConfigsBefore[6].symbol,
-      underlying: allConfigsBefore[6].underlying,
-      aToken: allConfigsBefore[6].aToken,
-      variableDebtToken: allConfigsBefore[6].variableDebtToken,
-      stableDebtToken: allConfigsBefore[6].stableDebtToken,
-      decimals: allConfigsBefore[6].decimals,
-      ltv: 62_00,
-      liquidationThreshold: 72_00,
-      liquidationBonus: 106_00, // 100_00 + 6_00
-      liquidationProtocolFee: allConfigsBefore[6].liquidationProtocolFee,
-      reserveFactor: allConfigsBefore[6].reserveFactor,
-      usageAsCollateralEnabled: allConfigsBefore[6].usageAsCollateralEnabled,
-      borrowingEnabled: allConfigsBefore[6].borrowingEnabled,
-      interestRateStrategy: allConfigsBefore[6].interestRateStrategy,
-      stableBorrowRateEnabled: allConfigsBefore[6].stableBorrowRateEnabled,
-      isPaused: allConfigsBefore[6].isPaused,
-      isActive: allConfigsBefore[6].isActive,
-      isFrozen: allConfigsBefore[6].isFrozen,
-      isSiloed: allConfigsBefore[6].isSiloed,
-      isBorrowableInIsolation: allConfigsBefore[6].isBorrowableInIsolation,
-      isFlashloanable: allConfigsBefore[6].isFlashloanable,
-      supplyCap: allConfigsBefore[6].supplyCap,
-      borrowCap: allConfigsBefore[6].borrowCap,
-      debtCeiling: allConfigsBefore[6].debtCeiling,
-      eModeCategory: allConfigsBefore[6].eModeCategory
-    });
+    ReserveConfig memory expectedAssetConfig = _findReserveConfig(allConfigsBefore, AaveV3AvalancheAssets.AAVEe_UNDERLYING);
+    expectedAssetConfig.ltv = 62_00;
+    expectedAssetConfig.liquidationThreshold = 72_00;
+    expectedAssetConfig.liquidationBonus = 106_00; // 100_00 + 6_00
 
     _validateReserveConfig(expectedAssetConfig, allConfigsAfter);
   }
@@ -316,7 +286,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   // So the solution is expecting the event emitted on the POOL_CONFIGURATOR,
   // and as this doesn't happen, expect the failure of the test
   function testFailCollateralsUpdatesNoChange() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 27094357);
+    vm.selectFork(avalancheFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
     AaveV3AvalancheCollateralUpdateNoChange payload = new AaveV3AvalancheCollateralUpdateNoChange(
@@ -342,7 +312,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
 
   // Same as testFailCollateralsUpdatesNoChange, but this time should work, as we are not expecting any event emitted
   function testCollateralsUpdatesNoChange() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 27094357);
+    vm.selectFork(avalancheFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
     AaveV3AvalancheCollateralUpdateNoChange payload = new AaveV3AvalancheCollateralUpdateNoChange(
@@ -365,39 +335,13 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
 
     ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(AaveV3Avalanche.POOL);
 
-    ReserveConfig memory expectedAssetConfig = ReserveConfig({
-      symbol: allConfigsBefore[6].symbol,
-      underlying: allConfigsBefore[6].underlying,
-      aToken: allConfigsBefore[6].aToken,
-      variableDebtToken: allConfigsBefore[6].variableDebtToken,
-      stableDebtToken: allConfigsBefore[6].stableDebtToken,
-      decimals: allConfigsBefore[6].decimals,
-      ltv: allConfigsBefore[6].ltv,
-      liquidationThreshold: allConfigsBefore[6].liquidationThreshold,
-      liquidationBonus: allConfigsBefore[6].liquidationBonus,
-      liquidationProtocolFee: allConfigsBefore[6].liquidationProtocolFee,
-      reserveFactor: allConfigsBefore[6].reserveFactor,
-      usageAsCollateralEnabled: allConfigsBefore[6].usageAsCollateralEnabled,
-      borrowingEnabled: allConfigsBefore[6].borrowingEnabled,
-      interestRateStrategy: allConfigsBefore[6].interestRateStrategy,
-      stableBorrowRateEnabled: allConfigsBefore[6].stableBorrowRateEnabled,
-      isPaused: allConfigsBefore[6].isPaused,
-      isActive: allConfigsBefore[6].isActive,
-      isFrozen: allConfigsBefore[6].isFrozen,
-      isSiloed: allConfigsBefore[6].isSiloed,
-      isBorrowableInIsolation: allConfigsBefore[6].isBorrowableInIsolation,
-      isFlashloanable: allConfigsBefore[6].isFlashloanable,
-      supplyCap: allConfigsBefore[6].supplyCap,
-      borrowCap: allConfigsBefore[6].borrowCap,
-      debtCeiling: allConfigsBefore[6].debtCeiling,
-      eModeCategory: allConfigsBefore[6].eModeCategory
-    });
+    ReserveConfig memory expectedAssetConfig = _findReserveConfig(allConfigsBefore, AaveV3AvalancheAssets.AAVEe_UNDERLYING);
 
     _validateReserveConfig(expectedAssetConfig, allConfigsAfter);
   }
 
   function testCollateralUpdateWrongBonus() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 30344870);
+    vm.selectFork(avalancheFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
     AaveV3AvalancheCollateralUpdateWrongBonus payload = new AaveV3AvalancheCollateralUpdateWrongBonus(
@@ -413,7 +357,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   }
 
   function testCollateralUpdateCorrectBonus() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 30344870);
+    vm.selectFork(avalancheFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
     AaveV3AvalancheCollateralUpdateCorrectBonus payload = new AaveV3AvalancheCollateralUpdateCorrectBonus(
@@ -436,39 +380,16 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
 
     ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(AaveV3Avalanche.POOL);
 
-    ReserveConfig memory expectedAssetConfig = ReserveConfig({
-      symbol: allConfigsBefore[6].symbol,
-      underlying: allConfigsBefore[6].underlying,
-      aToken: allConfigsBefore[6].aToken,
-      variableDebtToken: allConfigsBefore[6].variableDebtToken,
-      stableDebtToken: allConfigsBefore[6].stableDebtToken,
-      decimals: allConfigsBefore[6].decimals,
-      ltv: 62_00,
-      liquidationThreshold: 90_00,
-      liquidationBonus: 111_00, // 100_00 + 11_00
-      liquidationProtocolFee: allConfigsBefore[6].liquidationProtocolFee,
-      reserveFactor: allConfigsBefore[6].reserveFactor,
-      usageAsCollateralEnabled: allConfigsBefore[6].usageAsCollateralEnabled,
-      borrowingEnabled: allConfigsBefore[6].borrowingEnabled,
-      interestRateStrategy: allConfigsBefore[6].interestRateStrategy,
-      stableBorrowRateEnabled: allConfigsBefore[6].stableBorrowRateEnabled,
-      isPaused: allConfigsBefore[6].isPaused,
-      isActive: allConfigsBefore[6].isActive,
-      isFrozen: allConfigsBefore[6].isFrozen,
-      isSiloed: allConfigsBefore[6].isSiloed,
-      isBorrowableInIsolation: allConfigsBefore[6].isBorrowableInIsolation,
-      isFlashloanable: allConfigsBefore[6].isFlashloanable,
-      supplyCap: allConfigsBefore[6].supplyCap,
-      borrowCap: allConfigsBefore[6].borrowCap,
-      debtCeiling: allConfigsBefore[6].debtCeiling,
-      eModeCategory: allConfigsBefore[6].eModeCategory
-    });
+    ReserveConfig memory expectedAssetConfig = _findReserveConfig(allConfigsBefore, AaveV3AvalancheAssets.AAVEe_UNDERLYING);
+    expectedAssetConfig.ltv = 62_00;
+    expectedAssetConfig.liquidationThreshold = 90_00;
+    expectedAssetConfig.liquidationBonus = 111_00; // 100_00 + 11_00
 
     _validateReserveConfig(expectedAssetConfig, allConfigsAfter);
   }
 
   function testBorrowsUpdates() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 43003718);
+    vm.selectFork(polygonFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEnginePolLib.deploy());
     AaveV3PolygonBorrowUpdate payload = new AaveV3PolygonBorrowUpdate(engine);
@@ -499,7 +420,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   }
 
   function testRateStrategiesUpdates() public {
-    vm.createSelectFork(vm.rpcUrl('optimism'), 99066171);
+    vm.selectFork(optimismFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineOptLib.deploy());
     AaveV3OptimismMockRatesUpdate payload = new AaveV3OptimismMockRatesUpdate(engine);
@@ -544,7 +465,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   }
 
   function testPolygonRateStrategiesUpdates() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 40037250);
+    vm.selectFork(polygonFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEnginePolLib.deploy());
     AaveV3PolygonRatesUpdates070322 payload = new AaveV3PolygonRatesUpdates070322(engine);
@@ -563,7 +484,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   }
 
   function testAvaxRateStrategiesUpdates() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 27094357);
+    vm.selectFork(avalancheFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
     AaveV3AvalancheRatesUpdates070322 payload = new AaveV3AvalancheRatesUpdates070322(engine);
@@ -582,7 +503,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   }
 
   function testOptimismRateStrategiesUpdates() public {
-    vm.createSelectFork(vm.rpcUrl('optimism'), 78907810);
+    vm.selectFork(optimismFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineOptLib.deploy());
     AaveV3OptimismRatesUpdates070322 payload = new AaveV3OptimismRatesUpdates070322(engine);
@@ -601,7 +522,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   }
 
   function testArbitrumRateStrategiesUpdates() public {
-    vm.createSelectFork(vm.rpcUrl('arbitrum'), 67332070);
+    vm.selectFork(arbitrumFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineArbLib.deploy());
     AaveV3ArbitrumRatesUpdates070322 payload = new AaveV3ArbitrumRatesUpdates070322(engine);
@@ -620,7 +541,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   }
 
   function testPriceFeedsUpdates() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 40037250);
+    vm.selectFork(polygonFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEnginePolLib.deploy());
     AaveV3PolygonPriceFeedUpdate payload = new AaveV3PolygonPriceFeedUpdate(engine);
@@ -645,7 +566,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   }
 
   function testEModeCategoryUpdates() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 40037250);
+    vm.selectFork(polygonFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEnginePolLib.deploy());
     AaveV3PolygonEModeCategoryUpdate payload = new AaveV3PolygonEModeCategoryUpdate(engine);
@@ -676,7 +597,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   }
 
   function testEModeCategoryUpdatesWrongBonus() public {
-    vm.createSelectFork(vm.rpcUrl('avalanche'), 30344870);
+    vm.selectFork(avalancheFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
     AaveV3AvalancheEModeCategoryUpdateEdgeBonus payload = new AaveV3AvalancheEModeCategoryUpdateEdgeBonus(
