@@ -68,9 +68,9 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
 
   struct EModeCategories {
     uint8 eModeCategory;
-    uint256 ltv; // Only considered if liqThreshold > 0. With 2 digits precision, `10_00` for 10%. Should be lower than liquidationThreshold
-    uint256 liqThreshold; // If `0`, the asset will not be enabled as collateral. Same format as ltv, and should be higher
-    uint256 liqBonus; // Only considered if liqThreshold > 0. Same format as ltv
+    uint256 ltv; // With 2 digits precision, `10_00` for 10%. Should be lower or equal to liquidationThreshold
+    uint256 liqThreshold; // Same format as ltv, and should be higher or equal to ltv.
+    uint256 liqBonus; // Same format as ltv
     address priceSource; // A custom price oracle for the eMode category
     string label; // The label for the eMode category
   }
