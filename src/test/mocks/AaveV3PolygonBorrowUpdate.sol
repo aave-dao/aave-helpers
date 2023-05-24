@@ -19,7 +19,7 @@ contract AaveV3PolygonBorrowUpdate is AaveV3PayloadBase {
     borrowsUpdate[0] = IEngine.BorrowUpdate({
       asset: AaveV3PolygonAssets.AAVE_UNDERLYING,
       enabledToBorrow: EngineFlags.ENABLED,
-      flashloanable: EngineFlags.KEEP_CURRENT,
+      flashloanable: EngineFlags.DISABLED,
       stableRateModeEnabled: EngineFlags.KEEP_CURRENT,
       borrowableInIsolation: EngineFlags.KEEP_CURRENT,
       withSiloedBorrowing: EngineFlags.KEEP_CURRENT,

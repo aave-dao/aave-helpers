@@ -328,10 +328,9 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         );
       }
 
-      // TODO: update once all the underlying v3 instances are in 3.0.1 (supporting 100% RF)
       // The reserve factor should always be > 0
       require(
-        (borrows[i].reserveFactor > 0 && borrows[i].reserveFactor < 100_00) ||
+        (borrows[i].reserveFactor > 0 && borrows[i].reserveFactor <= 100_00) ||
           borrows[i].reserveFactor == EngineFlags.KEEP_CURRENT,
         'INVALID_RESERVE_FACTOR'
       );
@@ -340,9 +339,11 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         POOL_CONFIGURATOR.setReserveFactor(ids[i], borrows[i].reserveFactor);
       }
 
-      // TODO: update once all the underlying v3 instances are in 3.0.1 (supporting setReserveFlashLoaning())
-      if (borrows[i].flashloanable == EngineFlags.ENABLED) {
-        POOL_CONFIGURATOR.setReserveFlashLoaning(ids[i], true);
+      if (borrows[i].flashloanable != EngineFlags.KEEP_CURRENT) {
+        POOL_CONFIGURATOR.setReserveFlashLoaning(
+          ids[i], 
+          EngineFlags.toBool(borrows[i].flashloanable)
+        );
       }
     }
   }

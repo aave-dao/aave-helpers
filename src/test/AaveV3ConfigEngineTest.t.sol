@@ -24,7 +24,7 @@ import {AaveV3OptimismRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3O
 import {AaveV3ArbitrumRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3ArbitrumRatesUpdates070322.sol';
 import '../ProtocolV3TestBase.sol';
 
-contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
+contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
   using stdStorage for StdStorage;
 
   event CollateralConfigurationChanged(
@@ -468,7 +468,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
   }
 
   function testBorrowsUpdates() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 40037250);
+    vm.createSelectFork(vm.rpcUrl('polygon'), 43003718);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEnginePolLib.deploy());
     AaveV3PolygonBorrowUpdate payload = new AaveV3PolygonBorrowUpdate(engine);
@@ -489,33 +489,11 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
 
     ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(AaveV3Polygon.POOL);
 
-    ReserveConfig memory expectedAssetConfig = ReserveConfig({
-      symbol: allConfigsBefore[6].symbol,
-      underlying: allConfigsBefore[6].underlying,
-      aToken: allConfigsBefore[6].aToken,
-      variableDebtToken: allConfigsBefore[6].variableDebtToken,
-      stableDebtToken: allConfigsBefore[6].stableDebtToken,
-      decimals: allConfigsBefore[6].decimals,
-      ltv: allConfigsBefore[6].ltv,
-      liquidationThreshold: allConfigsBefore[6].liquidationThreshold,
-      liquidationBonus: allConfigsBefore[6].liquidationBonus,
-      liquidationProtocolFee: allConfigsBefore[6].liquidationProtocolFee,
-      reserveFactor: 15_00,
-      usageAsCollateralEnabled: allConfigsBefore[6].usageAsCollateralEnabled,
-      borrowingEnabled: true,
-      interestRateStrategy: allConfigsBefore[6].interestRateStrategy,
-      stableBorrowRateEnabled: allConfigsBefore[6].stableBorrowRateEnabled,
-      isPaused: allConfigsBefore[6].isPaused,
-      isActive: allConfigsBefore[6].isActive,
-      isFrozen: allConfigsBefore[6].isFrozen,
-      isSiloed: allConfigsBefore[6].isSiloed,
-      isBorrowableInIsolation: allConfigsBefore[6].isBorrowableInIsolation,
-      isFlashloanable: allConfigsBefore[6].isFlashloanable,
-      supplyCap: allConfigsBefore[6].supplyCap,
-      borrowCap: allConfigsBefore[6].borrowCap,
-      debtCeiling: allConfigsBefore[6].debtCeiling,
-      eModeCategory: allConfigsBefore[6].eModeCategory
-    });
+    ReserveConfig memory expectedAssetConfig = _findReserveConfig(allConfigsBefore, AaveV3PolygonAssets.AAVE_UNDERLYING);
+
+    expectedAssetConfig.reserveFactor = 15_00;
+    expectedAssetConfig.borrowingEnabled = true;
+    expectedAssetConfig.isFlashloanable = false;
 
     _validateReserveConfig(expectedAssetConfig, allConfigsAfter);
   }
