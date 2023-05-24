@@ -9,13 +9,6 @@ import {V2RateStrategyFactory} from '../src/v2-config-engine/V2RateStrategyFacto
 import './Utils.s.sol';
 
 library DeployV2RatesFactoryLib {
-
-  address public constant ETH_STANDARD_RATES_ADDR = 0x9B1e3C7483F0f21abFEaE3AeBC9b47b5f23f5bB0;
-  address public constant ETH_AMM_STANDARD_RATES_ADDR = 0x52E39422cd86a12a13773D86af5FdBF5665989aD;
-  address public constant POL_STANDARD_RATES_ADDR = 0xBb480ae4e2cf28FBE80C9b61ab075f6e7C4dB468;
-  address public constant AVAX_STANDARD_RATES_ADDR = 0x6724e923E4bb58fCdF7CEe7A5E7bBb47b99C2647;
-
-  // TODO check also by param, potentially there could be different contracts, but with exactly same params
   function _getUniqueStrategiesOnPool(ILendingPool pool)
     internal
     view
@@ -76,10 +69,6 @@ library DeployV2RatesFactoryLib {
   // We do so by checking if the strategy to initialise matches the standard deployed rates address codehash
   function _isStandardStrategy(address strategy) internal view returns (bool) {
     return (
-      strategy.codehash == ETH_STANDARD_RATES_ADDR.codehash || // Current standard codehash of Eth v2 rates strategy
-      strategy.codehash == POL_STANDARD_RATES_ADDR.codehash || // Current standard codehash of Polygon v2 rates strategy
-      strategy.codehash == ETH_AMM_STANDARD_RATES_ADDR.codehash || // Current standard codehash of Eth Amm v2 rates strategy
-      strategy.codehash == AVAX_STANDARD_RATES_ADDR.codehash || // Current standard codehash of Avax v2 rates strategy
       strategy.codehash == 0xd7aa7ce390578e74a5e48d4f530f22cbd75db8437fd6a1ae0a983e550483d972 // Current standard codehash deployed from factory
     );
   }
