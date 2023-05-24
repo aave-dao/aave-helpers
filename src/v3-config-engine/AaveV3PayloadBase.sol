@@ -14,9 +14,10 @@ import {EngineFlags} from './EngineFlags.sol';
  *   interaction with the Aave protocol.
  * - At the moment covering:
  *   - Listings of new assets on the pool.
+ *   - Listings of new assets on the pool with custom token impl.
  *   - Updates of caps (supply cap, borrow cap).
  *   - Updates of price feeds
- *   - Updates of interest rate strategies.
+ *   - Updates of interest rate strategies
  *   - Updates of borrow parameters (flashloanable, stableRateModeEnabled, borrowableInIsolation, withSiloedBorrowing, reserveFactor)
  *   - Updates of collateral parameters (ltv, liq threshold, liq bonus, liq protocol fee, debt ceiling)
  *   - Updates of emode category parameters (ltv, liq threshold, liq bonus, price source, label)
@@ -43,11 +44,11 @@ abstract contract AaveV3PayloadBase {
     IEngine.EModeUpdate[] memory eModeCategories = eModeCategoryUpdates();
     IEngine.Listing[] memory listings = newListings();
     IEngine.ListingWithCustomImpl[] memory listingsCustom = newListingsCustom();
-    IEngine.CapsUpdate[] memory caps = capsUpdates();
     IEngine.CollateralUpdate[] memory collaterals = collateralsUpdates();
     IEngine.BorrowUpdate[] memory borrows = borrowsUpdates();
-    IEngine.PriceFeedUpdate[] memory priceFeeds = priceFeedsUpdates();
     IEngine.RateStrategyUpdate[] memory rates = rateStrategiesUpdates();
+    IEngine.PriceFeedUpdate[] memory priceFeeds = priceFeedsUpdates();
+    IEngine.CapsUpdate[] memory caps = capsUpdates();
 
     if (eModeCategories.length != 0) {
       address(LISTING_ENGINE).functionDelegateCall(

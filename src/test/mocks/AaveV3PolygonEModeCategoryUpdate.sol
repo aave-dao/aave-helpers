@@ -57,6 +57,6 @@ contract AaveV3AvalancheEModeCategoryUpdateEdgeBonus is AaveV3PayloadBase {
   }
 
   function getPoolContext() public pure override returns (IEngine.PoolContext memory) {
-    return IEngine.PoolContext({networkName: 'Polygon', networkAbbreviation: 'Pol'});
+    return IEngine.PoolContext({networkName: 'Avalanche', networkAbbreviation: 'Ava'});
   }
 }
