@@ -3,11 +3,13 @@ pragma solidity ^0.8.12;
 
 import {ConfiguratorInputTypes, DataTypes} from 'aave-address-book/AaveV3.sol';
 import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
-import {PercentageMath} from 'aave-v3-core/contracts/protocol/libraries/math/PercentageMath.sol';
-import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
-import {IChainlinkAggregator} from '../interfaces/IChainlinkAggregator.sol';
-import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
-import {EngineFlags} from './EngineFlags.sol';
+import {CapsEngine} from './libraries/CapsEngine.sol';
+import {BorrowEngine} from './libraries/BorrowEngine.sol';
+import {CollateralEngine} from './libraries/CollateralEngine.sol';
+import {RateEngine} from './libraries/RateEngine.sol';
+import {PriceFeedEngine} from './libraries/PriceFeedEngine.sol';
+import {EModeEngine} from './libraries/EModeEngine.sol';
+import {ListingEngine} from './libraries/ListingEngine.sol';
 import './IAaveV3ConfigEngine.sol';
 
 /**
@@ -22,7 +24,6 @@ import './IAaveV3ConfigEngine.sol';
  * @author BGD Labs
  */
 contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
-  using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
 
   struct AssetsConfig {
     address[] ids;
@@ -139,626 +140,67 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     PoolContext memory context,
     ListingWithCustomImpl[] memory listings
   ) public {
-    require(listings.length != 0, 'AT_LEAST_ONE_ASSET_REQUIRED');
-
-    AssetsConfig memory configs = _repackListing(listings);
-
-    _setPriceFeeds(configs.ids, configs.basics);
-
-    _initAssets(context, configs.ids, configs.basics, configs.rates);
-
-    _configureCaps(configs.ids, configs.caps);
-
-    _configBorrowSide(configs.ids, configs.borrows);
-
-    _configCollateralSide(configs.ids, configs.collaterals);
+    ListingEngine.executeCustomAssetListing(
+      context,
+      POOL_CONFIGURATOR,
+      RATE_STRATEGIES_FACTORY,
+      POOL,
+      ORACLE,
+      COLLECTOR,
+      REWARDS_CONTROLLER,
+      listings
+    );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updateCaps(CapsUpdate[] memory updates) public {
-    require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
-
-    AssetsConfig memory configs = _repackCapsUpdate(updates);
-
-    _configureCaps(configs.ids, configs.caps);
+    CapsEngine.executeCapsUpdate(
+      POOL_CONFIGURATOR,
+      updates
+    );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updatePriceFeeds(PriceFeedUpdate[] memory updates) public {
-    require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
-
-    AssetsConfig memory configs = _repackPriceFeed(updates);
-
-    _setPriceFeeds(configs.ids, configs.basics);
+    PriceFeedEngine.executePriceFeedsUpdate(
+      ORACLE,
+      updates
+    );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updateCollateralSide(CollateralUpdate[] memory updates) public {
-    require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
-
-    AssetsConfig memory configs = _repackCollateralUpdate(updates);
-
-    _configCollateralSide(configs.ids, configs.collaterals);
+    CollateralEngine.executeCollateralSide(
+      POOL_CONFIGURATOR,
+      POOL,
+      updates
+    );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updateBorrowSide(BorrowUpdate[] memory updates) public {
-    require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
-
-    AssetsConfig memory configs = _repackBorrowUpdate(updates);
-
-    _configBorrowSide(configs.ids, configs.borrows);
+    BorrowEngine.executeBorrowSide(
+      POOL_CONFIGURATOR,
+      POOL,
+      updates
+    );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updateRateStrategies(RateStrategyUpdate[] memory updates) public {
-    require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
-
-    AssetsConfig memory configs = _repackRatesUpdate(updates);
-
-    _configRateStrategies(configs.ids, configs.rates);
+    RateEngine.executeRateStrategiesUpdate(
+      POOL_CONFIGURATOR,
+      RATE_STRATEGIES_FACTORY,
+      updates
+    );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updateEModeCategories(EModeUpdate[] memory updates) public {
-    require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
-
-    AssetsConfig memory configs = _repackEModeUpdate(updates);
-
-    _configEModeCategories(configs.eModeCategories);
-  }
-
-  function _setPriceFeeds(address[] memory ids, Basic[] memory basics) internal {
-    address[] memory assets = new address[](ids.length);
-    address[] memory sources = new address[](ids.length);
-
-    for (uint256 i = 0; i < ids.length; i++) {
-      require(basics[i].priceFeed != address(0), 'PRICE_FEED_ALWAYS_REQUIRED');
-      require(
-        IChainlinkAggregator(basics[i].priceFeed).latestAnswer() > 0,
-        'FEED_SHOULD_RETURN_POSITIVE_PRICE'
-      );
-      assets[i] = ids[i];
-      sources[i] = basics[i].priceFeed;
-    }
-
-    ORACLE.setAssetSources(assets, sources);
-  }
-
-  /// @dev mandatory configurations for any asset getting listed, including oracle config and basic init
-  function _initAssets(
-    PoolContext memory context,
-    address[] memory ids,
-    Basic[] memory basics,
-    IV3RateStrategyFactory.RateStrategyParams[] memory rates
-  ) internal {
-    ConfiguratorInputTypes.InitReserveInput[]
-      memory initReserveInputs = new ConfiguratorInputTypes.InitReserveInput[](ids.length);
-    address[] memory strategies = RATE_STRATEGIES_FACTORY.createStrategies(rates);
-
-    for (uint256 i = 0; i < ids.length; i++) {
-      uint8 decimals = IERC20Metadata(ids[i]).decimals();
-      require(decimals > 0, 'INVALID_ASSET_DECIMALS');
-
-      initReserveInputs[i] = ConfiguratorInputTypes.InitReserveInput({
-        aTokenImpl: basics[i].implementations.aToken,
-        stableDebtTokenImpl: basics[i].implementations.sToken,
-        variableDebtTokenImpl: basics[i].implementations.vToken,
-        underlyingAssetDecimals: decimals,
-        interestRateStrategyAddress: strategies[i],
-        underlyingAsset: ids[i],
-        treasury: COLLECTOR,
-        incentivesController: REWARDS_CONTROLLER,
-        aTokenName: string.concat('Aave ', context.networkName, ' ', basics[i].assetSymbol),
-        aTokenSymbol: string.concat('a', context.networkAbbreviation, basics[i].assetSymbol),
-        variableDebtTokenName: string.concat(
-          'Aave ',
-          context.networkName,
-          ' Variable Debt ',
-          basics[i].assetSymbol
-        ),
-        variableDebtTokenSymbol: string.concat(
-          'variableDebt',
-          context.networkAbbreviation,
-          basics[i].assetSymbol
-        ),
-        stableDebtTokenName: string.concat(
-          'Aave ',
-          context.networkName,
-          ' Stable Debt ',
-          basics[i].assetSymbol
-        ),
-        stableDebtTokenSymbol: string.concat(
-          'stableDebt',
-          context.networkAbbreviation,
-          basics[i].assetSymbol
-        ),
-        params: bytes('')
-      });
-    }
-    POOL_CONFIGURATOR.initReserves(initReserveInputs);
-  }
-
-  function _configureCaps(address[] memory ids, Caps[] memory caps) internal {
-    for (uint256 i = 0; i < ids.length; i++) {
-      if (caps[i].supplyCap != EngineFlags.KEEP_CURRENT) {
-        POOL_CONFIGURATOR.setSupplyCap(ids[i], caps[i].supplyCap);
-      }
-
-      if (caps[i].borrowCap != EngineFlags.KEEP_CURRENT) {
-        POOL_CONFIGURATOR.setBorrowCap(ids[i], caps[i].borrowCap);
-      }
-    }
-  }
-
-  function _configBorrowSide(address[] memory ids, Borrow[] memory borrows) internal {
-    for (uint256 i = 0; i < ids.length; i++) {
-      if (borrows[i].enabledToBorrow != EngineFlags.KEEP_CURRENT) {
-        POOL_CONFIGURATOR.setReserveBorrowing(
-          ids[i],
-          EngineFlags.toBool(borrows[i].enabledToBorrow)
-        );
-      } else {
-        (, , bool borrowingEnabled, , ) = POOL.getConfiguration(ids[i]).getFlags();
-        borrows[i].enabledToBorrow = EngineFlags.fromBool(borrowingEnabled);
-      }
-
-      if (borrows[i].enabledToBorrow == EngineFlags.ENABLED) {
-        if (borrows[i].stableRateModeEnabled != EngineFlags.KEEP_CURRENT) {
-          POOL_CONFIGURATOR.setReserveStableRateBorrowing(
-            ids[i],
-            EngineFlags.toBool(borrows[i].stableRateModeEnabled)
-          );
-        }
-      }
-
-      if (borrows[i].borrowableInIsolation != EngineFlags.KEEP_CURRENT) {
-        POOL_CONFIGURATOR.setBorrowableInIsolation(
-          ids[i],
-          EngineFlags.toBool(borrows[i].borrowableInIsolation)
-        );
-      }
-
-      if (borrows[i].withSiloedBorrowing != EngineFlags.KEEP_CURRENT) {
-        POOL_CONFIGURATOR.setSiloedBorrowing(
-          ids[i],
-          EngineFlags.toBool(borrows[i].withSiloedBorrowing)
-        );
-      }
-
-      // The reserve factor should always be > 0
-      require(
-        (borrows[i].reserveFactor > 0 && borrows[i].reserveFactor <= 100_00) ||
-          borrows[i].reserveFactor == EngineFlags.KEEP_CURRENT,
-        'INVALID_RESERVE_FACTOR'
-      );
-
-      if (borrows[i].reserveFactor != EngineFlags.KEEP_CURRENT) {
-        POOL_CONFIGURATOR.setReserveFactor(ids[i], borrows[i].reserveFactor);
-      }
-
-      if (borrows[i].flashloanable != EngineFlags.KEEP_CURRENT) {
-        POOL_CONFIGURATOR.setReserveFlashLoaning(
-          ids[i], 
-          EngineFlags.toBool(borrows[i].flashloanable)
-        );
-      }
-    }
-  }
-
-  function _configRateStrategies(
-    address[] memory ids,
-    IV3RateStrategyFactory.RateStrategyParams[] memory strategiesParams
-  ) internal {
-    for (uint256 i = 0; i < strategiesParams.length; i++) {
-      if (
-        strategiesParams[i].variableRateSlope1 == EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].variableRateSlope2 == EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].optimalUsageRatio == EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].baseVariableBorrowRate == EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].stableRateSlope1 == EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].stableRateSlope2 == EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].baseStableRateOffset == EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].stableRateExcessOffset == EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].optimalStableToTotalDebtRatio == EngineFlags.KEEP_CURRENT
-      ) {
-        IV3RateStrategyFactory.RateStrategyParams
-          memory currentStrategyData = RATE_STRATEGIES_FACTORY.getStrategyDataOfAsset(ids[i]);
-
-        if (strategiesParams[i].variableRateSlope1 == EngineFlags.KEEP_CURRENT) {
-          strategiesParams[i].variableRateSlope1 = currentStrategyData.variableRateSlope1;
-        }
-
-        if (strategiesParams[i].variableRateSlope2 == EngineFlags.KEEP_CURRENT) {
-          strategiesParams[i].variableRateSlope2 = currentStrategyData.variableRateSlope2;
-        }
-
-        if (strategiesParams[i].optimalUsageRatio == EngineFlags.KEEP_CURRENT) {
-          strategiesParams[i].optimalUsageRatio = currentStrategyData.optimalUsageRatio;
-        }
-
-        if (strategiesParams[i].baseVariableBorrowRate == EngineFlags.KEEP_CURRENT) {
-          strategiesParams[i].baseVariableBorrowRate = currentStrategyData.baseVariableBorrowRate;
-        }
-
-        if (strategiesParams[i].stableRateSlope1 == EngineFlags.KEEP_CURRENT) {
-          strategiesParams[i].stableRateSlope1 = currentStrategyData.stableRateSlope1;
-        }
-
-        if (strategiesParams[i].stableRateSlope2 == EngineFlags.KEEP_CURRENT) {
-          strategiesParams[i].stableRateSlope2 = currentStrategyData.stableRateSlope2;
-        }
-
-        if (strategiesParams[i].baseStableRateOffset == EngineFlags.KEEP_CURRENT) {
-          strategiesParams[i].baseStableRateOffset = currentStrategyData.baseStableRateOffset;
-        }
-
-        if (strategiesParams[i].stableRateExcessOffset == EngineFlags.KEEP_CURRENT) {
-          strategiesParams[i].stableRateExcessOffset = currentStrategyData.stableRateExcessOffset;
-        }
-
-        if (strategiesParams[i].optimalStableToTotalDebtRatio == EngineFlags.KEEP_CURRENT) {
-          strategiesParams[i].optimalStableToTotalDebtRatio = currentStrategyData
-            .optimalStableToTotalDebtRatio;
-        }
-      }
-    }
-
-    address[] memory strategies = RATE_STRATEGIES_FACTORY.createStrategies(strategiesParams);
-
-    for (uint256 i = 0; i < strategies.length; i++) {
-      POOL_CONFIGURATOR.setReserveInterestRateStrategyAddress(ids[i], strategies[i]);
-    }
-  }
-
-  function _configCollateralSide(address[] memory ids, Collateral[] memory collaterals) internal {
-    for (uint256 i = 0; i < ids.length; i++) {
-      if (collaterals[i].liqThreshold != 0) {
-        bool notAllKeepCurrent = collaterals[i].ltv != EngineFlags.KEEP_CURRENT ||
-          collaterals[i].liqThreshold != EngineFlags.KEEP_CURRENT ||
-          collaterals[i].liqBonus != EngineFlags.KEEP_CURRENT;
-
-        bool atLeastOneKeepCurrent = collaterals[i].ltv == EngineFlags.KEEP_CURRENT ||
-          collaterals[i].liqThreshold == EngineFlags.KEEP_CURRENT ||
-          collaterals[i].liqBonus == EngineFlags.KEEP_CURRENT;
-
-        if (notAllKeepCurrent && atLeastOneKeepCurrent) {
-          DataTypes.ReserveConfigurationMap memory configuration = POOL.getConfiguration(ids[i]);
-          (
-            uint256 currentLtv,
-            uint256 currentLiqThreshold,
-            uint256 currentLiqBonus,
-            ,
-            ,
-
-          ) = configuration.getParams();
-
-          if (collaterals[i].ltv == EngineFlags.KEEP_CURRENT) {
-            collaterals[i].ltv = currentLtv;
-          }
-
-          if (collaterals[i].liqThreshold == EngineFlags.KEEP_CURRENT) {
-            collaterals[i].liqThreshold = currentLiqThreshold;
-          }
-
-          if (collaterals[i].liqBonus == EngineFlags.KEEP_CURRENT) {
-            // Subtracting 100_00 to be consistent with the engine as 100_00 gets added while setting the liqBonus
-            collaterals[i].liqBonus = currentLiqBonus - 100_00;
-          }
-        }
-
-        if (notAllKeepCurrent) {
-          // LT*LB (in %) should never be above 100%, because it means instant undercollateralization
-          require(
-            PercentageMath.percentMul(collaterals[i].liqThreshold, 100_00 + collaterals[i].liqBonus) <= 100_00,
-            'INVALID_LT_LB_RATIO'
-          );
-
-          POOL_CONFIGURATOR.configureReserveAsCollateral(
-            ids[i],
-            collaterals[i].ltv,
-            collaterals[i].liqThreshold,
-            // For reference, this is to simplify the interaction with the Aave protocol,
-            // as there the definition is as e.g. 105% (5% bonus for liquidators)
-            100_00 + collaterals[i].liqBonus
-          );
-        }
-
-        if (collaterals[i].liqProtocolFee != EngineFlags.KEEP_CURRENT) {
-          require(collaterals[i].liqProtocolFee < 100_00, 'INVALID_LIQ_PROTOCOL_FEE');
-          POOL_CONFIGURATOR.setLiquidationProtocolFee(ids[i], collaterals[i].liqProtocolFee);
-        }
-
-        if (collaterals[i].debtCeiling != EngineFlags.KEEP_CURRENT) {
-          // For reference, this is to simplify the interactions with the Aave protocol,
-          // as there the definition is with 2 decimals. We don't see any reason to set
-          // a debt ceiling involving .something USD, so we simply don't allow to do it
-          POOL_CONFIGURATOR.setDebtCeiling(ids[i], collaterals[i].debtCeiling * 100);
-        }
-      }
-
-      if (collaterals[i].eModeCategory != EngineFlags.KEEP_CURRENT) {
-        POOL_CONFIGURATOR.setAssetEModeCategory(ids[i], SafeCast.toUint8(collaterals[i].eModeCategory));
-      }
-    }
-  }
-
-  function _configEModeCategories(EModeCategories[] memory updates) internal {
-    for (uint256 i = 0; i < updates.length; i++) {
-      if (
-        updates[i].ltv == EngineFlags.KEEP_CURRENT ||
-        updates[i].liqThreshold == EngineFlags.KEEP_CURRENT ||
-        updates[i].liqBonus == EngineFlags.KEEP_CURRENT ||
-        updates[i].priceSource == EngineFlags.KEEP_CURRENT_ADDRESS ||
-        keccak256(abi.encode(updates[i].label)) == keccak256(abi.encode(EngineFlags.KEEP_CURRENT_STRING))
-      ) {
-        DataTypes.EModeCategory memory configuration = POOL.getEModeCategoryData(updates[i].eModeCategory);
-        uint256 currentLtv = configuration.ltv;
-        uint256 currentLiqThreshold = configuration.liquidationThreshold;
-        uint256 currentLiqBonus = configuration.liquidationBonus;
-        address currentPriceSource = configuration.priceSource;
-        string memory currentLabel = configuration.label;
-
-        if (updates[i].ltv == EngineFlags.KEEP_CURRENT) {
-          updates[i].ltv = currentLtv;
-        }
-
-        if (updates[i].liqThreshold == EngineFlags.KEEP_CURRENT) {
-          updates[i].liqThreshold = currentLiqThreshold;
-        }
-
-        if (updates[i].liqBonus == EngineFlags.KEEP_CURRENT) {
-          // Subtracting 100_00 to be consistent with the engine as 100_00 gets added while setting the liqBonus
-          updates[i].liqBonus = currentLiqBonus - 100_00;
-        }
-
-        if (updates[i].priceSource == EngineFlags.KEEP_CURRENT_ADDRESS) {
-          updates[i].priceSource = currentPriceSource;
-        }
-
-        if (keccak256(abi.encode(updates[i].label)) == keccak256(abi.encode(EngineFlags.KEEP_CURRENT_STRING))) {
-          updates[i].label = currentLabel;
-        }
-      }
-
-      // LT*LB (in %) should never be above 100%, because it means instant undercollateralization
-      require(
-        PercentageMath.percentMul(updates[i].liqThreshold, 100_00 + updates[i].liqBonus) <= 100_00,
-        'INVALID_LT_LB_RATIO'
-      );
-
-      POOL_CONFIGURATOR.setEModeCategory(
-        updates[i].eModeCategory,
-        SafeCast.toUint16(updates[i].ltv), //toUint16()
-        SafeCast.toUint16(updates[i].liqThreshold), // .toUint16()
-        // For reference, this is to simplify the interaction with the Aave protocol,
-        // as there the definition is as e.g. 105% (5% bonus for liquidators)
-        SafeCast.toUint16(100_00 + updates[i].liqBonus), //.toUint16() 
-        updates[i].priceSource,
-        updates[i].label
-      );
-    }
-  }
-
-  function _repackListing(ListingWithCustomImpl[] memory listings)
-    internal
-    pure
-    returns (AssetsConfig memory)
-  {
-    address[] memory ids = new address[](listings.length);
-    Basic[] memory basics = new Basic[](listings.length);
-    Borrow[] memory borrows = new Borrow[](listings.length);
-    Collateral[] memory collaterals = new Collateral[](listings.length);
-    Caps[] memory caps = new Caps[](listings.length);
-    IV3RateStrategyFactory.RateStrategyParams[]
-      memory rates = new IV3RateStrategyFactory.RateStrategyParams[](listings.length);
-
-    for (uint256 i = 0; i < listings.length; i++) {
-      require(listings[i].base.asset != address(0), 'INVALID_ASSET');
-      ids[i] = listings[i].base.asset;
-      basics[i] = Basic({
-        assetSymbol: listings[i].base.assetSymbol,
-        priceFeed: listings[i].base.priceFeed,
-        rateStrategyParams: listings[i].base.rateStrategyParams,
-        implementations: listings[i].implementations
-      });
-      borrows[i] = Borrow({
-        enabledToBorrow: listings[i].base.enabledToBorrow,
-        flashloanable: listings[i].base.flashloanable,
-        stableRateModeEnabled: listings[i].base.stableRateModeEnabled,
-        borrowableInIsolation: listings[i].base.borrowableInIsolation,
-        withSiloedBorrowing: listings[i].base.withSiloedBorrowing,
-        reserveFactor: listings[i].base.reserveFactor
-      });
-      collaterals[i] = Collateral({
-        ltv: listings[i].base.ltv,
-        liqThreshold: listings[i].base.liqThreshold,
-        liqBonus: listings[i].base.liqBonus,
-        debtCeiling: listings[i].base.debtCeiling,
-        liqProtocolFee: listings[i].base.liqProtocolFee,
-        eModeCategory: listings[i].base.eModeCategory
-      });
-      caps[i] = Caps({
-        supplyCap: listings[i].base.supplyCap,
-        borrowCap: listings[i].base.borrowCap
-      });
-      rates[i] = listings[i].base.rateStrategyParams;
-    }
-
-    return
-      AssetsConfig({
-        ids: ids,
-        basics: basics,
-        borrows: borrows,
-        collaterals: collaterals,
-        caps: caps,
-        rates: rates,
-        eModeCategories: new EModeCategories[](0)
-      });
-  }
-
-  function _repackCapsUpdate(
-    CapsUpdate[] memory updates
-  ) internal pure returns (AssetsConfig memory) {
-    address[] memory ids = new address[](updates.length);
-    Caps[] memory caps = new Caps[](updates.length);
-
-    for (uint256 i = 0; i < updates.length; i++) {
-      ids[i] = updates[i].asset;
-      caps[i] = Caps({supplyCap: updates[i].supplyCap, borrowCap: updates[i].borrowCap});
-    }
-
-    return
-      AssetsConfig({
-        ids: ids,
-        caps: caps,
-        basics: new Basic[](0),
-        borrows: new Borrow[](0),
-        collaterals: new Collateral[](0),
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
-        eModeCategories: new EModeCategories[](0)
-      });
-  }
-
-  function _repackRatesUpdate(
-    RateStrategyUpdate[] memory updates
-  ) internal pure returns (AssetsConfig memory) {
-    address[] memory ids = new address[](updates.length);
-    IV3RateStrategyFactory.RateStrategyParams[]
-      memory rates = new IV3RateStrategyFactory.RateStrategyParams[](updates.length);
-
-    for (uint256 i = 0; i < updates.length; i++) {
-      ids[i] = updates[i].asset;
-      rates[i] = updates[i].params;
-    }
-
-    return
-      AssetsConfig({
-        ids: ids,
-        rates: rates,
-        basics: new Basic[](0),
-        borrows: new Borrow[](0),
-        caps: new Caps[](0),
-        collaterals: new Collateral[](0),
-        eModeCategories: new EModeCategories[](0)
-      });
-  }
-
-  function _repackCollateralUpdate(
-    CollateralUpdate[] memory updates
-  ) internal pure returns (AssetsConfig memory) {
-    address[] memory ids = new address[](updates.length);
-    Collateral[] memory collaterals = new Collateral[](updates.length);
-
-    for (uint256 i = 0; i < updates.length; i++) {
-      ids[i] = updates[i].asset;
-      collaterals[i] = Collateral({
-        ltv: updates[i].ltv,
-        liqThreshold: updates[i].liqThreshold,
-        liqBonus: updates[i].liqBonus,
-        debtCeiling: updates[i].debtCeiling,
-        liqProtocolFee: updates[i].liqProtocolFee,
-        eModeCategory: updates[i].eModeCategory
-      });
-    }
-
-    return
-      AssetsConfig({
-        ids: ids,
-        caps: new Caps[](0),
-        basics: new Basic[](0),
-        borrows: new Borrow[](0),
-        collaterals: collaterals,
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
-        eModeCategories: new EModeCategories[](0)
-      });
-  }
-
-  function _repackBorrowUpdate(
-    BorrowUpdate[] memory updates
-  ) internal pure returns (AssetsConfig memory) {
-    address[] memory ids = new address[](updates.length);
-    Borrow[] memory borrows = new Borrow[](updates.length);
-
-    for (uint256 i = 0; i < updates.length; i++) {
-      ids[i] = updates[i].asset;
-      borrows[i] = Borrow({
-        enabledToBorrow: updates[i].enabledToBorrow,
-        flashloanable: updates[i].flashloanable,
-        stableRateModeEnabled: updates[i].stableRateModeEnabled,
-        borrowableInIsolation: updates[i].borrowableInIsolation,
-        withSiloedBorrowing: updates[i].withSiloedBorrowing,
-        reserveFactor: updates[i].reserveFactor
-      });
-    }
-
-    return
-      AssetsConfig({
-        ids: ids,
-        caps: new Caps[](0),
-        basics: new Basic[](0),
-        borrows: borrows,
-        collaterals: new Collateral[](0),
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
-        eModeCategories: new EModeCategories[](0)
-      });
-  }
-
-  function _repackPriceFeed(
-    PriceFeedUpdate[] memory updates
-  ) internal pure returns (AssetsConfig memory) {
-    address[] memory ids = new address[](updates.length);
-    Basic[] memory basics = new Basic[](updates.length);
-
-    for (uint256 i = 0; i < updates.length; i++) {
-      ids[i] = updates[i].asset;
-      basics[i] = Basic({
-        priceFeed: updates[i].priceFeed,
-        assetSymbol: string(''), // unused for price feed update
-        rateStrategyParams: IV3RateStrategyFactory.RateStrategyParams(0, 0, 0, 0, 0, 0, 0, 0, 0), // unused for price feed update
-        implementations: TokenImplementations(address(0), address(0), address(0)) // unused for price feed update
-      });
-    }
-
-    return
-      AssetsConfig({
-        ids: ids,
-        caps: new Caps[](0),
-        basics: basics,
-        borrows: new Borrow[](0),
-        collaterals: new Collateral[](0),
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
-        eModeCategories: new EModeCategories[](0)
-      });
-  }
-
-  function _repackEModeUpdate(EModeUpdate[] memory updates)
-    internal
-    pure
-    returns (AssetsConfig memory)
-  {
-    EModeCategories[] memory eModeCategories = new EModeCategories[](updates.length);
-
-    for (uint256 i = 0; i < updates.length; i++) {
-      eModeCategories[i] = EModeCategories({
-        eModeCategory: updates[i].eModeCategory,
-        ltv: updates[i].ltv,
-        liqThreshold: updates[i].liqThreshold,
-        liqBonus: updates[i].liqBonus,
-        priceSource: updates[i].priceSource,
-        label: updates[i].label
-      });
-    }
-
-    return
-      AssetsConfig({
-        ids: new address[](0),
-        caps: new Caps[](0),
-        basics: new Basic[](0),
-        borrows: new Borrow[](0),
-        collaterals: new Collateral[](0),
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
-        eModeCategories: eModeCategories
-      });
+    EModeEngine.executeEModeCategoriesUpdate(
+      POOL_CONFIGURATOR,
+      POOL,
+      updates
+    );
   }
 }
