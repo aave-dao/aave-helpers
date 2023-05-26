@@ -74,15 +74,15 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     string label; // The label for the eMode category
   }
 
-  IPool internal immutable POOL;
-  IPoolConfigurator internal immutable POOL_CONFIGURATOR;
-  IAaveOracle internal immutable ORACLE;
-  address internal immutable ATOKEN_IMPL;
-  address internal immutable VTOKEN_IMPL;
-  address internal immutable STOKEN_IMPL;
-  address internal immutable REWARDS_CONTROLLER;
-  address internal immutable COLLECTOR;
-  IV3RateStrategyFactory internal immutable RATE_STRATEGIES_FACTORY;
+  IPool public immutable POOL;
+  IPoolConfigurator public immutable POOL_CONFIGURATOR;
+  IAaveOracle public immutable ORACLE;
+  address public immutable ATOKEN_IMPL;
+  address public immutable VTOKEN_IMPL;
+  address public immutable STOKEN_IMPL;
+  address public immutable REWARDS_CONTROLLER;
+  address public immutable COLLECTOR;
+  IV3RateStrategyFactory public immutable RATE_STRATEGIES_FACTORY;
 
   constructor(
     IPool pool,
