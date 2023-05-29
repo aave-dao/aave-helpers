@@ -10,6 +10,7 @@ import {RateEngine} from './libraries/RateEngine.sol';
 import {PriceFeedEngine} from './libraries/PriceFeedEngine.sol';
 import {EModeEngine} from './libraries/EModeEngine.sol';
 import {ListingEngine} from './libraries/ListingEngine.sol';
+import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
 import './IAaveV3ConfigEngine.sol';
 
 /**
@@ -24,6 +25,7 @@ import './IAaveV3ConfigEngine.sol';
  * @author BGD Labs
  */
 contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
+  using Address for address;
 
   struct AssetsConfig {
     address[] ids;
@@ -74,6 +76,16 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     string label; // The label for the eMode category
   }
 
+  struct EngineLibraries {
+    address listingEngine;
+    address eModeEngine;
+    address borrowEngine;
+    address collateralEngine;
+    address priceFeedEngine;
+    address rateEngine;
+    address capsEngine;
+  }
+
   IPool public immutable POOL;
   IPoolConfigurator public immutable POOL_CONFIGURATOR;
   IAaveOracle public immutable ORACLE;
@@ -83,6 +95,13 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   address public immutable REWARDS_CONTROLLER;
   address public immutable COLLECTOR;
   IV3RateStrategyFactory public immutable RATE_STRATEGIES_FACTORY;
+  address public immutable BORROW_ENGINE;
+  address public immutable CAPS_ENGINE;
+  address public immutable COLLATERAL_ENGINE;
+  address public immutable EMODE_ENGINE;
+  address public immutable LISTING_ENGINE;
+  address public immutable PRICE_FEED_ENGINE;
+  address public immutable RATE_ENGINE;
 
   constructor(
     IPool pool,
@@ -93,7 +112,8 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     address sTokenImpl,
     address rewardsController,
     address collector,
-    IV3RateStrategyFactory rateStrategiesFactory
+    IV3RateStrategyFactory rateStrategiesFactory,
+    EngineLibraries memory engineLibraries
   ) {
     require(address(pool) != address(0), 'ONLY_NONZERO_POOL');
     require(address(configurator) != address(0), 'ONLY_NONZERO_CONFIGURATOR');
@@ -105,6 +125,14 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     require(collector != address(0), 'ONLY_NONZERO_COLLECTOR');
     require(address(rateStrategiesFactory) != address(0), 'ONLY_NONZERO_RATES_FACTORY');
 
+    require(engineLibraries.borrowEngine != address(0), 'ONLY_NONZERO_BORROW_ENGINE');
+    require(engineLibraries.capsEngine != address(0), 'ONLY_NONZERO_CAPS_ENGINE');
+    require(engineLibraries.collateralEngine != address(0), 'ONLY_NONZERO_COLLATERAL_ENGINE');
+    require(engineLibraries.eModeEngine != address(0), 'ONLY_NONZERO_EMODE_ENGINE');
+    require(engineLibraries.listingEngine != address(0), 'ONLY_NONZERO_LISTING_ENGINE');
+    require(engineLibraries.priceFeedEngine != address(0), 'ONLY_NONZERO_PRICE_FEED_ENGINE');
+    require(engineLibraries.rateEngine != address(0), 'ONLY_NONZERO_RATE_ENGINE');
+
     POOL = pool;
     POOL_CONFIGURATOR = configurator;
     ORACLE = oracle;
@@ -114,6 +142,13 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     REWARDS_CONTROLLER = rewardsController;
     COLLECTOR = collector;
     RATE_STRATEGIES_FACTORY = rateStrategiesFactory;
+    BORROW_ENGINE = engineLibraries.borrowEngine;
+    CAPS_ENGINE = engineLibraries.capsEngine;
+    COLLATERAL_ENGINE = engineLibraries.collateralEngine;
+    EMODE_ENGINE = engineLibraries.eModeEngine;
+    LISTING_ENGINE = engineLibraries.listingEngine;
+    PRICE_FEED_ENGINE = engineLibraries.priceFeedEngine;
+    RATE_ENGINE = engineLibraries.rateEngine;
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
@@ -140,67 +175,60 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     PoolContext memory context,
     ListingWithCustomImpl[] memory listings
   ) public {
-    ListingEngine.executeCustomAssetListing(
-      context,
-      POOL_CONFIGURATOR,
-      RATE_STRATEGIES_FACTORY,
-      POOL,
-      ORACLE,
-      COLLECTOR,
-      REWARDS_CONTROLLER,
-      listings
+    LISTING_ENGINE.functionDelegateCall(
+      abi.encodeWithSelector(
+        ListingEngine.executeCustomAssetListing.selector,
+        context,
+        POOL_CONFIGURATOR,
+        RATE_STRATEGIES_FACTORY,
+        POOL,
+        ORACLE,
+        COLLECTOR,
+        REWARDS_CONTROLLER,
+        listings
+      )
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updateCaps(CapsUpdate[] memory updates) public {
-    CapsEngine.executeCapsUpdate(
-      POOL_CONFIGURATOR,
-      updates
+    CAPS_ENGINE.functionDelegateCall(
+      abi.encodeWithSelector(CapsEngine.executeCapsUpdate.selector, POOL_CONFIGURATOR, updates)
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updatePriceFeeds(PriceFeedUpdate[] memory updates) public {
-    PriceFeedEngine.executePriceFeedsUpdate(
-      ORACLE,
-      updates
+    PRICE_FEED_ENGINE.functionDelegateCall(
+      abi.encodeWithSelector(PriceFeedEngine.executePriceFeedsUpdate.selector, ORACLE, updates)
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updateCollateralSide(CollateralUpdate[] memory updates) public {
-    CollateralEngine.executeCollateralSide(
-      POOL_CONFIGURATOR,
-      POOL,
-      updates
+    COLLATERAL_ENGINE.functionDelegateCall(
+      abi.encodeWithSelector(CollateralEngine.executeCollateralSide.selector, POOL_CONFIGURATOR, POOL, updates)
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updateBorrowSide(BorrowUpdate[] memory updates) public {
-    BorrowEngine.executeBorrowSide(
-      POOL_CONFIGURATOR,
-      POOL,
-      updates
+    BORROW_ENGINE.functionDelegateCall(
+      abi.encodeWithSelector(BorrowEngine.executeBorrowSide.selector, POOL_CONFIGURATOR, POOL, updates)
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updateRateStrategies(RateStrategyUpdate[] memory updates) public {
-    RateEngine.executeRateStrategiesUpdate(
-      POOL_CONFIGURATOR,
-      RATE_STRATEGIES_FACTORY,
-      updates
+    RATE_ENGINE.functionDelegateCall(
+      abi.encodeWithSelector(RateEngine.executeRateStrategiesUpdate.selector, POOL_CONFIGURATOR, RATE_STRATEGIES_FACTORY, updates)
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updateEModeCategories(EModeUpdate[] memory updates) public {
-    EModeEngine.executeEModeCategoriesUpdate(
-      POOL_CONFIGURATOR,
-      POOL,
-      updates
+    EMODE_ENGINE.functionDelegateCall(
+      abi.encodeWithSelector(EModeEngine.executeEModeCategoriesUpdate.selector, POOL_CONFIGURATOR, POOL, updates)
     );
   }
 }
