@@ -165,7 +165,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
-  function listAssets(PoolContext memory context, Listing[] memory listings) public {
+  function listAssets(PoolContext calldata context, Listing[] memory listings) public {
     require(listings.length != 0, 'AT_LEAST_ONE_ASSET_REQUIRED');
 
     ListingWithCustomImpl[] memory customListings = new ListingWithCustomImpl[](listings.length);
@@ -185,7 +185,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
 
   /// @inheritdoc IAaveV3ConfigEngine
   function listAssetsCustom(
-    PoolContext memory context,
+    PoolContext calldata context,
     ListingWithCustomImpl[] memory listings
   ) public {
     LISTING_ENGINE.functionDelegateCall(
@@ -204,42 +204,42 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
-  function updateCaps(CapsUpdate[] memory updates) public {
+  function updateCaps(CapsUpdate[] calldata updates) public {
     CAPS_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(CapsEngine.executeCapsUpdate.selector, POOL_CONFIGURATOR, updates)
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
-  function updatePriceFeeds(PriceFeedUpdate[] memory updates) public {
+  function updatePriceFeeds(PriceFeedUpdate[] calldata updates) public {
     PRICE_FEED_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(PriceFeedEngine.executePriceFeedsUpdate.selector, ORACLE, updates)
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
-  function updateCollateralSide(CollateralUpdate[] memory updates) public {
+  function updateCollateralSide(CollateralUpdate[] calldata updates) public {
     COLLATERAL_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(CollateralEngine.executeCollateralSide.selector, POOL_CONFIGURATOR, POOL, updates)
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
-  function updateBorrowSide(BorrowUpdate[] memory updates) public {
+  function updateBorrowSide(BorrowUpdate[] calldata updates) public {
     BORROW_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(BorrowEngine.executeBorrowSide.selector, POOL_CONFIGURATOR, POOL, updates)
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
-  function updateRateStrategies(RateStrategyUpdate[] memory updates) public {
+  function updateRateStrategies(RateStrategyUpdate[] calldata updates) public {
     RATE_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(RateEngine.executeRateStrategiesUpdate.selector, POOL_CONFIGURATOR, RATE_STRATEGIES_FACTORY, updates)
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
-  function updateEModeCategories(EModeUpdate[] memory updates) public {
+  function updateEModeCategories(EModeUpdate[] calldata updates) public {
     EMODE_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(EModeEngine.executeEModeCategoriesUpdate.selector, POOL_CONFIGURATOR, POOL, updates)
     );
