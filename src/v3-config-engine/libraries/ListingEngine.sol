@@ -12,8 +12,47 @@ import {CollateralEngine} from './CollateralEngine.sol';
 import {ConfiguratorInputTypes} from 'aave-address-book/AaveV3.sol';
 
 library ListingEngine {
+  function executeAssetListing(
+    IEngine.PoolContext calldata context,
+    IPoolConfigurator poolConfigurator,
+    IV3RateStrategyFactory rateStrategiesFactory,
+    IPool pool,
+    IAaveOracle oracle,
+    address collector,
+    address rewardsController,
+    address aTokenImpl,
+    address vTokenImpl,
+    address sTokenImpl,
+    IEngine.Listing[] calldata listings
+  ) external {
+    require(listings.length != 0, 'AT_LEAST_ONE_ASSET_REQUIRED');
+
+    IEngine.ListingWithCustomImpl[] memory customListings = new IEngine.ListingWithCustomImpl[](listings.length);
+    for (uint256 i = 0; i < listings.length; i++) {
+      customListings[i] = IEngine.ListingWithCustomImpl({
+        base: listings[i],
+        implementations: IEngine.TokenImplementations({
+          aToken: aTokenImpl,
+          vToken: vTokenImpl,
+          sToken: sTokenImpl
+        })
+      });
+    }
+
+    executeCustomAssetListing(
+      context,
+      poolConfigurator,
+      rateStrategiesFactory,
+      pool,
+      oracle,
+      collector,
+      rewardsController,
+      customListings
+    );
+  }
+
   function executeCustomAssetListing(
-    IEngine.PoolContext memory context,
+    IEngine.PoolContext calldata context,
     IPoolConfigurator poolConfigurator,
     IV3RateStrategyFactory rateStrategiesFactory,
     IPool pool,
@@ -21,7 +60,7 @@ library ListingEngine {
     address collector,
     address rewardsController,
     IEngine.ListingWithCustomImpl[] memory listings
-  ) external {
+  ) public {
     require(listings.length != 0, 'AT_LEAST_ONE_ASSET_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackListing(listings);
@@ -105,7 +144,7 @@ library ListingEngine {
 
   /// @dev mandatory configurations for any asset getting listed, including oracle config and basic init
   function _initAssets(
-    IEngine.PoolContext memory context,
+    IEngine.PoolContext calldata context,
     IPoolConfigurator poolConfigurator,
     IV3RateStrategyFactory rateStrategiesFactory,
     address collector,

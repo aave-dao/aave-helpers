@@ -165,28 +165,29 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
-  function listAssets(PoolContext calldata context, Listing[] memory listings) public {
-    require(listings.length != 0, 'AT_LEAST_ONE_ASSET_REQUIRED');
-
-    ListingWithCustomImpl[] memory customListings = new ListingWithCustomImpl[](listings.length);
-    for (uint256 i = 0; i < listings.length; i++) {
-      customListings[i] = ListingWithCustomImpl({
-        base: listings[i],
-        implementations: TokenImplementations({
-          aToken: ATOKEN_IMPL,
-          vToken: VTOKEN_IMPL,
-          sToken: STOKEN_IMPL
-        })
-      });
-    }
-
-    listAssetsCustom(context, customListings);
+  function listAssets(PoolContext calldata context, Listing[] calldata listings) public {
+    LISTING_ENGINE.functionDelegateCall(
+      abi.encodeWithSelector(
+        ListingEngine.executeAssetListing.selector,
+        context,
+        POOL_CONFIGURATOR,
+        RATE_STRATEGIES_FACTORY,
+        POOL,
+        ORACLE,
+        COLLECTOR,
+        REWARDS_CONTROLLER,
+        ATOKEN_IMPL,
+        VTOKEN_IMPL,
+        STOKEN_IMPL,
+        listings
+      )
+    );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function listAssetsCustom(
     PoolContext calldata context,
-    ListingWithCustomImpl[] memory listings
+    ListingWithCustomImpl[] calldata listings
   ) public {
     LISTING_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(
