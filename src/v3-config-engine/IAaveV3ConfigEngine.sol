@@ -280,4 +280,18 @@ interface IAaveV3ConfigEngine {
   function REWARDS_CONTROLLER() external view returns (address);
 
   function COLLECTOR() external view returns (address);
+
+  function BORROW_ENGINE() external view returns (address);
+
+  function CAPS_ENGINE() external view returns (address);
+
+  function COLLATERAL_ENGINE() external view returns (address);
+
+  function EMODE_ENGINE() external view returns (address);
+
+  function LISTING_ENGINE() external view returns (address);
+
+  function PRICE_FEED_ENGINE() external view returns (address);
+
+  function RATE_ENGINE() external view returns (address);
 }
