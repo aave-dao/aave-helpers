@@ -19,7 +19,6 @@ import './IAaveV3ConfigEngine.sol';
  * - It is planned to be used via delegatecall, by any contract having appropriate permissions to
  * do a listing, or any other granular config
  * Assumptions:
- * - Only one a/v/s token implementation for all assets
  * - Only one RewardsController for all assets
  * - Only one Collector for all assets
  * @author BGD Labs
@@ -88,13 +87,14 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
 
   IPool public immutable POOL;
   IPoolConfigurator public immutable POOL_CONFIGURATOR;
+  IV3RateStrategyFactory public immutable RATE_STRATEGIES_FACTORY;
   IAaveOracle public immutable ORACLE;
   address public immutable ATOKEN_IMPL;
   address public immutable VTOKEN_IMPL;
   address public immutable STOKEN_IMPL;
   address public immutable REWARDS_CONTROLLER;
   address public immutable COLLECTOR;
-  IV3RateStrategyFactory public immutable RATE_STRATEGIES_FACTORY;
+
   address public immutable BORROW_ENGINE;
   address public immutable CAPS_ENGINE;
   address public immutable COLLATERAL_ENGINE;
@@ -103,6 +103,19 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   address public immutable PRICE_FEED_ENGINE;
   address public immutable RATE_ENGINE;
 
+  /**
+   * @dev Constructor.
+   * @param pool The reference to the v3 pool contract.
+   * @param configurator The reference to the v3 pool configurator contract.
+   * @param oracle The reference to the v3 aave oracle contract.
+   * @param aTokenImpl The address of default aToken Implementation.
+   * @param vTokenImpl The address of default variableDebtToken Implementation.
+   * @param sTokenImpl The address of default stableDebtToken Implementation.
+   * @param rewardsController The address of rewards controller.
+   * @param collector The address of aave collector.
+   * @param rateStrategiesFactory The address of rates factory contract.
+   * @param engineLibraries The struct containing the addresses of stateless libraries containing the engine logic.
+   */
   constructor(
     IPool pool,
     IPoolConfigurator configurator,
