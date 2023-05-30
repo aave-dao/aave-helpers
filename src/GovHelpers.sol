@@ -247,22 +247,17 @@ library GovHelpers {
   }
 
   function executePayload(Vm vm, address payloadAddress) internal {
-    if (
-      block.chainid == ChainIds.FANTOM ||
-      block.chainid == ChainIds.AVALANCHE ||
-      block.chainid == ChainIds.HARMONY
-    ) {
-      MockExecutor mockExecutor = new MockExecutor();
-      address guardian = _getGuardian();
-      vm.etch(guardian, address(mockExecutor).code);
-      MockExecutor(guardian).execute(payloadAddress);
-    } else {
-      address executor = _getExecutor();
-      Payload[] memory proposals = new Payload[](1);
-      proposals[0] = Payload(payloadAddress, 'execute()', '');
-      uint256 proposalId = _queueProposalToL2ExecutorStorage(vm, executor, proposals);
-      CommonExecutor(executor).execute(proposalId);
-    }
+    address executor = _getExecutor();
+    Payload[] memory proposals = new Payload[](1);
+    proposals[0] = Payload(payloadAddress, 'execute()', '');
+    uint256 proposalId = _queueProposalToL2ExecutorStorage(vm, executor, proposals);
+    CommonExecutor(executor).execute(proposalId);
+  }
+
+  function executePayload(Vm vm, address payloadAddress, address executor) internal {
+    MockExecutor mockExecutor = new MockExecutor();
+    vm.etch(executor, address(mockExecutor).code);
+    MockExecutor(executor).execute(payloadAddress);
   }
 
   function _getStorageSlotUintMapping(uint256 slot, uint256 key) internal pure returns (uint256) {
@@ -346,13 +341,6 @@ library GovHelpers {
     return proposalCount;
   }
 
-  function _getGuardian() internal view returns (address) {
-    if (block.chainid == ChainIds.FANTOM) return AaveV3Fantom.ACL_ADMIN;
-    if (block.chainid == ChainIds.AVALANCHE) return AaveV3Avalanche.ACL_ADMIN;
-    if (block.chainid == ChainIds.HARMONY) return AaveV3Harmony.ACL_ADMIN;
-    revert ExecutorNotFound();
-  }
-
   function _getExecutor() internal view returns (address) {
     if (block.chainid == ChainIds.OPTIMISM) return AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR;
     if (block.chainid == ChainIds.POLYGON) return AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR;
@@ -385,10 +373,13 @@ contract MockExecutor {
  *    DELEGATECALL on the address previously selected on step 1).
  */
 abstract contract TestWithExecutor is Test {
-  // @notice @deprecated kept, to not break existing tests
-  function _selectPayloadExecutor(address executor) internal {}
+  address internal _executor;
+
+  function _selectPayloadExecutor(address executor) internal {
+    _executor = executor;
+  }
 
   function _executePayload(address payloadAddress) internal {
-    GovHelpers.executePayload(vm, payloadAddress);
+    GovHelpers.executePayload(vm, payloadAddress, _executor);
   }
 }

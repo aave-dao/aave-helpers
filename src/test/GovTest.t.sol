@@ -37,3 +37,18 @@ contract GovernanceL2ExecutorTest is Test {
     GovHelpers.executePayload(vm, address(payload));
   }
 }
+
+contract GovernanceMainnetExecutorTest is Test {
+  event TestEvent();
+
+  function setUp() public {
+    vm.createSelectFork('mainnet', 17370904);
+  }
+
+  function testCreateProposal() public {
+    PayloadWithEmit payload = new PayloadWithEmit();
+    vm.expectEmit(true, true, true, true);
+    emit TestEvent();
+    GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.SHORT_EXECUTOR);
+  }
+}

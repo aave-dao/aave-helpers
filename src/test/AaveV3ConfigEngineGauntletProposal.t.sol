@@ -52,7 +52,7 @@ contract AaveV3AvalancheConfigEngineRatesTest is ProtocolV3TestBase, TestWithExe
 
     createConfigurationSnapshot('preTestEngineAvaV3Gauntlet', AaveV3Avalanche.POOL);
 
-    GovHelpers.executePayload(vm, address(payload));
+    GovHelpers.executePayload(vm, address(payload), 0xa35b76E4935449E33C56aB24b23fcd3246f13470); // Aave Avalanche's Guardian
 
     createConfigurationSnapshot('postTestEngineAvaV3Gauntlet', AaveV3Avalanche.POOL);
 
