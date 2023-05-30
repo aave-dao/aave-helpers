@@ -339,11 +339,7 @@ library GovHelpers {
         )
       );
       // withDelegateCalls
-      vm.store(
-        l2Executor,
-        bytes32(_arrLocation(proposalBaseSlot + 4, i, 1)),
-        bytes32(bytes1(0x01))
-      );
+      vm.store(l2Executor, bytes32(_arrLocation(proposalBaseSlot + 4, i, 1)), bytes32(uint256(1)));
     }
     // executiontime
     vm.store(l2Executor, bytes32(proposalBaseSlot + 5), bytes32(block.timestamp));
