@@ -9,6 +9,7 @@ import {AaveGovernanceV2, IAaveGovernanceV2, IExecutorWithTimelock} from 'aave-a
 import {IPoolAddressesProvider} from 'aave-address-book/AaveV3.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
+import {ChainIds} from './ChainIds.sol';
 
 interface CommonExecutor {
   /**
@@ -323,7 +324,10 @@ library GovHelpers {
   }
 
   function _getExecutor() internal view returns (address) {
-    if (block.chainid == 137) return AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR;
+    if (block.chainid == ChainIds.OPTIMISM) return AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR;
+    if (block.chainid == ChainIds.POLYGON) return AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR;
+    if (block.chainid == ChainIds.METIS) return AaveGovernanceV2.METIS_BRIDGE_EXECUTOR;
+    if (block.chainid == ChainIds.ARBITRUM) return AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR;
     revert ExecutorNotFound();
   }
 }
