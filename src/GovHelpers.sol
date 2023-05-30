@@ -233,12 +233,21 @@ library GovHelpers {
     return AaveGovernanceV2.GOV.getProposalById(proposalId);
   }
 
+  /**
+   * @dev executes latest actionset on a l2 executor
+   * @param vm Vm instance passed down from test
+   */
   function executeLatestActionSet(Vm vm) internal {
     address executor = _getExecutor();
     uint256 proposalCount = uint256(vm.load(executor, bytes32(uint256(5))));
     executeActionSet(vm, proposalCount - 1);
   }
 
+  /**
+   * @dev executes specified actionset on a l2 executor
+   * @param vm Vm instance passed down from test
+   * @param actionSetId id of actionset to execute
+   */
   function executeActionSet(Vm vm, uint256 actionSetId) internal {
     address executor = _getExecutor();
     uint256 proposalBaseSlot = _getStorageSlotUintMapping(6, actionSetId);
@@ -246,6 +255,13 @@ library GovHelpers {
     CommonExecutor(executor).execute(actionSetId);
   }
 
+  /**
+   * @dev executes specified payloadAddress on a l2 executor via proposalExecution
+   * This method automatically picks the correct executor based on the current chain
+   * @notice this method only acceps executors, not guardians
+   * @param vm Vm instance passed down from test
+   * @param payloadAddress address of payload to execute
+   */
   function executePayload(Vm vm, address payloadAddress) internal {
     address executor = _getExecutor();
     Payload[] memory proposals = new Payload[](1);
@@ -254,10 +270,21 @@ library GovHelpers {
     CommonExecutor(executor).execute(proposalId);
   }
 
+  /**
+   * @dev executes specified payloadAddress on a specified executor via delegatecall
+   * @notice this method accepts arbitrary executors (guardians and executors)
+   * @param vm Vm instance passed down from test
+   * @param payloadAddress address of payload to execute
+   * @param executor address of the executor
+   */
   function executePayload(Vm vm, address payloadAddress, address executor) internal {
-    MockExecutor mockExecutor = new MockExecutor();
-    vm.etch(executor, address(mockExecutor).code);
-    MockExecutor(executor).execute(payloadAddress);
+    if (_getExecutor() == executor) {
+      executePayload(vm, payloadAddress);
+    } else {
+      MockExecutor mockExecutor = new MockExecutor();
+      vm.etch(executor, address(mockExecutor).code);
+      MockExecutor(executor).execute(payloadAddress);
+    }
   }
 
   function _getStorageSlotUintMapping(uint256 slot, uint256 key) internal pure returns (uint256) {
@@ -346,7 +373,7 @@ library GovHelpers {
     if (block.chainid == ChainIds.POLYGON) return AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR;
     if (block.chainid == ChainIds.METIS) return AaveGovernanceV2.METIS_BRIDGE_EXECUTOR;
     if (block.chainid == ChainIds.ARBITRUM) return AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR;
-    revert ExecutorNotFound();
+    return address(0);
   }
 }
 
