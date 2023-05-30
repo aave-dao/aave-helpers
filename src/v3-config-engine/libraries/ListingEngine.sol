@@ -8,6 +8,7 @@ import {PriceFeedEngine} from './PriceFeedEngine.sol';
 import {CapsEngine} from './CapsEngine.sol';
 import {BorrowEngine} from './BorrowEngine.sol';
 import {CollateralEngine} from './CollateralEngine.sol';
+import {EModeEngine} from './EModeEngine.sol';
 import {ConfiguratorInputTypes} from 'aave-address-book/AaveV3.sol';
 
 library ListingEngine {
@@ -43,6 +44,10 @@ library ListingEngine {
     BorrowEngine.configBorrowSide(poolConfigurator, pool, configs.ids, configs.borrows);
 
     CollateralEngine.configCollateralSide(poolConfigurator, pool, configs.ids, configs.collaterals);
+
+    // For an asset listing we only update the e-mode category id for the asset and do not make changes 
+    // to the e-mode category configuration
+    EModeEngine.configEModeAssets(poolConfigurator, configs.ids, configs.eModeCategories);
   }
 
   function _repackListing(
@@ -53,6 +58,7 @@ library ListingEngine {
     Engine.Borrow[] memory borrows = new Engine.Borrow[](listings.length);
     Engine.Collateral[] memory collaterals = new Engine.Collateral[](listings.length);
     Engine.Caps[] memory caps = new Engine.Caps[](listings.length);
+    Engine.EModeCategories[] memory emodes = new Engine.EModeCategories[](listings.length);
     IV3RateStrategyFactory.RateStrategyParams[]
       memory rates = new IV3RateStrategyFactory.RateStrategyParams[](listings.length);
 
@@ -78,14 +84,21 @@ library ListingEngine {
         liqThreshold: listings[i].base.liqThreshold,
         liqBonus: listings[i].base.liqBonus,
         debtCeiling: listings[i].base.debtCeiling,
-        liqProtocolFee: listings[i].base.liqProtocolFee,
-        eModeCategory: listings[i].base.eModeCategory
+        liqProtocolFee: listings[i].base.liqProtocolFee
       });
       caps[i] = Engine.Caps({
         supplyCap: listings[i].base.supplyCap,
         borrowCap: listings[i].base.borrowCap
       });
       rates[i] = listings[i].base.rateStrategyParams;
+      emodes[i] = Engine.EModeCategories({
+        eModeCategory: listings[i].base.eModeCategory,
+        ltv: 0, // unused for asset listing
+        liqThreshold: 0, // unused for asset listing
+        liqBonus: 0, // unused for asset listing
+        priceSource: address(0), // unused for asset listing
+        label: '' // unused for asset listing
+      });
     }
 
     return
@@ -96,7 +109,7 @@ library ListingEngine {
         collaterals: collaterals,
         caps: caps,
         rates: rates,
-        eModeCategories: new Engine.EModeCategories[](0)
+        eModeCategories: emodes
       });
   }
 

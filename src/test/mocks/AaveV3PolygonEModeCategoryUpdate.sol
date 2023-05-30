@@ -12,10 +12,10 @@ import '../../v3-config-engine/AaveV3PayloadBase.sol';
 contract AaveV3PolygonEModeCategoryUpdate is AaveV3PayloadBase {
   constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
 
-  function eModeCategoryUpdates() public pure override returns (IEngine.EModeUpdate[] memory) {
-    IEngine.EModeUpdate[] memory eModeUpdates = new IEngine.EModeUpdate[](1);
+  function eModeCategoriesUpdates() public pure override returns (IEngine.EModeCategoryUpdate[] memory) {
+    IEngine.EModeCategoryUpdate[] memory eModeUpdates = new IEngine.EModeCategoryUpdate[](1);
 
-    eModeUpdates[0] = IEngine.EModeUpdate({
+    eModeUpdates[0] = IEngine.EModeCategoryUpdate({
       eModeCategory: 1,
       ltv: 97_40,
       liqThreshold: 97_60,
@@ -41,10 +41,10 @@ contract AaveV3PolygonEModeCategoryUpdate is AaveV3PayloadBase {
 contract AaveV3AvalancheEModeCategoryUpdateEdgeBonus is AaveV3PayloadBase {
   constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
 
-  function eModeCategoryUpdates() public pure override returns (IEngine.EModeUpdate[] memory) {
-    IEngine.EModeUpdate[] memory eModeUpdates = new IEngine.EModeUpdate[](1);
+  function eModeCategoriesUpdates() public pure override returns (IEngine.EModeCategoryUpdate[] memory) {
+    IEngine.EModeCategoryUpdate[] memory eModeUpdates = new IEngine.EModeCategoryUpdate[](1);
 
-    eModeUpdates[0] = IEngine.EModeUpdate({
+    eModeUpdates[0] = IEngine.EModeCategoryUpdate({
       eModeCategory: 1,
       ltv: 97_40,
       liqThreshold: 97_60,

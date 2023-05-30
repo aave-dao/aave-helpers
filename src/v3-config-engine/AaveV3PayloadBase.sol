@@ -21,6 +21,7 @@ import {EngineFlags} from './EngineFlags.sol';
  *   - Updates of borrow parameters (flashloanable, stableRateModeEnabled, borrowableInIsolation, withSiloedBorrowing, reserveFactor)
  *   - Updates of collateral parameters (ltv, liq threshold, liq bonus, liq protocol fee, debt ceiling)
  *   - Updates of emode category parameters (ltv, liq threshold, liq bonus, price source, label)
+ *   - Updates of emode category of assets (e-mode id)
  * @author BGD Labs
  */
 abstract contract AaveV3PayloadBase {
@@ -41,13 +42,14 @@ abstract contract AaveV3PayloadBase {
   function execute() external {
     _preExecute();
 
-    IEngine.EModeUpdate[] memory eModeCategories = eModeCategoryUpdates();
+    IEngine.EModeCategoryUpdate[] memory eModeCategories = eModeCategoriesUpdates();
     IEngine.Listing[] memory listings = newListings();
     IEngine.ListingWithCustomImpl[] memory listingsCustom = newListingsCustom();
     IEngine.CollateralUpdate[] memory collaterals = collateralsUpdates();
     IEngine.BorrowUpdate[] memory borrows = borrowsUpdates();
     IEngine.RateStrategyUpdate[] memory rates = rateStrategiesUpdates();
     IEngine.PriceFeedUpdate[] memory priceFeeds = priceFeedsUpdates();
+    IEngine.EModeAssetUpdate[] memory eModeAssets = eModeAssetsUpdates();
     IEngine.CapsUpdate[] memory caps = capsUpdates();
 
     if (eModeCategories.length != 0) {
@@ -96,6 +98,12 @@ abstract contract AaveV3PayloadBase {
       );
     }
 
+    if (eModeAssets.length != 0) {
+      address(LISTING_ENGINE).functionDelegateCall(
+        abi.encodeWithSelector(LISTING_ENGINE.updateEModeAssets.selector, eModeAssets)
+      );
+    }
+
     if (caps.length != 0) {
       address(LISTING_ENGINE).functionDelegateCall(
         abi.encodeWithSelector(LISTING_ENGINE.updateCaps.selector, caps)
@@ -136,7 +144,10 @@ abstract contract AaveV3PayloadBase {
   function priceFeedsUpdates() public view virtual returns (IEngine.PriceFeedUpdate[] memory) {}
 
   /// @dev to be defined in the child with a list of eMode categories to update
-  function eModeCategoryUpdates() public view virtual returns (IEngine.EModeUpdate[] memory) {}
+  function eModeCategoriesUpdates() public view virtual returns (IEngine.EModeCategoryUpdate[] memory) {}
+
+  /// @dev to be defined in the child with a list of assets for which eMode categories to update
+  function eModeAssetsUpdates() public view virtual returns (IEngine.EModeAssetUpdate[] memory) {}
 
   /// @dev to be defined in the child with a list of set of parameters of rate strategies
   function rateStrategiesUpdates()

@@ -36,7 +36,7 @@ contract AaveV3PolygonMockListing is AaveV3PayloadBase {
       borrowCap: 60_000,
       debtCeiling: 0,
       liqProtocolFee: 10_00,
-      eModeCategory: 0
+      eModeCategory: 1
     });
 
     return listings;

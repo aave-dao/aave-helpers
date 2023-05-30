@@ -12,16 +12,39 @@ library EModeEngine {
   using PercentageMath for uint256;
   using SafeCast for uint256;
 
-  function executeEModeCategoriesUpdate(
+  function executeEModeAssetsUpdate(
     IPoolConfigurator poolConfigurator,
-    IPool pool,
-    IEngine.EModeUpdate[] memory updates
+    IEngine.EModeAssetUpdate[] memory updates
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
-    Engine.AssetsConfig memory configs = _repackEModeUpdate(updates);
+    Engine.AssetsConfig memory configs = _repackEModeAssetsUpdate(updates);
+
+    configEModeAssets(poolConfigurator, configs.ids, configs.eModeCategories);
+  }
+
+  function executeEModeCategoriesUpdate(
+    IPoolConfigurator poolConfigurator,
+    IPool pool,
+    IEngine.EModeCategoryUpdate[] memory updates
+  ) external {
+    require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
+
+    Engine.AssetsConfig memory configs = _repackEModeCategoriesUpdate(updates);
 
     _configEModeCategories(poolConfigurator, pool, configs.eModeCategories);
+  }
+
+  function configEModeAssets(
+    IPoolConfigurator poolConfigurator,
+    address[] memory ids,
+    Engine.EModeCategories[] memory updates
+  ) public {
+    for (uint256 i = 0; i < updates.length; i++) {
+      if (updates[i].eModeCategory != EngineFlags.KEEP_CURRENT) {
+        poolConfigurator.setAssetEModeCategory(ids[i], updates[i].eModeCategory);
+      }
+    }
   }
 
   function _configEModeCategories(
@@ -80,19 +103,19 @@ library EModeEngine {
 
       poolConfigurator.setEModeCategory(
         updates[i].eModeCategory,
-        SafeCast.toUint16(updates[i].ltv), //toUint16()
-        SafeCast.toUint16(updates[i].liqThreshold), // .toUint16()
+        updates[i].ltv.toUint16(),
+        updates[i].liqThreshold.toUint16(),
         // For reference, this is to simplify the interaction with the Aave protocol,
         // as there the definition is as e.g. 105% (5% bonus for liquidators)
-        SafeCast.toUint16(100_00 + updates[i].liqBonus), //.toUint16()
+        (100_00 + updates[i].liqBonus).toUint16(),
         updates[i].priceSource,
         updates[i].label
       );
     }
   }
 
-  function _repackEModeUpdate(
-    IEngine.EModeUpdate[] memory updates
+  function _repackEModeCategoriesUpdate(
+    IEngine.EModeCategoryUpdate[] memory updates
   ) internal pure returns (Engine.AssetsConfig memory) {
     Engine.EModeCategories[] memory eModeCategories = new Engine.EModeCategories[](updates.length);
 
@@ -110,6 +133,36 @@ library EModeEngine {
     return
       Engine.AssetsConfig({
         ids: new address[](0),
+        caps: new Engine.Caps[](0),
+        basics: new Engine.Basic[](0),
+        borrows: new Engine.Borrow[](0),
+        collaterals: new Engine.Collateral[](0),
+        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
+        eModeCategories: eModeCategories
+      });
+  }
+
+  function _repackEModeAssetsUpdate(
+    IEngine.EModeAssetUpdate[] memory updates
+  ) internal pure returns (Engine.AssetsConfig memory) {
+    address[] memory ids = new address[](updates.length);
+    Engine.EModeCategories[] memory eModeCategories = new Engine.EModeCategories[](updates.length);
+
+    for (uint256 i = 0; i < updates.length; i++) {
+      ids[i] = updates[i].asset;
+      eModeCategories[i] = Engine.EModeCategories({
+        eModeCategory: updates[i].eModeCategory,
+        ltv: 0, // unused for e-mode asset update
+        liqThreshold: 0, // unused for e-mode asset update
+        liqBonus: 0, // unused for e-mode asset update
+        priceSource: address(0), // unused for e-mode asset update
+        label: '' // unused for e-mode asset update
+      });
+    }
+
+    return
+      Engine.AssetsConfig({
+        ids: ids,
         caps: new Engine.Caps[](0),
         basics: new Engine.Basic[](0),
         borrows: new Engine.Borrow[](0),

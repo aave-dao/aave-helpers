@@ -20,8 +20,7 @@ contract AaveV3AvalancheCollateralUpdate is AaveV3PayloadBase {
       liqThreshold: 72_00,
       liqBonus: 6_00,
       debtCeiling: EngineFlags.KEEP_CURRENT,
-      liqProtocolFee: EngineFlags.KEEP_CURRENT,
-      eModeCategory: EngineFlags.KEEP_CURRENT
+      liqProtocolFee: EngineFlags.KEEP_CURRENT
     });
 
     return collateralsUpdate;

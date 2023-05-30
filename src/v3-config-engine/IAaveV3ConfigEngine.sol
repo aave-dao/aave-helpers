@@ -119,8 +119,7 @@ interface IAaveV3ConfigEngine {
    *   liqThreshold: 70_00,
    *   liqBonus: EngineFlags.KEEP_CURRENT,
    *   debtCeiling: EngineFlags.KEEP_CURRENT,
-   *   liqProtocolFee: 7_00,
-   *   eModeCategory: EngineFlags.KEEP_CURRENT
+   *   liqProtocolFee: 7_00
    * })
    */
   struct CollateralUpdate {
@@ -130,7 +129,6 @@ interface IAaveV3ConfigEngine {
     uint256 liqBonus;
     uint256 debtCeiling;
     uint256 liqProtocolFee;
-    uint256 eModeCategory;
   }
 
   /**
@@ -157,7 +155,19 @@ interface IAaveV3ConfigEngine {
 
   /**
    * @dev Example (mock):
-   * EModeUpdate({
+   * EModeAssetUpdate({
+   *   asset: AaveV3EthereumAssets.AAVE_UNDERLYING,
+   *   eModeCategory: 1, // ETH correlated
+   * })
+   */
+  struct EModeAssetUpdate {
+    address asset;
+    uint8 eModeCategory;
+  }
+
+  /**
+   * @dev Example (mock):
+   * EModeCategoryUpdate({
    *   eModeCategory: 1, // STABLECOINS
    *   ltv: 60_00,
    *   liqThreshold: 70_00,
@@ -166,7 +176,7 @@ interface IAaveV3ConfigEngine {
    *   label: EngineFlags.KEEP_CURRENT_STRING
    * })
    */
-  struct EModeUpdate {
+  struct EModeCategoryUpdate {
     uint8 eModeCategory;
     uint256 ltv;
     uint256 liqThreshold;
@@ -257,11 +267,18 @@ interface IAaveV3ConfigEngine {
   function updateBorrowSide(BorrowUpdate[] memory updates) external;
 
   /**
-   * @notice Performs an update of the borrow-related params of the assets, in the Aave pool configured in this engine instance
-   * @param updates `BorrowUpdate[]` list of declarative updates containing the new parameters
+   * @notice Performs an update of the e-mode categories, in the Aave pool configured in this engine instance
+   * @param updates `EModeCategoryUpdate[]` list of declarative updates containing the new parameters
    *   More information on the documentation of the struct.
    */
-  function updateEModeCategories(EModeUpdate[] memory updates) external;
+  function updateEModeCategories(EModeCategoryUpdate[] memory updates) external;
+
+  /**
+   * @notice Performs an update of the e-mode category of the assets, in the Aave pool configured in this engine instance
+   * @param updates `EModeAssetUpdate[]` list of declarative updates containing the new parameters
+   *   More information on the documentation of the struct.
+   */
+  function updateEModeAssets(EModeAssetUpdate[] calldata updates) external;
 
   function RATE_STRATEGIES_FACTORY() external view returns (IV3RateStrategyFactory);
 

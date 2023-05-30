@@ -20,8 +20,7 @@ contract AaveV3AvalancheCollateralUpdateWrongBonus is AaveV3PayloadBase {
       liqThreshold: 90_00,
       liqBonus: 12_00,
       debtCeiling: EngineFlags.KEEP_CURRENT,
-      liqProtocolFee: EngineFlags.KEEP_CURRENT,
-      eModeCategory: EngineFlags.KEEP_CURRENT
+      liqProtocolFee: EngineFlags.KEEP_CURRENT
     });
 
     return collateralsUpdate;
@@ -49,8 +48,7 @@ contract AaveV3AvalancheCollateralUpdateCorrectBonus is AaveV3PayloadBase {
       liqThreshold: 90_00,
       liqBonus: 11_00,
       debtCeiling: EngineFlags.KEEP_CURRENT,
-      liqProtocolFee: EngineFlags.KEEP_CURRENT,
-      eModeCategory: EngineFlags.KEEP_CURRENT
+      liqProtocolFee: EngineFlags.KEEP_CURRENT
     });
 
     return collateralsUpdate;

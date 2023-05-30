@@ -58,7 +58,6 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     uint256 liqBonus; // Only considered if liqThreshold > 0. Same format as ltv
     uint256 debtCeiling; // Only considered if liqThreshold > 0. In USD and without decimals, so 100_000 for 100k USD debt ceiling
     uint256 liqProtocolFee; // Only considered if liqThreshold > 0. Same format as ltv
-    uint256 eModeCategory; // If `0` eMode will be disabled for the asset, else the eMode category will be set.
   }
 
   struct Caps {
@@ -255,12 +254,23 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
-  function updateEModeCategories(EModeUpdate[] calldata updates) external {
+  function updateEModeCategories(EModeCategoryUpdate[] calldata updates) external {
     EMODE_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(
         EModeEngine.executeEModeCategoriesUpdate.selector,
         POOL_CONFIGURATOR,
         POOL,
+        updates
+      )
+    );
+  }
+
+  /// @inheritdoc IAaveV3ConfigEngine
+  function updateEModeAssets(EModeAssetUpdate[] calldata updates) external {
+    EMODE_ENGINE.functionDelegateCall(
+      abi.encodeWithSelector(
+        EModeEngine.executeEModeAssetsUpdate.selector,
+        POOL_CONFIGURATOR,
         updates
       )
     );
