@@ -9,6 +9,7 @@ import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializabl
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
+import {ChainIds} from './ChainIds.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -125,7 +126,10 @@ contract ProtocolV2TestBase is CommonTestBase {
         console.log(configs[i].symbol);
         _deposit(configs[i], pool, user, amount);
         _skipBlocks(1000);
-        if (block.chainid == 1 && configs[i].underlying == AaveV2EthereumAssets.stETH_UNDERLYING) {
+        if (
+          block.chainid == ChainIds.MAINNET &&
+          configs[i].underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+        ) {
           assertGe(_withdraw(configs[i], pool, user, type(uint256).max), amount - 2);
         } else {
           assertGe(_withdraw(configs[i], pool, user, type(uint256).max), amount);
@@ -199,7 +203,10 @@ contract ProtocolV2TestBase is CommonTestBase {
     pool.deposit(config.underlying, amount, user, 0);
     console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
-    if (block.chainid == 1 && config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING) {
+    if (
+      block.chainid == ChainIds.MAINNET &&
+      config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+    ) {
       assertApproxEqAbs(aTokenAfter, aTokenBefore + amount, 2, '_deposit(): STETH_DUST_GT_2');
     } else {
       assertApproxEqAbs(aTokenAfter, aTokenBefore + amount, 1, '_deposit(): STETH_DUST_GT_1');
@@ -219,13 +226,19 @@ contract ProtocolV2TestBase is CommonTestBase {
     console.log('WITHDRAW: %s, Amount: %s', config.symbol, amountOut);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
     if (aTokenBefore < amount) {
-      if (block.chainid == 1 && config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING) {
+      if (
+        block.chainid == ChainIds.MAINNET &&
+        config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+      ) {
         assertApproxEqAbs(aTokenAfter, 0, 2, '_withdraw(): STETH_DUST_GT_2');
       } else {
         require(aTokenAfter == 0, '_withdraw(): DUST_AFTER_WITHDRAW_ALL');
       }
     } else {
-      if (block.chainid == 1 && config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING) {
+      if (
+        block.chainid == ChainIds.MAINNET &&
+        config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+      ) {
         assertApproxEqAbs(aTokenAfter, aTokenBefore - amount, 2, '_withdraw(): STETH_DUST_GT_2');
       } else {
         assertApproxEqAbs(aTokenAfter, aTokenBefore - amount, 1, '_withdraw(): DUST_GT_1');
@@ -248,7 +261,10 @@ contract ProtocolV2TestBase is CommonTestBase {
     console.log('BORROW: %s, Amount %s, Stable: %s', config.symbol, amount, stable);
     pool.borrow(config.underlying, amount, stable ? 1 : 2, 0, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
-    if (block.chainid == 1 && config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING) {
+    if (
+      block.chainid == ChainIds.MAINNET &&
+      config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+    ) {
       assertApproxEqAbs(debtAfter, debtBefore + amount, 2, '_borrow(): DUST_GT_2');
     } else {
       assertApproxEqAbs(debtAfter, debtBefore + amount, 1, '_borrow(): DUST_GT_1');

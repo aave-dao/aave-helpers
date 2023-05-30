@@ -5,6 +5,7 @@ import 'forge-std/StdJson.sol';
 import 'forge-std/Test.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
+import {ChainIds} from './ChainIds.sol';
 
 struct ReserveTokens {
   address aToken;
@@ -39,7 +40,7 @@ contract CommonTestBase is Test {
    */
   function _patchedDeal(address asset, address user, uint256 amount) internal {
     // TODO: once https://github.com/foundry-rs/foundry/pull/4884 merged scripts need to be adjusted
-    if (block.chainid == 1) {
+    if (block.chainid == ChainIds.MAINNET) {
       // GUSD
       if (asset == AaveV2EthereumAssets.GUSD_UNDERLYING) {
         vm.prank(0x22FFDA6813f4F34C520bf36E5Ea01167bC9DF159);
@@ -77,7 +78,7 @@ contract CommonTestBase is Test {
    * @param amount the amount to approve
    */
   function _patchedApprove(address asset, address spender, uint256 amount) internal {
-    if (block.chainid == 1) {
+    if (block.chainid == ChainIds.MAINNET) {
       // USDT
       if (asset == AaveV2EthereumAssets.USDT_UNDERLYING) {
         PatchedIERC20(asset).approve(spender, amount);

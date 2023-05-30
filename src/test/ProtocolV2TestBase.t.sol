@@ -11,25 +11,12 @@ contract ProtocolV2TestBaseTest is ProtocolV2TestBase {
     vm.createSelectFork('mainnet', 17293676);
   }
 
-  // function testSnpashot() public {
-  //   this.createConfigurationSnapshot('v2-report', AaveV2Ethereum.POOL);
-  // }
+  function testSnpashot() public {
+    this.createConfigurationSnapshot('v2-report', AaveV2Ethereum.POOL);
+  }
 
-  // commented out as it is insanely slow with public rpcs
   function testE2E() public {
     address user = vm.addr(3);
     this.e2eTest(AaveV2Ethereum.POOL, user);
   }
-
-  // function testTUSD() public {
-  //   address user = vm.addr(32);
-  //   vm.startPrank(user);
-  //   ReserveConfig[] memory configs = _getReservesConfigs(AaveV2Ethereum.POOL);
-  //   ReserveConfig memory config = _findReserveConfig(
-  //     configs,
-  //     0x0000000000085d4780B73119b644AE5ecd22b376
-  //   );
-  //   _deposit(config, AaveV2Ethereum.POOL, user, 100 ether);
-  //   _withdraw(config, AaveV2Ethereum.POOL, user, 1 ether);
-  // }
 }
