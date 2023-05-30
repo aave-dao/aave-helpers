@@ -23,7 +23,6 @@ contract AaveV3PolygonConfigEngineRatesTest is ProtocolV3TestBase, TestWithExecu
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('polygon'), 40074125);
-    _selectPayloadExecutor(AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
   }
 
   function testEngine() public {
@@ -45,7 +44,6 @@ contract AaveV3AvalancheConfigEngineRatesTest is ProtocolV3TestBase, TestWithExe
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('avalanche'), 27134232);
-    _selectPayloadExecutor(0xa35b76E4935449E33C56aB24b23fcd3246f13470); // Aave Avalanche's Guardian
   }
 
   function testEngine() public {
@@ -67,7 +65,6 @@ contract AaveV3OptimismConfigEngineRatesTest is ProtocolV3TestBase, TestWithExec
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('optimism'), 79074228);
-    _selectPayloadExecutor(AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR);
   }
 
   function testEngine() public {
@@ -89,7 +86,6 @@ contract AaveV3ArbitrumConfigEngineRatesTest is ProtocolV3TestBase, TestWithExec
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('arbitrum'), 67634819);
-    _selectPayloadExecutor(AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR);
   }
 
   function testEngine() public {

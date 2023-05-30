@@ -7,6 +7,9 @@ import {Test} from 'forge-std/Test.sol';
 import {console2} from 'forge-std/console2.sol';
 import {AaveGovernanceV2, IAaveGovernanceV2, IExecutorWithTimelock} from 'aave-address-book/AaveGovernanceV2.sol';
 import {IPoolAddressesProvider} from 'aave-address-book/AaveV3.sol';
+import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
+import {AaveV3Harmony} from 'aave-address-book/AaveV3Harmony.sol';
+import {AaveV3Fantom} from 'aave-address-book/AaveV3Fantom.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {ChainIds} from './ChainIds.sol';
@@ -231,11 +234,22 @@ library GovHelpers {
   }
 
   function executePayload(Vm vm, address payloadAddress) internal {
-    address executor = _getExecutor();
-    Payload[] memory proposals = new Payload[](1);
-    proposals[0] = Payload(payloadAddress, 'execute()', '');
-    uint256 proposalId = _queueProposalToL2ExecutorStorage(vm, executor, proposals);
-    CommonExecutor(executor).execute(proposalId);
+    if (
+      block.chainid == ChainIds.FANTOM ||
+      block.chainid == ChainIds.AVALANCHE ||
+      block.chainid == ChainIds.HARMONY
+    ) {
+      MockExecutor mockExecutor = new MockExecutor();
+      address guardian = _getGuardian();
+      vm.etch(guardian, address(mockExecutor).code);
+      MockExecutor(guardian).execute(payloadAddress);
+    } else {
+      address executor = _getExecutor();
+      Payload[] memory proposals = new Payload[](1);
+      proposals[0] = Payload(payloadAddress, 'execute()', '');
+      uint256 proposalId = _queueProposalToL2ExecutorStorage(vm, executor, proposals);
+      CommonExecutor(executor).execute(proposalId);
+    }
   }
 
   function _getStorageSlotUintMapping(uint256 slot, uint256 key) internal pure returns (uint256) {
@@ -323,6 +337,13 @@ library GovHelpers {
     return proposalCount;
   }
 
+  function _getGuardian() internal view returns (address) {
+    if (block.chainid == ChainIds.FANTOM) return AaveV3Fantom.ACL_ADMIN;
+    if (block.chainid == ChainIds.AVALANCHE) return AaveV3Avalanche.ACL_ADMIN;
+    if (block.chainid == ChainIds.HARMONY) return AaveV3Harmony.ACL_ADMIN;
+    revert ExecutorNotFound();
+  }
+
   function _getExecutor() internal view returns (address) {
     if (block.chainid == ChainIds.OPTIMISM) return AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR;
     if (block.chainid == ChainIds.POLYGON) return AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR;
@@ -333,17 +354,30 @@ library GovHelpers {
 }
 
 /**
+ * @dev Mock contract which allows performing a delegatecall to `execute`
+ * Intended to be used as replacement for L2 admins/executors to mock governance/gnosis execution.
+ */
+contract MockExecutor {
+  /**
+   * @notice Non-standard functionality used to skip governance and just execute a payload.
+   */
+  function execute(address payload) public {
+    (bool success, ) = payload.delegatecall(abi.encodeWithSignature('execute()'));
+    require(success, 'PROPOSAL_EXECUTION_FAILED');
+  }
+}
+
+/**
  * @dev Inheriting from this contract in a forge test allows to
+ * @notice @deprecated kept, to not break existing tests
  * 1. Configure on the setUp() of the child contract an executor for governance proposals
  *    (or any address with permissions) just by doing for example a `_selectPayloadExecutor(AaveGovernanceV2.SHORT_EXECUTOR)`
  * 2. Afterwards, on a test you can just do `_executePayload(somePayloadAddress)`, and it will be executed via
  *    DELEGATECALL on the address previously selected on step 1).
  */
 abstract contract TestWithExecutor is Test {
-  // @deprecated  kept, to not be so breaking
-  function _selectPayloadExecutor(address executor) internal {
-    // stub
-  }
+  // @notice @deprecated kept, to not break existing tests
+  function _selectPayloadExecutor(address executor) internal {}
 
   function _executePayload(address payloadAddress) internal {
     GovHelpers.executePayload(vm, payloadAddress);

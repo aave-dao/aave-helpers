@@ -28,7 +28,6 @@ contract GovernanceL2ExecutorTest is TestWithExecutor {
 
   function setUp() public {
     vm.createSelectFork('polygon', 39582255);
-    _selectPayloadExecutor(AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
   }
 
   function testCreateProposal() public {
