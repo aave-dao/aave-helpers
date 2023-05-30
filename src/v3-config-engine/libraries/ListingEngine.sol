@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-import {EngineFlags} from '../EngineFlags.sol';
 import {AaveV3ConfigEngine as Engine} from '../AaveV3ConfigEngine.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {IAaveV3ConfigEngine as IEngine, IPoolConfigurator, IV3RateStrategyFactory, IAaveOracle, IPool} from '../IAaveV3ConfigEngine.sol';
@@ -12,45 +11,6 @@ import {CollateralEngine} from './CollateralEngine.sol';
 import {ConfiguratorInputTypes} from 'aave-address-book/AaveV3.sol';
 
 library ListingEngine {
-  function executeAssetListing(
-    IEngine.PoolContext calldata context,
-    IPoolConfigurator poolConfigurator,
-    IV3RateStrategyFactory rateStrategiesFactory,
-    IPool pool,
-    IAaveOracle oracle,
-    address collector,
-    address rewardsController,
-    address aTokenImpl,
-    address vTokenImpl,
-    address sTokenImpl,
-    IEngine.Listing[] calldata listings
-  ) external {
-    require(listings.length != 0, 'AT_LEAST_ONE_ASSET_REQUIRED');
-
-    IEngine.ListingWithCustomImpl[] memory customListings = new IEngine.ListingWithCustomImpl[](listings.length);
-    for (uint256 i = 0; i < listings.length; i++) {
-      customListings[i] = IEngine.ListingWithCustomImpl({
-        base: listings[i],
-        implementations: IEngine.TokenImplementations({
-          aToken: aTokenImpl,
-          vToken: vTokenImpl,
-          sToken: sTokenImpl
-        })
-      });
-    }
-
-    executeCustomAssetListing(
-      context,
-      poolConfigurator,
-      rateStrategiesFactory,
-      pool,
-      oracle,
-      collector,
-      rewardsController,
-      customListings
-    );
-  }
-
   function executeCustomAssetListing(
     IEngine.PoolContext calldata context,
     IPoolConfigurator poolConfigurator,
@@ -60,7 +20,7 @@ library ListingEngine {
     address collector,
     address rewardsController,
     IEngine.ListingWithCustomImpl[] memory listings
-  ) public {
+  ) external {
     require(listings.length != 0, 'AT_LEAST_ONE_ASSET_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackListing(listings);
