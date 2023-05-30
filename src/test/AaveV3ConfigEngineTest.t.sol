@@ -11,6 +11,7 @@ import {AaveV3AvalancheCollateralUpdateWrongBonus, AaveV3AvalancheCollateralUpda
 import {AaveV3PolygonBorrowUpdate} from './mocks/AaveV3PolygonBorrowUpdate.sol';
 import {AaveV3PolygonPriceFeedUpdate} from './mocks/AaveV3PolygonPriceFeedUpdate.sol';
 import {AaveV3PolygonEModeCategoryUpdate, AaveV3AvalancheEModeCategoryUpdateEdgeBonus} from './mocks/AaveV3PolygonEModeCategoryUpdate.sol';
+import {AaveV3EthereumEModeAssetUpdate} from './mocks/AaveV3EthereumEModeAssetUpdate.sol';
 import {AaveV3OptimismMockRatesUpdate} from './mocks/AaveV3OptimismMockRatesUpdate.sol';
 import {DeployRatesFactoryPolLib, DeployRatesFactoryEthLib, DeployRatesFactoryAvaLib, DeployRatesFactoryArbLib, DeployRatesFactoryOptLib} from '../../scripts/V3RateStrategyFactory.s.sol';
 import {DeployEnginePolLib, DeployEngineEthLib, DeployEngineAvaLib, DeployEngineOptLib, DeployEngineArbLib} from '../../scripts/AaveV3ConfigEngine.s.sol';
@@ -99,7 +100,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
       supplyCap: 85_000,
       borrowCap: 60_000,
       debtCeiling: 0,
-      eModeCategory: 0
+      eModeCategory: 1
     });
 
     _validateReserveConfig(expectedAssetConfig, allConfigsAfter);
@@ -623,6 +624,32 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
 
     vm.expectRevert(bytes('INVALID_LT_LB_RATIO'));
     payload.execute();
+  }
+
+  function testEModeAssetUpdates() public {
+    vm.selectFork(mainnetFork);
+
+    IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineEthLib.deploy());
+    AaveV3EthereumEModeAssetUpdate payload = new AaveV3EthereumEModeAssetUpdate(engine);
+
+    vm.startPrank(AaveV3Ethereum.ACL_ADMIN);
+    AaveV3Ethereum.ACL_MANAGER.addPoolAdmin(address(payload));
+    vm.stopPrank();
+
+    createConfigurationSnapshot('preTestEngineEModeAssetUpdate', AaveV3Ethereum.POOL);
+
+    payload.execute();
+
+    createConfigurationSnapshot('postTestEngineEModeAssetUpdate', AaveV3Ethereum.POOL);
+
+    diffReports('preTestEngineEModeAssetUpdate', 'postTestEngineEModeAssetUpdate');
+
+    assertEq(
+      AaveV3Ethereum.AAVE_PROTOCOL_DATA_PROVIDER.getReserveEModeCategory(
+        AaveV3EthereumAssets.AAVE_UNDERLYING
+      ),
+      1
+    );
   }
 
   function _bpsToRay(uint256 amount) internal pure returns (uint256) {

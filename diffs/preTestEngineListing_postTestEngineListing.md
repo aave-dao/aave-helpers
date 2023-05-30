@@ -14,7 +14,7 @@
 | debtCeiling | 0 $ |
 | isSiloed | false |
 | isFlashloanable | false |
-| eModeCategory | 0 |
+| eModeCategory | 1 |
 | oracle | [0x443C5116CdF663Eb387e72C688D276e702135C87](https://polygonscan.com/address/0x443C5116CdF663Eb387e72C688D276e702135C87) |
 | oracleDecimals | 8 |
 | oracleDescription | 1INCH / USD |
@@ -70,7 +70,7 @@
         "borrowingEnabled": true,
         "debtCeiling": 0,
         "decimals": 18,
-        "eModeCategory": 0,
+        "eModeCategory": 1,
         "interestRateStrategy": "0x03733F4E008d36f2e37F0080fF1c8DF756622E6F",
         "isActive": true,
         "isBorrowableInIsolation": false,
