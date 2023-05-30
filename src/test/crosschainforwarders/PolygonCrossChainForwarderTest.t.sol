@@ -7,7 +7,6 @@ import {AaveGovernanceV2, IExecutorWithTimelock} from 'aave-address-book/AaveGov
 import {IStateReceiver} from 'governance-crosschain-bridges/contracts/dependencies/polygon/fxportal/FxChild.sol';
 import {GovHelpers} from '../../GovHelpers.sol';
 import {ProtocolV3TestBase, ReserveConfig, ReserveTokens, IERC20} from '../../ProtocolV3TestBase.sol';
-import {BridgeExecutorHelpers} from '../../BridgeExecutorHelpers.sol';
 import {CrosschainForwarderPolygon} from '../../crosschainforwarders/CrosschainForwarderPolygon.sol';
 import {PayloadWithEmit} from '../mocks/PayloadWithEmit.sol';
 
@@ -79,6 +78,6 @@ contract PolygonCrossChainForwarderTest is ProtocolV3TestBase {
     // 4. Forward time & execute proposal
     vm.expectEmit(true, true, true, true);
     emit TestEvent();
-    BridgeExecutorHelpers.waitAndExecuteLatest(vm, POLYGON_BRIDGE_EXECUTOR);
+    GovHelpers.executeLatestActionSet(vm);
   }
 }

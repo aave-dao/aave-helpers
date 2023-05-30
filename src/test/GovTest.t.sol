@@ -23,17 +23,17 @@ contract GovernanceTest is Test {
   }
 }
 
-contract GovernanceL2ExecutorTest is TestWithExecutor {
+contract GovernanceL2ExecutorTest is Test {
   event TestEvent();
 
   function setUp() public {
-    vm.createSelectFork('polygon', 39582255);
+    vm.createSelectFork('polygon', 43322560);
   }
 
   function testCreateProposal() public {
     PayloadWithEmit payload = new PayloadWithEmit();
     vm.expectEmit(true, true, true, true);
     emit TestEvent();
-    _executePayload(address(payload));
+    GovHelpers.executePayload(vm, address(payload));
   }
 }

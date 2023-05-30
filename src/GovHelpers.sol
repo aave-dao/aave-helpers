@@ -233,6 +233,19 @@ library GovHelpers {
     return AaveGovernanceV2.GOV.getProposalById(proposalId);
   }
 
+  function executeLatestActionSet(Vm vm) internal {
+    address executor = _getExecutor();
+    uint256 proposalCount = uint256(vm.load(executor, bytes32(uint256(5))));
+    executeActionSet(vm, proposalCount - 1);
+  }
+
+  function executeActionSet(Vm vm, uint256 actionSetId) internal {
+    address executor = _getExecutor();
+    uint256 proposalBaseSlot = _getStorageSlotUintMapping(6, actionSetId);
+    vm.store(executor, bytes32(proposalBaseSlot + 5), bytes32(block.timestamp));
+    CommonExecutor(executor).execute(actionSetId);
+  }
+
   function executePayload(Vm vm, address payloadAddress) internal {
     if (
       block.chainid == ChainIds.FANTOM ||

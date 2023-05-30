@@ -9,7 +9,6 @@ import {IInbox} from 'governance-crosschain-bridges/contracts/dependencies/arbit
 import {IL2BridgeExecutor} from 'governance-crosschain-bridges/contracts/interfaces/IL2BridgeExecutor.sol';
 import {GovHelpers} from '../../GovHelpers.sol';
 import {ProtocolV3TestBase, ReserveConfig, ReserveTokens, IERC20} from '../../ProtocolV3TestBase.sol';
-import {BridgeExecutorHelpers} from '../../BridgeExecutorHelpers.sol';
 import {ProtocolV3TestBase, ReserveConfig} from '../../ProtocolV3TestBase.sol';
 import {CrosschainForwarderArbitrum} from '../../crosschainforwarders/CrosschainForwarderArbitrum.sol';
 import {PayloadWithEmit} from '../mocks/PayloadWithEmit.sol';
@@ -142,6 +141,6 @@ contract ArbitrumCrossChainForwarderTest is ProtocolV3TestBase {
     // 4. execute the proposal
     vm.expectEmit(true, true, true, true);
     emit TestEvent();
-    BridgeExecutorHelpers.waitAndExecuteLatest(vm, AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR);
+    GovHelpers.executeLatestActionSet(vm);
   }
 }

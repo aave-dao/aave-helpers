@@ -15,14 +15,14 @@ import {AaveV3AvalancheRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3
 import {AaveV3OptimismRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3OptimismRatesUpdates070322.sol';
 import {AaveV3ArbitrumRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3ArbitrumRatesUpdates070322.sol';
 import {DeployEnginePolLib, DeployEngineEthLib, DeployEngineAvaLib, DeployEngineOptLib, DeployEngineArbLib} from '../../scripts/AaveV3ConfigEngine.s.sol';
-import {TestWithExecutor} from '../GovHelpers.sol';
+import {GovHelpers, TestWithExecutor} from '../GovHelpers.sol';
 import '../ProtocolV3TestBase.sol';
 
 contract AaveV3PolygonConfigEngineRatesTest is ProtocolV3TestBase, TestWithExecutor {
   using stdStorage for StdStorage;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 40074125);
+    vm.createSelectFork(vm.rpcUrl('polygon'), 43322560);
   }
 
   function testEngine() public {
@@ -31,7 +31,7 @@ contract AaveV3PolygonConfigEngineRatesTest is ProtocolV3TestBase, TestWithExecu
 
     createConfigurationSnapshot('preTestEnginePolV3Gauntlet', AaveV3Polygon.POOL);
 
-    _executePayload(address(payload));
+    GovHelpers.executePayload(vm, address(payload));
 
     createConfigurationSnapshot('postTestEnginePolV3Gauntlet', AaveV3Polygon.POOL);
 
@@ -52,7 +52,7 @@ contract AaveV3AvalancheConfigEngineRatesTest is ProtocolV3TestBase, TestWithExe
 
     createConfigurationSnapshot('preTestEngineAvaV3Gauntlet', AaveV3Avalanche.POOL);
 
-    _executePayload(address(payload));
+    GovHelpers.executePayload(vm, address(payload));
 
     createConfigurationSnapshot('postTestEngineAvaV3Gauntlet', AaveV3Avalanche.POOL);
 
@@ -60,7 +60,7 @@ contract AaveV3AvalancheConfigEngineRatesTest is ProtocolV3TestBase, TestWithExe
   }
 }
 
-contract AaveV3OptimismConfigEngineRatesTest is ProtocolV3TestBase, TestWithExecutor {
+contract AaveV3OptimismConfigEngineRatesTest is ProtocolV3TestBase {
   using stdStorage for StdStorage;
 
   function setUp() public {
@@ -73,7 +73,7 @@ contract AaveV3OptimismConfigEngineRatesTest is ProtocolV3TestBase, TestWithExec
 
     createConfigurationSnapshot('preTestEngineOptV3Gauntlet', AaveV3Optimism.POOL);
 
-    _executePayload(address(payload));
+    GovHelpers.executePayload(vm, address(payload));
 
     createConfigurationSnapshot('postTestEngineOptV3Gauntlet', AaveV3Optimism.POOL);
 
@@ -81,24 +81,20 @@ contract AaveV3OptimismConfigEngineRatesTest is ProtocolV3TestBase, TestWithExec
   }
 }
 
-contract AaveV3ArbitrumConfigEngineRatesTest is ProtocolV3TestBase, TestWithExecutor {
+contract AaveV3ArbitrumConfigEngineRatesTest is ProtocolV3TestBase {
   using stdStorage for StdStorage;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('arbitrum'), 67634819);
+    vm.createSelectFork(vm.rpcUrl('arbitrum'), 95949966);
   }
 
   function testEngine() public {
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(0x0EfdfC1A940DE4E7E6acC9Bb801481f81B17fd20);
     AaveV3ArbitrumRatesUpdates070322 payload = new AaveV3ArbitrumRatesUpdates070322(engine);
 
-    vm.startPrank(AaveV3Arbitrum.ACL_ADMIN);
-    AaveV3Arbitrum.ACL_MANAGER.addPoolAdmin(address(payload));
-    vm.stopPrank();
-
     createConfigurationSnapshot('preTestEngineArbV3Gauntlet', AaveV3Arbitrum.POOL);
 
-    payload.execute();
+    GovHelpers.executePayload(vm, address(payload));
 
     createConfigurationSnapshot('postTestEngineArbV3Gauntlet', AaveV3Arbitrum.POOL);
 
