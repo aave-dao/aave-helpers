@@ -36,8 +36,8 @@ library RateEngine {
         strategiesParams[i].stableRateExcessOffset == EngineFlags.KEEP_CURRENT ||
         strategiesParams[i].optimalStableToTotalDebtRatio == EngineFlags.KEEP_CURRENT
       ) {
-        IV3RateStrategyFactory.RateStrategyParams
-          memory currentStrategyData = rateStrategiesFactory.getStrategyDataOfAsset(ids[i]);
+        IV3RateStrategyFactory.RateStrategyParams memory currentStrategyData = rateStrategiesFactory
+          .getStrategyDataOfAsset(ids[i]);
 
         if (strategiesParams[i].variableRateSlope1 == EngineFlags.KEEP_CURRENT) {
           strategiesParams[i].variableRateSlope1 = currentStrategyData.variableRateSlope1;

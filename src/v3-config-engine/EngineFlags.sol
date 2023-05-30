@@ -12,7 +12,8 @@ library EngineFlags {
 
   /// @dev magic value to be used as flag to keep unchanged any current configuration
   /// Strongly assumes that the value `0x0000000000000000000000000000000000000050` will never be used, which seems reasonable
-  address internal constant KEEP_CURRENT_ADDRESS = address(0x0000000000000000000000000000000000000050);
+  address internal constant KEEP_CURRENT_ADDRESS =
+    address(0x0000000000000000000000000000000000000050);
 
   /// @dev value to be used as flag for bool value true
   uint256 internal constant ENABLED = 1;

@@ -33,8 +33,8 @@ library ListingEngine {
       rateStrategiesFactory,
       collector,
       rewardsController,
-      configs.ids, 
-      configs.basics, 
+      configs.ids,
+      configs.basics,
       configs.rates
     );
 
@@ -45,11 +45,9 @@ library ListingEngine {
     CollateralEngine.configCollateralSide(poolConfigurator, pool, configs.ids, configs.collaterals);
   }
 
-  function _repackListing(IEngine.ListingWithCustomImpl[] memory listings)
-    internal
-    pure
-    returns (Engine.AssetsConfig memory)
-  {
+  function _repackListing(
+    IEngine.ListingWithCustomImpl[] memory listings
+  ) internal pure returns (Engine.AssetsConfig memory) {
     address[] memory ids = new address[](listings.length);
     Engine.Basic[] memory basics = new Engine.Basic[](listings.length);
     Engine.Borrow[] memory borrows = new Engine.Borrow[](listings.length);

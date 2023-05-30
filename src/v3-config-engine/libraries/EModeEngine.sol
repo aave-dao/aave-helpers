@@ -12,7 +12,11 @@ library EModeEngine {
   using PercentageMath for uint256;
   using SafeCast for uint256;
 
-  function executeEModeCategoriesUpdate(IPoolConfigurator poolConfigurator, IPool pool, IEngine.EModeUpdate[] memory updates) external {
+  function executeEModeCategoriesUpdate(
+    IPoolConfigurator poolConfigurator,
+    IPool pool,
+    IEngine.EModeUpdate[] memory updates
+  ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackEModeUpdate(updates);
@@ -20,16 +24,23 @@ library EModeEngine {
     _configEModeCategories(poolConfigurator, pool, configs.eModeCategories);
   }
 
-  function _configEModeCategories(IPoolConfigurator poolConfigurator, IPool pool, Engine.EModeCategories[] memory updates) internal {
+  function _configEModeCategories(
+    IPoolConfigurator poolConfigurator,
+    IPool pool,
+    Engine.EModeCategories[] memory updates
+  ) internal {
     for (uint256 i = 0; i < updates.length; i++) {
       if (
         updates[i].ltv == EngineFlags.KEEP_CURRENT ||
         updates[i].liqThreshold == EngineFlags.KEEP_CURRENT ||
         updates[i].liqBonus == EngineFlags.KEEP_CURRENT ||
         updates[i].priceSource == EngineFlags.KEEP_CURRENT_ADDRESS ||
-        keccak256(abi.encode(updates[i].label)) == keccak256(abi.encode(EngineFlags.KEEP_CURRENT_STRING))
+        keccak256(abi.encode(updates[i].label)) ==
+        keccak256(abi.encode(EngineFlags.KEEP_CURRENT_STRING))
       ) {
-        DataTypes.EModeCategory memory configuration = pool.getEModeCategoryData(updates[i].eModeCategory);
+        DataTypes.EModeCategory memory configuration = pool.getEModeCategoryData(
+          updates[i].eModeCategory
+        );
         uint256 currentLtv = configuration.ltv;
         uint256 currentLiqThreshold = configuration.liquidationThreshold;
         uint256 currentLiqBonus = configuration.liquidationBonus;
@@ -53,7 +64,10 @@ library EModeEngine {
           updates[i].priceSource = currentPriceSource;
         }
 
-        if (keccak256(abi.encode(updates[i].label)) == keccak256(abi.encode(EngineFlags.KEEP_CURRENT_STRING))) {
+        if (
+          keccak256(abi.encode(updates[i].label)) ==
+          keccak256(abi.encode(EngineFlags.KEEP_CURRENT_STRING))
+        ) {
           updates[i].label = currentLabel;
         }
       }
@@ -70,18 +84,16 @@ library EModeEngine {
         SafeCast.toUint16(updates[i].liqThreshold), // .toUint16()
         // For reference, this is to simplify the interaction with the Aave protocol,
         // as there the definition is as e.g. 105% (5% bonus for liquidators)
-        SafeCast.toUint16(100_00 + updates[i].liqBonus), //.toUint16() 
+        SafeCast.toUint16(100_00 + updates[i].liqBonus), //.toUint16()
         updates[i].priceSource,
         updates[i].label
       );
     }
   }
 
-  function _repackEModeUpdate(IEngine.EModeUpdate[] memory updates)
-    internal
-    pure
-    returns (Engine.AssetsConfig memory)
-  {
+  function _repackEModeUpdate(
+    IEngine.EModeUpdate[] memory updates
+  ) internal pure returns (Engine.AssetsConfig memory) {
     Engine.EModeCategories[] memory eModeCategories = new Engine.EModeCategories[](updates.length);
 
     for (uint256 i = 0; i < updates.length; i++) {

@@ -10,7 +10,11 @@ import {IAaveV3ConfigEngine as IEngine, IV3RateStrategyFactory, IPoolConfigurato
 library BorrowEngine {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
 
-  function executeBorrowSide(IPoolConfigurator poolConfigurator, IPool pool, IEngine.BorrowUpdate[] memory updates) external {
+  function executeBorrowSide(
+    IPoolConfigurator poolConfigurator,
+    IPool pool,
+    IEngine.BorrowUpdate[] memory updates
+  ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackBorrowUpdate(updates);
@@ -18,7 +22,12 @@ library BorrowEngine {
     configBorrowSide(poolConfigurator, pool, configs.ids, configs.borrows);
   }
 
-  function configBorrowSide(IPoolConfigurator poolConfigurator, IPool pool, address[] memory ids, Engine.Borrow[] memory borrows) public {
+  function configBorrowSide(
+    IPoolConfigurator poolConfigurator,
+    IPool pool,
+    address[] memory ids,
+    Engine.Borrow[] memory borrows
+  ) public {
     for (uint256 i = 0; i < ids.length; i++) {
       if (borrows[i].enabledToBorrow != EngineFlags.KEEP_CURRENT) {
         poolConfigurator.setReserveBorrowing(
@@ -66,7 +75,7 @@ library BorrowEngine {
 
       if (borrows[i].flashloanable != EngineFlags.KEEP_CURRENT) {
         poolConfigurator.setReserveFlashLoaning(
-          ids[i], 
+          ids[i],
           EngineFlags.toBool(borrows[i].flashloanable)
         );
       }

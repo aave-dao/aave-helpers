@@ -239,7 +239,10 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
 
     ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(AaveV3Ethereum.POOL);
 
-    ReserveConfig memory expectedAssetConfig = _findReserveConfig(allConfigsBefore, AaveV3EthereumAssets.AAVE_UNDERLYING);
+    ReserveConfig memory expectedAssetConfig = _findReserveConfig(
+      allConfigsBefore,
+      AaveV3EthereumAssets.AAVE_UNDERLYING
+    );
 
     expectedAssetConfig.supplyCap = 1_000_000;
 
@@ -271,7 +274,10 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
 
     ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(AaveV3Avalanche.POOL);
 
-    ReserveConfig memory expectedAssetConfig = _findReserveConfig(allConfigsBefore, AaveV3AvalancheAssets.AAVEe_UNDERLYING);
+    ReserveConfig memory expectedAssetConfig = _findReserveConfig(
+      allConfigsBefore,
+      AaveV3AvalancheAssets.AAVEe_UNDERLYING
+    );
     expectedAssetConfig.ltv = 62_00;
     expectedAssetConfig.liquidationThreshold = 72_00;
     expectedAssetConfig.liquidationBonus = 106_00; // 100_00 + 6_00
@@ -335,7 +341,10 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
 
     ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(AaveV3Avalanche.POOL);
 
-    ReserveConfig memory expectedAssetConfig = _findReserveConfig(allConfigsBefore, AaveV3AvalancheAssets.AAVEe_UNDERLYING);
+    ReserveConfig memory expectedAssetConfig = _findReserveConfig(
+      allConfigsBefore,
+      AaveV3AvalancheAssets.AAVEe_UNDERLYING
+    );
 
     _validateReserveConfig(expectedAssetConfig, allConfigsAfter);
   }
@@ -380,7 +389,10 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
 
     ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(AaveV3Avalanche.POOL);
 
-    ReserveConfig memory expectedAssetConfig = _findReserveConfig(allConfigsBefore, AaveV3AvalancheAssets.AAVEe_UNDERLYING);
+    ReserveConfig memory expectedAssetConfig = _findReserveConfig(
+      allConfigsBefore,
+      AaveV3AvalancheAssets.AAVEe_UNDERLYING
+    );
     expectedAssetConfig.ltv = 62_00;
     expectedAssetConfig.liquidationThreshold = 90_00;
     expectedAssetConfig.liquidationBonus = 111_00; // 100_00 + 11_00
@@ -410,7 +422,10 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
 
     ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(AaveV3Polygon.POOL);
 
-    ReserveConfig memory expectedAssetConfig = _findReserveConfig(allConfigsBefore, AaveV3PolygonAssets.AAVE_UNDERLYING);
+    ReserveConfig memory expectedAssetConfig = _findReserveConfig(
+      allConfigsBefore,
+      AaveV3PolygonAssets.AAVE_UNDERLYING
+    );
 
     expectedAssetConfig.reserveFactor = 15_00;
     expectedAssetConfig.borrowingEnabled = true;
@@ -575,7 +590,9 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
     AaveV3Polygon.ACL_MANAGER.addPoolAdmin(address(payload));
     vm.stopPrank();
 
-    DataTypes.EModeCategory memory eModeCategoryDataBefore = AaveV3Polygon.POOL.getEModeCategoryData(1);
+    DataTypes.EModeCategory memory eModeCategoryDataBefore = AaveV3Polygon
+      .POOL
+      .getEModeCategoryData(1);
 
     createConfigurationSnapshot('preTestEngineEModeCategoryUpdate', AaveV3Polygon.POOL);
 
@@ -589,11 +606,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
     eModeCategoryDataBefore.liquidationThreshold = 97_60;
     eModeCategoryDataBefore.liquidationBonus = 101_50; // 100_00 + 1_50
 
-    _validateEmodeCategory(
-      AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
-      1,
-      eModeCategoryDataBefore
-    );
+    _validateEmodeCategory(AaveV3Polygon.POOL_ADDRESSES_PROVIDER, 1, eModeCategoryDataBefore);
   }
 
   function testEModeCategoryUpdatesWrongBonus() public {

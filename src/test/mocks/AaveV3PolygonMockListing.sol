@@ -21,9 +21,8 @@ contract AaveV3PolygonMockListing is AaveV3PayloadBase {
       asset: 0x9c2C5fd7b07E95EE044DDeba0E97a665F142394f,
       assetSymbol: '1INCH',
       priceFeed: 0x443C5116CdF663Eb387e72C688D276e702135C87,
-      rateStrategyParams: IV3RateStrategyFactory(AaveV3Polygon.RATES_FACTORY).getStrategyDataOfAsset(
-        AaveV3PolygonAssets.AAVE_UNDERLYING
-      ), // Quite common case, of setting the same rate strategy as an already listed asset
+      rateStrategyParams: IV3RateStrategyFactory(AaveV3Polygon.RATES_FACTORY)
+        .getStrategyDataOfAsset(AaveV3PolygonAssets.AAVE_UNDERLYING), // Quite common case, of setting the same rate strategy as an already listed asset
       enabledToBorrow: EngineFlags.ENABLED,
       stableRateModeEnabled: EngineFlags.DISABLED,
       borrowableInIsolation: EngineFlags.DISABLED,

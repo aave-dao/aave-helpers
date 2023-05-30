@@ -1051,7 +1051,9 @@ contract ProtocolV3TestBase is CommonTestBase {
     DataTypes.EModeCategory memory expectedCategoryData
   ) internal view {
     address poolAddress = addressesProvider.getPool();
-    DataTypes.EModeCategory memory currentCategoryData = IPool(poolAddress).getEModeCategoryData(uint8(category));
+    DataTypes.EModeCategory memory currentCategoryData = IPool(poolAddress).getEModeCategoryData(
+      uint8(category)
+    );
     require(
       keccak256(bytes(currentCategoryData.label)) == keccak256(bytes(expectedCategoryData.label)),
       '_validateEmodeCategory(): INVALID_LABEL'

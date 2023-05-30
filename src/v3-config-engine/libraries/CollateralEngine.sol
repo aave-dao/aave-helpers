@@ -14,7 +14,11 @@ library CollateralEngine {
   using PercentageMath for uint256;
   using SafeCast for uint256;
 
-  function executeCollateralSide(IPoolConfigurator poolConfigurator, IPool pool, IEngine.CollateralUpdate[] memory updates) external {
+  function executeCollateralSide(
+    IPoolConfigurator poolConfigurator,
+    IPool pool,
+    IEngine.CollateralUpdate[] memory updates
+  ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackCollateralUpdate(updates);
@@ -22,7 +26,12 @@ library CollateralEngine {
     configCollateralSide(poolConfigurator, pool, configs.ids, configs.collaterals);
   }
 
-  function configCollateralSide(IPoolConfigurator poolConfigurator, IPool pool, address[] memory ids, Engine.Collateral[] memory collaterals) public {
+  function configCollateralSide(
+    IPoolConfigurator poolConfigurator,
+    IPool pool,
+    address[] memory ids,
+    Engine.Collateral[] memory collaterals
+  ) public {
     for (uint256 i = 0; i < ids.length; i++) {
       if (collaterals[i].liqThreshold != 0) {
         bool notAllKeepCurrent = collaterals[i].ltv != EngineFlags.KEEP_CURRENT ||

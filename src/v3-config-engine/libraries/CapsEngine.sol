@@ -6,7 +6,10 @@ import {AaveV3ConfigEngine as Engine} from '../AaveV3ConfigEngine.sol';
 import {IAaveV3ConfigEngine as IEngine, IPoolConfigurator, IV3RateStrategyFactory} from '../IAaveV3ConfigEngine.sol';
 
 library CapsEngine {
-  function executeCapsUpdate(IPoolConfigurator poolConfigurator, IEngine.CapsUpdate[] memory updates) external {
+  function executeCapsUpdate(
+    IPoolConfigurator poolConfigurator,
+    IEngine.CapsUpdate[] memory updates
+  ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackCapsUpdate(updates);
@@ -14,7 +17,11 @@ library CapsEngine {
     configureCaps(poolConfigurator, configs.ids, configs.caps);
   }
 
-  function configureCaps(IPoolConfigurator poolConfigurator, address[] memory ids, Engine.Caps[] memory caps) public {
+  function configureCaps(
+    IPoolConfigurator poolConfigurator,
+    address[] memory ids,
+    Engine.Caps[] memory caps
+  ) public {
     for (uint256 i = 0; i < ids.length; i++) {
       if (caps[i].supplyCap != EngineFlags.KEEP_CURRENT) {
         poolConfigurator.setSupplyCap(ids[i], caps[i].supplyCap);

@@ -138,13 +138,14 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     require(collector != address(0), 'ONLY_NONZERO_COLLECTOR');
     require(address(rateStrategiesFactory) != address(0), 'ONLY_NONZERO_RATES_FACTORY');
 
-    require(engineLibraries.borrowEngine != address(0), 'ONLY_NONZERO_BORROW_ENGINE');
-    require(engineLibraries.capsEngine != address(0), 'ONLY_NONZERO_CAPS_ENGINE');
-    require(engineLibraries.collateralEngine != address(0), 'ONLY_NONZERO_COLLATERAL_ENGINE');
-    require(engineLibraries.eModeEngine != address(0), 'ONLY_NONZERO_EMODE_ENGINE');
-    require(engineLibraries.listingEngine != address(0), 'ONLY_NONZERO_LISTING_ENGINE');
-    require(engineLibraries.priceFeedEngine != address(0), 'ONLY_NONZERO_PRICE_FEED_ENGINE');
-    require(engineLibraries.rateEngine != address(0), 'ONLY_NONZERO_RATE_ENGINE');
+    require(
+      engineLibraries.borrowEngine != address(0) &&
+        engineLibraries.capsEngine != address(0) &&
+        engineLibraries.listingEngine != address(0) &&
+        engineLibraries.priceFeedEngine != address(0) &&
+        engineLibraries.rateEngine != address(0),
+      'ONLY_NONZERO_ENGINE_LIBRARIES'
+    );
 
     POOL = pool;
     POOL_CONFIGURATOR = configurator;
@@ -220,28 +221,48 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   /// @inheritdoc IAaveV3ConfigEngine
   function updateCollateralSide(CollateralUpdate[] calldata updates) external {
     COLLATERAL_ENGINE.functionDelegateCall(
-      abi.encodeWithSelector(CollateralEngine.executeCollateralSide.selector, POOL_CONFIGURATOR, POOL, updates)
+      abi.encodeWithSelector(
+        CollateralEngine.executeCollateralSide.selector,
+        POOL_CONFIGURATOR,
+        POOL,
+        updates
+      )
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updateBorrowSide(BorrowUpdate[] calldata updates) external {
     BORROW_ENGINE.functionDelegateCall(
-      abi.encodeWithSelector(BorrowEngine.executeBorrowSide.selector, POOL_CONFIGURATOR, POOL, updates)
+      abi.encodeWithSelector(
+        BorrowEngine.executeBorrowSide.selector,
+        POOL_CONFIGURATOR,
+        POOL,
+        updates
+      )
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updateRateStrategies(RateStrategyUpdate[] calldata updates) external {
     RATE_ENGINE.functionDelegateCall(
-      abi.encodeWithSelector(RateEngine.executeRateStrategiesUpdate.selector, POOL_CONFIGURATOR, RATE_STRATEGIES_FACTORY, updates)
+      abi.encodeWithSelector(
+        RateEngine.executeRateStrategiesUpdate.selector,
+        POOL_CONFIGURATOR,
+        RATE_STRATEGIES_FACTORY,
+        updates
+      )
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updateEModeCategories(EModeUpdate[] calldata updates) external {
     EMODE_ENGINE.functionDelegateCall(
-      abi.encodeWithSelector(EModeEngine.executeEModeCategoriesUpdate.selector, POOL_CONFIGURATOR, POOL, updates)
+      abi.encodeWithSelector(
+        EModeEngine.executeEModeCategoriesUpdate.selector,
+        POOL_CONFIGURATOR,
+        POOL,
+        updates
+      )
     );
   }
 }

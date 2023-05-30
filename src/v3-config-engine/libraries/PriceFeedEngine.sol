@@ -7,7 +7,10 @@ import {IChainlinkAggregator} from '../../interfaces/IChainlinkAggregator.sol';
 import {EngineFlags} from '../EngineFlags.sol';
 
 library PriceFeedEngine {
-  function executePriceFeedsUpdate(IAaveOracle oracle, IEngine.PriceFeedUpdate[] memory updates) external {
+  function executePriceFeedsUpdate(
+    IAaveOracle oracle,
+    IEngine.PriceFeedUpdate[] memory updates
+  ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackPriceFeed(updates);
@@ -15,7 +18,11 @@ library PriceFeedEngine {
     setPriceFeeds(oracle, configs.ids, configs.basics);
   }
 
-  function setPriceFeeds(IAaveOracle oracle, address[] memory ids, Engine.Basic[] memory basics) public {
+  function setPriceFeeds(
+    IAaveOracle oracle,
+    address[] memory ids,
+    Engine.Basic[] memory basics
+  ) public {
     address[] memory assets = new address[](ids.length);
     address[] memory sources = new address[](ids.length);
 

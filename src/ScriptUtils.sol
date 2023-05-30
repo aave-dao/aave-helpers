@@ -85,8 +85,14 @@ library Create2Utils {
     return (_addr.code.length > 0);
   }
 
-  function computeCreate2Address(bytes32 salt, bytes32 initcodeHash) internal pure returns (address) {
-    return addressFromLast20Bytes(keccak256(abi.encodePacked(bytes1(0xff), CREATE2_FACTORY, salt, initcodeHash)));
+  function computeCreate2Address(
+    bytes32 salt,
+    bytes32 initcodeHash
+  ) internal pure returns (address) {
+    return
+      addressFromLast20Bytes(
+        keccak256(abi.encodePacked(bytes1(0xff), CREATE2_FACTORY, salt, initcodeHash))
+      );
   }
 
   function addressFromLast20Bytes(bytes32 bytesValue) internal pure returns (address) {
