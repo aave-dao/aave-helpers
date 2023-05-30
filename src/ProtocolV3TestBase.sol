@@ -64,6 +64,17 @@ contract ProtocolV3TestBase is CommonTestBase {
     string memory reportName,
     IPool pool
   ) public returns (ReserveConfig[] memory) {
+    return createConfigurationSnapshot(reportName, pool, true, true, true, true);
+  }
+
+  function createConfigurationSnapshot(
+    string memory reportName,
+    IPool pool,
+    bool reserveConfigs,
+    bool strategyConfigs,
+    bool eModeConigs,
+    bool poolConfigs
+  ) public returns (ReserveConfig[] memory) {
     string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
     // overwrite with empty json to later be extended
     vm.writeFile(
@@ -72,10 +83,10 @@ contract ProtocolV3TestBase is CommonTestBase {
     );
     vm.serializeUint('root', 'chainId', block.chainid);
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    _writeReserveConfigs(path, configs, pool);
-    _writeStrategyConfigs(path, configs);
-    _writeEModeConfigs(path, configs, pool);
-    _writePoolConfiguration(path, pool);
+    if (reserveConfigs) _writeReserveConfigs(path, configs, pool);
+    if (strategyConfigs) _writeStrategyConfigs(path, configs);
+    if (eModeConigs) _writeEModeConfigs(path, configs, pool);
+    if (poolConfigs) _writePoolConfiguration(path, pool);
 
     return configs;
   }
