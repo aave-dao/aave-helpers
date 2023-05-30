@@ -22,7 +22,7 @@ contract AaveV3PolygonConfigEngineRatesTest is ProtocolV3TestBase, TestWithExecu
   using stdStorage for StdStorage;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 43322560);
+    vm.createSelectFork(vm.rpcUrl('polygon'), 40074125);
   }
 
   function testEngine() public {
@@ -85,7 +85,7 @@ contract AaveV3ArbitrumConfigEngineRatesTest is ProtocolV3TestBase {
   using stdStorage for StdStorage;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('arbitrum'), 95949966);
+    vm.createSelectFork(vm.rpcUrl('arbitrum'), 67634819);
   }
 
   function testEngine() public {
