@@ -11,15 +11,14 @@ library BorrowEngine {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
 
   function executeBorrowSide(
-    IPoolConfigurator poolConfigurator,
-    IPool pool,
+    Engine.EngineConstants calldata engineConstants,
     IEngine.BorrowUpdate[] memory updates
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackBorrowUpdate(updates);
 
-    configBorrowSide(poolConfigurator, pool, configs.ids, configs.borrows);
+    configBorrowSide(engineConstants.poolConfigurator, engineConstants.pool, configs.ids, configs.borrows);
   }
 
   function configBorrowSide(

@@ -7,14 +7,14 @@ import {IAaveV3ConfigEngine as IEngine, IPoolConfigurator, IV3RateStrategyFactor
 
 library CapsEngine {
   function executeCapsUpdate(
-    IPoolConfigurator poolConfigurator,
+    Engine.EngineConstants calldata engineConstants,
     IEngine.CapsUpdate[] memory updates
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackCapsUpdate(updates);
 
-    configureCaps(poolConfigurator, configs.ids, configs.caps);
+    configureCaps(engineConstants.poolConfigurator, configs.ids, configs.caps);
   }
 
   function configureCaps(

@@ -10,44 +10,80 @@ import {BorrowEngine} from './BorrowEngine.sol';
 import {CollateralEngine} from './CollateralEngine.sol';
 import {EModeEngine} from './EModeEngine.sol';
 import {ConfiguratorInputTypes} from 'aave-address-book/AaveV3.sol';
+import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
 
 library ListingEngine {
+  using Address for address;
+
   function executeCustomAssetListing(
     IEngine.PoolContext calldata context,
-    IPoolConfigurator poolConfigurator,
-    IV3RateStrategyFactory rateStrategiesFactory,
-    IPool pool,
-    IAaveOracle oracle,
-    address collector,
-    address rewardsController,
-    IEngine.ListingWithCustomImpl[] memory listings
+    Engine.EngineConstants calldata engineConstants,
+    Engine.EngineLibraries calldata engineLibraries,
+    IEngine.ListingWithCustomImpl[] calldata listings
   ) external {
     require(listings.length != 0, 'AT_LEAST_ONE_ASSET_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackListing(listings);
 
-    PriceFeedEngine.setPriceFeeds(oracle, configs.ids, configs.basics);
+    engineLibraries.priceFeedEngine.functionDelegateCall(
+      abi.encodeWithSelector(
+        PriceFeedEngine.setPriceFeeds.selector,
+        engineConstants.oracle,
+        configs.ids,
+        configs.basics
+      )
+    );
 
     _initAssets(
       context,
-      poolConfigurator,
-      rateStrategiesFactory,
-      collector,
-      rewardsController,
+      engineConstants.poolConfigurator,
+      engineConstants.ratesStrategyFactory,
+      engineConstants.collector,
+      engineConstants.rewardsController,
       configs.ids,
       configs.basics,
       configs.rates
     );
 
-    CapsEngine.configureCaps(poolConfigurator, configs.ids, configs.caps);
+    engineLibraries.capsEngine.functionDelegateCall(
+      abi.encodeWithSelector(
+        CapsEngine.configureCaps.selector,
+        engineConstants.poolConfigurator,
+        configs.ids,
+        configs.caps
+      )
+    );
 
-    BorrowEngine.configBorrowSide(poolConfigurator, pool, configs.ids, configs.borrows);
+    engineLibraries.borrowEngine.functionDelegateCall(
+      abi.encodeWithSelector(
+        BorrowEngine.configBorrowSide.selector,
+        engineConstants.poolConfigurator,
+        engineConstants.pool,
+        configs.ids,
+        configs.borrows
+      )
+    );
 
-    CollateralEngine.configCollateralSide(poolConfigurator, pool, configs.ids, configs.collaterals);
+    engineLibraries.collateralEngine.functionDelegateCall(
+      abi.encodeWithSelector(
+        CollateralEngine.configCollateralSide.selector,
+        engineConstants.poolConfigurator,
+        engineConstants.pool,
+        configs.ids,
+        configs.collaterals
+      )
+    );
 
     // For an asset listing we only update the e-mode category id for the asset and do not make changes 
     // to the e-mode category configuration
-    EModeEngine.configEModeAssets(poolConfigurator, configs.ids, configs.eModeCategories);
+    engineLibraries.eModeEngine.functionDelegateCall(
+      abi.encodeWithSelector(
+        EModeEngine.configEModeAssets.selector,
+        engineConstants.poolConfigurator,
+        configs.ids,
+        configs.eModeCategories
+      )
+    );
   }
 
   function _repackListing(

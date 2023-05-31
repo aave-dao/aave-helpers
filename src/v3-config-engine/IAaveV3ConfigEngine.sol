@@ -280,7 +280,7 @@ interface IAaveV3ConfigEngine {
    */
   function updateEModeAssets(EModeAssetUpdate[] calldata updates) external;
 
-  function RATE_STRATEGIES_FACTORY() external view returns (IV3RateStrategyFactory);
+  function RATE_STRATEGY_FACTORY() external view returns (IV3RateStrategyFactory);
 
   function POOL() external view returns (IPool);
 

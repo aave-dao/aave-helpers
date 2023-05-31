@@ -84,9 +84,21 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     address capsEngine;
   }
 
+  struct EngineConstants {
+    IPool pool;
+    IPoolConfigurator poolConfigurator;
+    IV3RateStrategyFactory ratesStrategyFactory;
+    IAaveOracle oracle;
+    address aTokenImpl;
+    address vTokenImpl;
+    address sTokenImpl;
+    address rewardsController;
+    address collector;
+  }
+
   IPool public immutable POOL;
   IPoolConfigurator public immutable POOL_CONFIGURATOR;
-  IV3RateStrategyFactory public immutable RATE_STRATEGIES_FACTORY;
+  IV3RateStrategyFactory public immutable RATE_STRATEGY_FACTORY;
   IAaveOracle public immutable ORACLE;
   address public immutable ATOKEN_IMPL;
   address public immutable VTOKEN_IMPL;
@@ -104,38 +116,25 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
 
   /**
    * @dev Constructor.
-   * @param pool The reference to the v3 pool contract.
-   * @param configurator The reference to the v3 pool configurator contract.
-   * @param oracle The reference to the v3 aave oracle contract.
-   * @param aTokenImpl The address of default aToken Implementation.
-   * @param vTokenImpl The address of default variableDebtToken Implementation.
-   * @param sTokenImpl The address of default stableDebtToken Implementation.
-   * @param rewardsController The address of rewards controller.
-   * @param collector The address of aave collector.
-   * @param rateStrategiesFactory The address of rates factory contract.
+   * @param engineConstants The struct containing all the engine constants.
    * @param engineLibraries The struct containing the addresses of stateless libraries containing the engine logic.
    */
   constructor(
-    IPool pool,
-    IPoolConfigurator configurator,
-    IAaveOracle oracle,
-    address aTokenImpl,
-    address vTokenImpl,
-    address sTokenImpl,
-    address rewardsController,
-    address collector,
-    IV3RateStrategyFactory rateStrategiesFactory,
+    EngineConstants memory engineConstants,
     EngineLibraries memory engineLibraries
   ) {
-    require(address(pool) != address(0), 'ONLY_NONZERO_POOL');
-    require(address(configurator) != address(0), 'ONLY_NONZERO_CONFIGURATOR');
-    require(address(oracle) != address(0), 'ONLY_NONZERO_ORACLE');
-    require(aTokenImpl != address(0), 'ONLY_NONZERO_ATOKEN');
-    require(vTokenImpl != address(0), 'ONLY_NONZERO_VTOKEN');
-    require(sTokenImpl != address(0), 'ONLY_NONZERO_STOKEN');
-    require(rewardsController != address(0), 'ONLY_NONZERO_REWARDS_CONTROLLER');
-    require(collector != address(0), 'ONLY_NONZERO_COLLECTOR');
-    require(address(rateStrategiesFactory) != address(0), 'ONLY_NONZERO_RATES_FACTORY');
+    require(
+      address(engineConstants.pool) != address(0) &&
+        address(engineConstants.poolConfigurator) != address(0) &&
+        address(engineConstants.oracle) != address(0) &&
+        engineConstants.aTokenImpl != address(0) &&
+        engineConstants.vTokenImpl != address(0) &&
+        engineConstants.sTokenImpl != address(0) &&
+        engineConstants.rewardsController != address(0) &&
+        engineConstants.collector != address(0) &&
+        address(engineConstants.ratesStrategyFactory) != address(0),
+      'ONLY_NONZERO_ENGINE_CONSTANTS'
+    );
 
     require(
       engineLibraries.borrowEngine != address(0) &&
@@ -146,15 +145,15 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
       'ONLY_NONZERO_ENGINE_LIBRARIES'
     );
 
-    POOL = pool;
-    POOL_CONFIGURATOR = configurator;
-    ORACLE = oracle;
-    ATOKEN_IMPL = aTokenImpl;
-    VTOKEN_IMPL = vTokenImpl;
-    STOKEN_IMPL = sTokenImpl;
-    REWARDS_CONTROLLER = rewardsController;
-    COLLECTOR = collector;
-    RATE_STRATEGIES_FACTORY = rateStrategiesFactory;
+    POOL = engineConstants.pool;
+    POOL_CONFIGURATOR = engineConstants.poolConfigurator;
+    ORACLE = engineConstants.oracle;
+    ATOKEN_IMPL = engineConstants.aTokenImpl;
+    VTOKEN_IMPL = engineConstants.vTokenImpl;
+    STOKEN_IMPL = engineConstants.sTokenImpl;
+    REWARDS_CONTROLLER = engineConstants.rewardsController;
+    COLLECTOR = engineConstants.collector;
+    RATE_STRATEGY_FACTORY = engineConstants.ratesStrategyFactory;
     BORROW_ENGINE = engineLibraries.borrowEngine;
     CAPS_ENGINE = engineLibraries.capsEngine;
     COLLATERAL_ENGINE = engineLibraries.collateralEngine;
@@ -192,12 +191,8 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
       abi.encodeWithSelector(
         ListingEngine.executeCustomAssetListing.selector,
         context,
-        POOL_CONFIGURATOR,
-        RATE_STRATEGIES_FACTORY,
-        POOL,
-        ORACLE,
-        COLLECTOR,
-        REWARDS_CONTROLLER,
+        _getEngineConstants(),
+        _getEngineLibraries(),
         listings
       )
     );
@@ -206,14 +201,14 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   /// @inheritdoc IAaveV3ConfigEngine
   function updateCaps(CapsUpdate[] calldata updates) external {
     CAPS_ENGINE.functionDelegateCall(
-      abi.encodeWithSelector(CapsEngine.executeCapsUpdate.selector, POOL_CONFIGURATOR, updates)
+      abi.encodeWithSelector(CapsEngine.executeCapsUpdate.selector, _getEngineConstants(), updates)
     );
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
   function updatePriceFeeds(PriceFeedUpdate[] calldata updates) external {
     PRICE_FEED_ENGINE.functionDelegateCall(
-      abi.encodeWithSelector(PriceFeedEngine.executePriceFeedsUpdate.selector, ORACLE, updates)
+      abi.encodeWithSelector(PriceFeedEngine.executePriceFeedsUpdate.selector, _getEngineConstants(), updates)
     );
   }
 
@@ -222,8 +217,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     COLLATERAL_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(
         CollateralEngine.executeCollateralSide.selector,
-        POOL_CONFIGURATOR,
-        POOL,
+        _getEngineConstants(),
         updates
       )
     );
@@ -234,8 +228,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     BORROW_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(
         BorrowEngine.executeBorrowSide.selector,
-        POOL_CONFIGURATOR,
-        POOL,
+        _getEngineConstants(),
         updates
       )
     );
@@ -246,8 +239,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     RATE_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(
         RateEngine.executeRateStrategiesUpdate.selector,
-        POOL_CONFIGURATOR,
-        RATE_STRATEGIES_FACTORY,
+        _getEngineConstants(),
         updates
       )
     );
@@ -258,8 +250,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     EMODE_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(
         EModeEngine.executeEModeCategoriesUpdate.selector,
-        POOL_CONFIGURATOR,
-        POOL,
+        _getEngineConstants(),
         updates
       )
     );
@@ -270,9 +261,35 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     EMODE_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(
         EModeEngine.executeEModeAssetsUpdate.selector,
-        POOL_CONFIGURATOR,
+        _getEngineConstants(),
         updates
       )
     );
+  }
+
+  function _getEngineLibraries() internal view returns (EngineLibraries memory) {
+    return EngineLibraries({
+      listingEngine: LISTING_ENGINE,
+      eModeEngine: EMODE_ENGINE,
+      borrowEngine: BORROW_ENGINE,
+      collateralEngine: COLLATERAL_ENGINE,
+      priceFeedEngine: PRICE_FEED_ENGINE,
+      rateEngine: RATE_ENGINE,
+      capsEngine: CAPS_ENGINE
+    });
+  }
+
+  function _getEngineConstants() internal view returns (EngineConstants memory) {
+    return EngineConstants({
+      pool: POOL,
+      poolConfigurator: POOL_CONFIGURATOR,
+      ratesStrategyFactory: RATE_STRATEGY_FACTORY,
+      oracle: ORACLE,
+      aTokenImpl: ATOKEN_IMPL,
+      vTokenImpl: VTOKEN_IMPL,
+      sTokenImpl: STOKEN_IMPL,
+      rewardsController: REWARDS_CONTROLLER,
+      collector: COLLECTOR
+    });
   }
 }

@@ -8,14 +8,14 @@ import {EngineFlags} from '../EngineFlags.sol';
 
 library PriceFeedEngine {
   function executePriceFeedsUpdate(
-    IAaveOracle oracle,
+    Engine.EngineConstants calldata engineConstants,
     IEngine.PriceFeedUpdate[] memory updates
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackPriceFeed(updates);
 
-    setPriceFeeds(oracle, configs.ids, configs.basics);
+    setPriceFeeds(engineConstants.oracle, configs.ids, configs.basics);
   }
 
   function setPriceFeeds(

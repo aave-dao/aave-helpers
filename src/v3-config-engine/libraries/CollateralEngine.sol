@@ -13,15 +13,14 @@ library CollateralEngine {
   using PercentageMath for uint256;
 
   function executeCollateralSide(
-    IPoolConfigurator poolConfigurator,
-    IPool pool,
+    Engine.EngineConstants calldata engineConstants,
     IEngine.CollateralUpdate[] memory updates
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackCollateralUpdate(updates);
 
-    configCollateralSide(poolConfigurator, pool, configs.ids, configs.collaterals);
+    configCollateralSide(engineConstants.poolConfigurator, engineConstants.pool, configs.ids, configs.collaterals);
   }
 
   function configCollateralSide(

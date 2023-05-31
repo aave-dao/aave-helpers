@@ -13,26 +13,25 @@ library EModeEngine {
   using SafeCast for uint256;
 
   function executeEModeAssetsUpdate(
-    IPoolConfigurator poolConfigurator,
+    Engine.EngineConstants calldata engineConstants,
     IEngine.EModeAssetUpdate[] memory updates
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackEModeAssetsUpdate(updates);
 
-    configEModeAssets(poolConfigurator, configs.ids, configs.eModeCategories);
+    configEModeAssets(engineConstants.poolConfigurator, configs.ids, configs.eModeCategories);
   }
 
   function executeEModeCategoriesUpdate(
-    IPoolConfigurator poolConfigurator,
-    IPool pool,
+    Engine.EngineConstants calldata engineConstants,
     IEngine.EModeCategoryUpdate[] memory updates
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackEModeCategoriesUpdate(updates);
 
-    _configEModeCategories(poolConfigurator, pool, configs.eModeCategories);
+    _configEModeCategories(engineConstants.poolConfigurator, engineConstants.pool, configs.eModeCategories);
   }
 
   function configEModeAssets(

@@ -7,15 +7,14 @@ import {IAaveV3ConfigEngine as IEngine, IPoolConfigurator, IV3RateStrategyFactor
 
 library RateEngine {
   function executeRateStrategiesUpdate(
-    IPoolConfigurator poolConfigurator,
-    IV3RateStrategyFactory rateStrategiesFactory,
+    Engine.EngineConstants calldata engineConstants,
     IEngine.RateStrategyUpdate[] memory updates
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
     Engine.AssetsConfig memory configs = _repackRatesUpdate(updates);
 
-    configRateStrategies(poolConfigurator, rateStrategiesFactory, configs.ids, configs.rates);
+    configRateStrategies(engineConstants.poolConfigurator, engineConstants.ratesStrategyFactory, configs.ids, configs.rates);
   }
 
   function configRateStrategies(
