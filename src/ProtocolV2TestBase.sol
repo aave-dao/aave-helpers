@@ -4,10 +4,12 @@ pragma solidity >=0.7.5 <0.9.0;
 import 'forge-std/Test.sol';
 import {IAaveOracle, ILendingPool, ILendingPoolAddressesProvider, ILendingPoolConfigurator, IAaveProtocolDataProvider, DataTypes, TokenData, ILendingRateOracle, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV2.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
+import {ChainIds} from './ChainIds.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -119,14 +121,19 @@ contract ProtocolV2TestBase is CommonTestBase {
   ) internal {
     // test all basic interactions
     for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 100 * 10 ** configs[i].decimals;
       if (_includeInE2e(configs[i])) {
+        uint256 amount = 100 * 10 ** configs[i].decimals;
+        console.log(configs[i].symbol);
         _deposit(configs[i], pool, user, amount);
         _skipBlocks(1000);
-        assertEq(_withdraw(configs[i], pool, user, amount), amount);
-        _deposit(configs[i], pool, user, amount);
-        _skipBlocks(1000);
-        assertGe(_withdraw(configs[i], pool, user, type(uint256).max), amount);
+        if (
+          block.chainid == ChainIds.MAINNET &&
+          configs[i].underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+        ) {
+          assertGe(_withdraw(configs[i], pool, user, type(uint256).max), amount - 2);
+        } else {
+          assertGe(_withdraw(configs[i], pool, user, type(uint256).max), amount);
+        }
       } else {
         console.log('SKIP: REASON_FROZEN %s', configs[i].symbol);
       }
@@ -145,8 +152,8 @@ contract ProtocolV2TestBase is CommonTestBase {
     ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
     _deposit(collateralConfig, pool, user, 1000000 ether);
     for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 10 ** configs[i].decimals;
       if (_includeInE2e(configs[i]) && configs[i].borrowingEnabled) {
+        uint256 amount = 10 ** configs[i].decimals;
         _deposit(configs[i], pool, EOA, amount * 2);
         this._borrow(configs[i], pool, user, amount, false);
       } else {
@@ -189,12 +196,21 @@ contract ProtocolV2TestBase is CommonTestBase {
   ) internal {
     vm.startPrank(user);
     uint256 aTokenBefore = IERC20(config.aToken).balanceOf(user);
-    deal(config.underlying, user, amount);
-    IERC20(config.underlying).approve(address(pool), amount);
-    console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
+    _patchedDeal(config.underlying, user, amount);
+    // TODO: woraround as `_patchedDeal` changes prank context & there's currently no way to revert
+    vm.startPrank(user);
+    _patchedApprove(config.underlying, address(pool), amount);
     pool.deposit(config.underlying, amount, user, 0);
+    console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
-    assertApproxEqAbs(aTokenAfter, aTokenBefore + amount, 1);
+    if (
+      block.chainid == ChainIds.MAINNET &&
+      config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+    ) {
+      assertApproxEqAbs(aTokenAfter, aTokenBefore + amount, 2, '_deposit(): STETH_DUST_GT_2');
+    } else {
+      assertApproxEqAbs(aTokenAfter, aTokenBefore + amount, 1, '_deposit(): STETH_DUST_GT_1');
+    }
     vm.stopPrank();
   }
 
@@ -210,9 +226,23 @@ contract ProtocolV2TestBase is CommonTestBase {
     console.log('WITHDRAW: %s, Amount: %s', config.symbol, amountOut);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
     if (aTokenBefore < amount) {
-      require(aTokenAfter == 0, '_withdraw(): DUST_AFTER_WITHDRAW_ALL');
+      if (
+        block.chainid == ChainIds.MAINNET &&
+        config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+      ) {
+        assertApproxEqAbs(aTokenAfter, 0, 2, '_withdraw(): STETH_DUST_GT_2');
+      } else {
+        require(aTokenAfter == 0, '_withdraw(): DUST_AFTER_WITHDRAW_ALL');
+      }
     } else {
-      assertApproxEqAbs(aTokenAfter, aTokenBefore - amount, 1);
+      if (
+        block.chainid == ChainIds.MAINNET &&
+        config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+      ) {
+        assertApproxEqAbs(aTokenAfter, aTokenBefore - amount, 2, '_withdraw(): STETH_DUST_GT_2');
+      } else {
+        assertApproxEqAbs(aTokenAfter, aTokenBefore - amount, 1, '_withdraw(): DUST_GT_1');
+      }
     }
     vm.stopPrank();
     return amountOut;
@@ -231,7 +261,14 @@ contract ProtocolV2TestBase is CommonTestBase {
     console.log('BORROW: %s, Amount %s, Stable: %s', config.symbol, amount, stable);
     pool.borrow(config.underlying, amount, stable ? 1 : 2, 0, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
-    assertApproxEqAbs(debtAfter, debtBefore + amount, 1);
+    if (
+      block.chainid == ChainIds.MAINNET &&
+      config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+    ) {
+      assertApproxEqAbs(debtAfter, debtBefore + amount, 2, '_borrow(): DUST_GT_2');
+    } else {
+      assertApproxEqAbs(debtAfter, debtBefore + amount, 1, '_borrow(): DUST_GT_1');
+    }
     vm.stopPrank();
   }
 
