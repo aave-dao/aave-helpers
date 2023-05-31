@@ -18,9 +18,7 @@ library EModeEngine {
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
-    Engine.AssetsConfig memory configs = _repackEModeAssetsUpdate(updates);
-
-    _configEModeAssets(engineConstants.poolConfigurator, configs.ids, configs.eModeCategories);
+    _configEModeAssets(engineConstants.poolConfigurator, updates);
   }
 
   function executeEModeCategoriesUpdate(
@@ -29,23 +27,16 @@ library EModeEngine {
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
-    Engine.AssetsConfig memory configs = _repackEModeCategoriesUpdate(updates);
-
-    _configEModeCategories(
-      engineConstants.poolConfigurator,
-      engineConstants.pool,
-      configs.eModeCategories
-    );
+    _configEModeCategories(engineConstants.poolConfigurator, engineConstants.pool, updates);
   }
 
   function _configEModeAssets(
     IPoolConfigurator poolConfigurator,
-    address[] memory ids,
-    Engine.EModeCategories[] memory updates
+    IEngine.EModeAssetUpdate[] memory updates
   ) internal {
     for (uint256 i = 0; i < updates.length; i++) {
       if (updates[i].eModeCategory != EngineFlags.KEEP_CURRENT) {
-        poolConfigurator.setAssetEModeCategory(ids[i], updates[i].eModeCategory);
+        poolConfigurator.setAssetEModeCategory(updates[i].asset, updates[i].eModeCategory);
       }
     }
   }
@@ -53,7 +44,7 @@ library EModeEngine {
   function _configEModeCategories(
     IPoolConfigurator poolConfigurator,
     IPool pool,
-    Engine.EModeCategories[] memory updates
+    IEngine.EModeCategoryUpdate[] memory updates
   ) internal {
     for (uint256 i = 0; i < updates.length; i++) {
       if (
@@ -115,63 +106,5 @@ library EModeEngine {
         updates[i].label
       );
     }
-  }
-
-  function _repackEModeCategoriesUpdate(
-    IEngine.EModeCategoryUpdate[] memory updates
-  ) internal pure returns (Engine.AssetsConfig memory) {
-    Engine.EModeCategories[] memory eModeCategories = new Engine.EModeCategories[](updates.length);
-
-    for (uint256 i = 0; i < updates.length; i++) {
-      eModeCategories[i] = Engine.EModeCategories({
-        eModeCategory: updates[i].eModeCategory,
-        ltv: updates[i].ltv,
-        liqThreshold: updates[i].liqThreshold,
-        liqBonus: updates[i].liqBonus,
-        priceSource: updates[i].priceSource,
-        label: updates[i].label
-      });
-    }
-
-    return
-      Engine.AssetsConfig({
-        ids: new address[](0),
-        caps: new Engine.Caps[](0),
-        basics: new Engine.Basic[](0),
-        borrows: new Engine.Borrow[](0),
-        collaterals: new Engine.Collateral[](0),
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
-        eModeCategories: eModeCategories
-      });
-  }
-
-  function _repackEModeAssetsUpdate(
-    IEngine.EModeAssetUpdate[] memory updates
-  ) internal pure returns (Engine.AssetsConfig memory) {
-    address[] memory ids = new address[](updates.length);
-    Engine.EModeCategories[] memory eModeCategories = new Engine.EModeCategories[](updates.length);
-
-    for (uint256 i = 0; i < updates.length; i++) {
-      ids[i] = updates[i].asset;
-      eModeCategories[i] = Engine.EModeCategories({
-        eModeCategory: updates[i].eModeCategory,
-        ltv: 0, // unused for e-mode asset update
-        liqThreshold: 0, // unused for e-mode asset update
-        liqBonus: 0, // unused for e-mode asset update
-        priceSource: address(0), // unused for e-mode asset update
-        label: '' // unused for e-mode asset update
-      });
-    }
-
-    return
-      Engine.AssetsConfig({
-        ids: ids,
-        caps: new Engine.Caps[](0),
-        basics: new Engine.Basic[](0),
-        borrows: new Engine.Borrow[](0),
-        collaterals: new Engine.Collateral[](0),
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
-        eModeCategories: eModeCategories
-      });
   }
 }

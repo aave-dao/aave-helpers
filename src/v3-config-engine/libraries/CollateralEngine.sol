@@ -18,34 +18,28 @@ library CollateralEngine {
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
-    Engine.AssetsConfig memory configs = _repackCollateralUpdate(updates);
-
-    _configCollateralSide(
-      engineConstants.poolConfigurator,
-      engineConstants.pool,
-      configs.ids,
-      configs.collaterals
-    );
+    _configCollateralSide(engineConstants.poolConfigurator, engineConstants.pool, updates);
   }
 
   function _configCollateralSide(
     IPoolConfigurator poolConfigurator,
     IPool pool,
-    address[] memory ids,
-    Engine.Collateral[] memory collaterals
+    IEngine.CollateralUpdate[] memory updates
   ) internal {
-    for (uint256 i = 0; i < ids.length; i++) {
-      if (collaterals[i].liqThreshold != 0) {
-        bool notAllKeepCurrent = collaterals[i].ltv != EngineFlags.KEEP_CURRENT ||
-          collaterals[i].liqThreshold != EngineFlags.KEEP_CURRENT ||
-          collaterals[i].liqBonus != EngineFlags.KEEP_CURRENT;
+    for (uint256 i = 0; i < updates.length; i++) {
+      if (updates[i].liqThreshold != 0) {
+        bool notAllKeepCurrent = updates[i].ltv != EngineFlags.KEEP_CURRENT ||
+          updates[i].liqThreshold != EngineFlags.KEEP_CURRENT ||
+          updates[i].liqBonus != EngineFlags.KEEP_CURRENT;
 
-        bool atLeastOneKeepCurrent = collaterals[i].ltv == EngineFlags.KEEP_CURRENT ||
-          collaterals[i].liqThreshold == EngineFlags.KEEP_CURRENT ||
-          collaterals[i].liqBonus == EngineFlags.KEEP_CURRENT;
+        bool atLeastOneKeepCurrent = updates[i].ltv == EngineFlags.KEEP_CURRENT ||
+          updates[i].liqThreshold == EngineFlags.KEEP_CURRENT ||
+          updates[i].liqBonus == EngineFlags.KEEP_CURRENT;
 
         if (notAllKeepCurrent && atLeastOneKeepCurrent) {
-          DataTypes.ReserveConfigurationMap memory configuration = pool.getConfiguration(ids[i]);
+          DataTypes.ReserveConfigurationMap memory configuration = pool.getConfiguration(
+            updates[i].asset
+          );
           (
             uint256 currentLtv,
             uint256 currentLiqThreshold,
@@ -55,78 +49,49 @@ library CollateralEngine {
 
           ) = configuration.getParams();
 
-          if (collaterals[i].ltv == EngineFlags.KEEP_CURRENT) {
-            collaterals[i].ltv = currentLtv;
+          if (updates[i].ltv == EngineFlags.KEEP_CURRENT) {
+            updates[i].ltv = currentLtv;
           }
 
-          if (collaterals[i].liqThreshold == EngineFlags.KEEP_CURRENT) {
-            collaterals[i].liqThreshold = currentLiqThreshold;
+          if (updates[i].liqThreshold == EngineFlags.KEEP_CURRENT) {
+            updates[i].liqThreshold = currentLiqThreshold;
           }
 
-          if (collaterals[i].liqBonus == EngineFlags.KEEP_CURRENT) {
+          if (updates[i].liqBonus == EngineFlags.KEEP_CURRENT) {
             // Subtracting 100_00 to be consistent with the engine as 100_00 gets added while setting the liqBonus
-            collaterals[i].liqBonus = currentLiqBonus - 100_00;
+            updates[i].liqBonus = currentLiqBonus - 100_00;
           }
         }
 
         if (notAllKeepCurrent) {
           // LT*LB (in %) should never be above 100%, because it means instant undercollateralization
           require(
-            collaterals[i].liqThreshold.percentMul(100_00 + collaterals[i].liqBonus) <= 100_00,
+            updates[i].liqThreshold.percentMul(100_00 + updates[i].liqBonus) <= 100_00,
             'INVALID_LT_LB_RATIO'
           );
 
           poolConfigurator.configureReserveAsCollateral(
-            ids[i],
-            collaterals[i].ltv,
-            collaterals[i].liqThreshold,
+            updates[i].asset,
+            updates[i].ltv,
+            updates[i].liqThreshold,
             // For reference, this is to simplify the interaction with the Aave protocol,
             // as there the definition is as e.g. 105% (5% bonus for liquidators)
-            100_00 + collaterals[i].liqBonus
+            100_00 + updates[i].liqBonus
           );
         }
 
-        if (collaterals[i].liqProtocolFee != EngineFlags.KEEP_CURRENT) {
-          require(collaterals[i].liqProtocolFee < 100_00, 'INVALID_LIQ_PROTOCOL_FEE');
-          poolConfigurator.setLiquidationProtocolFee(ids[i], collaterals[i].liqProtocolFee);
+        if (updates[i].liqProtocolFee != EngineFlags.KEEP_CURRENT) {
+          require(updates[i].liqProtocolFee < 100_00, 'INVALID_LIQ_PROTOCOL_FEE');
+          poolConfigurator.setLiquidationProtocolFee(updates[i].asset, updates[i].liqProtocolFee);
         }
 
-        if (collaterals[i].debtCeiling != EngineFlags.KEEP_CURRENT) {
+        if (updates[i].debtCeiling != EngineFlags.KEEP_CURRENT) {
           // For reference, this is to simplify the interactions with the Aave protocol,
           // as there the definition is with 2 decimals. We don't see any reason to set
           // a debt ceiling involving .something USD, so we simply don't allow to do it
-          poolConfigurator.setDebtCeiling(ids[i], collaterals[i].debtCeiling * 100);
+          poolConfigurator.setDebtCeiling(updates[i].asset, updates[i].debtCeiling * 100);
         }
       }
     }
-  }
-
-  function _repackCollateralUpdate(
-    IEngine.CollateralUpdate[] memory updates
-  ) internal pure returns (Engine.AssetsConfig memory) {
-    address[] memory ids = new address[](updates.length);
-    Engine.Collateral[] memory collaterals = new Engine.Collateral[](updates.length);
-
-    for (uint256 i = 0; i < updates.length; i++) {
-      ids[i] = updates[i].asset;
-      collaterals[i] = Engine.Collateral({
-        ltv: updates[i].ltv,
-        liqThreshold: updates[i].liqThreshold,
-        liqBonus: updates[i].liqBonus,
-        debtCeiling: updates[i].debtCeiling,
-        liqProtocolFee: updates[i].liqProtocolFee
-      });
-    }
-
-    return
-      Engine.AssetsConfig({
-        ids: ids,
-        caps: new Engine.Caps[](0),
-        basics: new Engine.Basic[](0),
-        borrows: new Engine.Borrow[](0),
-        collaterals: collaterals,
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
-        eModeCategories: new Engine.EModeCategories[](0)
-      });
   }
 }

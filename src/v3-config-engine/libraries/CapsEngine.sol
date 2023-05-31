@@ -12,47 +12,21 @@ library CapsEngine {
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
-    Engine.AssetsConfig memory configs = _repackCapsUpdate(updates);
-
-    _configureCaps(engineConstants.poolConfigurator, configs.ids, configs.caps);
+    _configureCaps(engineConstants.poolConfigurator, updates);
   }
 
   function _configureCaps(
     IPoolConfigurator poolConfigurator,
-    address[] memory ids,
-    Engine.Caps[] memory caps
+    IEngine.CapsUpdate[] memory caps
   ) internal {
-    for (uint256 i = 0; i < ids.length; i++) {
+    for (uint256 i = 0; i < caps.length; i++) {
       if (caps[i].supplyCap != EngineFlags.KEEP_CURRENT) {
-        poolConfigurator.setSupplyCap(ids[i], caps[i].supplyCap);
+        poolConfigurator.setSupplyCap(caps[i].asset, caps[i].supplyCap);
       }
 
       if (caps[i].borrowCap != EngineFlags.KEEP_CURRENT) {
-        poolConfigurator.setBorrowCap(ids[i], caps[i].borrowCap);
+        poolConfigurator.setBorrowCap(caps[i].asset, caps[i].borrowCap);
       }
     }
-  }
-
-  function _repackCapsUpdate(
-    IEngine.CapsUpdate[] memory updates
-  ) internal pure returns (Engine.AssetsConfig memory) {
-    address[] memory ids = new address[](updates.length);
-    Engine.Caps[] memory caps = new Engine.Caps[](updates.length);
-
-    for (uint256 i = 0; i < updates.length; i++) {
-      ids[i] = updates[i].asset;
-      caps[i] = Engine.Caps({supplyCap: updates[i].supplyCap, borrowCap: updates[i].borrowCap});
-    }
-
-    return
-      Engine.AssetsConfig({
-        ids: ids,
-        caps: caps,
-        basics: new Engine.Basic[](0),
-        borrows: new Engine.Borrow[](0),
-        collaterals: new Engine.Collateral[](0),
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
-        eModeCategories: new Engine.EModeCategories[](0)
-      });
   }
 }

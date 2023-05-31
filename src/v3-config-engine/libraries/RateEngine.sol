@@ -12,13 +12,16 @@ library RateEngine {
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
-    Engine.AssetsConfig memory configs = _repackRatesUpdate(updates);
+    (
+      address[] memory ids,
+      IV3RateStrategyFactory.RateStrategyParams[] memory rates
+    ) = _repackRatesUpdate(updates);
 
     _configRateStrategies(
       engineConstants.poolConfigurator,
       engineConstants.ratesStrategyFactory,
-      configs.ids,
-      configs.rates
+      ids,
+      rates
     );
   }
 
@@ -91,7 +94,7 @@ library RateEngine {
 
   function _repackRatesUpdate(
     IEngine.RateStrategyUpdate[] memory updates
-  ) internal pure returns (Engine.AssetsConfig memory) {
+  ) internal pure returns (address[] memory, IV3RateStrategyFactory.RateStrategyParams[] memory) {
     address[] memory ids = new address[](updates.length);
     IV3RateStrategyFactory.RateStrategyParams[]
       memory rates = new IV3RateStrategyFactory.RateStrategyParams[](updates.length);
@@ -100,16 +103,6 @@ library RateEngine {
       ids[i] = updates[i].asset;
       rates[i] = updates[i].params;
     }
-
-    return
-      Engine.AssetsConfig({
-        ids: ids,
-        rates: rates,
-        basics: new Engine.Basic[](0),
-        borrows: new Engine.Borrow[](0),
-        caps: new Engine.Caps[](0),
-        collaterals: new Engine.Collateral[](0),
-        eModeCategories: new Engine.EModeCategories[](0)
-      });
+    return (ids, rates);
   }
 }

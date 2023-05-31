@@ -26,52 +26,9 @@ import './IAaveV3ConfigEngine.sol';
 contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   using Address for address;
 
-  struct AssetsConfig {
-    address[] ids;
-    Basic[] basics;
-    Borrow[] borrows;
-    Collateral[] collaterals;
-    Caps[] caps;
-    IV3RateStrategyFactory.RateStrategyParams[] rates;
-    EModeCategories[] eModeCategories;
-  }
-
   struct Basic {
     string assetSymbol;
-    address priceFeed;
-    IV3RateStrategyFactory.RateStrategyParams rateStrategyParams;
     TokenImplementations implementations;
-  }
-
-  struct Borrow {
-    uint256 enabledToBorrow; // Main config flag, if EngineFlag.DISABLED, some of the other fields will not be considered
-    uint256 flashloanable; // EngineFlag.ENABLED for true, EngineFlag.DISABLED for false otherwise EngineFlag.KEEP_CURRENT
-    uint256 stableRateModeEnabled; // EngineFlag.ENABLED for true, EngineFlag.DISABLED for false otherwise EngineFlag.KEEP_CURRENT
-    uint256 borrowableInIsolation; // EngineFlag.ENABLED for true, EngineFlag.DISABLED for false otherwise EngineFlag.KEEP_CURRENT
-    uint256 withSiloedBorrowing; // EngineFlag.ENABLED for true, EngineFlag.DISABLED for false otherwise EngineFlag.KEEP_CURRENT
-    uint256 reserveFactor; // With 2 digits precision, `10_00` for 10%. Should be positive and < 100_00
-  }
-
-  struct Collateral {
-    uint256 ltv; // Only considered if liqThreshold > 0. With 2 digits precision, `10_00` for 10%. Should be lower than liquidationThreshold
-    uint256 liqThreshold; // If `0`, the asset will not be enabled as collateral. Same format as ltv, and should be higher
-    uint256 liqBonus; // Only considered if liqThreshold > 0. Same format as ltv
-    uint256 debtCeiling; // Only considered if liqThreshold > 0. In USD and without decimals, so 100_000 for 100k USD debt ceiling
-    uint256 liqProtocolFee; // Only considered if liqThreshold > 0. Same format as ltv
-  }
-
-  struct Caps {
-    uint256 supplyCap; // Always configured. In "big units" of the asset, and no decimals. 100 for 100 ETH supply cap
-    uint256 borrowCap; // Always configured, no matter if enabled for borrowing or not. Same format as supply cap
-  }
-
-  struct EModeCategories {
-    uint8 eModeCategory;
-    uint256 ltv; // With 2 digits precision, `10_00` for 10%. Should be lower or equal to liquidationThreshold
-    uint256 liqThreshold; // Same format as ltv, and should be higher or equal to ltv.
-    uint256 liqBonus; // Same format as ltv
-    address priceSource; // A custom price oracle for the eMode category
-    string label; // The label for the eMode category
   }
 
   struct EngineLibraries {

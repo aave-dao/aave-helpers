@@ -122,8 +122,6 @@ library ListingEngine {
       ids[i] = listings[i].base.asset;
       basics[i] = Engine.Basic({
         assetSymbol: listings[i].base.assetSymbol,
-        priceFeed: listings[i].base.priceFeed,
-        rateStrategyParams: listings[i].base.rateStrategyParams,
         implementations: listings[i].implementations
       });
       priceFeedsUpdates[i] = IEngine.PriceFeedUpdate({

@@ -16,103 +16,65 @@ library BorrowEngine {
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
-    Engine.AssetsConfig memory configs = _repackBorrowUpdate(updates);
-
-    _configBorrowSide(
-      engineConstants.poolConfigurator,
-      engineConstants.pool,
-      configs.ids,
-      configs.borrows
-    );
+    _configBorrowSide(engineConstants.poolConfigurator, engineConstants.pool, updates);
   }
 
   function _configBorrowSide(
     IPoolConfigurator poolConfigurator,
     IPool pool,
-    address[] memory ids,
-    Engine.Borrow[] memory borrows
+    IEngine.BorrowUpdate[] memory updates
   ) internal {
-    for (uint256 i = 0; i < ids.length; i++) {
-      if (borrows[i].enabledToBorrow != EngineFlags.KEEP_CURRENT) {
+    for (uint256 i = 0; i < updates.length; i++) {
+      if (updates[i].enabledToBorrow != EngineFlags.KEEP_CURRENT) {
         poolConfigurator.setReserveBorrowing(
-          ids[i],
-          EngineFlags.toBool(borrows[i].enabledToBorrow)
+          updates[i].asset,
+          EngineFlags.toBool(updates[i].enabledToBorrow)
         );
       } else {
-        (, , bool borrowingEnabled, , ) = pool.getConfiguration(ids[i]).getFlags();
-        borrows[i].enabledToBorrow = EngineFlags.fromBool(borrowingEnabled);
+        (, , bool borrowingEnabled, , ) = pool.getConfiguration(updates[i].asset).getFlags();
+        updates[i].enabledToBorrow = EngineFlags.fromBool(borrowingEnabled);
       }
 
-      if (borrows[i].enabledToBorrow == EngineFlags.ENABLED) {
-        if (borrows[i].stableRateModeEnabled != EngineFlags.KEEP_CURRENT) {
+      if (updates[i].enabledToBorrow == EngineFlags.ENABLED) {
+        if (updates[i].stableRateModeEnabled != EngineFlags.KEEP_CURRENT) {
           poolConfigurator.setReserveStableRateBorrowing(
-            ids[i],
-            EngineFlags.toBool(borrows[i].stableRateModeEnabled)
+            updates[i].asset,
+            EngineFlags.toBool(updates[i].stableRateModeEnabled)
           );
         }
       }
 
-      if (borrows[i].borrowableInIsolation != EngineFlags.KEEP_CURRENT) {
+      if (updates[i].borrowableInIsolation != EngineFlags.KEEP_CURRENT) {
         poolConfigurator.setBorrowableInIsolation(
-          ids[i],
-          EngineFlags.toBool(borrows[i].borrowableInIsolation)
+          updates[i].asset,
+          EngineFlags.toBool(updates[i].borrowableInIsolation)
         );
       }
 
-      if (borrows[i].withSiloedBorrowing != EngineFlags.KEEP_CURRENT) {
+      if (updates[i].withSiloedBorrowing != EngineFlags.KEEP_CURRENT) {
         poolConfigurator.setSiloedBorrowing(
-          ids[i],
-          EngineFlags.toBool(borrows[i].withSiloedBorrowing)
+          updates[i].asset,
+          EngineFlags.toBool(updates[i].withSiloedBorrowing)
         );
       }
 
       // The reserve factor should always be > 0
       require(
-        (borrows[i].reserveFactor > 0 && borrows[i].reserveFactor <= 100_00) ||
-          borrows[i].reserveFactor == EngineFlags.KEEP_CURRENT,
+        (updates[i].reserveFactor > 0 && updates[i].reserveFactor <= 100_00) ||
+          updates[i].reserveFactor == EngineFlags.KEEP_CURRENT,
         'INVALID_RESERVE_FACTOR'
       );
 
-      if (borrows[i].reserveFactor != EngineFlags.KEEP_CURRENT) {
-        poolConfigurator.setReserveFactor(ids[i], borrows[i].reserveFactor);
+      if (updates[i].reserveFactor != EngineFlags.KEEP_CURRENT) {
+        poolConfigurator.setReserveFactor(updates[i].asset, updates[i].reserveFactor);
       }
 
-      if (borrows[i].flashloanable != EngineFlags.KEEP_CURRENT) {
+      if (updates[i].flashloanable != EngineFlags.KEEP_CURRENT) {
         poolConfigurator.setReserveFlashLoaning(
-          ids[i],
-          EngineFlags.toBool(borrows[i].flashloanable)
+          updates[i].asset,
+          EngineFlags.toBool(updates[i].flashloanable)
         );
       }
     }
-  }
-
-  function _repackBorrowUpdate(
-    IEngine.BorrowUpdate[] memory updates
-  ) internal pure returns (Engine.AssetsConfig memory) {
-    address[] memory ids = new address[](updates.length);
-    Engine.Borrow[] memory borrows = new Engine.Borrow[](updates.length);
-
-    for (uint256 i = 0; i < updates.length; i++) {
-      ids[i] = updates[i].asset;
-      borrows[i] = Engine.Borrow({
-        enabledToBorrow: updates[i].enabledToBorrow,
-        flashloanable: updates[i].flashloanable,
-        stableRateModeEnabled: updates[i].stableRateModeEnabled,
-        borrowableInIsolation: updates[i].borrowableInIsolation,
-        withSiloedBorrowing: updates[i].withSiloedBorrowing,
-        reserveFactor: updates[i].reserveFactor
-      });
-    }
-
-    return
-      Engine.AssetsConfig({
-        ids: ids,
-        caps: new Engine.Caps[](0),
-        basics: new Engine.Basic[](0),
-        borrows: borrows,
-        collaterals: new Engine.Collateral[](0),
-        rates: new IV3RateStrategyFactory.RateStrategyParams[](0),
-        eModeCategories: new Engine.EModeCategories[](0)
-      });
   }
 }
