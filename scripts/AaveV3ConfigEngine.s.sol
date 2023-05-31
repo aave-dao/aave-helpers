@@ -30,19 +30,22 @@ library DeployEngineEthLib {
       rateEngine: Create2Utils._create2Deploy('v1', type(RateEngine).creationCode),
       capsEngine: Create2Utils._create2Deploy('v1', type(CapsEngine).creationCode)
     });
+    AaveV3ConfigEngine.EngineConstants memory engineConstants = AaveV3ConfigEngine.EngineConstants({
+      pool: AaveV3Ethereum.POOL,
+      poolConfigurator: AaveV3Ethereum.POOL_CONFIGURATOR,
+      ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Ethereum.RATES_FACTORY),
+      oracle: AaveV3Ethereum.ORACLE,
+      aTokenImpl: AaveV3Ethereum.DEFAULT_A_TOKEN_IMPL_REV_1,
+      vTokenImpl: AaveV3Ethereum.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
+      sTokenImpl: AaveV3Ethereum.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
+      rewardsController: AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER,
+      collector: address(AaveV3Ethereum.COLLECTOR)
+    });
 
     return
       address(
         new AaveV3ConfigEngine(
-          AaveV3Ethereum.POOL,
-          AaveV3Ethereum.POOL_CONFIGURATOR,
-          AaveV3Ethereum.ORACLE,
-          AaveV3Ethereum.DEFAULT_A_TOKEN_IMPL_REV_1,
-          AaveV3Ethereum.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
-          AaveV3Ethereum.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
-          AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER,
-          address(AaveV3Ethereum.COLLECTOR),
-          IV3RateStrategyFactory(AaveV3Ethereum.RATES_FACTORY),
+          engineConstants,
           engineLibraries
         )
       );
@@ -60,19 +63,22 @@ library DeployEngineOptLib {
       rateEngine: Create2Utils._create2Deploy('v1', type(RateEngine).creationCode),
       capsEngine: Create2Utils._create2Deploy('v1', type(CapsEngine).creationCode)
     });
+    AaveV3ConfigEngine.EngineConstants memory engineConstants = AaveV3ConfigEngine.EngineConstants({
+      pool: AaveV3Optimism.POOL,
+      poolConfigurator: AaveV3Optimism.POOL_CONFIGURATOR,
+      ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Optimism.RATES_FACTORY),
+      oracle: AaveV3Optimism.ORACLE,
+      aTokenImpl: AaveV3Optimism.DEFAULT_A_TOKEN_IMPL_REV_2,
+      vTokenImpl: AaveV3Optimism.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
+      sTokenImpl: AaveV3Optimism.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
+      rewardsController: AaveV3Optimism.DEFAULT_INCENTIVES_CONTROLLER,
+      collector: address(AaveV3Optimism.COLLECTOR)
+    });
 
     return
       address(
         new AaveV3ConfigEngine(
-          AaveV3Optimism.POOL,
-          AaveV3Optimism.POOL_CONFIGURATOR,
-          AaveV3Optimism.ORACLE,
-          AaveV3Optimism.DEFAULT_A_TOKEN_IMPL_REV_2,
-          AaveV3Optimism.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
-          AaveV3Optimism.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
-          AaveV3Optimism.DEFAULT_INCENTIVES_CONTROLLER,
-          address(AaveV3Optimism.COLLECTOR),
-          IV3RateStrategyFactory(AaveV3Optimism.RATES_FACTORY),
+          engineConstants,
           engineLibraries
         )
       );
@@ -90,19 +96,22 @@ library DeployEngineArbLib {
       rateEngine: Create2Utils._create2Deploy('v1', type(RateEngine).creationCode),
       capsEngine: Create2Utils._create2Deploy('v1', type(CapsEngine).creationCode)
     });
+    AaveV3ConfigEngine.EngineConstants memory engineConstants = AaveV3ConfigEngine.EngineConstants({
+      pool: AaveV3Arbitrum.POOL,
+      poolConfigurator: AaveV3Arbitrum.POOL_CONFIGURATOR,
+      ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Arbitrum.RATES_FACTORY),
+      oracle: AaveV3Arbitrum.ORACLE,
+      aTokenImpl: AaveV3Arbitrum.DEFAULT_A_TOKEN_IMPL_REV_2,
+      vTokenImpl: AaveV3Arbitrum.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
+      sTokenImpl: AaveV3Arbitrum.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
+      rewardsController: AaveV3Arbitrum.DEFAULT_INCENTIVES_CONTROLLER,
+      collector: address(AaveV3Arbitrum.COLLECTOR)
+    });
 
     return
       address(
         new AaveV3ConfigEngine(
-          AaveV3Arbitrum.POOL,
-          AaveV3Arbitrum.POOL_CONFIGURATOR,
-          AaveV3Arbitrum.ORACLE,
-          AaveV3Arbitrum.DEFAULT_A_TOKEN_IMPL_REV_2,
-          AaveV3Arbitrum.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
-          AaveV3Arbitrum.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
-          AaveV3Arbitrum.DEFAULT_INCENTIVES_CONTROLLER,
-          address(AaveV3Arbitrum.COLLECTOR),
-          IV3RateStrategyFactory(AaveV3Arbitrum.RATES_FACTORY),
+          engineConstants,
           engineLibraries
         )
       );
@@ -120,19 +129,22 @@ library DeployEnginePolLib {
       rateEngine: Create2Utils._create2Deploy('v1', type(RateEngine).creationCode),
       capsEngine: Create2Utils._create2Deploy('v1', type(CapsEngine).creationCode)
     });
+    AaveV3ConfigEngine.EngineConstants memory engineConstants = AaveV3ConfigEngine.EngineConstants({
+      pool: AaveV3Polygon.POOL,
+      poolConfigurator: AaveV3Polygon.POOL_CONFIGURATOR,
+      ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Polygon.RATES_FACTORY),
+      oracle: AaveV3Polygon.ORACLE,
+      aTokenImpl: AaveV3Polygon.DEFAULT_A_TOKEN_IMPL_REV_2,
+      vTokenImpl: AaveV3Polygon.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
+      sTokenImpl: AaveV3Polygon.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
+      rewardsController: AaveV3Polygon.DEFAULT_INCENTIVES_CONTROLLER,
+      collector: address(AaveV3Polygon.COLLECTOR)
+    });
 
     return
       address(
         new AaveV3ConfigEngine(
-          AaveV3Polygon.POOL,
-          AaveV3Polygon.POOL_CONFIGURATOR,
-          AaveV3Polygon.ORACLE,
-          AaveV3Polygon.DEFAULT_A_TOKEN_IMPL_REV_2,
-          AaveV3Polygon.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
-          AaveV3Polygon.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
-          AaveV3Polygon.DEFAULT_INCENTIVES_CONTROLLER,
-          address(AaveV3Polygon.COLLECTOR),
-          IV3RateStrategyFactory(AaveV3Polygon.RATES_FACTORY),
+          engineConstants,
           engineLibraries
         )
       );
@@ -150,19 +162,22 @@ library DeployEngineAvaLib {
       rateEngine: Create2Utils._create2Deploy('v1', type(RateEngine).creationCode),
       capsEngine: Create2Utils._create2Deploy('v1', type(CapsEngine).creationCode)
     });
+    AaveV3ConfigEngine.EngineConstants memory engineConstants = AaveV3ConfigEngine.EngineConstants({
+      pool: AaveV3Avalanche.POOL,
+      poolConfigurator: AaveV3Avalanche.POOL_CONFIGURATOR,
+      ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Avalanche.RATES_FACTORY),
+      oracle: AaveV3Avalanche.ORACLE,
+      aTokenImpl: AaveV3Avalanche.DEFAULT_A_TOKEN_IMPL_REV_2,
+      vTokenImpl: AaveV3Avalanche.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
+      sTokenImpl: AaveV3Avalanche.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
+      rewardsController: AaveV3Avalanche.DEFAULT_INCENTIVES_CONTROLLER,
+      collector: address(AaveV3Avalanche.COLLECTOR)
+    });
 
     return
       address(
         new AaveV3ConfigEngine(
-          AaveV3Avalanche.POOL,
-          AaveV3Avalanche.POOL_CONFIGURATOR,
-          AaveV3Avalanche.ORACLE,
-          AaveV3Avalanche.DEFAULT_A_TOKEN_IMPL_REV_2,
-          AaveV3Avalanche.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
-          AaveV3Avalanche.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
-          AaveV3Avalanche.DEFAULT_INCENTIVES_CONTROLLER,
-          address(AaveV3Avalanche.COLLECTOR),
-          IV3RateStrategyFactory(AaveV3Avalanche.RATES_FACTORY),
+          engineConstants,
           engineLibraries
         )
       );
@@ -180,19 +195,22 @@ library DeployEngineMetLib {
       rateEngine: Create2Utils._create2Deploy('v1', type(RateEngine).creationCode),
       capsEngine: Create2Utils._create2Deploy('v1', type(CapsEngine).creationCode)
     });
+    AaveV3ConfigEngine.EngineConstants memory engineConstants = AaveV3ConfigEngine.EngineConstants({
+      pool: AaveV3Metis.POOL,
+      poolConfigurator: AaveV3Metis.POOL_CONFIGURATOR,
+      ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Metis.RATES_FACTORY),
+      oracle: AaveV3Metis.ORACLE,
+      aTokenImpl: AaveV3Metis.DEFAULT_A_TOKEN_IMPL_REV_1,
+      vTokenImpl: AaveV3Metis.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
+      sTokenImpl: AaveV3Metis.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
+      rewardsController: AaveV3Metis.DEFAULT_INCENTIVES_CONTROLLER,
+      collector: address(AaveV3Metis.COLLECTOR)
+    });
 
     return
       address(
         new AaveV3ConfigEngine(
-          AaveV3Metis.POOL,
-          AaveV3Metis.POOL_CONFIGURATOR,
-          AaveV3Metis.ORACLE,
-          AaveV3Metis.DEFAULT_A_TOKEN_IMPL_REV_1,
-          AaveV3Metis.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
-          AaveV3Metis.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
-          AaveV3Metis.DEFAULT_INCENTIVES_CONTROLLER,
-          address(AaveV3Metis.COLLECTOR),
-          IV3RateStrategyFactory(AaveV3Metis.RATES_FACTORY),
+          engineConstants,
           engineLibraries
         )
       );
