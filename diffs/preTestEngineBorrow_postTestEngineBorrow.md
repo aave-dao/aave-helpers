@@ -6,8 +6,8 @@
 
 | description | value before | value after |
 | --- | --- | --- |
-| borrowingEnabled | false | true |
 | reserveFactor | 0 % | 15 % |
+| borrowingEnabled | false | true |
 
 
 ## Raw diff

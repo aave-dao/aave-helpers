@@ -5,6 +5,7 @@ import 'forge-std/Test.sol';
 import {GovHelpers, TestWithExecutor} from '../GovHelpers.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
+import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 
 contract GovernanceTest is Test {
   function setUp() public {
@@ -32,14 +33,33 @@ contract GovernanceTest is Test {
   }
 }
 
-contract GovernanceExistingProposalTest is TestWithExecutor {
+contract GovernanceL2ExecutorTest is Test {
+  event TestEvent();
+
   function setUp() public {
-    vm.createSelectFork('polygon', 39582255);
-    _selectPayloadExecutor(AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
+    vm.createSelectFork('polygon', 43322560);
   }
 
   function testCreateProposal() public {
-    _executor.execute(15);
+    PayloadWithEmit payload = new PayloadWithEmit();
+    vm.expectEmit(true, true, true, true);
+    emit TestEvent();
+    GovHelpers.executePayload(vm, address(payload));
+  }
+}
+
+contract GovernanceMainnetExecutorTest is Test {
+  event TestEvent();
+
+  function setUp() public {
+    vm.createSelectFork('mainnet', 17370904);
+  }
+
+  function testCreateProposal() public {
+    PayloadWithEmit payload = new PayloadWithEmit();
+    vm.expectEmit(true, true, true, true);
+    emit TestEvent();
+    GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.SHORT_EXECUTOR);
   }
 }
 

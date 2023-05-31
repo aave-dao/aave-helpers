@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@adraffy/ens-normalize/-/ens-normalize-1.9.0.tgz#223572538f6bea336750039bb43a4016dcc8182d"
   integrity sha512-iowxq3U30sghZotgl4s/oJRci6WPBfNO5YYgk2cIOMCHr3LeGPcsZjCEr+33Q4N+oV3OABDAtA+pyvWjbvBifQ==
 
-"@bgd-labs/report-engine@^0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@bgd-labs/report-engine/-/report-engine-0.0.9.tgz#610493e2962bcbbf692d06e8ebdd88eb2f40b8fc"
-  integrity sha512-YtQxcPhAopTQh1NNcl+338ubSHBdf48MbeKGlI2XF/eWPQCGxNHsLW62osc7gSZYqLKM1wz2vYTGkjFNifSeVA==
+"@bgd-labs/report-engine@^0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@bgd-labs/report-engine/-/report-engine-0.0.11.tgz#03209a5924c8499febe75b93208f196fd6673535"
+  integrity sha512-6NiP8gwi3GV5gISsfnd7PZcLd2tOLU1okjGJACtb8iJuLcdRlbASJPDmR/aTtaGpItmjoQJNVWpPkFQgoy5W6A==
   dependencies:
     json-bigint "^1.0.0"
     node-fetch "^2.6.9"

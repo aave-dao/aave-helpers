@@ -6,9 +6,9 @@
 
 | description | value before | value after |
 | --- | --- | --- |
-| liquidationBonus | 7.5 % | 6 % |
-| liquidationThreshold | 71.3 % | 72 % |
 | ltv | 60 % | 62 % |
+| liquidationThreshold | 71.3 % | 72 % |
+| liquidationBonus | 7.5 % | 6 % |
 
 
 ## Raw diff

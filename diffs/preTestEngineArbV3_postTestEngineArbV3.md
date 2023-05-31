@@ -6,8 +6,8 @@
 
 | description | value before | value after |
 | --- | --- | --- |
-| interestRateStrategy | [0x9b34E3e183c9b0d1a08fF57a8fb59c821616295f](https://https://arbiscan.io/address/0x9b34E3e183c9b0d1a08fF57a8fb59c821616295f) | [0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F](https://https://arbiscan.io/address/0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F) |
 | reserveFactor | 10 % | 15 % |
+| interestRateStrategy | [0x9b34E3e183c9b0d1a08fF57a8fb59c821616295f](https://https://arbiscan.io/address/0x9b34E3e183c9b0d1a08fF57a8fb59c821616295f) | [0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F](https://https://arbiscan.io/address/0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F) |
 | optimalUsageRatio | 45 % | 80 % |
 | maxExcessUsageRatio | 55 % | 20 % |
 | baseVariableBorrowRate | 0 % | 1 % |

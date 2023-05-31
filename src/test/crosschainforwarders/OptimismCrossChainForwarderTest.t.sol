@@ -8,7 +8,6 @@ import {AddressAliasHelper} from 'governance-crosschain-bridges/contracts/depend
 import {IL2CrossDomainMessenger} from 'governance-crosschain-bridges/contracts/dependencies/optimism/interfaces/IL2CrossDomainMessenger.sol';
 import {GovHelpers} from '../../GovHelpers.sol';
 import {ProtocolV3TestBase, ReserveConfig, ReserveTokens, IERC20} from '../../ProtocolV3TestBase.sol';
-import {BridgeExecutorHelpers} from '../../BridgeExecutorHelpers.sol';
 import {CrosschainForwarderOptimism} from '../../crosschainforwarders/CrosschainForwarderOptimism.sol';
 import {PayloadWithEmit} from '../mocks/PayloadWithEmit.sol';
 
@@ -74,6 +73,6 @@ contract OptimismCrossChainForwarderTest is ProtocolV3TestBase {
     // 4. execute proposal on l2
     vm.expectEmit(true, true, true, true);
     emit TestEvent();
-    BridgeExecutorHelpers.waitAndExecuteLatest(vm, OPTIMISM_BRIDGE_EXECUTOR);
+    GovHelpers.executeLatestActionSet(vm);
   }
 }

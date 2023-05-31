@@ -64,6 +64,17 @@ contract ProtocolV3TestBase is CommonTestBase {
     string memory reportName,
     IPool pool
   ) public returns (ReserveConfig[] memory) {
+    return createConfigurationSnapshot(reportName, pool, true, true, true, true);
+  }
+
+  function createConfigurationSnapshot(
+    string memory reportName,
+    IPool pool,
+    bool reserveConfigs,
+    bool strategyConfigs,
+    bool eModeConigs,
+    bool poolConfigs
+  ) public returns (ReserveConfig[] memory) {
     string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
     // overwrite with empty json to later be extended
     vm.writeFile(
@@ -72,10 +83,10 @@ contract ProtocolV3TestBase is CommonTestBase {
     );
     vm.serializeUint('root', 'chainId', block.chainid);
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    _writeReserveConfigs(path, configs, pool);
-    _writeStrategyConfigs(path, configs);
-    _writeEModeConfigs(path, configs, pool);
-    _writePoolConfiguration(path, pool);
+    if (reserveConfigs) _writeReserveConfigs(path, configs, pool);
+    if (strategyConfigs) _writeStrategyConfigs(path, configs);
+    if (eModeConigs) _writeEModeConfigs(path, configs, pool);
+    if (poolConfigs) _writePoolConfiguration(path, pool);
 
     return configs;
   }
@@ -426,9 +437,13 @@ contract ProtocolV3TestBase is CommonTestBase {
     IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
     vm.serializeAddress(poolConfigKey, 'poolAddressesProvider', address(addressesProvider));
 
-    // oracle
-    IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
-    vm.serializeAddress(poolConfigKey, 'oracle', address(oracle));
+    // oracles
+    vm.serializeAddress(poolConfigKey, 'oracle', addressesProvider.getPriceOracle());
+    vm.serializeAddress(
+      poolConfigKey,
+      'priceOracleSentinel',
+      addressesProvider.getPriceOracleSentinel()
+    );
 
     // pool configurator
     IPoolConfigurator configurator = IPoolConfigurator(addressesProvider.getPoolConfigurator());
@@ -439,7 +454,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, address(configurator))
     );
 
-    // PoolDaraProvider
+    // PoolDataProvider
     IPoolDataProvider pdp = IPoolDataProvider(addressesProvider.getPoolDataProvider());
     vm.serializeAddress(poolConfigKey, 'protocolDataProvider', address(pdp));
 

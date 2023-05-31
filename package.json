@@ -26,6 +26,6 @@
     "prettier-plugin-solidity": "^1.1.3"
   },
   "dependencies": {
-    "@bgd-labs/report-engine": "^0.0.9"
+    "@bgd-labs/report-engine": "^0.0.11"
   }
 }

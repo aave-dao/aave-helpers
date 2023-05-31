@@ -7,7 +7,6 @@ import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {IL2CrossDomainMessenger} from 'governance-crosschain-bridges/contracts/dependencies/optimism/interfaces/IL2CrossDomainMessenger.sol';
 import {GovHelpers} from '../../GovHelpers.sol';
 import {ProtocolV3TestBase} from '../../ProtocolV3TestBase.sol';
-import {BridgeExecutorHelpers} from '../../BridgeExecutorHelpers.sol';
 import {CrosschainForwarderMetis} from '../../crosschainforwarders/CrosschainForwarderMetis.sol';
 import {PayloadWithEmit} from '../mocks/PayloadWithEmit.sol';
 
@@ -73,6 +72,6 @@ contract MetisCrossChainForwarderTest is ProtocolV3TestBase {
     // 4. execute proposal on l2
     vm.expectEmit(true, true, true, true);
     emit TestEvent();
-    BridgeExecutorHelpers.waitAndExecuteLatest(vm, METIS_BRIDGE_EXECUTOR);
+    GovHelpers.executeLatestActionSet(vm);
   }
 }
