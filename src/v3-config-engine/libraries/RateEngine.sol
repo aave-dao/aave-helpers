@@ -14,15 +14,20 @@ library RateEngine {
 
     Engine.AssetsConfig memory configs = _repackRatesUpdate(updates);
 
-    configRateStrategies(engineConstants.poolConfigurator, engineConstants.ratesStrategyFactory, configs.ids, configs.rates);
+    _configRateStrategies(
+      engineConstants.poolConfigurator,
+      engineConstants.ratesStrategyFactory,
+      configs.ids,
+      configs.rates
+    );
   }
 
-  function configRateStrategies(
+  function _configRateStrategies(
     IPoolConfigurator poolConfigurator,
     IV3RateStrategyFactory rateStrategiesFactory,
     address[] memory ids,
     IV3RateStrategyFactory.RateStrategyParams[] memory strategiesParams
-  ) public {
+  ) internal {
     for (uint256 i = 0; i < strategiesParams.length; i++) {
       if (
         strategiesParams[i].variableRateSlope1 == EngineFlags.KEEP_CURRENT ||

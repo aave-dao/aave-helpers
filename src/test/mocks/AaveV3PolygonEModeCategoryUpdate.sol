@@ -12,7 +12,12 @@ import '../../v3-config-engine/AaveV3PayloadBase.sol';
 contract AaveV3PolygonEModeCategoryUpdate is AaveV3PayloadBase {
   constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
 
-  function eModeCategoriesUpdates() public pure override returns (IEngine.EModeCategoryUpdate[] memory) {
+  function eModeCategoriesUpdates()
+    public
+    pure
+    override
+    returns (IEngine.EModeCategoryUpdate[] memory)
+  {
     IEngine.EModeCategoryUpdate[] memory eModeUpdates = new IEngine.EModeCategoryUpdate[](1);
 
     eModeUpdates[0] = IEngine.EModeCategoryUpdate({
@@ -41,7 +46,12 @@ contract AaveV3PolygonEModeCategoryUpdate is AaveV3PayloadBase {
 contract AaveV3AvalancheEModeCategoryUpdateEdgeBonus is AaveV3PayloadBase {
   constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
 
-  function eModeCategoriesUpdates() public pure override returns (IEngine.EModeCategoryUpdate[] memory) {
+  function eModeCategoriesUpdates()
+    public
+    pure
+    override
+    returns (IEngine.EModeCategoryUpdate[] memory)
+  {
     IEngine.EModeCategoryUpdate[] memory eModeUpdates = new IEngine.EModeCategoryUpdate[](1);
 
     eModeUpdates[0] = IEngine.EModeCategoryUpdate({

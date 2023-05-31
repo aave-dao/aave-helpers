@@ -18,15 +18,20 @@ library BorrowEngine {
 
     Engine.AssetsConfig memory configs = _repackBorrowUpdate(updates);
 
-    configBorrowSide(engineConstants.poolConfigurator, engineConstants.pool, configs.ids, configs.borrows);
+    _configBorrowSide(
+      engineConstants.poolConfigurator,
+      engineConstants.pool,
+      configs.ids,
+      configs.borrows
+    );
   }
 
-  function configBorrowSide(
+  function _configBorrowSide(
     IPoolConfigurator poolConfigurator,
     IPool pool,
     address[] memory ids,
     Engine.Borrow[] memory borrows
-  ) public {
+  ) internal {
     for (uint256 i = 0; i < ids.length; i++) {
       if (borrows[i].enabledToBorrow != EngineFlags.KEEP_CURRENT) {
         poolConfigurator.setReserveBorrowing(

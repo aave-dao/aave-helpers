@@ -20,7 +20,7 @@ library EModeEngine {
 
     Engine.AssetsConfig memory configs = _repackEModeAssetsUpdate(updates);
 
-    configEModeAssets(engineConstants.poolConfigurator, configs.ids, configs.eModeCategories);
+    _configEModeAssets(engineConstants.poolConfigurator, configs.ids, configs.eModeCategories);
   }
 
   function executeEModeCategoriesUpdate(
@@ -31,14 +31,18 @@ library EModeEngine {
 
     Engine.AssetsConfig memory configs = _repackEModeCategoriesUpdate(updates);
 
-    _configEModeCategories(engineConstants.poolConfigurator, engineConstants.pool, configs.eModeCategories);
+    _configEModeCategories(
+      engineConstants.poolConfigurator,
+      engineConstants.pool,
+      configs.eModeCategories
+    );
   }
 
-  function configEModeAssets(
+  function _configEModeAssets(
     IPoolConfigurator poolConfigurator,
     address[] memory ids,
     Engine.EModeCategories[] memory updates
-  ) public {
+  ) internal {
     for (uint256 i = 0; i < updates.length; i++) {
       if (updates[i].eModeCategory != EngineFlags.KEEP_CURRENT) {
         poolConfigurator.setAssetEModeCategory(ids[i], updates[i].eModeCategory);

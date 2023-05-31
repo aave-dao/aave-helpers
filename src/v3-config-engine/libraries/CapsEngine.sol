@@ -14,14 +14,14 @@ library CapsEngine {
 
     Engine.AssetsConfig memory configs = _repackCapsUpdate(updates);
 
-    configureCaps(engineConstants.poolConfigurator, configs.ids, configs.caps);
+    _configureCaps(engineConstants.poolConfigurator, configs.ids, configs.caps);
   }
 
-  function configureCaps(
+  function _configureCaps(
     IPoolConfigurator poolConfigurator,
     address[] memory ids,
     Engine.Caps[] memory caps
-  ) public {
+  ) internal {
     for (uint256 i = 0; i < ids.length; i++) {
       if (caps[i].supplyCap != EngineFlags.KEEP_CURRENT) {
         poolConfigurator.setSupplyCap(ids[i], caps[i].supplyCap);

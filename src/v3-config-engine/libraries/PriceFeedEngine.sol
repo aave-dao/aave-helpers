@@ -15,14 +15,14 @@ library PriceFeedEngine {
 
     Engine.AssetsConfig memory configs = _repackPriceFeed(updates);
 
-    setPriceFeeds(engineConstants.oracle, configs.ids, configs.basics);
+    _setPriceFeeds(engineConstants.oracle, configs.ids, configs.basics);
   }
 
-  function setPriceFeeds(
+  function _setPriceFeeds(
     IAaveOracle oracle,
     address[] memory ids,
     Engine.Basic[] memory basics
-  ) public {
+  ) internal {
     address[] memory assets = new address[](ids.length);
     address[] memory sources = new address[](ids.length);
 

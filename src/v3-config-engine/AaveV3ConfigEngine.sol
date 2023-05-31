@@ -119,10 +119,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
    * @param engineConstants The struct containing all the engine constants.
    * @param engineLibraries The struct containing the addresses of stateless libraries containing the engine logic.
    */
-  constructor(
-    EngineConstants memory engineConstants,
-    EngineLibraries memory engineLibraries
-  ) {
+  constructor(EngineConstants memory engineConstants, EngineLibraries memory engineLibraries) {
     require(
       address(engineConstants.pool) != address(0) &&
         address(engineConstants.poolConfigurator) != address(0) &&
@@ -208,7 +205,11 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   /// @inheritdoc IAaveV3ConfigEngine
   function updatePriceFeeds(PriceFeedUpdate[] calldata updates) external {
     PRICE_FEED_ENGINE.functionDelegateCall(
-      abi.encodeWithSelector(PriceFeedEngine.executePriceFeedsUpdate.selector, _getEngineConstants(), updates)
+      abi.encodeWithSelector(
+        PriceFeedEngine.executePriceFeedsUpdate.selector,
+        _getEngineConstants(),
+        updates
+      )
     );
   }
 
@@ -268,28 +269,30 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   }
 
   function _getEngineLibraries() internal view returns (EngineLibraries memory) {
-    return EngineLibraries({
-      listingEngine: LISTING_ENGINE,
-      eModeEngine: EMODE_ENGINE,
-      borrowEngine: BORROW_ENGINE,
-      collateralEngine: COLLATERAL_ENGINE,
-      priceFeedEngine: PRICE_FEED_ENGINE,
-      rateEngine: RATE_ENGINE,
-      capsEngine: CAPS_ENGINE
-    });
+    return
+      EngineLibraries({
+        listingEngine: LISTING_ENGINE,
+        eModeEngine: EMODE_ENGINE,
+        borrowEngine: BORROW_ENGINE,
+        collateralEngine: COLLATERAL_ENGINE,
+        priceFeedEngine: PRICE_FEED_ENGINE,
+        rateEngine: RATE_ENGINE,
+        capsEngine: CAPS_ENGINE
+      });
   }
 
   function _getEngineConstants() internal view returns (EngineConstants memory) {
-    return EngineConstants({
-      pool: POOL,
-      poolConfigurator: POOL_CONFIGURATOR,
-      ratesStrategyFactory: RATE_STRATEGY_FACTORY,
-      oracle: ORACLE,
-      aTokenImpl: ATOKEN_IMPL,
-      vTokenImpl: VTOKEN_IMPL,
-      sTokenImpl: STOKEN_IMPL,
-      rewardsController: REWARDS_CONTROLLER,
-      collector: COLLECTOR
-    });
+    return
+      EngineConstants({
+        pool: POOL,
+        poolConfigurator: POOL_CONFIGURATOR,
+        ratesStrategyFactory: RATE_STRATEGY_FACTORY,
+        oracle: ORACLE,
+        aTokenImpl: ATOKEN_IMPL,
+        vTokenImpl: VTOKEN_IMPL,
+        sTokenImpl: STOKEN_IMPL,
+        rewardsController: REWARDS_CONTROLLER,
+        collector: COLLECTOR
+      });
   }
 }

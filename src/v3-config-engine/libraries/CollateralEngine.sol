@@ -20,15 +20,20 @@ library CollateralEngine {
 
     Engine.AssetsConfig memory configs = _repackCollateralUpdate(updates);
 
-    configCollateralSide(engineConstants.poolConfigurator, engineConstants.pool, configs.ids, configs.collaterals);
+    _configCollateralSide(
+      engineConstants.poolConfigurator,
+      engineConstants.pool,
+      configs.ids,
+      configs.collaterals
+    );
   }
 
-  function configCollateralSide(
+  function _configCollateralSide(
     IPoolConfigurator poolConfigurator,
     IPool pool,
     address[] memory ids,
     Engine.Collateral[] memory collaterals
-  ) public {
+  ) internal {
     for (uint256 i = 0; i < ids.length; i++) {
       if (collaterals[i].liqThreshold != 0) {
         bool notAllKeepCurrent = collaterals[i].ltv != EngineFlags.KEEP_CURRENT ||
