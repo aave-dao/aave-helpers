@@ -7,6 +7,7 @@ import './IAaveV2ConfigEngine.sol';
 /**
  * @dev Helper smart contract abstracting the complexity of changing rates configurations on Aave v2.
  *      It is planned to be used via delegatecall, by any contract having appropriate permissions to update rates
+ * IMPORTANT!!! This contract MUST BE STATELESS always, as in practise is a library to be used via DELEGATECALL
  * @author BGD Labs
  */
 contract AaveV2ConfigEngine is IAaveV2ConfigEngine {
