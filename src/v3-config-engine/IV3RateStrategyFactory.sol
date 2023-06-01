@@ -68,10 +68,9 @@ interface IV3RateStrategyFactory {
    * @param strategy The address of the rate strategy
    * @return RateStrategyParams Struct with the parameters of the strategy
    */
-  function getStrategyData(IDefaultInterestRateStrategy strategy)
-    external
-    view
-    returns (RateStrategyParams memory);
+  function getStrategyData(
+    IDefaultInterestRateStrategy strategy
+  ) external view returns (RateStrategyParams memory);
 
   function ADDRESSES_PROVIDER() external view returns (IPoolAddressesProvider);
 }

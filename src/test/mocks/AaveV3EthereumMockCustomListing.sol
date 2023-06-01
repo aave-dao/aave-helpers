@@ -11,7 +11,12 @@ import '../../v3-config-engine/AaveV3PayloadEthereum.sol';
 contract AaveV3EthereumMockCustomListing is AaveV3PayloadBase {
   constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
 
-  function newListingsCustom() public view override returns (IEngine.ListingWithCustomImpl[] memory) {
+  function newListingsCustom()
+    public
+    view
+    override
+    returns (IEngine.ListingWithCustomImpl[] memory)
+  {
     IEngine.ListingWithCustomImpl[] memory listingsCustom = new IEngine.ListingWithCustomImpl[](1);
 
     listingsCustom[0] = IEngine.ListingWithCustomImpl(

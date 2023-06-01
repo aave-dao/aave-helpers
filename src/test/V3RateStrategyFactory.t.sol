@@ -12,7 +12,7 @@ contract V3RateStrategyFactoryTest is ProtocolV3TestBase {
   V3RateStrategyFactory rateStrategyFactory;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 16613098);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 17370731);
     rateStrategyFactory = new V3RateStrategyFactory(AaveV3Ethereum.POOL_ADDRESSES_PROVIDER);
   }
 
@@ -33,7 +33,8 @@ contract V3RateStrategyFactoryTest is ProtocolV3TestBase {
       optimalStableToTotalDebtRatio: strategy.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO()
     });
 
-    IV3RateStrategyFactory.RateStrategyParams[] memory rateStrategyParams = new IV3RateStrategyFactory.RateStrategyParams[](1);
+    IV3RateStrategyFactory.RateStrategyParams[]
+      memory rateStrategyParams = new IV3RateStrategyFactory.RateStrategyParams[](1);
 
     rateStrategyParams[0] = IV3RateStrategyFactory.RateStrategyParams({
       optimalUsageRatio: expectedStrategyValues.optimalUsageRatio,
@@ -65,7 +66,8 @@ contract V3RateStrategyFactoryTest is ProtocolV3TestBase {
       AaveV3EthereumAssets.USDT_INTEREST_RATE_STRATEGY
     );
 
-    IV3RateStrategyFactory.RateStrategyParams[] memory rateStrategyParams = new IV3RateStrategyFactory.RateStrategyParams[](1);
+    IV3RateStrategyFactory.RateStrategyParams[]
+      memory rateStrategyParams = new IV3RateStrategyFactory.RateStrategyParams[](1);
     rateStrategyParams[0] = IV3RateStrategyFactory.RateStrategyParams({
       optimalUsageRatio: strategy.OPTIMAL_USAGE_RATIO(),
       baseVariableBorrowRate: strategy.getBaseVariableBorrowRate(),
@@ -89,9 +91,6 @@ contract V3RateStrategyFactoryTest is ProtocolV3TestBase {
     );
 
     // Asserts multiple strategies with same params created to have the same address
-    assertEq(
-      createdStrategyAddresses,
-      expectedStrategyAddresses
-    );
+    assertEq(createdStrategyAddresses, expectedStrategyAddresses);
   }
 }

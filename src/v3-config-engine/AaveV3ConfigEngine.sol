@@ -3,6 +3,7 @@ pragma solidity ^0.8.12;
 
 import {ConfiguratorInputTypes, DataTypes} from 'aave-address-book/AaveV3.sol';
 import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {PercentageMath} from 'aave-v3-core/contracts/protocol/libraries/math/PercentageMath.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {IChainlinkAggregator} from '../interfaces/IChainlinkAggregator.sol';
 import {EngineFlags} from './EngineFlags.sol';
@@ -21,6 +22,7 @@ import './IAaveV3ConfigEngine.sol';
  */
 contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
+  using PercentageMath for uint256;
 
   struct AssetsConfig {
     address[] ids;
@@ -123,9 +125,10 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
-  function listAssetsCustom(PoolContext memory context, ListingWithCustomImpl[] memory listings)
-    public
-  {
+  function listAssetsCustom(
+    PoolContext memory context,
+    ListingWithCustomImpl[] memory listings
+  ) public {
     require(listings.length != 0, 'AT_LEAST_ONE_ASSET_REQUIRED');
 
     AssetsConfig memory configs = _repackListing(listings);
@@ -391,11 +394,15 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   function _configCollateralSide(address[] memory ids, Collateral[] memory collaterals) internal {
     for (uint256 i = 0; i < ids.length; i++) {
       if (collaterals[i].liqThreshold != 0) {
-        if (
-          collaterals[i].ltv == EngineFlags.KEEP_CURRENT ||
+        bool notAllKeepCurrent = collaterals[i].ltv != EngineFlags.KEEP_CURRENT ||
+          collaterals[i].liqThreshold != EngineFlags.KEEP_CURRENT ||
+          collaterals[i].liqBonus != EngineFlags.KEEP_CURRENT;
+
+        bool atLeastOneKeepCurrent = collaterals[i].ltv == EngineFlags.KEEP_CURRENT ||
           collaterals[i].liqThreshold == EngineFlags.KEEP_CURRENT ||
-          collaterals[i].liqBonus == EngineFlags.KEEP_CURRENT
-        ) {
+          collaterals[i].liqBonus == EngineFlags.KEEP_CURRENT;
+
+        if (notAllKeepCurrent && atLeastOneKeepCurrent) {
           DataTypes.ReserveConfigurationMap memory configuration = POOL.getConfiguration(ids[i]);
           (
             uint256 currentLtv,
@@ -420,19 +427,22 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
           }
         }
 
-        require(
-          collaterals[i].liqThreshold + collaterals[i].liqBonus < 100_00,
-          'INVALID_LIQ_PARAMS_ABOVE_100'
-        );
+        if (notAllKeepCurrent) {
+          // LT*LB (in %) should never be above 100%, because it means instant undercollateralization
+          require(
+            collaterals[i].liqThreshold.percentMul(100_00 + collaterals[i].liqBonus) <= 100_00,
+            'INVALID_LT_LB_RATIO'
+          );
 
-        POOL_CONFIGURATOR.configureReserveAsCollateral(
-          ids[i],
-          collaterals[i].ltv,
-          collaterals[i].liqThreshold,
-          // For reference, this is to simplify the interaction with the Aave protocol,
-          // as there the definition is as e.g. 105% (5% bonus for liquidators)
-          100_00 + collaterals[i].liqBonus
-        );
+          POOL_CONFIGURATOR.configureReserveAsCollateral(
+            ids[i],
+            collaterals[i].ltv,
+            collaterals[i].liqThreshold,
+            // For reference, this is to simplify the interaction with the Aave protocol,
+            // as there the definition is as e.g. 105% (5% bonus for liquidators)
+            100_00 + collaterals[i].liqBonus
+          );
+        }
 
         if (collaterals[i].liqProtocolFee != EngineFlags.KEEP_CURRENT) {
           require(collaterals[i].liqProtocolFee < 100_00, 'INVALID_LIQ_PROTOCOL_FEE');
@@ -453,11 +463,9 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     }
   }
 
-  function _repackListing(ListingWithCustomImpl[] memory listings)
-    internal
-    pure
-    returns (AssetsConfig memory)
-  {
+  function _repackListing(
+    ListingWithCustomImpl[] memory listings
+  ) internal pure returns (AssetsConfig memory) {
     address[] memory ids = new address[](listings.length);
     Basic[] memory basics = new Basic[](listings.length);
     Borrow[] memory borrows = new Borrow[](listings.length);
@@ -509,11 +517,9 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
       });
   }
 
-  function _repackCapsUpdate(CapsUpdate[] memory updates)
-    internal
-    pure
-    returns (AssetsConfig memory)
-  {
+  function _repackCapsUpdate(
+    CapsUpdate[] memory updates
+  ) internal pure returns (AssetsConfig memory) {
     address[] memory ids = new address[](updates.length);
     Caps[] memory caps = new Caps[](updates.length);
 
@@ -533,11 +539,9 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
       });
   }
 
-  function _repackRatesUpdate(RateStrategyUpdate[] memory updates)
-    internal
-    pure
-    returns (AssetsConfig memory)
-  {
+  function _repackRatesUpdate(
+    RateStrategyUpdate[] memory updates
+  ) internal pure returns (AssetsConfig memory) {
     address[] memory ids = new address[](updates.length);
     IV3RateStrategyFactory.RateStrategyParams[]
       memory rates = new IV3RateStrategyFactory.RateStrategyParams[](updates.length);
@@ -558,11 +562,9 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
       });
   }
 
-  function _repackCollateralUpdate(CollateralUpdate[] memory updates)
-    internal
-    pure
-    returns (AssetsConfig memory)
-  {
+  function _repackCollateralUpdate(
+    CollateralUpdate[] memory updates
+  ) internal pure returns (AssetsConfig memory) {
     address[] memory ids = new address[](updates.length);
     Collateral[] memory collaterals = new Collateral[](updates.length);
 
@@ -589,11 +591,9 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
       });
   }
 
-  function _repackBorrowUpdate(BorrowUpdate[] memory updates)
-    internal
-    pure
-    returns (AssetsConfig memory)
-  {
+  function _repackBorrowUpdate(
+    BorrowUpdate[] memory updates
+  ) internal pure returns (AssetsConfig memory) {
     address[] memory ids = new address[](updates.length);
     Borrow[] memory borrows = new Borrow[](updates.length);
 
@@ -620,11 +620,9 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
       });
   }
 
-  function _repackPriceFeed(PriceFeedUpdate[] memory updates)
-    internal
-    pure
-    returns (AssetsConfig memory)
-  {
+  function _repackPriceFeed(
+    PriceFeedUpdate[] memory updates
+  ) internal pure returns (AssetsConfig memory) {
     address[] memory ids = new address[](updates.length);
     Basic[] memory basics = new Basic[](updates.length);
 

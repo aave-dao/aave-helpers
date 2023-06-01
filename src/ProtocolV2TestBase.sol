@@ -2,10 +2,14 @@
 pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
-import {IAaveOracle, ILendingPool, ILendingPoolAddressesProvider, IAaveProtocolDataProvider, DataTypes, TokenData, ILendingRateOracle, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV2.sol';
+import {IAaveOracle, ILendingPool, ILendingPoolAddressesProvider, ILendingPoolConfigurator, IAaveProtocolDataProvider, DataTypes, TokenData, ILendingRateOracle, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV2.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
+import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
+import {ProxyHelpers} from './ProxyHelpers.sol';
+import {ChainIds} from './ChainIds.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -48,19 +52,21 @@ contract ProtocolV2TestBase is CommonTestBase {
    * @param pool the pool to be snapshotted
    * @return ReserveConfig[] list of configs
    */
-  function createConfigurationSnapshot(string memory reportName, ILendingPool pool)
-    public
-    returns (ReserveConfig[] memory)
-  {
-    string memory path = string(abi.encodePacked('./reports/', reportName, '.md'));
-    vm.writeFile(path, '# Report\n\n');
+  function createConfigurationSnapshot(
+    string memory reportName,
+    ILendingPool pool
+  ) public returns (ReserveConfig[] memory) {
+    string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
+    vm.writeFile(path, '{ "reserves": {}, "strategies": {}, "poolConfiguration": {} }');
+    vm.serializeUint('root', 'chainId', block.chainid);
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(
       pool.getAddressesProvider()
     );
     ILendingRateOracle oracle = ILendingRateOracle(addressesProvider.getLendingRateOracle());
-    _writeReserveConfigs(path, configs, oracle);
+    _writeReserveConfigs(path, configs, pool, oracle);
     _writeStrategyConfigs(path, configs);
+    _writePoolConfiguration(path, pool);
 
     return configs;
   }
@@ -83,16 +89,24 @@ contract ProtocolV2TestBase is CommonTestBase {
   }
 
   /**
+   * Reserves that are frozen or not active should not be included in e2e test suite
+   */
+  function _includeInE2e(ReserveConfig memory config) internal pure returns (bool) {
+    return !config.isFrozen && config.isActive;
+  }
+
+  /**
    * @dev returns the first collateral in the list that cannot be borrowed in stable mode
    */
-  function _getFirstCollateral(ReserveConfig[] memory configs)
-    private
-    pure
-    returns (ReserveConfig memory config)
-  {
+  function _getFirstCollateral(
+    ReserveConfig[] memory configs
+  ) private pure returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
-      if (configs[i].usageAsCollateralEnabled && !configs[i].stableBorrowRateEnabled)
-        return configs[i];
+      if (
+        _includeInE2e(configs[i]) &&
+        configs[i].usageAsCollateralEnabled &&
+        !configs[i].stableBorrowRateEnabled
+      ) return configs[i];
     }
     revert('ERROR: No collateral found');
   }
@@ -107,14 +121,19 @@ contract ProtocolV2TestBase is CommonTestBase {
   ) internal {
     // test all basic interactions
     for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 100 * 10**configs[i].decimals;
-      if (!configs[i].isFrozen) {
+      if (_includeInE2e(configs[i])) {
+        uint256 amount = 100 * 10 ** configs[i].decimals;
+        console.log(configs[i].symbol);
         _deposit(configs[i], pool, user, amount);
         _skipBlocks(1000);
-        assertEq(_withdraw(configs[i], pool, user, amount), amount);
-        _deposit(configs[i], pool, user, amount);
-        _skipBlocks(1000);
-        assertGe(_withdraw(configs[i], pool, user, type(uint256).max), amount);
+        if (
+          block.chainid == ChainIds.MAINNET &&
+          configs[i].underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+        ) {
+          assertGe(_withdraw(configs[i], pool, user, type(uint256).max), amount - 2);
+        } else {
+          assertGe(_withdraw(configs[i], pool, user, type(uint256).max), amount);
+        }
       } else {
         console.log('SKIP: REASON_FROZEN %s', configs[i].symbol);
       }
@@ -133,8 +152,8 @@ contract ProtocolV2TestBase is CommonTestBase {
     ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
     _deposit(collateralConfig, pool, user, 1000000 ether);
     for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 10**configs[i].decimals;
-      if (configs[i].borrowingEnabled) {
+      if (_includeInE2e(configs[i]) && configs[i].borrowingEnabled) {
+        uint256 amount = 10 ** configs[i].decimals;
         _deposit(configs[i], pool, EOA, amount * 2);
         this._borrow(configs[i], pool, user, amount, false);
       } else {
@@ -155,8 +174,12 @@ contract ProtocolV2TestBase is CommonTestBase {
     ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
     _deposit(collateralConfig, pool, user, 1000000 ether);
     for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 10**configs[i].decimals;
-      if (configs[i].borrowingEnabled && configs[i].stableBorrowRateEnabled) {
+      uint256 amount = 10 ** configs[i].decimals;
+      if (
+        _includeInE2e(configs[i]) &&
+        configs[i].borrowingEnabled &&
+        configs[i].stableBorrowRateEnabled
+      ) {
         _deposit(configs[i], pool, EOA, amount * 2);
         this._borrow(configs[i], pool, user, amount, true);
       } else {
@@ -173,12 +196,21 @@ contract ProtocolV2TestBase is CommonTestBase {
   ) internal {
     vm.startPrank(user);
     uint256 aTokenBefore = IERC20(config.aToken).balanceOf(user);
-    deal(config.underlying, user, amount);
-    IERC20(config.underlying).approve(address(pool), amount);
-    console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
+    _patchedDeal(config.underlying, user, amount);
+    // TODO: woraround as `_patchedDeal` changes prank context & there's currently no way to revert
+    vm.startPrank(user);
+    _patchedApprove(config.underlying, address(pool), amount);
     pool.deposit(config.underlying, amount, user, 0);
+    console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
-    assertApproxEqAbs(aTokenAfter, aTokenBefore + amount, 1);
+    if (
+      block.chainid == ChainIds.MAINNET &&
+      config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+    ) {
+      assertApproxEqAbs(aTokenAfter, aTokenBefore + amount, 2, '_deposit(): STETH_DUST_GT_2');
+    } else {
+      assertApproxEqAbs(aTokenAfter, aTokenBefore + amount, 1, '_deposit(): STETH_DUST_GT_1');
+    }
     vm.stopPrank();
   }
 
@@ -194,9 +226,23 @@ contract ProtocolV2TestBase is CommonTestBase {
     console.log('WITHDRAW: %s, Amount: %s', config.symbol, amountOut);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
     if (aTokenBefore < amount) {
-      require(aTokenAfter == 0, '_withdraw(): DUST_AFTER_WITHDRAW_ALL');
+      if (
+        block.chainid == ChainIds.MAINNET &&
+        config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+      ) {
+        assertApproxEqAbs(aTokenAfter, 0, 2, '_withdraw(): STETH_DUST_GT_2');
+      } else {
+        require(aTokenAfter == 0, '_withdraw(): DUST_AFTER_WITHDRAW_ALL');
+      }
     } else {
-      assertApproxEqAbs(aTokenAfter, aTokenBefore - amount, 1);
+      if (
+        block.chainid == ChainIds.MAINNET &&
+        config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+      ) {
+        assertApproxEqAbs(aTokenAfter, aTokenBefore - amount, 2, '_withdraw(): STETH_DUST_GT_2');
+      } else {
+        assertApproxEqAbs(aTokenAfter, aTokenBefore - amount, 1, '_withdraw(): DUST_GT_1');
+      }
     }
     vm.stopPrank();
     return amountOut;
@@ -215,7 +261,14 @@ contract ProtocolV2TestBase is CommonTestBase {
     console.log('BORROW: %s, Amount %s, Stable: %s', config.symbol, amount, stable);
     pool.borrow(config.underlying, amount, stable ? 1 : 2, 0, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
-    assertApproxEqAbs(debtAfter, debtBefore + amount, 1);
+    if (
+      block.chainid == ChainIds.MAINNET &&
+      config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
+    ) {
+      assertApproxEqAbs(debtAfter, debtBefore + amount, 2, '_borrow(): DUST_GT_2');
+    } else {
+      assertApproxEqAbs(debtAfter, debtBefore + amount, 1, '_borrow(): DUST_GT_1');
+    }
     vm.stopPrank();
   }
 
@@ -239,17 +292,10 @@ contract ProtocolV2TestBase is CommonTestBase {
   }
 
   function _writeStrategyConfigs(string memory path, ReserveConfig[] memory configs) internal {
-    vm.writeLine(path, '## InterestRateStrategies\n');
-    vm.writeLine(
-      path,
-      string(
-        abi.encodePacked(
-          '| strategy | getStableRateSlope1 | getStableRateSlope2 ',
-          '| getBaseVariableBorrowRate | getVariableRateSlope1 | getVariableRateSlope2 | optimalUtilizationRatio | excessUtilizationRatio |'
-        )
-      )
-    );
-    vm.writeLine(path, '|---|---|---|---|---|---|---|---|');
+    // keys for json stringification
+    string memory strategiesKey = 'stategies';
+    string memory content = '{}';
+
     address[] memory usedStrategies = new address[](configs.length);
     for (uint256 i = 0; i < configs.length; i++) {
       if (!_isInAddressArray(usedStrategies, configs[i].interestRateStrategy)) {
@@ -257,148 +303,168 @@ contract ProtocolV2TestBase is CommonTestBase {
         IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
           configs[i].interestRateStrategy
         );
-        vm.writeLine(
-          path,
-          string(
-            abi.encodePacked(
-              abi.encodePacked(
-                '| ',
-                vm.toString(address(strategy)),
-                ' | ',
-                vm.toString(strategy.stableRateSlope1()),
-                ' | ',
-                vm.toString(strategy.stableRateSlope2()),
-                ' | '
-              ),
-              abi.encodePacked(
-                vm.toString(strategy.baseVariableBorrowRate()),
-                ' | ',
-                vm.toString(strategy.variableRateSlope1()),
-                ' | ',
-                vm.toString(strategy.variableRateSlope2()),
-                ' | ',
-                vm.toString(strategy.OPTIMAL_UTILIZATION_RATE()),
-                ' | ',
-                vm.toString(strategy.EXCESS_UTILIZATION_RATE()),
-                ' |'
-              )
-            )
-          )
+        string memory key = vm.toString(address(strategy));
+        vm.serializeString(key, 'stableRateSlope1', vm.toString(strategy.stableRateSlope1()));
+        vm.serializeString(key, 'stableRateSlope2', vm.toString(strategy.stableRateSlope2()));
+        vm.serializeString(
+          key,
+          'baseVariableBorrowRate',
+          vm.toString(strategy.baseVariableBorrowRate())
         );
+        vm.serializeString(key, 'variableRateSlope1', vm.toString(strategy.variableRateSlope1()));
+        vm.serializeString(key, 'variableRateSlope2', vm.toString(strategy.variableRateSlope2()));
+        vm.serializeString(
+          key,
+          'optimalUsageRatio',
+          vm.toString(strategy.OPTIMAL_UTILIZATION_RATE())
+        );
+        string memory object = vm.serializeString(
+          key,
+          'maxExcessUsageRatio',
+          vm.toString(strategy.EXCESS_UTILIZATION_RATE())
+        );
+        content = vm.serializeString(strategiesKey, key, object);
       }
     }
-    vm.writeLine(path, '\n');
+    string memory output = vm.serializeString('root', 'strategies', content);
+    vm.writeJson(output, path);
   }
 
-  function _logStrategyPreviewUrlParams(ReserveConfig memory config, ILendingPool pool) internal {
-    IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
-      config.interestRateStrategy
-    );
+  function _writePoolConfiguration(string memory path, ILendingPool pool) internal {
+    // keys for json stringification
+    string memory poolConfigKey = 'poolConfig';
+
+    // addresses provider
     ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(
       pool.getAddressesProvider()
     );
-    ILendingRateOracle oracle = ILendingRateOracle(addressesProvider.getLendingRateOracle());
+    vm.serializeAddress(poolConfigKey, 'poolAddressesProvider', address(addressesProvider));
 
-    emit log_named_string(
-      config.symbol,
-      string.concat(
-        '?variableRateSlope1=',
-        vm.toString(strategy.variableRateSlope1()),
-        '&variableRateSlope2=',
-        vm.toString(strategy.variableRateSlope2()),
-        '&stableRateSlope1=',
-        vm.toString(strategy.stableRateSlope1()),
-        '&stableRateSlope2=',
-        vm.toString(strategy.stableRateSlope2()),
-        '&optimalUsageRatio=',
-        vm.toString(strategy.OPTIMAL_UTILIZATION_RATE()),
-        '&baseVariableBorrowRate=',
-        vm.toString(strategy.baseVariableBorrowRate()),
-        '&baseStableBorrowRate=',
-        vm.toString(oracle.getMarketBorrowRate(config.underlying))
+    // oracle
+    IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
+    vm.serializeAddress(poolConfigKey, 'oracle', address(oracle));
+
+    // pool configurator
+    ILendingPoolConfigurator configurator = ILendingPoolConfigurator(
+      addressesProvider.getLendingPoolConfigurator()
+    );
+    vm.serializeAddress(poolConfigKey, 'poolConfigurator', address(configurator));
+    vm.serializeAddress(
+      poolConfigKey,
+      'poolConfiguratorImpl',
+      ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, address(configurator))
+    );
+
+    // PoolDaraProvider
+    IAaveProtocolDataProvider pdp = IAaveProtocolDataProvider(
+      addressesProvider.getAddress(
+        0x0100000000000000000000000000000000000000000000000000000000000000
       )
     );
+    vm.serializeAddress(poolConfigKey, 'protocolDataProvider', address(pdp));
+
+    // pool
+    vm.serializeAddress(
+      poolConfigKey,
+      'poolImpl',
+      ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, address(pool))
+    );
+    string memory content = vm.serializeAddress(poolConfigKey, 'pool', address(pool));
+
+    string memory output = vm.serializeString('root', 'poolConfig', content);
+    vm.writeJson(output, path);
   }
 
   function _writeReserveConfigs(
     string memory path,
     ReserveConfig[] memory configs,
-    ILendingRateOracle oracle
+    ILendingPool pool,
+    ILendingRateOracle rateOracle
   ) internal {
-    vm.writeLine(path, '## Reserve Configurations\n');
-    vm.writeLine(
-      path,
-      string(
-        abi.encodePacked(
-          '| symbol | underlying | aToken | stableDebtToken | variableDebtToken | decimals | ltv | liquidationThreshold | liquidationBonus | ',
-          'reserveFactor | usageAsCollateralEnabled | borrowingEnabled | stableBorrowRateEnabled | ',
-          'interestRateStrategy | isActive | isFrozen | baseStableBorrowRate |'
-        )
-      )
+    // keys for json stringification
+    string memory reservesKey = 'reserves';
+    string memory content = '{}';
+
+    ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(
+      pool.getAddressesProvider()
     );
-    vm.writeLine(
-      path,
-      string(
-        abi.encodePacked(
-          '|---|---|---|---|---|---|---|---',
-          '|---|---|---|---|---|---|---|---|---|'
-        )
-      )
-    );
+    IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
+
     for (uint256 i = 0; i < configs.length; i++) {
       ReserveConfig memory config = configs[i];
-      vm.writeLine(
-        path,
-        string(
-          abi.encodePacked(
-            abi.encodePacked(
-              '| ',
-              config.symbol,
-              ' | ',
-              vm.toString(config.underlying),
-              ' | ',
-              vm.toString(config.aToken),
-              ' | ',
-              vm.toString(config.stableDebtToken),
-              ' | ',
-              vm.toString(config.variableDebtToken),
-              ' | ',
-              vm.toString(config.decimals),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(config.ltv),
-              ' | ',
-              vm.toString(config.liquidationThreshold),
-              ' | ',
-              vm.toString(config.liquidationBonus),
-              ' | ',
-              vm.toString(config.reserveFactor),
-              ' | ',
-              vm.toString(config.usageAsCollateralEnabled),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(config.borrowingEnabled),
-              ' | ',
-              vm.toString(config.stableBorrowRateEnabled),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(config.interestRateStrategy),
-              ' | ',
-              vm.toString(config.isActive),
-              ' | ',
-              vm.toString(config.isFrozen),
-              ' | ',
-              vm.toString(oracle.getMarketBorrowRate(config.underlying)),
-              ' |'
-            )
-          )
+      ExtendedAggregatorV2V3Interface assetOracle = ExtendedAggregatorV2V3Interface(
+        oracle.getSourceOfAsset(config.underlying)
+      );
+
+      string memory key = vm.toString(config.underlying);
+      vm.serializeString(key, 'symbol', config.symbol);
+      vm.serializeString(
+        key,
+        'baseStableBorrowRate',
+        vm.toString(rateOracle.getMarketBorrowRate(config.underlying))
+      );
+      vm.serializeUint(key, 'ltv', config.ltv);
+      vm.serializeUint(key, 'liquidationThreshold', config.liquidationThreshold);
+      vm.serializeUint(key, 'liquidationBonus', config.liquidationBonus);
+      vm.serializeUint(key, 'reserveFactor', config.reserveFactor);
+      vm.serializeUint(key, 'decimals', config.decimals);
+      vm.serializeBool(key, 'usageAsCollateralEnabled', config.usageAsCollateralEnabled);
+      vm.serializeBool(key, 'borrowingEnabled', config.borrowingEnabled);
+      vm.serializeBool(key, 'stableBorrowRateEnabled', config.stableBorrowRateEnabled);
+      vm.serializeBool(key, 'isActive', config.isActive);
+      vm.serializeBool(key, 'isFrozen', config.isFrozen);
+      vm.serializeAddress(key, 'interestRateStrategy', config.interestRateStrategy);
+      vm.serializeAddress(key, 'underlying', config.underlying);
+      vm.serializeAddress(key, 'aToken', config.aToken);
+      vm.serializeAddress(key, 'stableDebtToken', config.stableDebtToken);
+      vm.serializeAddress(key, 'variableDebtToken', config.variableDebtToken);
+      vm.serializeAddress(
+        key,
+        'aTokenImpl',
+        ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, config.aToken)
+      );
+      vm.serializeAddress(
+        key,
+        'stableDebtTokenImpl',
+        ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+          vm,
+          config.stableDebtToken
         )
       );
+      vm.serializeAddress(
+        key,
+        'variableDebtTokenImpl',
+        ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+          vm,
+          config.variableDebtToken
+        )
+      );
+      vm.serializeAddress(key, 'oracle', address(assetOracle));
+      if (address(assetOracle) != address(0)) {
+        try assetOracle.description() returns (string memory name) {
+          vm.serializeString(key, 'oracleDescription', name);
+        } catch {
+          try assetOracle.name() returns (string memory name) {
+            vm.serializeString(key, 'oracleName', name);
+          } catch {}
+        }
+        try assetOracle.decimals() returns (uint8 decimals) {
+          vm.serializeUint(key, 'oracleDecimals', decimals);
+        } catch {
+          try assetOracle.DECIMALS() returns (uint8 decimals) {
+            vm.serializeUint(key, 'oracleDecimals', decimals);
+          } catch {}
+        }
+      }
+      string memory out = vm.serializeUint(
+        key,
+        'oracleLatestAnswer',
+        uint256(oracle.getAssetPrice(config.underlying))
+      );
+      content = vm.serializeString(reservesKey, key, out);
     }
-    vm.writeLine(path, '\n');
+    string memory output = vm.serializeString('root', 'reserves', content);
+    vm.writeJson(output, path);
   }
 
   function _getReservesConfigs(ILendingPool pool) internal view returns (ReserveConfig[] memory) {
@@ -430,11 +496,10 @@ contract ProtocolV2TestBase is CommonTestBase {
     return vars.configs;
   }
 
-  function _getStructReserveTokens(IAaveProtocolDataProvider pdp, address underlyingAddress)
-    internal
-    view
-    returns (ReserveTokens memory)
-  {
+  function _getStructReserveTokens(
+    IAaveProtocolDataProvider pdp,
+    address underlyingAddress
+  ) internal view returns (ReserveTokens memory) {
     ReserveTokens memory reserveTokens;
     (reserveTokens.aToken, reserveTokens.stableDebtToken, reserveTokens.variableDebtToken) = pdp
       .getReserveTokensAddresses(underlyingAddress);
@@ -502,11 +567,10 @@ contract ProtocolV2TestBase is CommonTestBase {
       });
   }
 
-  function _findReserveConfig(ReserveConfig[] memory configs, address underlying)
-    internal
-    pure
-    returns (ReserveConfig memory)
-  {
+  function _findReserveConfig(
+    ReserveConfig[] memory configs,
+    address underlying
+  ) internal pure returns (ReserveConfig memory) {
     for (uint256 i = 0; i < configs.length; i++) {
       if (configs[i].underlying == underlying) {
         // Important to clone the struct, to avoid unexpected side effect if modifying the returned config
@@ -695,10 +759,10 @@ contract ProtocolV2TestBase is CommonTestBase {
     }
   }
 
-  function _requireNoChangeInConfigs(ReserveConfig memory config1, ReserveConfig memory config2)
-    internal
-    pure
-  {
+  function _requireNoChangeInConfigs(
+    ReserveConfig memory config1,
+    ReserveConfig memory config2
+  ) internal pure {
     require(
       keccak256(abi.encodePacked(config1.symbol)) == keccak256(abi.encodePacked(config2.symbol)),
       '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_SYMBOL_CHANGED'

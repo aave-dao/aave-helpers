@@ -2,9 +2,10 @@
 pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
-import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes} from 'aave-address-book/AaveV3.sol';
+import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
+import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 
@@ -59,16 +60,33 @@ contract ProtocolV3TestBase is CommonTestBase {
    * @param pool the pool to be snapshotted
    * @return ReserveConfig[] list of configs
    */
-  function createConfigurationSnapshot(string memory reportName, IPool pool)
-    public
-    returns (ReserveConfig[] memory)
-  {
-    string memory path = string(abi.encodePacked('./reports/', reportName, '.md'));
-    vm.writeFile(path, '# Report\n\n');
+  function createConfigurationSnapshot(
+    string memory reportName,
+    IPool pool
+  ) public returns (ReserveConfig[] memory) {
+    return createConfigurationSnapshot(reportName, pool, true, true, true, true);
+  }
+
+  function createConfigurationSnapshot(
+    string memory reportName,
+    IPool pool,
+    bool reserveConfigs,
+    bool strategyConfigs,
+    bool eModeConigs,
+    bool poolConfigs
+  ) public returns (ReserveConfig[] memory) {
+    string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
+    // overwrite with empty json to later be extended
+    vm.writeFile(
+      path,
+      '{ "eModes": {}, "reserves": {}, "strategies": {}, "poolConfiguration": {} }'
+    );
+    vm.serializeUint('root', 'chainId', block.chainid);
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    _writeReserveConfigs(path, configs);
-    _writeStrategyConfigs(path, configs);
-    _writeEModeConfigs(path, configs, pool);
+    if (reserveConfigs) _writeReserveConfigs(path, configs, pool);
+    if (strategyConfigs) _writeStrategyConfigs(path, configs);
+    if (eModeConigs) _writeEModeConfigs(path, configs, pool);
+    if (poolConfigs) _writePoolConfiguration(path, pool);
 
     return configs;
   }
@@ -93,11 +111,9 @@ contract ProtocolV3TestBase is CommonTestBase {
   /**
    * @dev returns the first collateral in the list that cannot be borrowed in stable mode
    */
-  function _getFirstCollateral(ReserveConfig[] memory configs)
-    private
-    pure
-    returns (ReserveConfig memory config)
-  {
+  function _getFirstCollateral(
+    ReserveConfig[] memory configs
+  ) private pure returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
       if (configs[i].usageAsCollateralEnabled && !configs[i].stableBorrowRateEnabled)
         return configs[i];
@@ -108,14 +124,10 @@ contract ProtocolV3TestBase is CommonTestBase {
   /**
    * @dev tests that all assets can be deposited & withdrawn
    */
-  function _supplyWithdrawFlow(
-    ReserveConfig[] memory configs,
-    IPool pool,
-    address user
-  ) internal {
+  function _supplyWithdrawFlow(ReserveConfig[] memory configs, IPool pool, address user) internal {
     // test all basic interactions
     for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 100 * 10**configs[i].decimals;
+      uint256 amount = 100 * 10 ** configs[i].decimals;
       if (!configs[i].isFrozen) {
         _deposit(configs[i], pool, user, amount);
         _skipBlocks(1000);
@@ -132,16 +144,12 @@ contract ProtocolV3TestBase is CommonTestBase {
   /**
    * @dev tests that all assets with borrowing enabled can be borrowed
    */
-  function _variableBorrowFlow(
-    ReserveConfig[] memory configs,
-    IPool pool,
-    address user
-  ) internal {
+  function _variableBorrowFlow(ReserveConfig[] memory configs, IPool pool, address user) internal {
     // put 1M whatever collateral, which should be enough to borrow 1 of each
     ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
     _deposit(collateralConfig, pool, user, 1000000 ether);
     for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 10**configs[i].decimals;
+      uint256 amount = 10 ** configs[i].decimals;
       if (configs[i].borrowingEnabled) {
         _deposit(configs[i], pool, EOA, amount * 2);
         this._borrow(configs[i], pool, user, amount, false);
@@ -154,16 +162,12 @@ contract ProtocolV3TestBase is CommonTestBase {
   /**
    * @dev tests that all assets with stable borrowing enabled can be borrowed
    */
-  function _stableBorrowFlow(
-    ReserveConfig[] memory configs,
-    IPool pool,
-    address user
-  ) internal {
+  function _stableBorrowFlow(ReserveConfig[] memory configs, IPool pool, address user) internal {
     // put 1M whatever collateral, which should be enough to borrow 1 of each
     ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
     _deposit(collateralConfig, pool, user, 1000000 ether);
     for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 10**configs[i].decimals;
+      uint256 amount = 10 ** configs[i].decimals;
       if (configs[i].borrowingEnabled && configs[i].stableBorrowRateEnabled) {
         _deposit(configs[i], pool, EOA, amount * 2);
         this._borrow(configs[i], pool, user, amount, true);
@@ -251,12 +255,10 @@ contract ProtocolV3TestBase is CommonTestBase {
     ReserveConfig[] memory configs,
     IPool pool
   ) internal {
-    vm.writeLine(path, '## EMode categories\n\n');
-    vm.writeLine(
-      path,
-      '| id | label | ltv | liquidationThreshold | liquidationBonus | priceSource |'
-    );
-    vm.writeLine(path, '|---|---|---|---|---|---|');
+    // keys for json stringification
+    string memory eModesKey = 'emodes';
+    string memory content = '{}';
+
     uint256[] memory usedCategories = new uint256[](configs.length);
     for (uint256 i = 0; i < configs.length; i++) {
       if (!_isInUint256Array(usedCategories, configs[i].eModeCategory)) {
@@ -264,43 +266,25 @@ contract ProtocolV3TestBase is CommonTestBase {
         DataTypes.EModeCategory memory category = pool.getEModeCategoryData(
           uint8(configs[i].eModeCategory)
         );
-        vm.writeLine(
-          path,
-          string(
-            abi.encodePacked(
-              '| ',
-              vm.toString(configs[i].eModeCategory),
-              ' | ',
-              category.label,
-              ' | ',
-              vm.toString(category.ltv),
-              ' | ',
-              vm.toString(category.liquidationThreshold),
-              ' | ',
-              vm.toString(category.liquidationBonus),
-              ' | ',
-              vm.toString(category.priceSource),
-              ' |'
-            )
-          )
-        );
+        string memory key = vm.toString(configs[i].eModeCategory);
+        vm.serializeUint(key, 'eModeCategory', configs[i].eModeCategory);
+        vm.serializeString(key, 'label', category.label);
+        vm.serializeUint(key, 'ltv', category.ltv);
+        vm.serializeUint(key, 'liquidationThreshold', category.liquidationThreshold);
+        vm.serializeUint(key, 'liquidationBonus', category.liquidationBonus);
+        string memory object = vm.serializeAddress(key, 'priceSource', category.priceSource);
+        content = vm.serializeString(eModesKey, key, object);
       }
     }
-    vm.writeLine(path, '\n');
+    string memory output = vm.serializeString('root', 'eModes', content);
+    vm.writeJson(output, path);
   }
 
   function _writeStrategyConfigs(string memory path, ReserveConfig[] memory configs) internal {
-    vm.writeLine(path, '## InterestRateStrategies\n');
-    vm.writeLine(
-      path,
-      string(
-        abi.encodePacked(
-          '| strategy | getBaseStableBorrowRate | getStableRateSlope1 | getStableRateSlope2 | optimalStableToTotal | maxStabletoTotalExcess ',
-          '| getBaseVariableBorrowRate | getVariableRateSlope1 | getVariableRateSlope2 | optimalUsageRatio | maxExcessUsageRatio |'
-        )
-      )
-    );
-    vm.writeLine(path, '|---|---|---|---|---|---|---|---|---|---|---|');
+    // keys for json stringification
+    string memory strategiesKey = 'stategies';
+    string memory content = '{}';
+
     address[] memory usedStrategies = new address[](configs.length);
     for (uint256 i = 0; i < configs.length; i++) {
       if (!_isInAddressArray(usedStrategies, configs[i].interestRateStrategy)) {
@@ -308,184 +292,182 @@ contract ProtocolV3TestBase is CommonTestBase {
         IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
           configs[i].interestRateStrategy
         );
-        vm.writeLine(
-          path,
-          string(
-            abi.encodePacked(
-              abi.encodePacked(
-                '| ',
-                vm.toString(address(strategy)),
-                ' | ',
-                vm.toString(strategy.getBaseStableBorrowRate()),
-                ' | ',
-                vm.toString(strategy.getStableRateSlope1()),
-                ' | ',
-                vm.toString(strategy.getStableRateSlope2()),
-                ' | ',
-                vm.toString(strategy.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO()),
-                ' | ',
-                vm.toString(strategy.MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO()),
-                ' | '
-              ),
-              abi.encodePacked(
-                vm.toString(strategy.getBaseVariableBorrowRate()),
-                ' | ',
-                vm.toString(strategy.getVariableRateSlope1()),
-                ' | ',
-                vm.toString(strategy.getVariableRateSlope2()),
-                ' | ',
-                vm.toString(strategy.OPTIMAL_USAGE_RATIO()),
-                ' | ',
-                vm.toString(strategy.MAX_EXCESS_USAGE_RATIO()),
-                ' |'
-              )
-            )
-          )
+        string memory key = vm.toString(address(strategy));
+        vm.serializeString(
+          key,
+          'baseStableBorrowRate',
+          vm.toString(strategy.getBaseStableBorrowRate())
         );
+        vm.serializeString(key, 'stableRateSlope1', vm.toString(strategy.getStableRateSlope1()));
+        vm.serializeString(key, 'stableRateSlope2', vm.toString(strategy.getStableRateSlope2()));
+        vm.serializeString(
+          key,
+          'baseVariableBorrowRate',
+          vm.toString(strategy.getBaseVariableBorrowRate())
+        );
+        vm.serializeString(
+          key,
+          'variableRateSlope1',
+          vm.toString(strategy.getVariableRateSlope1())
+        );
+        vm.serializeString(
+          key,
+          'variableRateSlope2',
+          vm.toString(strategy.getVariableRateSlope2())
+        );
+        vm.serializeString(
+          key,
+          'optimalStableToTotalDebtRatio',
+          vm.toString(strategy.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO())
+        );
+        vm.serializeString(
+          key,
+          'maxExcessStableToTotalDebtRatio',
+          vm.toString(strategy.MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO())
+        );
+        vm.serializeString(key, 'optimalUsageRatio', vm.toString(strategy.OPTIMAL_USAGE_RATIO()));
+        string memory object = vm.serializeString(
+          key,
+          'maxExcessUsageRatio',
+          vm.toString(strategy.MAX_EXCESS_USAGE_RATIO())
+        );
+        content = vm.serializeString(strategiesKey, key, object);
       }
     }
-    vm.writeLine(path, '\n');
+    string memory output = vm.serializeString('root', 'strategies', content);
+    vm.writeJson(output, path);
   }
 
-  function _logStrategyPreviewUrlParams(ReserveConfig memory config) internal {
-    IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
-      config.interestRateStrategy
-    );
+  function _writeReserveConfigs(
+    string memory path,
+    ReserveConfig[] memory configs,
+    IPool pool
+  ) internal {
+    // keys for json stringification
+    string memory reservesKey = 'reserves';
+    string memory content = '{}';
 
-    emit log_named_string(
-      config.symbol,
-      string.concat(
-        '?variableRateSlope1=',
-        vm.toString(strategy.getVariableRateSlope1()),
-        '&variableRateSlope2=',
-        vm.toString(strategy.getVariableRateSlope2()),
-        '&stableRateSlope1=',
-        vm.toString(strategy.getStableRateSlope1()),
-        '&stableRateSlope2=',
-        vm.toString(strategy.getStableRateSlope2()),
-        '&optimalUsageRatio=',
-        vm.toString(strategy.OPTIMAL_USAGE_RATIO()),
-        '&baseVariableBorrowRate=',
-        vm.toString(strategy.getBaseVariableBorrowRate()),
-        '&baseStableBorrowRate=',
-        vm.toString(strategy.getBaseStableBorrowRate())
-      )
-    );
-  }
-
-  function _writeReserveConfigs(string memory path, ReserveConfig[] memory configs) internal {
-    vm.writeLine(path, '## Reserve Configurations\n');
-    vm.writeLine(
-      path,
-      string(
-        abi.encodePacked(
-          '| symbol | underlying | aToken | stableDebtToken | variableDebtToken | decimals | ltv | liquidationThreshold | liquidationBonus | ',
-          'liquidationProtocolFee | reserveFactor | usageAsCollateralEnabled | borrowingEnabled | stableBorrowRateEnabled | supplyCap | borrowCap | debtCeiling | eModeCategory | ',
-          'interestRateStrategy | isActive | isFrozen | isSiloed | isBorrowableInIsolation | isFlashloanable | aTokenImpl | stableDebtTokenImpl | variableDebtTokenImpl |'
-        )
-      )
-    );
-    vm.writeLine(
-      path,
-      string(
-        abi.encodePacked(
-          '|---|---|---|---|---|---|---|---|---',
-          '|---|---|---|---|---|---|---|---|---',
-          '|---|---|---|---|---|---|---|---|---|'
-        )
-      )
-    );
+    IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
+    IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
     for (uint256 i = 0; i < configs.length; i++) {
       ReserveConfig memory config = configs[i];
-      vm.writeLine(
-        path,
-        string(
-          abi.encodePacked(
-            abi.encodePacked(
-              '| ',
-              config.symbol,
-              ' | ',
-              vm.toString(config.underlying),
-              ' | ',
-              vm.toString(config.aToken),
-              ' | ',
-              vm.toString(config.stableDebtToken),
-              ' | ',
-              vm.toString(config.variableDebtToken),
-              ' | ',
-              vm.toString(config.decimals),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(config.ltv),
-              ' | ',
-              vm.toString(config.liquidationThreshold),
-              ' | ',
-              vm.toString(config.liquidationBonus),
-              ' | ',
-              vm.toString(config.liquidationProtocolFee),
-              ' | ',
-              vm.toString(config.reserveFactor),
-              ' | ',
-              vm.toString(config.usageAsCollateralEnabled),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(config.borrowingEnabled),
-              ' | ',
-              vm.toString(config.stableBorrowRateEnabled),
-              ' | ',
-              vm.toString(config.supplyCap),
-              ' | ',
-              vm.toString(config.borrowCap),
-              ' | ',
-              vm.toString(config.debtCeiling),
-              ' | ',
-              vm.toString(config.eModeCategory),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(config.interestRateStrategy),
-              ' | ',
-              vm.toString(config.isActive),
-              ' | ',
-              vm.toString(config.isFrozen),
-              ' | ',
-              vm.toString(config.isSiloed),
-              ' | ',
-              vm.toString(config.isBorrowableInIsolation),
-              ' | ',
-              vm.toString(config.isFlashloanable),
-              ' | '
-            ),
-            abi.encodePacked(
-              vm.toString(
-                ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
-                  vm,
-                  config.aToken
-                )
-              ),
-              ' | ',
-              vm.toString(
-                ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
-                  vm,
-                  config.stableDebtToken
-                )
-              ),
-              ' | ',
-              vm.toString(
-                ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
-                  vm,
-                  config.variableDebtToken
-                )
-              ),
-              ' |'
-            )
-          )
+      ExtendedAggregatorV2V3Interface assetOracle = ExtendedAggregatorV2V3Interface(
+        oracle.getSourceOfAsset(config.underlying)
+      );
+
+      string memory key = vm.toString(config.underlying);
+      vm.serializeString(key, 'symbol', config.symbol);
+      vm.serializeUint(key, 'ltv', config.ltv);
+      vm.serializeUint(key, 'liquidationThreshold', config.liquidationThreshold);
+      vm.serializeUint(key, 'liquidationBonus', config.liquidationBonus);
+      vm.serializeUint(key, 'liquidationProtocolFee', config.liquidationProtocolFee);
+      vm.serializeUint(key, 'reserveFactor', config.reserveFactor);
+      vm.serializeUint(key, 'decimals', config.decimals);
+      vm.serializeUint(key, 'borrowCap', config.borrowCap);
+      vm.serializeUint(key, 'supplyCap', config.supplyCap);
+      vm.serializeUint(key, 'debtCeiling', config.debtCeiling);
+      vm.serializeUint(key, 'eModeCategory', config.eModeCategory);
+      vm.serializeBool(key, 'usageAsCollateralEnabled', config.usageAsCollateralEnabled);
+      vm.serializeBool(key, 'borrowingEnabled', config.borrowingEnabled);
+      vm.serializeBool(key, 'stableBorrowRateEnabled', config.stableBorrowRateEnabled);
+      vm.serializeBool(key, 'isActive', config.isActive);
+      vm.serializeBool(key, 'isFrozen', config.isFrozen);
+      vm.serializeBool(key, 'isSiloed', config.isSiloed);
+      vm.serializeBool(key, 'isBorrowableInIsolation', config.isBorrowableInIsolation);
+      vm.serializeBool(key, 'isFlashloanable', config.isFlashloanable);
+      vm.serializeAddress(key, 'interestRateStrategy', config.interestRateStrategy);
+      vm.serializeAddress(key, 'underlying', config.underlying);
+      vm.serializeAddress(key, 'aToken', config.aToken);
+      vm.serializeAddress(key, 'stableDebtToken', config.stableDebtToken);
+      vm.serializeAddress(key, 'variableDebtToken', config.variableDebtToken);
+      vm.serializeAddress(
+        key,
+        'aTokenImpl',
+        ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, config.aToken)
+      );
+      vm.serializeAddress(
+        key,
+        'stableDebtTokenImpl',
+        ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+          vm,
+          config.stableDebtToken
         )
       );
+      vm.serializeAddress(
+        key,
+        'variableDebtTokenImpl',
+        ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
+          vm,
+          config.variableDebtToken
+        )
+      );
+      vm.serializeAddress(key, 'oracle', address(assetOracle));
+      if (address(assetOracle) != address(0)) {
+        try assetOracle.description() returns (string memory name) {
+          vm.serializeString(key, 'oracleDescription', name);
+        } catch {
+          try assetOracle.name() returns (string memory name) {
+            vm.serializeString(key, 'oracleName', name);
+          } catch {}
+        }
+        try assetOracle.decimals() returns (uint8 decimals) {
+          vm.serializeUint(key, 'oracleDecimals', decimals);
+        } catch {
+          try assetOracle.DECIMALS() returns (uint8 decimals) {
+            vm.serializeUint(key, 'oracleDecimals', decimals);
+          } catch {}
+        }
+      }
+      string memory out = vm.serializeUint(
+        key,
+        'oracleLatestAnswer',
+        uint256(oracle.getAssetPrice(config.underlying))
+      );
+      content = vm.serializeString(reservesKey, key, out);
     }
-    vm.writeLine(path, '\n');
+    string memory output = vm.serializeString('root', 'reserves', content);
+    vm.writeJson(output, path);
+  }
+
+  function _writePoolConfiguration(string memory path, IPool pool) internal {
+    // keys for json stringification
+    string memory poolConfigKey = 'poolConfig';
+
+    // addresses provider
+    IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
+    vm.serializeAddress(poolConfigKey, 'poolAddressesProvider', address(addressesProvider));
+
+    // oracles
+    vm.serializeAddress(poolConfigKey, 'oracle', addressesProvider.getPriceOracle());
+    vm.serializeAddress(
+      poolConfigKey,
+      'priceOracleSentinel',
+      addressesProvider.getPriceOracleSentinel()
+    );
+
+    // pool configurator
+    IPoolConfigurator configurator = IPoolConfigurator(addressesProvider.getPoolConfigurator());
+    vm.serializeAddress(poolConfigKey, 'poolConfigurator', address(configurator));
+    vm.serializeAddress(
+      poolConfigKey,
+      'poolConfiguratorImpl',
+      ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, address(configurator))
+    );
+
+    // PoolDataProvider
+    IPoolDataProvider pdp = IPoolDataProvider(addressesProvider.getPoolDataProvider());
+    vm.serializeAddress(poolConfigKey, 'protocolDataProvider', address(pdp));
+
+    // pool
+    vm.serializeAddress(
+      poolConfigKey,
+      'poolImpl',
+      ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, address(pool))
+    );
+    string memory content = vm.serializeAddress(poolConfigKey, 'pool', address(pool));
+
+    string memory output = vm.serializeString('root', 'poolConfig', content);
+    vm.writeJson(output, path);
   }
 
   function _getReservesConfigs(IPool pool) internal view returns (ReserveConfig[] memory) {
@@ -511,11 +493,10 @@ contract ProtocolV3TestBase is CommonTestBase {
     return vars.configs;
   }
 
-  function _getStructReserveTokens(IPoolDataProvider pdp, address underlyingAddress)
-    internal
-    view
-    returns (ReserveTokens memory)
-  {
+  function _getStructReserveTokens(
+    IPoolDataProvider pdp,
+    address underlyingAddress
+  ) internal view returns (ReserveTokens memory) {
     ReserveTokens memory reserveTokens;
     (reserveTokens.aToken, reserveTokens.stableDebtToken, reserveTokens.variableDebtToken) = pdp
       .getReserveTokensAddresses(underlyingAddress);
@@ -605,11 +586,10 @@ contract ProtocolV3TestBase is CommonTestBase {
       });
   }
 
-  function _findReserveConfig(ReserveConfig[] memory configs, address underlying)
-    internal
-    pure
-    returns (ReserveConfig memory)
-  {
+  function _findReserveConfig(
+    ReserveConfig[] memory configs,
+    address underlying
+  ) internal pure returns (ReserveConfig memory) {
     for (uint256 i = 0; i < configs.length; i++) {
       if (configs[i].underlying == underlying) {
         // Important to clone the struct, to avoid unexpected side effect if modifying the returned config
@@ -847,10 +827,10 @@ contract ProtocolV3TestBase is CommonTestBase {
     }
   }
 
-  function _requireNoChangeInConfigs(ReserveConfig memory config1, ReserveConfig memory config2)
-    internal
-    pure
-  {
+  function _requireNoChangeInConfigs(
+    ReserveConfig memory config1,
+    ReserveConfig memory config2
+  ) internal pure {
     require(
       keccak256(abi.encodePacked(config1.symbol)) == keccak256(abi.encodePacked(config2.symbol)),
       '_noReservesConfigsChangesApartNewListings() : UNEXPECTED_SYMBOL_CHANGED'
@@ -986,11 +966,11 @@ contract ProtocolV3TestBase is CommonTestBase {
   }
 
   function _validateAssetSourceOnOracle(
-    IPoolAddressesProvider addressProvider,
+    IPoolAddressesProvider addressesProvider,
     address asset,
     address expectedSource
   ) internal view {
-    IAaveOracle oracle = IAaveOracle(addressProvider.getPriceOracle());
+    IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
 
     require(
       oracle.getSourceOfAsset(asset) == expectedSource,

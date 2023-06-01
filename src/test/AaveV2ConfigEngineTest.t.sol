@@ -3,8 +3,8 @@ pragma solidity ^0.8.0;
 
 import {AaveV2EthereumRatesUpdate} from './mocks/AaveV2EthereumRatesUpdate.sol';
 import {IAaveV2ConfigEngine} from '../v2-config-engine/IAaveV2ConfigEngine.sol';
-import {DeployV2EngineEthLib} from '../../script/AaveV2ConfigEngine.s.sol';
-import {DeployV2RatesFactoryEthLib} from '../../script/V2RateStrategyFactory.s.sol';
+import {DeployV2EngineEthLib} from '../../scripts/AaveV2ConfigEngine.s.sol';
+import {DeployV2RatesFactoryEthLib} from '../../scripts/V2RateStrategyFactory.s.sol';
 import {AaveV2Ethereum} from 'aave-address-book/AaveAddressBook.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
@@ -30,7 +30,7 @@ contract AaveV2ConfigEngineTest is ProtocolV2TestBase, TestWithExecutor {
     createConfigurationSnapshot('preTestV2RatesUpdates', AaveV2Ethereum.POOL);
 
     _selectPayloadExecutor(AaveGovernanceV2.SHORT_EXECUTOR);
-    _executor.execute(address(payload));
+    _executePayload(address(payload));
 
     createConfigurationSnapshot('postTestV2RatesUpdates', AaveV2Ethereum.POOL);
 

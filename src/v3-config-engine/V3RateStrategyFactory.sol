@@ -116,11 +116,9 @@ contract V3RateStrategyFactory is Initializable, IV3RateStrategyFactory {
   }
 
   ///@inheritdoc IV3RateStrategyFactory
-  function getStrategyData(IDefaultInterestRateStrategy strategy)
-    public
-    view
-    returns (RateStrategyParams memory)
-  {
+  function getStrategyData(
+    IDefaultInterestRateStrategy strategy
+  ) public view returns (RateStrategyParams memory) {
     return
       RateStrategyParams({
         optimalUsageRatio: strategy.OPTIMAL_USAGE_RATIO(),

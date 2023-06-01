@@ -195,7 +195,10 @@ interface IAaveV3ConfigEngine {
    *   More information on the documentation of the struct.
    * @param listings `ListingWithCustomImpl[]` list of declarative configs for every aspect of the asset listings.
    */
-  function listAssetsCustom(PoolContext memory context, ListingWithCustomImpl[] memory listings) external;
+  function listAssetsCustom(
+    PoolContext memory context,
+    ListingWithCustomImpl[] memory listings
+  ) external;
 
   /**
    * @notice Performs an update of the caps (supply, borrow) of the assets, in the Aave pool configured in this engine instance
