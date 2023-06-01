@@ -38,10 +38,10 @@
   resolved "https://registry.yarnpkg.com/@bgd-labs/aave-address-book/-/aave-address-book-1.23.1.tgz#11b070a29c5eec0ecda92315656edcb3d5d70474"
   integrity sha512-jtkVvGpjzZKcjwVtKEDN03uE3tkBRbzKeoSHzUVvMpX6K6IvvxTECv3XczsYMiq7i6Z+hluY3TXvHS98JyJKvg==
 
-"@bgd-labs/aave-cli@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@bgd-labs/aave-cli/-/aave-cli-0.0.2.tgz#f5bd1879370fa8a95ff4d411158e08a45f1d8bcd"
-  integrity sha512-YqZLPBKvCnGxbU1U6BDT1zaOvKhS032xBONZBh2O9kkxgQYC6UWE/wH5IOWmOd1KWM8A45qHy1Pdtsw6dyy9pw==
+"@bgd-labs/aave-cli@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@bgd-labs/aave-cli/-/aave-cli-0.0.8.tgz#f7f34c1fafe0767c694b4eb99fa5b339c3255919"
+  integrity sha512-3HrtBvwRC3hqe++Pb1ddkktQlqFrZAjWJEIQR72PX1TvLeyimbbHOjX/chG06gSsNnov5n6x9FTpbJu9FwCFTQ==
   dependencies:
     "@bgd-labs/aave-address-book" "^1.23.1"
     bs58 "^5.0.0"
@@ -52,7 +52,7 @@
     json-bigint "^1.0.0"
     node-fetch "^2.6.9"
     object-hash "^3.0.0"
-    viem "^0.3.40"
+    viem "^0.3.41"
     yargs "^17.7.2"
     zod "^3.21.4"
 
@@ -1141,10 +1141,10 @@ varint@^6.0.0:
   resolved "https://registry.yarnpkg.com/varint/-/varint-6.0.0.tgz#9881eb0ce8feaea6512439d19ddf84bf551661d0"
   integrity sha512-cXEIW6cfr15lFv563k4GuVuW/fiwjknytD37jIOLSdSWuOI6WnO/oKwmP2FQTU2l01LP8/M5TSAJpzUaGe3uWg==
 
-viem@^0.3.40:
-  version "0.3.40"
-  resolved "https://registry.yarnpkg.com/viem/-/viem-0.3.40.tgz#557134ffee56ed5159e566d870ba74599ac1366c"
-  integrity sha512-IVOaJVXUXxqRjgDNHx21R69nJ4Q4AAxpkjWRtjtBKNJFPCPzjYwBuzxZX0T0FW581fT/BwrlXxZtdHrQ1wbfdw==
+viem@^0.3.41:
+  version "0.3.43"
+  resolved "https://registry.yarnpkg.com/viem/-/viem-0.3.43.tgz#ccadd97637e8a4647cab596ef02737342590159c"
+  integrity sha512-hzzBn553/+y5jH8V1OzMShAJmPtRm/+lC7DLrjXKZSW+yoyL09OGBd0FggXLzB8deFf7JGgs4tz4rHnn0YYrdA==
   dependencies:
     "@adraffy/ens-normalize" "1.9.0"
     "@noble/curves" "1.0.0"
