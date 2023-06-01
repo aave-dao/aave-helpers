@@ -11,7 +11,7 @@ test   :; forge test -vvv
 test-gauntlet-strategies-update:; forge test -vvv --match-path src/test/AaveV3ConfigEngineGauntletProposal.t.sol --gas-report
 test-config-engine:; forge test -vvv --match-path src/test/AaveV3ConfigEngineTest.t.sol --gas-report
 test-rates-factory:; forge test -vvv --match-path src/test/V3RateStrategyFactory.t.sol --gas-report
-test-v2-config-engine:; forge test -vvv --match-path src/test/AaveV2RatePayloadBase.t.sol --gas-report
+test-v2-config-engine:; forge test -vvv --match-path src/test/AaveV2ConfigEngineTest.t.sol --gas-report
 test-v2-rates-factory:; forge test -vvv --match-path src/test/V2RateStrategyFactory.t.sol --gas-report
 
 # Scripts
