@@ -43,6 +43,11 @@ deploy-rates-factory-v2-eth-amm :; forge script scripts/V2RateStrategyFactory.s.
 deploy-rates-factory-v2-pol :; forge script scripts/V2RateStrategyFactory.s.sol:DeployV2RatesFactoryPol --mnemonics random --rpc-url polygon --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-rates-factory-v2-ava :; forge script scripts/V2RateStrategyFactory.s.sol:DeployV2RatesFactoryAva --mnemonics random --rpc-url avalanche --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 
+deploy-config-engine-v2-eth :; forge script scripts/AaveV2ConfigEngine.s.sol:DeployV2EngineEth --mnemonics random --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
+deploy-config-engine-v2-eth-amm :; forge script scripts/AaveV2ConfigEngine.s.sol:DeployV2EngineEthAMM --mnemonics random --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
+deploy-config-engine-v2-pol :; forge script scripts/AaveV2ConfigEngine.s.sol:DeployV2EnginePol --mnemonics random --rpc-url polygon --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
+deploy-config-engine-v2-ava :; forge script scripts/AaveV2ConfigEngine.s.sol:DeployV2EngineAva --mnemonics random --rpc-url avalanche --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
+
 # Utilities
 download :; cast etherscan-source --chain ${chain} -d src/etherscan/${chain}_${address} ${address}
 git-diff :
