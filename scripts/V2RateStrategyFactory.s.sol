@@ -101,8 +101,8 @@ library DeployV2RatesFactoryPolLib {
     return
       DeployV2RatesFactoryLib._createAndSetupRatesFactory(
         AaveV2Polygon.POOL_ADDRESSES_PROVIDER,
-        AaveMisc.TRANSPARENT_PROXY_FACTORY_ETHEREUM,
-        AaveMisc.PROXY_ADMIN_ETHEREUM
+        AaveMisc.TRANSPARENT_PROXY_FACTORY_POLYGON,
+        AaveMisc.PROXY_ADMIN_POLYGON
       );
   }
 }
