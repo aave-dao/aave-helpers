@@ -51,6 +51,15 @@ library GovHelpers {
     inputs[4] = '-u';
     inputs[5] = vm.toString(upload);
     bytes memory bs58Hash = vm.ffi(inputs);
+    console2.logString('Info: This preview will only work when the file has been uploaded to ipfs');
+    console2.logString(
+      string(
+        abi.encodePacked(
+          'Preview: https://app.aave.com/governance/ipfs-preview/?ipfsHash=',
+          vm.toString(bs58Hash)
+        )
+      )
+    );
     return bytes32(bs58Hash);
   }
 
