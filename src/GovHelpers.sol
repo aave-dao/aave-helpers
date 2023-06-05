@@ -51,6 +51,12 @@ library GovHelpers {
     inputs[4] = '-u';
     inputs[5] = vm.toString(upload);
     bytes memory bs58Hash = vm.ffi(inputs);
+    // currenty there is no better way as ffi silently fails
+    // revisit once https://github.com/foundry-rs/foundry/pull/4908 progresses
+    require(
+      bs58Hash.length != 0,
+      'CALCULATED_HASH_IS_ZERO_CHECK_IF_YARN_DEPENDENCIES_ARE_INSTALLED'
+    );
     console2.logString('Info: This preview will only work when the file has been uploaded to ipfs');
     console2.logString(
       string(
