@@ -9,6 +9,14 @@ import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 
+interface IERC20Detailed is IERC20 {
+  function name() external view returns (string memory);
+
+  function symbol() external view returns (string memory);
+
+  function decimals() external view returns (uint8);
+}
+
 struct ReserveConfig {
   string symbol;
   address underlying;
@@ -431,6 +439,8 @@ contract ProtocolV3TestBase is CommonTestBase {
         'aTokenImpl',
         ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, config.aToken)
       );
+      vm.serializeString(key, 'aTokenSymbol', IERC20Detailed(config.aToken).symbol());
+      vm.serializeString(key, 'aTokenName', IERC20Detailed(config.aToken).name());
       vm.serializeAddress(
         key,
         'stableDebtTokenImpl',
@@ -439,6 +449,12 @@ contract ProtocolV3TestBase is CommonTestBase {
           config.stableDebtToken
         )
       );
+      vm.serializeString(
+        key,
+        'stableDebtTokenSymbol',
+        IERC20Detailed(config.stableDebtToken).symbol()
+      );
+      vm.serializeString(key, 'stableDebtTokenName', IERC20Detailed(config.stableDebtToken).name());
       vm.serializeAddress(
         key,
         'variableDebtTokenImpl',
@@ -446,6 +462,16 @@ contract ProtocolV3TestBase is CommonTestBase {
           vm,
           config.variableDebtToken
         )
+      );
+      vm.serializeString(
+        key,
+        'variableDebtTokenSymbol',
+        IERC20Detailed(config.variableDebtToken).symbol()
+      );
+      vm.serializeString(
+        key,
+        'variableDebtTokenName',
+        IERC20Detailed(config.variableDebtToken).name()
       );
       vm.serializeAddress(key, 'oracle', address(assetOracle));
       if (address(assetOracle) != address(0)) {

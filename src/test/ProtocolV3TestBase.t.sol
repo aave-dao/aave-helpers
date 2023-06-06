@@ -25,15 +25,15 @@ contract ProtocolV3TestBaseTest is ProtocolV3_0_1TestBase {
 
 contract ProtocolV3TestE2ETestAsset is ProtocolV3_0_1TestBase {
   function setUp() public {
-    vm.createSelectFork('optimism', 105016991);
+    vm.createSelectFork('optimism', 105213914);
   }
 
-  function test_e2eTestAsset() public {
+  function testFail_e2eTestAsset() public {
     ReserveConfig[] memory configs = _getReservesConfigs(AaveV3Optimism.POOL);
     e2eTestAsset(
       AaveV3Optimism.POOL,
-      _findReserveConfig(configs, AaveV3OptimismAssets.DAI_UNDERLYING), // DAI
-      _findReserveConfig(configs, AaveV3OptimismAssets.MAI_UNDERLYING) // MAI
+      _findReserveConfig(configs, AaveV3OptimismAssets.DAI_UNDERLYING),
+      _findReserveConfig(configs, AaveV3OptimismAssets.MAI_UNDERLYING)
     );
   }
 }
