@@ -25,6 +25,7 @@ struct ReserveConfig {
   bool borrowingEnabled;
   address interestRateStrategy;
   bool stableBorrowRateEnabled;
+  bool isPaused;
   bool isActive;
   bool isFrozen;
   bool isSiloed;
@@ -108,6 +109,46 @@ contract ProtocolV3TestBase is CommonTestBase {
     vm.revertTo(snapshot);
   }
 
+  function e2eTestAsset(
+    IPool pool,
+    ReserveConfig memory collateralConfig,
+    ReserveConfig memory testAssetConfig
+  ) public {
+    address collateralSupplier = vm.addr(3);
+    address testAssetSupplier = vm.addr(4);
+    require(collateralConfig.usageAsCollateralEnabled, 'COLLATERAL_CONFIG_MUST_BE_COLLATERAL');
+    uint256 testAssetAmount = 10 * 10 ** testAssetConfig.decimals;
+    _deposit(collateralConfig, pool, collateralSupplier, 100_000 * 10 ** collateralConfig.decimals);
+    _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
+    uint256 snapshot = vm.snapshot();
+    // test withdrawal
+    assertGe(
+      _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max),
+      testAssetAmount
+    );
+    assertEq(IERC20(testAssetConfig.aToken).balanceOf(testAssetSupplier), 0);
+    vm.revertTo(snapshot);
+    if (testAssetConfig.borrowingEnabled) {
+      _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
+      vm.revertTo(snapshot);
+      if (testAssetConfig.stableBorrowRateEnabled) {
+        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
+        vm.revertTo(snapshot);
+      }
+    }
+  }
+
+  function _e2eTestBorrowRepay(
+    IPool pool,
+    address borrower,
+    ReserveConfig memory testAssetConfig,
+    uint256 amount,
+    bool stable
+  ) internal {
+    this._borrow(testAssetConfig, pool, borrower, amount, stable);
+    _repay(testAssetConfig, pool, borrower, amount, stable);
+  }
+
   /**
    * @dev returns the first collateral in the list that cannot be borrowed in stable mode
    */
@@ -183,6 +224,10 @@ contract ProtocolV3TestBase is CommonTestBase {
     address user,
     uint256 amount
   ) internal {
+    require(!config.isFrozen, 'DEPOSIT(): FROZEN_RESERVE');
+    require(config.isActive, 'DEPOSIT(): INACTIVE_RESERVE');
+    require(!config.isPaused, 'DEPOSIT(): PAUSED_RESERVE');
+    console.log(config.isPaused);
     vm.startPrank(user);
     uint256 aTokenBefore = IERC20(config.aToken).balanceOf(user);
     deal(config.underlying, user, amount);
@@ -370,6 +415,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       vm.serializeBool(key, 'usageAsCollateralEnabled', config.usageAsCollateralEnabled);
       vm.serializeBool(key, 'borrowingEnabled', config.borrowingEnabled);
       vm.serializeBool(key, 'stableBorrowRateEnabled', config.stableBorrowRateEnabled);
+      vm.serializeBool(key, 'isPaused', config.isPaused);
       vm.serializeBool(key, 'isActive', config.isActive);
       vm.serializeBool(key, 'isFrozen', config.isFrozen);
       vm.serializeBool(key, 'isSiloed', config.isSiloed);
@@ -535,6 +581,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     localConfig.interestRateStrategy = pool
       .getReserveData(reserve.tokenAddress)
       .interestRateStrategyAddress;
+    localConfig.isPaused = pdp.getPaused(reserve.tokenAddress);
     localConfig.isActive = isActive;
     localConfig.isFrozen = isFrozen;
     localConfig.isSiloed = pdp.getSiloedBorrowing(reserve.tokenAddress);
@@ -574,6 +621,7 @@ contract ProtocolV3TestBase is CommonTestBase {
         borrowingEnabled: config.borrowingEnabled,
         interestRateStrategy: config.interestRateStrategy,
         stableBorrowRateEnabled: config.stableBorrowRateEnabled,
+        isPaused: config.isPaused,
         isActive: config.isActive,
         isFrozen: config.isFrozen,
         isSiloed: config.isSiloed,
@@ -1038,6 +1086,7 @@ contract ProtocolV3_0_1TestBase is ProtocolV3TestBase {
     localConfig.interestRateStrategy = pool
       .getReserveData(reserve.tokenAddress)
       .interestRateStrategyAddress;
+    localConfig.isPaused = pdp.getPaused(reserve.tokenAddress);
     localConfig.isActive = isActive;
     localConfig.isFrozen = isFrozen;
     localConfig.isSiloed = pdp.getSiloedBorrowing(reserve.tokenAddress);

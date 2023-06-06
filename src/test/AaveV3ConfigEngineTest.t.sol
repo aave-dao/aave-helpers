@@ -72,6 +72,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
       interestRateStrategy: _findReserveConfigBySymbol(allConfigsAfter, 'AAVE')
         .interestRateStrategy,
       stableBorrowRateEnabled: false,
+      isPaused: false,
       isActive: true,
       isFrozen: false,
       isSiloed: false,
@@ -154,6 +155,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
       interestRateStrategy: _findReserveConfigBySymbol(allConfigsAfter, 'AAVE')
         .interestRateStrategy,
       stableBorrowRateEnabled: true,
+      isPaused: false,
       isActive: true,
       isFrozen: false,
       isSiloed: false,
@@ -235,6 +237,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
       borrowingEnabled: allConfigsBefore[6].borrowingEnabled,
       interestRateStrategy: allConfigsBefore[6].interestRateStrategy,
       stableBorrowRateEnabled: allConfigsBefore[6].stableBorrowRateEnabled,
+      isPaused: allConfigsBefore[6].isPaused,
       isActive: allConfigsBefore[6].isActive,
       isFrozen: allConfigsBefore[6].isFrozen,
       isSiloed: allConfigsBefore[6].isSiloed,
@@ -290,6 +293,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
       borrowingEnabled: allConfigsBefore[6].borrowingEnabled,
       interestRateStrategy: allConfigsBefore[6].interestRateStrategy,
       stableBorrowRateEnabled: allConfigsBefore[6].stableBorrowRateEnabled,
+      isPaused: allConfigsBefore[6].isPaused,
       isActive: allConfigsBefore[6].isActive,
       isFrozen: allConfigsBefore[6].isFrozen,
       isSiloed: allConfigsBefore[6].isSiloed,
@@ -376,6 +380,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
       borrowingEnabled: allConfigsBefore[6].borrowingEnabled,
       interestRateStrategy: allConfigsBefore[6].interestRateStrategy,
       stableBorrowRateEnabled: allConfigsBefore[6].stableBorrowRateEnabled,
+      isPaused: allConfigsBefore[6].isPaused,
       isActive: allConfigsBefore[6].isActive,
       isFrozen: allConfigsBefore[6].isFrozen,
       isSiloed: allConfigsBefore[6].isSiloed,
@@ -406,7 +411,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
     payload.execute();
   }
 
-function testCollateralUpdateCorrectBonus() public {
+  function testCollateralUpdateCorrectBonus() public {
     vm.createSelectFork(vm.rpcUrl('avalanche'), 30344870);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
@@ -446,6 +451,7 @@ function testCollateralUpdateCorrectBonus() public {
       borrowingEnabled: allConfigsBefore[6].borrowingEnabled,
       interestRateStrategy: allConfigsBefore[6].interestRateStrategy,
       stableBorrowRateEnabled: allConfigsBefore[6].stableBorrowRateEnabled,
+      isPaused: allConfigsBefore[6].isPaused,
       isActive: allConfigsBefore[6].isActive,
       isFrozen: allConfigsBefore[6].isFrozen,
       isSiloed: allConfigsBefore[6].isSiloed,
@@ -498,6 +504,7 @@ function testCollateralUpdateCorrectBonus() public {
       borrowingEnabled: true,
       interestRateStrategy: allConfigsBefore[6].interestRateStrategy,
       stableBorrowRateEnabled: allConfigsBefore[6].stableBorrowRateEnabled,
+      isPaused: allConfigsBefore[6].isPaused,
       isActive: allConfigsBefore[6].isActive,
       isFrozen: allConfigsBefore[6].isFrozen,
       isSiloed: allConfigsBefore[6].isSiloed,
