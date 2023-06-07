@@ -45,6 +45,12 @@ contract ProtocolV3TestE2ETestAsset is ProtocolV3_0_1TestBase {
       _findReserveConfig(configs, AaveV3OptimismAssets.USDC_UNDERLYING)
     );
   }
+}
+
+contract ProtocolV3TestE2ETestAll is ProtocolV3_0_1TestBase {
+  function setUp() public {
+    vm.createSelectFork('optimism', 105213914);
+  }
 
   function test_e2e() public {
     e2eTest(AaveV3Optimism.POOL);

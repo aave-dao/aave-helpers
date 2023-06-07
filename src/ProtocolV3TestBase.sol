@@ -107,10 +107,13 @@ contract ProtocolV3TestBase is CommonTestBase {
   function e2eTest(IPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
-    uint256 snapshot = vm.snapshot();
     for (uint256 i; i < configs.length; i++) {
-      e2eTestAsset(pool, collateralConfig, configs[i]);
-      vm.revertTo(snapshot);
+      if (_includeInE2e(configs[i])) {
+        // there's a foundry bug causing issues when this is outside the loop
+        uint256 snapshot = vm.snapshot();
+        e2eTestAsset(pool, collateralConfig, configs[i]);
+        vm.revertTo(snapshot);
+      }
     }
   }
 
@@ -120,21 +123,21 @@ contract ProtocolV3TestBase is CommonTestBase {
     ReserveConfig memory testAssetConfig
   ) public {
     console.log(
-      'E2E: collateral %s, testasset %s',
+      'E2E: Collateral %s, TestAsset %s',
       collateralConfig.symbol,
       testAssetConfig.symbol
     );
     address collateralSupplier = vm.addr(3);
     address testAssetSupplier = vm.addr(4);
     require(collateralConfig.usageAsCollateralEnabled, 'COLLATERAL_CONFIG_MUST_BE_COLLATERAL');
+    uint256 testAssetAmount = _getTokenAmountByDollarValue(pool, testAssetConfig, 100);
     if (
-      testAssetConfig.supplyCap <
-      IERC20(testAssetConfig.aToken).totalSupply() / 10 ** testAssetConfig.decimals
+      (testAssetConfig.supplyCap * 10 ** testAssetConfig.decimals) <
+      IERC20(testAssetConfig.aToken).totalSupply() + testAssetAmount
     ) {
-      console.log('Skip: %s, supply cap reached', testAssetConfig.symbol);
+      console.log('Skip: %s, supply cap fully utilized', testAssetConfig.symbol);
       return;
     }
-    uint256 testAssetAmount = _getTokenAmountByDollarValue(pool, testAssetConfig, 100);
     _deposit(collateralConfig, pool, collateralSupplier, 10_000 * 10 ** collateralConfig.decimals);
     _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
     uint256 snapshot = vm.snapshot();
@@ -152,6 +155,13 @@ contract ProtocolV3TestBase is CommonTestBase {
         vm.revertTo(snapshot);
       }
     }
+  }
+
+  /**
+   * Reserves that are frozen or not active should not be included in e2e test suite
+   */
+  function _includeInE2e(ReserveConfig memory config) internal pure returns (bool) {
+    return !config.isFrozen && config.isActive && !config.isPaused;
   }
 
   function _getTokenAmountByDollarValue(
