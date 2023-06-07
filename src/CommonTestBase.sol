@@ -5,6 +5,7 @@ import 'forge-std/StdJson.sol';
 import 'forge-std/Test.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
+import {AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {ChainIds} from './ChainIds.sol';
 
 struct ReserveTokens {
@@ -62,6 +63,14 @@ contract CommonTestBase is Test {
       // stETH
       if (asset == AaveV2EthereumAssets.stETH_UNDERLYING) {
         vm.prank(0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0);
+        IERC20(asset).transfer(user, amount);
+        return;
+      }
+    }
+    if (block.chainid == ChainIds.OPTIMISM) {
+      // sUSD
+      if (asset == AaveV3OptimismAssets.sUSD_UNDERLYING) {
+        vm.prank(AaveV3OptimismAssets.sUSD_A_TOKEN);
         IERC20(asset).transfer(user, amount);
         return;
       }
