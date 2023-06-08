@@ -12,7 +12,5 @@ import './AaveV2PayloadBase.sol';
 abstract contract AaveV2PayloadEthereum is
   AaveV2PayloadBase(IEngine(AaveV2Ethereum.LISTING_ENGINE))
 {
-  function getPoolContext() public pure override returns (IEngine.PoolContext memory) {
-    return IEngine.PoolContext({networkName: 'Ethereum', networkAbbreviation: 'Eth'});
-  }
+
 }

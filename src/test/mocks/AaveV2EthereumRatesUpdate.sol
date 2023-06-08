@@ -12,7 +12,12 @@ import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 contract AaveV2EthereumRatesUpdate is AaveV2PayloadBase {
   constructor(IEngine customEngine) AaveV2PayloadBase(customEngine) {}
 
-  function rateStrategiesUpdates() public pure override returns (IEngine.RateStrategyUpdate[] memory) {
+  function rateStrategiesUpdates()
+    public
+    pure
+    override
+    returns (IEngine.RateStrategyUpdate[] memory)
+  {
     IEngine.RateStrategyUpdate[] memory rateStrategy = new IEngine.RateStrategyUpdate[](1);
 
     rateStrategy[0] = IEngine.RateStrategyUpdate({
@@ -28,9 +33,5 @@ contract AaveV2EthereumRatesUpdate is AaveV2PayloadBase {
     });
 
     return rateStrategy;
-  }
-
-  function getPoolContext() public pure override returns (IEngine.PoolContext memory) {
-    return IEngine.PoolContext({networkName: 'Ethereum', networkAbbreviation: 'Eth'});
   }
 }

@@ -12,7 +12,5 @@ import './AaveV2PayloadBase.sol';
 abstract contract AaveV2PayloadAvalanche is
   AaveV2PayloadBase(IEngine(AaveV2Avalanche.LISTING_ENGINE))
 {
-  function getPoolContext() public pure override returns (IEngine.PoolContext memory) {
-    return IEngine.PoolContext({networkName: 'Avalanche', networkAbbreviation: 'Ava'});
-  }
+
 }

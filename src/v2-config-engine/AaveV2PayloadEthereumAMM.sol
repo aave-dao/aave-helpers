@@ -12,7 +12,5 @@ import './AaveV2PayloadBase.sol';
 abstract contract AaveV2PayloadEthereumAMM is
   AaveV2PayloadBase(IEngine(AaveV2EthereumAMM.LISTING_ENGINE))
 {
-  function getPoolContext() public pure override returns (IEngine.PoolContext memory) {
-    return IEngine.PoolContext({networkName: 'AMM Market', networkAbbreviation: 'Amm'});
-  }
+
 }

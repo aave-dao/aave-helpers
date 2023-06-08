@@ -10,7 +10,5 @@ import './AaveV2PayloadBase.sol';
  */
 // TODO: Add rates factory address after deploying
 abstract contract AaveV2PayloadPolygon is AaveV2PayloadBase(IEngine(AaveV2Polygon.LISTING_ENGINE)) {
-  function getPoolContext() public pure override returns (IEngine.PoolContext memory) {
-    return IEngine.PoolContext({networkName: 'Polygon', networkAbbreviation: 'Pol'});
-  }
+
 }
