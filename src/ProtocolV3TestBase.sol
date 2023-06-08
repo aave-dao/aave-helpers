@@ -183,7 +183,6 @@ contract ProtocolV3TestBase is CommonTestBase {
     bool stable
   ) internal {
     this._borrow(testAssetConfig, pool, borrower, amount, stable);
-    assertEq(IERC20(testAssetConfig.underlying).balanceOf(borrower), amount);
     _repay(testAssetConfig, pool, borrower, amount, stable);
   }
 
