@@ -56,3 +56,13 @@ contract ProtocolV3TestE2ETestAll is ProtocolV3_0_1TestBase {
     e2eTest(AaveV3Optimism.POOL);
   }
 }
+
+contract ProtocolV3TestE2ETestSnapshot is ProtocolV3_0_1TestBase {
+  function setUp() public {
+    vm.createSelectFork('optimism', 105213914);
+  }
+
+  function test_snapshot() public {
+    createConfigurationSnapshot('snpashot', AaveV3Optimism.POOL, true, false, false, false);
+  }
+}

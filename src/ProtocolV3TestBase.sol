@@ -8,6 +8,7 @@ import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializabl
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
+import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
 
 interface IERC20Detailed is IERC20 {
   function name() external view returns (string memory);
@@ -63,6 +64,8 @@ struct InterestStrategyValues {
 }
 
 contract ProtocolV3TestBase is CommonTestBase {
+  using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
+
   /**
    * @dev Generates a markdown compatible snapshot of the whole pool configuration into `/reports`.
    * @param reportName filename suffix for the generated reports.
@@ -527,7 +530,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     vars.configs = new ReserveConfig[](vars.reserves.length);
 
     for (uint256 i = 0; i < vars.reserves.length; i++) {
-      vars.configs[i] = _getStructReserveConfig(pool, poolDataProvider, vars.reserves[i]);
+      vars.configs[i] = _getStructReserveConfig(pool, vars.reserves[i]);
       ReserveTokens memory reserveTokens = _getStructReserveTokens(
         poolDataProvider,
         vars.configs[i].underlying
@@ -553,52 +556,40 @@ contract ProtocolV3TestBase is CommonTestBase {
 
   function _getStructReserveConfig(
     IPool pool,
-    IPoolDataProvider pdp,
     IPoolDataProvider.TokenData memory reserve
   ) internal view virtual returns (ReserveConfig memory) {
     ReserveConfig memory localConfig;
-    (
-      uint256 decimals,
-      uint256 ltv,
-      uint256 liquidationThreshold,
-      uint256 liquidationBonus,
-      uint256 reserveFactor,
-      bool usageAsCollateralEnabled,
-      bool borrowingEnabled,
-      bool stableBorrowRateEnabled,
-      bool isActive,
-      bool isFrozen
-    ) = pdp.getReserveConfigurationData(reserve.tokenAddress);
-    localConfig.symbol = reserve.symbol;
-    localConfig.underlying = reserve.tokenAddress;
-    localConfig.decimals = decimals;
-    localConfig.ltv = ltv;
-    localConfig.liquidationThreshold = liquidationThreshold;
-    localConfig.liquidationBonus = liquidationBonus;
-    localConfig.reserveFactor = reserveFactor;
-    localConfig.usageAsCollateralEnabled = usageAsCollateralEnabled;
-    localConfig.borrowingEnabled = borrowingEnabled;
-    localConfig.stableBorrowRateEnabled = stableBorrowRateEnabled;
+    DataTypes.ReserveConfigurationMap memory configuration = pool.getConfiguration(
+      reserve.tokenAddress
+    );
     localConfig.interestRateStrategy = pool
       .getReserveData(reserve.tokenAddress)
       .interestRateStrategyAddress;
-    localConfig.isPaused = pdp.getPaused(reserve.tokenAddress);
-    localConfig.isActive = isActive;
-    localConfig.isFrozen = isFrozen;
-    localConfig.isSiloed = pdp.getSiloedBorrowing(reserve.tokenAddress);
-    (localConfig.borrowCap, localConfig.supplyCap) = pdp.getReserveCaps(reserve.tokenAddress);
-    localConfig.debtCeiling = pdp.getDebtCeiling(reserve.tokenAddress);
-    localConfig.eModeCategory = pdp.getReserveEModeCategory(reserve.tokenAddress);
-    localConfig.liquidationProtocolFee = pdp.getLiquidationProtocolFee(reserve.tokenAddress);
+    (
+      localConfig.ltv,
+      localConfig.liquidationThreshold,
+      localConfig.liquidationBonus,
+      localConfig.decimals,
+      localConfig.reserveFactor,
+      localConfig.eModeCategory
+    ) = configuration.getParams();
+    (
+      localConfig.isActive,
+      localConfig.isFrozen,
+      localConfig.borrowingEnabled,
+      localConfig.stableBorrowRateEnabled,
+      localConfig.isPaused
+    ) = configuration.getFlags();
+    localConfig.symbol = reserve.symbol;
+    localConfig.underlying = reserve.tokenAddress;
+    localConfig.usageAsCollateralEnabled = localConfig.liquidationThreshold != 0;
+    localConfig.isSiloed = configuration.getSiloedBorrowing();
+    (localConfig.borrowCap, localConfig.supplyCap) = configuration.getCaps();
+    localConfig.debtCeiling = configuration.getDebtCeiling();
+    localConfig.liquidationProtocolFee = configuration.getLiquidationProtocolFee();
+    localConfig.isBorrowableInIsolation = configuration.getBorrowableInIsolation();
 
-    // TODO this should be improved, but at the moment is simpler to avoid importing the
-    // ReserveConfiguration library
-    localConfig.isBorrowableInIsolation =
-      (pool.getConfiguration(reserve.tokenAddress).data &
-        ~uint256(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDFFFFFFFFFFFFFFF)) !=
-      0;
-
-    localConfig.isFlashloanable = false; // TODO pdp.getFlashLoanEnabled(reserve.tokenAddress) once updated address book
+    localConfig.isFlashloanable = false;
 
     return localConfig;
   }
@@ -1056,54 +1047,44 @@ contract ProtocolV3TestBase is CommonTestBase {
 }
 
 contract ProtocolV3_0_1TestBase is ProtocolV3TestBase {
+  using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
+
   function _getStructReserveConfig(
     IPool pool,
-    IPoolDataProvider pdp,
     IPoolDataProvider.TokenData memory reserve
   ) internal view override returns (ReserveConfig memory) {
     ReserveConfig memory localConfig;
-    (
-      uint256 decimals,
-      uint256 ltv,
-      uint256 liquidationThreshold,
-      uint256 liquidationBonus,
-      uint256 reserveFactor,
-      bool usageAsCollateralEnabled,
-      bool borrowingEnabled,
-      bool stableBorrowRateEnabled,
-      bool isActive,
-      bool isFrozen
-    ) = pdp.getReserveConfigurationData(reserve.tokenAddress);
-    localConfig.symbol = reserve.symbol;
-    localConfig.underlying = reserve.tokenAddress;
-    localConfig.decimals = decimals;
-    localConfig.ltv = ltv;
-    localConfig.liquidationThreshold = liquidationThreshold;
-    localConfig.liquidationBonus = liquidationBonus;
-    localConfig.reserveFactor = reserveFactor;
-    localConfig.usageAsCollateralEnabled = usageAsCollateralEnabled;
-    localConfig.borrowingEnabled = borrowingEnabled;
-    localConfig.stableBorrowRateEnabled = stableBorrowRateEnabled;
+    DataTypes.ReserveConfigurationMap memory configuration = pool.getConfiguration(
+      reserve.tokenAddress
+    );
     localConfig.interestRateStrategy = pool
       .getReserveData(reserve.tokenAddress)
       .interestRateStrategyAddress;
-    localConfig.isPaused = pdp.getPaused(reserve.tokenAddress);
-    localConfig.isActive = isActive;
-    localConfig.isFrozen = isFrozen;
-    localConfig.isSiloed = pdp.getSiloedBorrowing(reserve.tokenAddress);
-    (localConfig.borrowCap, localConfig.supplyCap) = pdp.getReserveCaps(reserve.tokenAddress);
-    localConfig.debtCeiling = pdp.getDebtCeiling(reserve.tokenAddress);
-    localConfig.eModeCategory = pdp.getReserveEModeCategory(reserve.tokenAddress);
-    localConfig.liquidationProtocolFee = pdp.getLiquidationProtocolFee(reserve.tokenAddress);
+    (
+      localConfig.ltv,
+      localConfig.liquidationThreshold,
+      localConfig.liquidationBonus,
+      localConfig.decimals,
+      localConfig.reserveFactor,
+      localConfig.eModeCategory
+    ) = configuration.getParams();
+    (
+      localConfig.isActive,
+      localConfig.isFrozen,
+      localConfig.borrowingEnabled,
+      localConfig.stableBorrowRateEnabled,
+      localConfig.isPaused
+    ) = configuration.getFlags();
+    localConfig.symbol = reserve.symbol;
+    localConfig.underlying = reserve.tokenAddress;
+    localConfig.usageAsCollateralEnabled = localConfig.liquidationThreshold != 0;
+    localConfig.isSiloed = configuration.getSiloedBorrowing();
+    (localConfig.borrowCap, localConfig.supplyCap) = configuration.getCaps();
+    localConfig.debtCeiling = configuration.getDebtCeiling();
+    localConfig.liquidationProtocolFee = configuration.getLiquidationProtocolFee();
+    localConfig.isBorrowableInIsolation = configuration.getBorrowableInIsolation();
 
-    // TODO this should be improved, but at the moment is simpler to avoid importing the
-    // ReserveConfiguration library
-    localConfig.isBorrowableInIsolation =
-      (pool.getConfiguration(reserve.tokenAddress).data &
-        ~uint256(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDFFFFFFFFFFFFFFF)) !=
-      0;
-
-    localConfig.isFlashloanable = pdp.getFlashLoanEnabled(reserve.tokenAddress);
+    localConfig.isFlashloanable = configuration.getFlashLoanEnabled();
 
     return localConfig;
   }
