@@ -63,6 +63,6 @@ contract ProtocolV3TestE2ETestSnapshot is ProtocolV3_0_1TestBase {
   }
 
   function test_snapshot() public {
-    createConfigurationSnapshot('snpashot', AaveV3Optimism.POOL, true, false, false, false);
+    createConfigurationSnapshot('snapshot', AaveV3Optimism.POOL, true, false, false, false);
   }
 }
