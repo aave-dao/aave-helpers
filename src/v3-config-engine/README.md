@@ -28,7 +28,7 @@ Change Borrow-related parameters? Same as previous, just define the update withi
 
 Change eMode category configuration? Same as previous, just define the update within a `eModeCategoriesUpdates()` function, and the base payload will take care of the rest.
 
-Change eMode category of a particular asset? Same as previous, just define the update within a `eModeAssetsUpdates()` function, and the base payload will take care of the rest.
+Change eMode category of a particular asset? Same as previous, just define the update within a `assetsEModeUpdates()` function, and the base payload will take care of the rest.
 
 ### Internal aspects to consider
 
@@ -44,7 +44,7 @@ The `Base Aave v3 Payload` defines `_preExecute()` and `_postExecute()` hook fun
   6. `collateralsUpdates()`
   7. `rateStrategiesUpdates()`
   8. `priceFeedsUpdates()`
-  9. `eModeAssetsUpdates()`
+  9. `assetsEModeUpdates()`
   10. `capsUpdates()`
   11. `_postExecute()`
 

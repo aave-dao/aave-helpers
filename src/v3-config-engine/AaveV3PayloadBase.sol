@@ -27,10 +27,10 @@ import {EngineFlags} from './EngineFlags.sol';
 abstract contract AaveV3PayloadBase {
   using Address for address;
 
-  IEngine public immutable LISTING_ENGINE;
+  IEngine public immutable CONFIG_ENGINE;
 
   constructor(IEngine engine) {
-    LISTING_ENGINE = engine;
+    CONFIG_ENGINE = engine;
   }
 
   /// @dev to be overriden on the child if any extra logic is needed pre-listing
@@ -49,25 +49,25 @@ abstract contract AaveV3PayloadBase {
     IEngine.BorrowUpdate[] memory borrows = borrowsUpdates();
     IEngine.RateStrategyUpdate[] memory rates = rateStrategiesUpdates();
     IEngine.PriceFeedUpdate[] memory priceFeeds = priceFeedsUpdates();
-    IEngine.EModeAssetUpdate[] memory eModeAssets = eModeAssetsUpdates();
+    IEngine.AssetEModeUpdate[] memory assetsEMode = assetsEModeUpdates();
     IEngine.CapsUpdate[] memory caps = capsUpdates();
 
     if (eModeCategories.length != 0) {
-      address(LISTING_ENGINE).functionDelegateCall(
-        abi.encodeWithSelector(LISTING_ENGINE.updateEModeCategories.selector, eModeCategories)
+      address(CONFIG_ENGINE).functionDelegateCall(
+        abi.encodeWithSelector(CONFIG_ENGINE.updateEModeCategories.selector, eModeCategories)
       );
     }
 
     if (listings.length != 0) {
-      address(LISTING_ENGINE).functionDelegateCall(
-        abi.encodeWithSelector(LISTING_ENGINE.listAssets.selector, getPoolContext(), listings)
+      address(CONFIG_ENGINE).functionDelegateCall(
+        abi.encodeWithSelector(CONFIG_ENGINE.listAssets.selector, getPoolContext(), listings)
       );
     }
 
     if (listingsCustom.length != 0) {
-      address(LISTING_ENGINE).functionDelegateCall(
+      address(CONFIG_ENGINE).functionDelegateCall(
         abi.encodeWithSelector(
-          LISTING_ENGINE.listAssetsCustom.selector,
+          CONFIG_ENGINE.listAssetsCustom.selector,
           getPoolContext(),
           listingsCustom
         )
@@ -75,38 +75,38 @@ abstract contract AaveV3PayloadBase {
     }
 
     if (borrows.length != 0) {
-      address(LISTING_ENGINE).functionDelegateCall(
-        abi.encodeWithSelector(LISTING_ENGINE.updateBorrowSide.selector, borrows)
+      address(CONFIG_ENGINE).functionDelegateCall(
+        abi.encodeWithSelector(CONFIG_ENGINE.updateBorrowSide.selector, borrows)
       );
     }
 
     if (collaterals.length != 0) {
-      address(LISTING_ENGINE).functionDelegateCall(
-        abi.encodeWithSelector(LISTING_ENGINE.updateCollateralSide.selector, collaterals)
+      address(CONFIG_ENGINE).functionDelegateCall(
+        abi.encodeWithSelector(CONFIG_ENGINE.updateCollateralSide.selector, collaterals)
       );
     }
 
     if (rates.length != 0) {
-      address(LISTING_ENGINE).functionDelegateCall(
-        abi.encodeWithSelector(LISTING_ENGINE.updateRateStrategies.selector, rates)
+      address(CONFIG_ENGINE).functionDelegateCall(
+        abi.encodeWithSelector(CONFIG_ENGINE.updateRateStrategies.selector, rates)
       );
     }
 
     if (priceFeeds.length != 0) {
-      address(LISTING_ENGINE).functionDelegateCall(
-        abi.encodeWithSelector(LISTING_ENGINE.updatePriceFeeds.selector, priceFeeds)
+      address(CONFIG_ENGINE).functionDelegateCall(
+        abi.encodeWithSelector(CONFIG_ENGINE.updatePriceFeeds.selector, priceFeeds)
       );
     }
 
-    if (eModeAssets.length != 0) {
-      address(LISTING_ENGINE).functionDelegateCall(
-        abi.encodeWithSelector(LISTING_ENGINE.updateEModeAssets.selector, eModeAssets)
+    if (assetsEMode.length != 0) {
+      address(CONFIG_ENGINE).functionDelegateCall(
+        abi.encodeWithSelector(CONFIG_ENGINE.updateAssetsEMode.selector, assetsEMode)
       );
     }
 
     if (caps.length != 0) {
-      address(LISTING_ENGINE).functionDelegateCall(
-        abi.encodeWithSelector(LISTING_ENGINE.updateCaps.selector, caps)
+      address(CONFIG_ENGINE).functionDelegateCall(
+        abi.encodeWithSelector(CONFIG_ENGINE.updateCaps.selector, caps)
       );
     }
 
@@ -152,7 +152,7 @@ abstract contract AaveV3PayloadBase {
   {}
 
   /// @dev to be defined in the child with a list of assets for which eMode categories to update
-  function eModeAssetsUpdates() public view virtual returns (IEngine.EModeAssetUpdate[] memory) {}
+  function assetsEModeUpdates() public view virtual returns (IEngine.AssetEModeUpdate[] memory) {}
 
   /// @dev to be defined in the child with a list of set of parameters of rate strategies
   function rateStrategiesUpdates()

@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-import {ConfiguratorInputTypes, DataTypes} from 'aave-address-book/AaveV3.sol';
-import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
 import {CapsEngine} from './libraries/CapsEngine.sol';
 import {BorrowEngine} from './libraries/BorrowEngine.sol';
 import {CollateralEngine} from './libraries/CollateralEngine.sol';
@@ -25,33 +23,6 @@ import './IAaveV3ConfigEngine.sol';
  */
 contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   using Address for address;
-
-  struct Basic {
-    string assetSymbol;
-    TokenImplementations implementations;
-  }
-
-  struct EngineLibraries {
-    address listingEngine;
-    address eModeEngine;
-    address borrowEngine;
-    address collateralEngine;
-    address priceFeedEngine;
-    address rateEngine;
-    address capsEngine;
-  }
-
-  struct EngineConstants {
-    IPool pool;
-    IPoolConfigurator poolConfigurator;
-    IV3RateStrategyFactory ratesStrategyFactory;
-    IAaveOracle oracle;
-    address aTokenImpl;
-    address vTokenImpl;
-    address sTokenImpl;
-    address rewardsController;
-    address collector;
-  }
 
   IPool public immutable POOL;
   IPoolConfigurator public immutable POOL_CONFIGURATOR;
@@ -215,10 +186,10 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
   }
 
   /// @inheritdoc IAaveV3ConfigEngine
-  function updateEModeAssets(EModeAssetUpdate[] calldata updates) external {
+  function updateAssetsEMode(AssetEModeUpdate[] calldata updates) external {
     EMODE_ENGINE.functionDelegateCall(
       abi.encodeWithSelector(
-        EModeEngine.executeEModeAssetsUpdate.selector,
+        EModeEngine.executeAssetsEModeUpdate.selector,
         _getEngineConstants(),
         updates
       )

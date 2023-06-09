@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-import {AaveV3ConfigEngine as Engine} from '../AaveV3ConfigEngine.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
-import {IAaveV3ConfigEngine as IEngine, IPoolConfigurator, IV3RateStrategyFactory, IAaveOracle, IPool} from '../IAaveV3ConfigEngine.sol';
+import {IAaveV3ConfigEngine as IEngine, IPoolConfigurator, IV3RateStrategyFactory, IPool} from '../IAaveV3ConfigEngine.sol';
 import {PriceFeedEngine} from './PriceFeedEngine.sol';
 import {CapsEngine} from './CapsEngine.sol';
 import {BorrowEngine} from './BorrowEngine.sol';
@@ -17,19 +16,19 @@ library ListingEngine {
 
   function executeCustomAssetListing(
     IEngine.PoolContext calldata context,
-    Engine.EngineConstants calldata engineConstants,
-    Engine.EngineLibraries calldata engineLibraries,
+    IEngine.EngineConstants calldata engineConstants,
+    IEngine.EngineLibraries calldata engineLibraries,
     IEngine.ListingWithCustomImpl[] calldata listings
   ) external {
     require(listings.length != 0, 'AT_LEAST_ONE_ASSET_REQUIRED');
 
     (
       address[] memory ids,
-      Engine.Basic[] memory basics,
+      IEngine.Basic[] memory basics,
       IEngine.BorrowUpdate[] memory borrowsUpdates,
       IEngine.CollateralUpdate[] memory collateralsUpdates,
       IEngine.PriceFeedUpdate[] memory priceFeedsUpdates,
-      IEngine.EModeAssetUpdate[] memory emodeAssetsUpdates,
+      IEngine.AssetEModeUpdate[] memory assetsEModeUpdates,
       IEngine.CapsUpdate[] memory capsUpdates,
       IV3RateStrategyFactory.RateStrategyParams[] memory rates
     ) = _repackListing(listings);
@@ -77,9 +76,9 @@ library ListingEngine {
     // to the e-mode category configuration
     engineLibraries.eModeEngine.functionDelegateCall(
       abi.encodeWithSelector(
-        EModeEngine.executeEModeAssetsUpdate.selector,
+        EModeEngine.executeAssetsEModeUpdate.selector,
         engineConstants,
-        emodeAssetsUpdates
+        assetsEModeUpdates
       )
     );
   }
@@ -91,11 +90,11 @@ library ListingEngine {
     pure
     returns (
       address[] memory,
-      Engine.Basic[] memory,
+      IEngine.Basic[] memory,
       IEngine.BorrowUpdate[] memory,
       IEngine.CollateralUpdate[] memory,
       IEngine.PriceFeedUpdate[] memory,
-      IEngine.EModeAssetUpdate[] memory,
+      IEngine.AssetEModeUpdate[] memory,
       IEngine.CapsUpdate[] memory,
       IV3RateStrategyFactory.RateStrategyParams[] memory
     )
@@ -108,19 +107,19 @@ library ListingEngine {
     IEngine.PriceFeedUpdate[] memory priceFeedsUpdates = new IEngine.PriceFeedUpdate[](
       listings.length
     );
-    IEngine.EModeAssetUpdate[] memory emodeAssetsUpdates = new IEngine.EModeAssetUpdate[](
+    IEngine.AssetEModeUpdate[] memory assetsEModeUpdates = new IEngine.AssetEModeUpdate[](
       listings.length
     );
     IEngine.CapsUpdate[] memory capsUpdates = new IEngine.CapsUpdate[](listings.length);
 
-    Engine.Basic[] memory basics = new Engine.Basic[](listings.length);
+    IEngine.Basic[] memory basics = new IEngine.Basic[](listings.length);
     IV3RateStrategyFactory.RateStrategyParams[]
       memory rates = new IV3RateStrategyFactory.RateStrategyParams[](listings.length);
 
     for (uint256 i = 0; i < listings.length; i++) {
       require(listings[i].base.asset != address(0), 'INVALID_ASSET');
       ids[i] = listings[i].base.asset;
-      basics[i] = Engine.Basic({
+      basics[i] = IEngine.Basic({
         assetSymbol: listings[i].base.assetSymbol,
         implementations: listings[i].implementations
       });
@@ -151,7 +150,7 @@ library ListingEngine {
         borrowCap: listings[i].base.borrowCap
       });
       rates[i] = listings[i].base.rateStrategyParams;
-      emodeAssetsUpdates[i] = IEngine.EModeAssetUpdate({
+      assetsEModeUpdates[i] = IEngine.AssetEModeUpdate({
         asset: listings[i].base.asset,
         eModeCategory: listings[i].base.eModeCategory
       });
@@ -163,7 +162,7 @@ library ListingEngine {
       borrowsUpdates,
       collateralsUpdates,
       priceFeedsUpdates,
-      emodeAssetsUpdates,
+      assetsEModeUpdates,
       capsUpdates,
       rates
     );
@@ -177,7 +176,7 @@ library ListingEngine {
     address collector,
     address rewardsController,
     address[] memory ids,
-    Engine.Basic[] memory basics,
+    IEngine.Basic[] memory basics,
     IV3RateStrategyFactory.RateStrategyParams[] memory rates
   ) internal {
     ConfiguratorInputTypes.InitReserveInput[]

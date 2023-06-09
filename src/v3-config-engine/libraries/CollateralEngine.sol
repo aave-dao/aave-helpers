@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.12;
 
-import {AaveV3ConfigEngine as Engine} from '../AaveV3ConfigEngine.sol';
 import {DataTypes} from 'aave-address-book/AaveV3.sol';
 import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
-import {IAaveV3ConfigEngine as IEngine, IV3RateStrategyFactory, IPoolConfigurator, IPool} from '../IAaveV3ConfigEngine.sol';
+import {IAaveV3ConfigEngine as IEngine, IPoolConfigurator, IPool} from '../IAaveV3ConfigEngine.sol';
 import {PercentageMath} from 'aave-v3-core/contracts/protocol/libraries/math/PercentageMath.sol';
 import {EngineFlags} from '../EngineFlags.sol';
 
@@ -13,7 +12,7 @@ library CollateralEngine {
   using PercentageMath for uint256;
 
   function executeCollateralSide(
-    Engine.EngineConstants calldata engineConstants,
+    IEngine.EngineConstants calldata engineConstants,
     IEngine.CollateralUpdate[] memory updates
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');

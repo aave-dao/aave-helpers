@@ -2,7 +2,8 @@
 pragma solidity ^0.8.0;
 
 import '../src/ScriptUtils.sol';
-import {AaveV3ConfigEngine} from '../src/v3-config-engine/AaveV3ConfigEngine.sol';
+import {AaveV3ConfigEngine as Engine} from '../src/v3-config-engine/AaveV3ConfigEngine.sol';
+import {IAaveV3ConfigEngine as IEngine} from '../src/v3-config-engine/IAaveV3ConfigEngine.sol';
 import {IV3RateStrategyFactory} from '../src/v3-config-engine/IV3RateStrategyFactory.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
@@ -10,7 +11,6 @@ import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
-import {IPool, IPoolConfigurator, IAaveOracle} from 'aave-address-book/AaveV3.sol';
 import {CapsEngine} from '../src/v3-config-engine/libraries/CapsEngine.sol';
 import {BorrowEngine} from '../src/v3-config-engine/libraries/BorrowEngine.sol';
 import {CollateralEngine} from '../src/v3-config-engine/libraries/CollateralEngine.sol';
@@ -21,7 +21,7 @@ import {ListingEngine} from '../src/v3-config-engine/libraries/ListingEngine.sol
 
 library DeployEngineEthLib {
   function deploy() internal returns (address) {
-    AaveV3ConfigEngine.EngineLibraries memory engineLibraries = AaveV3ConfigEngine.EngineLibraries({
+    IEngine.EngineLibraries memory engineLibraries = IEngine.EngineLibraries({
       listingEngine: Create2Utils._create2Deploy('v1', type(ListingEngine).creationCode),
       eModeEngine: Create2Utils._create2Deploy('v1', type(EModeEngine).creationCode),
       borrowEngine: Create2Utils._create2Deploy('v1', type(BorrowEngine).creationCode),
@@ -30,7 +30,7 @@ library DeployEngineEthLib {
       rateEngine: Create2Utils._create2Deploy('v1', type(RateEngine).creationCode),
       capsEngine: Create2Utils._create2Deploy('v1', type(CapsEngine).creationCode)
     });
-    AaveV3ConfigEngine.EngineConstants memory engineConstants = AaveV3ConfigEngine.EngineConstants({
+    IEngine.EngineConstants memory engineConstants = IEngine.EngineConstants({
       pool: AaveV3Ethereum.POOL,
       poolConfigurator: AaveV3Ethereum.POOL_CONFIGURATOR,
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Ethereum.RATES_FACTORY),
@@ -44,7 +44,7 @@ library DeployEngineEthLib {
 
     return
       address(
-        new AaveV3ConfigEngine(
+        new Engine(
           engineConstants,
           engineLibraries
         )
@@ -54,7 +54,7 @@ library DeployEngineEthLib {
 
 library DeployEngineOptLib {
   function deploy() internal returns (address) {
-    AaveV3ConfigEngine.EngineLibraries memory engineLibraries = AaveV3ConfigEngine.EngineLibraries({
+    IEngine.EngineLibraries memory engineLibraries = IEngine.EngineLibraries({
       listingEngine: Create2Utils._create2Deploy('v1', type(ListingEngine).creationCode),
       eModeEngine: Create2Utils._create2Deploy('v1', type(EModeEngine).creationCode),
       borrowEngine: Create2Utils._create2Deploy('v1', type(BorrowEngine).creationCode),
@@ -63,7 +63,7 @@ library DeployEngineOptLib {
       rateEngine: Create2Utils._create2Deploy('v1', type(RateEngine).creationCode),
       capsEngine: Create2Utils._create2Deploy('v1', type(CapsEngine).creationCode)
     });
-    AaveV3ConfigEngine.EngineConstants memory engineConstants = AaveV3ConfigEngine.EngineConstants({
+    IEngine.EngineConstants memory engineConstants = IEngine.EngineConstants({
       pool: AaveV3Optimism.POOL,
       poolConfigurator: AaveV3Optimism.POOL_CONFIGURATOR,
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Optimism.RATES_FACTORY),
@@ -77,7 +77,7 @@ library DeployEngineOptLib {
 
     return
       address(
-        new AaveV3ConfigEngine(
+        new Engine(
           engineConstants,
           engineLibraries
         )
@@ -87,7 +87,7 @@ library DeployEngineOptLib {
 
 library DeployEngineArbLib {
   function deploy() internal returns (address) {
-    AaveV3ConfigEngine.EngineLibraries memory engineLibraries = AaveV3ConfigEngine.EngineLibraries({
+    IEngine.EngineLibraries memory engineLibraries = IEngine.EngineLibraries({
       listingEngine: Create2Utils._create2Deploy('v1', type(ListingEngine).creationCode),
       eModeEngine: Create2Utils._create2Deploy('v1', type(EModeEngine).creationCode),
       borrowEngine: Create2Utils._create2Deploy('v1', type(BorrowEngine).creationCode),
@@ -96,7 +96,7 @@ library DeployEngineArbLib {
       rateEngine: Create2Utils._create2Deploy('v1', type(RateEngine).creationCode),
       capsEngine: Create2Utils._create2Deploy('v1', type(CapsEngine).creationCode)
     });
-    AaveV3ConfigEngine.EngineConstants memory engineConstants = AaveV3ConfigEngine.EngineConstants({
+    IEngine.EngineConstants memory engineConstants = IEngine.EngineConstants({
       pool: AaveV3Arbitrum.POOL,
       poolConfigurator: AaveV3Arbitrum.POOL_CONFIGURATOR,
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Arbitrum.RATES_FACTORY),
@@ -110,7 +110,7 @@ library DeployEngineArbLib {
 
     return
       address(
-        new AaveV3ConfigEngine(
+        new Engine(
           engineConstants,
           engineLibraries
         )
@@ -120,7 +120,7 @@ library DeployEngineArbLib {
 
 library DeployEnginePolLib {
   function deploy() internal returns (address) {
-    AaveV3ConfigEngine.EngineLibraries memory engineLibraries = AaveV3ConfigEngine.EngineLibraries({
+    IEngine.EngineLibraries memory engineLibraries = IEngine.EngineLibraries({
       listingEngine: Create2Utils._create2Deploy('v1', type(ListingEngine).creationCode),
       eModeEngine: Create2Utils._create2Deploy('v1', type(EModeEngine).creationCode),
       borrowEngine: Create2Utils._create2Deploy('v1', type(BorrowEngine).creationCode),
@@ -129,7 +129,7 @@ library DeployEnginePolLib {
       rateEngine: Create2Utils._create2Deploy('v1', type(RateEngine).creationCode),
       capsEngine: Create2Utils._create2Deploy('v1', type(CapsEngine).creationCode)
     });
-    AaveV3ConfigEngine.EngineConstants memory engineConstants = AaveV3ConfigEngine.EngineConstants({
+    IEngine.EngineConstants memory engineConstants = IEngine.EngineConstants({
       pool: AaveV3Polygon.POOL,
       poolConfigurator: AaveV3Polygon.POOL_CONFIGURATOR,
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Polygon.RATES_FACTORY),
@@ -143,7 +143,7 @@ library DeployEnginePolLib {
 
     return
       address(
-        new AaveV3ConfigEngine(
+        new Engine(
           engineConstants,
           engineLibraries
         )
@@ -153,7 +153,7 @@ library DeployEnginePolLib {
 
 library DeployEngineAvaLib {
   function deploy() internal returns (address) {
-    AaveV3ConfigEngine.EngineLibraries memory engineLibraries = AaveV3ConfigEngine.EngineLibraries({
+    IEngine.EngineLibraries memory engineLibraries = IEngine.EngineLibraries({
       listingEngine: Create2Utils._create2Deploy('v1', type(ListingEngine).creationCode),
       eModeEngine: Create2Utils._create2Deploy('v1', type(EModeEngine).creationCode),
       borrowEngine: Create2Utils._create2Deploy('v1', type(BorrowEngine).creationCode),
@@ -162,7 +162,7 @@ library DeployEngineAvaLib {
       rateEngine: Create2Utils._create2Deploy('v1', type(RateEngine).creationCode),
       capsEngine: Create2Utils._create2Deploy('v1', type(CapsEngine).creationCode)
     });
-    AaveV3ConfigEngine.EngineConstants memory engineConstants = AaveV3ConfigEngine.EngineConstants({
+    IEngine.EngineConstants memory engineConstants = IEngine.EngineConstants({
       pool: AaveV3Avalanche.POOL,
       poolConfigurator: AaveV3Avalanche.POOL_CONFIGURATOR,
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Avalanche.RATES_FACTORY),
@@ -176,7 +176,7 @@ library DeployEngineAvaLib {
 
     return
       address(
-        new AaveV3ConfigEngine(
+        new Engine(
           engineConstants,
           engineLibraries
         )
@@ -186,7 +186,7 @@ library DeployEngineAvaLib {
 
 library DeployEngineMetLib {
   function deploy() internal returns (address) {
-    AaveV3ConfigEngine.EngineLibraries memory engineLibraries = AaveV3ConfigEngine.EngineLibraries({
+    IEngine.EngineLibraries memory engineLibraries = IEngine.EngineLibraries({
       listingEngine: Create2Utils._create2Deploy('v1', type(ListingEngine).creationCode),
       eModeEngine: Create2Utils._create2Deploy('v1', type(EModeEngine).creationCode),
       borrowEngine: Create2Utils._create2Deploy('v1', type(BorrowEngine).creationCode),
@@ -195,7 +195,7 @@ library DeployEngineMetLib {
       rateEngine: Create2Utils._create2Deploy('v1', type(RateEngine).creationCode),
       capsEngine: Create2Utils._create2Deploy('v1', type(CapsEngine).creationCode)
     });
-    AaveV3ConfigEngine.EngineConstants memory engineConstants = AaveV3ConfigEngine.EngineConstants({
+    IEngine.EngineConstants memory engineConstants = IEngine.EngineConstants({
       pool: AaveV3Metis.POOL,
       poolConfigurator: AaveV3Metis.POOL_CONFIGURATOR,
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Metis.RATES_FACTORY),
@@ -209,7 +209,7 @@ library DeployEngineMetLib {
 
     return
       address(
-        new AaveV3ConfigEngine(
+        new Engine(
           engineConstants,
           engineLibraries
         )

@@ -11,7 +11,7 @@ import {AaveV3AvalancheCollateralUpdateWrongBonus, AaveV3AvalancheCollateralUpda
 import {AaveV3PolygonBorrowUpdate} from './mocks/AaveV3PolygonBorrowUpdate.sol';
 import {AaveV3PolygonPriceFeedUpdate} from './mocks/AaveV3PolygonPriceFeedUpdate.sol';
 import {AaveV3PolygonEModeCategoryUpdate, AaveV3AvalancheEModeCategoryUpdateEdgeBonus} from './mocks/AaveV3PolygonEModeCategoryUpdate.sol';
-import {AaveV3EthereumEModeAssetUpdate} from './mocks/AaveV3EthereumEModeAssetUpdate.sol';
+import {AaveV3EthereumAssetEModeUpdate} from './mocks/AaveV3EthereumAssetEModeUpdate.sol';
 import {AaveV3OptimismMockRatesUpdate} from './mocks/AaveV3OptimismMockRatesUpdate.sol';
 import {DeployRatesFactoryPolLib, DeployRatesFactoryEthLib, DeployRatesFactoryAvaLib, DeployRatesFactoryArbLib, DeployRatesFactoryOptLib} from '../../scripts/V3RateStrategyFactory.s.sol';
 import {DeployEnginePolLib, DeployEngineEthLib, DeployEngineAvaLib, DeployEngineOptLib, DeployEngineArbLib} from '../../scripts/AaveV3ConfigEngine.s.sol';
@@ -626,27 +626,27 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
     payload.execute();
   }
 
-  function testEModeAssetUpdates() public {
+  function testAssetEModeUpdates() public {
     vm.selectFork(mainnetFork);
 
     IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineEthLib.deploy());
-    AaveV3EthereumEModeAssetUpdate payload = new AaveV3EthereumEModeAssetUpdate(engine);
+    AaveV3EthereumAssetEModeUpdate payload = new AaveV3EthereumAssetEModeUpdate(engine);
 
     vm.startPrank(AaveV3Ethereum.ACL_ADMIN);
     AaveV3Ethereum.ACL_MANAGER.addPoolAdmin(address(payload));
     vm.stopPrank();
 
-    createConfigurationSnapshot('preTestEngineEModeAssetUpdate', AaveV3Ethereum.POOL);
+    createConfigurationSnapshot('preTestEngineAssetEModeUpdate', AaveV3Ethereum.POOL);
 
     payload.execute();
 
-    createConfigurationSnapshot('postTestEngineEModeAssetUpdate', AaveV3Ethereum.POOL);
+    createConfigurationSnapshot('postTestEngineAssetEModeUpdate', AaveV3Ethereum.POOL);
 
-    diffReports('preTestEngineEModeAssetUpdate', 'postTestEngineEModeAssetUpdate');
+    diffReports('preTestEngineAssetEModeUpdate', 'postTestEngineAssetEModeUpdate');
 
     assertEq(
       AaveV3Ethereum.AAVE_PROTOCOL_DATA_PROVIDER.getReserveEModeCategory(
-        AaveV3EthereumAssets.AAVE_UNDERLYING
+        AaveV3EthereumAssets.rETH_UNDERLYING
       ),
       1
     );

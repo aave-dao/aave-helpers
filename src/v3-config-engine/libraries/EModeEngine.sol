@@ -2,27 +2,26 @@
 pragma solidity ^0.8.12;
 
 import {EngineFlags} from '../EngineFlags.sol';
-import {AaveV3ConfigEngine as Engine} from '../AaveV3ConfigEngine.sol';
 import {DataTypes} from 'aave-address-book/AaveV3.sol';
 import {SafeCast} from 'solidity-utils/contracts/oz-common/SafeCast.sol';
 import {PercentageMath} from 'aave-v3-core/contracts/protocol/libraries/math/PercentageMath.sol';
-import {IAaveV3ConfigEngine as IEngine, IPoolConfigurator, IV3RateStrategyFactory, IPool} from '../IAaveV3ConfigEngine.sol';
+import {IAaveV3ConfigEngine as IEngine, IPoolConfigurator, IPool} from '../IAaveV3ConfigEngine.sol';
 
 library EModeEngine {
   using PercentageMath for uint256;
   using SafeCast for uint256;
 
-  function executeEModeAssetsUpdate(
-    Engine.EngineConstants calldata engineConstants,
-    IEngine.EModeAssetUpdate[] memory updates
+  function executeAssetsEModeUpdate(
+    IEngine.EngineConstants calldata engineConstants,
+    IEngine.AssetEModeUpdate[] memory updates
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
 
-    _configEModeAssets(engineConstants.poolConfigurator, updates);
+    _configAssetsEMode(engineConstants.poolConfigurator, updates);
   }
 
   function executeEModeCategoriesUpdate(
-    Engine.EngineConstants calldata engineConstants,
+    IEngine.EngineConstants calldata engineConstants,
     IEngine.EModeCategoryUpdate[] memory updates
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
@@ -30,9 +29,9 @@ library EModeEngine {
     _configEModeCategories(engineConstants.poolConfigurator, engineConstants.pool, updates);
   }
 
-  function _configEModeAssets(
+  function _configAssetsEMode(
     IPoolConfigurator poolConfigurator,
-    IEngine.EModeAssetUpdate[] memory updates
+    IEngine.AssetEModeUpdate[] memory updates
   ) internal {
     for (uint256 i = 0; i < updates.length; i++) {
       if (updates[i].eModeCategory != EngineFlags.KEEP_CURRENT) {

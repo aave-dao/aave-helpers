@@ -7,6 +7,34 @@ import {IV3RateStrategyFactory} from './IV3RateStrategyFactory.sol';
 /// @dev Examples here assume the usage of the `AaveV3PayloadBase` base contracts
 /// contained in this same repository
 interface IAaveV3ConfigEngine {
+
+  struct Basic {
+    string assetSymbol;
+    TokenImplementations implementations;
+  }
+
+  struct EngineLibraries {
+    address listingEngine;
+    address eModeEngine;
+    address borrowEngine;
+    address collateralEngine;
+    address priceFeedEngine;
+    address rateEngine;
+    address capsEngine;
+  }
+
+  struct EngineConstants {
+    IPool pool;
+    IPoolConfigurator poolConfigurator;
+    IV3RateStrategyFactory ratesStrategyFactory;
+    IAaveOracle oracle;
+    address aTokenImpl;
+    address vTokenImpl;
+    address sTokenImpl;
+    address rewardsController;
+    address collector;
+  }
+
   /**
    * @dev Required for naming of a/v/s tokens
    * Example (mock):
@@ -155,12 +183,12 @@ interface IAaveV3ConfigEngine {
 
   /**
    * @dev Example (mock):
-   * EModeAssetUpdate({
-   *   asset: AaveV3EthereumAssets.AAVE_UNDERLYING,
+   * AssetEModeUpdate({
+   *   asset: AaveV3EthereumAssets.rETH_UNDERLYING,
    *   eModeCategory: 1, // ETH correlated
    * })
    */
-  struct EModeAssetUpdate {
+  struct AssetEModeUpdate {
     address asset;
     uint8 eModeCategory;
   }
@@ -168,7 +196,7 @@ interface IAaveV3ConfigEngine {
   /**
    * @dev Example (mock):
    * EModeCategoryUpdate({
-   *   eModeCategory: 1, // STABLECOINS
+   *   eModeCategory: 1, // ETH correlated
    *   ltv: 60_00,
    *   liqThreshold: 70_00,
    *   liqBonus: EngineFlags.KEEP_CURRENT,
@@ -275,10 +303,10 @@ interface IAaveV3ConfigEngine {
 
   /**
    * @notice Performs an update of the e-mode category of the assets, in the Aave pool configured in this engine instance
-   * @param updates `EModeAssetUpdate[]` list of declarative updates containing the new parameters
+   * @param updates `AssetEModeUpdate[]` list of declarative updates containing the new parameters
    *   More information on the documentation of the struct.
    */
-  function updateEModeAssets(EModeAssetUpdate[] calldata updates) external;
+  function updateAssetsEMode(AssetEModeUpdate[] calldata updates) external;
 
   function RATE_STRATEGY_FACTORY() external view returns (IV3RateStrategyFactory);
 

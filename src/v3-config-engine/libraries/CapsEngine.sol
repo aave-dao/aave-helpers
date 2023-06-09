@@ -2,12 +2,11 @@
 pragma solidity ^0.8.12;
 
 import {EngineFlags} from '../EngineFlags.sol';
-import {AaveV3ConfigEngine as Engine} from '../AaveV3ConfigEngine.sol';
-import {IAaveV3ConfigEngine as IEngine, IPoolConfigurator, IV3RateStrategyFactory} from '../IAaveV3ConfigEngine.sol';
+import {IAaveV3ConfigEngine as IEngine, IPoolConfigurator} from '../IAaveV3ConfigEngine.sol';
 
 library CapsEngine {
   function executeCapsUpdate(
-    Engine.EngineConstants calldata engineConstants,
+    IEngine.EngineConstants calldata engineConstants,
     IEngine.CapsUpdate[] memory updates
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');

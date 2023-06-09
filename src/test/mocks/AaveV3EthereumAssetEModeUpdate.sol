@@ -4,18 +4,18 @@ pragma solidity ^0.8.0;
 import '../../v3-config-engine/AaveV3PayloadEthereum.sol';
 
 /**
- * @dev Smart contract for a mock caps update, for testing purposes
+ * @dev Smart contract for a mock asset e-mode update, for testing purposes
  * IMPORTANT Parameters are pseudo-random, DON'T USE THIS ANYHOW IN PRODUCTION
  * @author BGD Labs
  */
-contract AaveV3EthereumEModeAssetUpdate is AaveV3PayloadBase {
+contract AaveV3EthereumAssetEModeUpdate is AaveV3PayloadBase {
   constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
 
-  function eModeAssetsUpdates() public pure override returns (IEngine.EModeAssetUpdate[] memory) {
-    IEngine.EModeAssetUpdate[] memory eModeUpdate = new IEngine.EModeAssetUpdate[](1);
+  function assetsEModeUpdates() public pure override returns (IEngine.AssetEModeUpdate[] memory) {
+    IEngine.AssetEModeUpdate[] memory eModeUpdate = new IEngine.AssetEModeUpdate[](1);
 
-    eModeUpdate[0] = IEngine.EModeAssetUpdate({
-      asset: AaveV3EthereumAssets.AAVE_UNDERLYING,
+    eModeUpdate[0] = IEngine.AssetEModeUpdate({
+      asset: AaveV3EthereumAssets.rETH_UNDERLYING,
       eModeCategory: 1
     });
 

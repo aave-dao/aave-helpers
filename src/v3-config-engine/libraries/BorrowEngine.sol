@@ -2,16 +2,15 @@
 pragma solidity ^0.8.12;
 
 import {EngineFlags} from '../EngineFlags.sol';
-import {AaveV3ConfigEngine as Engine} from '../AaveV3ConfigEngine.sol';
-import {ConfiguratorInputTypes, DataTypes} from 'aave-address-book/AaveV3.sol';
+import {DataTypes} from 'aave-address-book/AaveV3.sol';
 import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
-import {IAaveV3ConfigEngine as IEngine, IV3RateStrategyFactory, IPoolConfigurator, IPool} from '../IAaveV3ConfigEngine.sol';
+import {IAaveV3ConfigEngine as IEngine, IPoolConfigurator, IPool} from '../IAaveV3ConfigEngine.sol';
 
 library BorrowEngine {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
 
   function executeBorrowSide(
-    Engine.EngineConstants calldata engineConstants,
+    IEngine.EngineConstants calldata engineConstants,
     IEngine.BorrowUpdate[] memory updates
   ) external {
     require(updates.length != 0, 'AT_LEAST_ONE_UPDATE_REQUIRED');
