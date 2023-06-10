@@ -9,6 +9,7 @@ remappings = [
 fs_permissions = [{access = "read-write", path = "./reports"}]
 ffi = true
 solc = '0.8.17'
+via_ir = true
 
 [rpc_endpoints]
 mainnet = "${RPC_MAINNET}"
