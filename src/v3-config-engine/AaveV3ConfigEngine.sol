@@ -55,7 +55,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     address aTokenImpl,
     address vTokenImpl,
     address sTokenImpl,
-    EngineConstants memory engineConstants, 
+    EngineConstants memory engineConstants,
     EngineLibraries memory engineLibraries
   ) {
     require(
@@ -69,9 +69,7 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
     );
 
     require(
-      aTokenImpl != address(0) &&
-        vTokenImpl != address(0) &&
-        sTokenImpl != address(0),
+      aTokenImpl != address(0) && vTokenImpl != address(0) && sTokenImpl != address(0),
       'ONLY_NONZERO_TOKEN_IMPLS'
     );
 

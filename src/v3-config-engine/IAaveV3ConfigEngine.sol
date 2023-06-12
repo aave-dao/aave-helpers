@@ -7,7 +7,6 @@ import {IV3RateStrategyFactory} from './IV3RateStrategyFactory.sol';
 /// @dev Examples here assume the usage of the `AaveV3PayloadBase` base contracts
 /// contained in this same repository
 interface IAaveV3ConfigEngine {
-
   struct Basic {
     string assetSymbol;
     TokenImplementations implementations;
