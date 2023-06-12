@@ -13,6 +13,7 @@ import './IAaveV3ConfigEngine.sol';
 
 /**
  * @dev Helper smart contract abstracting the complexity of changing configurations on Aave v3, simplifying
+ * - !!!IMPORTANT!!! This engine MUST BE STATELESS always, as in practise is a library to be used via DELEGATECALL
  * listing flow and parameters updates.
  * - It is planned to be used via delegatecall, by any contract having appropriate permissions to
  * do a listing, or any other granular config

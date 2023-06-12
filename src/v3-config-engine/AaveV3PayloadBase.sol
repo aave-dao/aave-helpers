@@ -9,6 +9,7 @@ import {EngineFlags} from './EngineFlags.sol';
 
 /**
  * @dev Base smart contract for an Aave v3.0.1 configs update.
+ * - !!!IMPORTANT!!! This payload inheriting AaveV3PayloadBase MUST BE STATELESS always
  * - Assumes this contract has the right permissions
  * - Connected to a IAaveV3ConfigEngine engine contact, which abstract the complexities of
  *   interaction with the Aave protocol.
