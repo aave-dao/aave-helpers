@@ -35,9 +35,6 @@ library DeployEngineEthLib {
       poolConfigurator: AaveV3Ethereum.POOL_CONFIGURATOR,
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Ethereum.RATES_FACTORY),
       oracle: AaveV3Ethereum.ORACLE,
-      aTokenImpl: AaveV3Ethereum.DEFAULT_A_TOKEN_IMPL_REV_1,
-      vTokenImpl: AaveV3Ethereum.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
-      sTokenImpl: AaveV3Ethereum.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
       rewardsController: AaveV3Ethereum.DEFAULT_INCENTIVES_CONTROLLER,
       collector: address(AaveV3Ethereum.COLLECTOR)
     });
@@ -45,6 +42,9 @@ library DeployEngineEthLib {
     return
       address(
         new Engine(
+          AaveV3Ethereum.DEFAULT_A_TOKEN_IMPL_REV_1,
+          AaveV3Ethereum.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
+          AaveV3Ethereum.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
           engineConstants,
           engineLibraries
         )
@@ -68,9 +68,6 @@ library DeployEngineOptLib {
       poolConfigurator: AaveV3Optimism.POOL_CONFIGURATOR,
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Optimism.RATES_FACTORY),
       oracle: AaveV3Optimism.ORACLE,
-      aTokenImpl: AaveV3Optimism.DEFAULT_A_TOKEN_IMPL_REV_2,
-      vTokenImpl: AaveV3Optimism.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
-      sTokenImpl: AaveV3Optimism.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
       rewardsController: AaveV3Optimism.DEFAULT_INCENTIVES_CONTROLLER,
       collector: address(AaveV3Optimism.COLLECTOR)
     });
@@ -78,6 +75,9 @@ library DeployEngineOptLib {
     return
       address(
         new Engine(
+          AaveV3Optimism.DEFAULT_A_TOKEN_IMPL_REV_2,
+          AaveV3Optimism.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
+          AaveV3Optimism.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
           engineConstants,
           engineLibraries
         )
@@ -101,9 +101,6 @@ library DeployEngineArbLib {
       poolConfigurator: AaveV3Arbitrum.POOL_CONFIGURATOR,
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Arbitrum.RATES_FACTORY),
       oracle: AaveV3Arbitrum.ORACLE,
-      aTokenImpl: AaveV3Arbitrum.DEFAULT_A_TOKEN_IMPL_REV_2,
-      vTokenImpl: AaveV3Arbitrum.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
-      sTokenImpl: AaveV3Arbitrum.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
       rewardsController: AaveV3Arbitrum.DEFAULT_INCENTIVES_CONTROLLER,
       collector: address(AaveV3Arbitrum.COLLECTOR)
     });
@@ -111,6 +108,9 @@ library DeployEngineArbLib {
     return
       address(
         new Engine(
+          AaveV3Arbitrum.DEFAULT_A_TOKEN_IMPL_REV_2,
+          AaveV3Arbitrum.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
+          AaveV3Arbitrum.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
           engineConstants,
           engineLibraries
         )
@@ -134,9 +134,6 @@ library DeployEnginePolLib {
       poolConfigurator: AaveV3Polygon.POOL_CONFIGURATOR,
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Polygon.RATES_FACTORY),
       oracle: AaveV3Polygon.ORACLE,
-      aTokenImpl: AaveV3Polygon.DEFAULT_A_TOKEN_IMPL_REV_2,
-      vTokenImpl: AaveV3Polygon.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
-      sTokenImpl: AaveV3Polygon.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
       rewardsController: AaveV3Polygon.DEFAULT_INCENTIVES_CONTROLLER,
       collector: address(AaveV3Polygon.COLLECTOR)
     });
@@ -144,6 +141,9 @@ library DeployEnginePolLib {
     return
       address(
         new Engine(
+          AaveV3Polygon.DEFAULT_A_TOKEN_IMPL_REV_2,
+          AaveV3Polygon.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
+          AaveV3Polygon.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
           engineConstants,
           engineLibraries
         )
@@ -167,9 +167,6 @@ library DeployEngineAvaLib {
       poolConfigurator: AaveV3Avalanche.POOL_CONFIGURATOR,
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Avalanche.RATES_FACTORY),
       oracle: AaveV3Avalanche.ORACLE,
-      aTokenImpl: AaveV3Avalanche.DEFAULT_A_TOKEN_IMPL_REV_2,
-      vTokenImpl: AaveV3Avalanche.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
-      sTokenImpl: AaveV3Avalanche.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
       rewardsController: AaveV3Avalanche.DEFAULT_INCENTIVES_CONTROLLER,
       collector: address(AaveV3Avalanche.COLLECTOR)
     });
@@ -177,6 +174,9 @@ library DeployEngineAvaLib {
     return
       address(
         new Engine(
+          AaveV3Avalanche.DEFAULT_A_TOKEN_IMPL_REV_2,
+          AaveV3Avalanche.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
+          AaveV3Avalanche.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
           engineConstants,
           engineLibraries
         )
@@ -200,9 +200,6 @@ library DeployEngineMetLib {
       poolConfigurator: AaveV3Metis.POOL_CONFIGURATOR,
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Metis.RATES_FACTORY),
       oracle: AaveV3Metis.ORACLE,
-      aTokenImpl: AaveV3Metis.DEFAULT_A_TOKEN_IMPL_REV_1,
-      vTokenImpl: AaveV3Metis.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
-      sTokenImpl: AaveV3Metis.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
       rewardsController: AaveV3Metis.DEFAULT_INCENTIVES_CONTROLLER,
       collector: address(AaveV3Metis.COLLECTOR)
     });
@@ -210,6 +207,9 @@ library DeployEngineMetLib {
     return
       address(
         new Engine(
+          AaveV3Metis.DEFAULT_A_TOKEN_IMPL_REV_1,
+          AaveV3Metis.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
+          AaveV3Metis.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
           engineConstants,
           engineLibraries
         )

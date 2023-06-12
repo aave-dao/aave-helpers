@@ -28,9 +28,6 @@ interface IAaveV3ConfigEngine {
     IPoolConfigurator poolConfigurator;
     IV3RateStrategyFactory ratesStrategyFactory;
     IAaveOracle oracle;
-    address aTokenImpl;
-    address vTokenImpl;
-    address sTokenImpl;
     address rewardsController;
     address collector;
   }

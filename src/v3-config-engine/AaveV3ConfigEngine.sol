@@ -45,21 +45,34 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
 
   /**
    * @dev Constructor.
+   * @param aTokenImpl The address of default aToken implementation.
+   * @param vTokenImpl The address of default variable debt token implementation.
+   * @param sTokenImpl The address of default stable debt token implementation.
    * @param engineConstants The struct containing all the engine constants.
    * @param engineLibraries The struct containing the addresses of stateless libraries containing the engine logic.
    */
-  constructor(EngineConstants memory engineConstants, EngineLibraries memory engineLibraries) {
+  constructor(
+    address aTokenImpl,
+    address vTokenImpl,
+    address sTokenImpl,
+    EngineConstants memory engineConstants, 
+    EngineLibraries memory engineLibraries
+  ) {
     require(
       address(engineConstants.pool) != address(0) &&
         address(engineConstants.poolConfigurator) != address(0) &&
         address(engineConstants.oracle) != address(0) &&
-        engineConstants.aTokenImpl != address(0) &&
-        engineConstants.vTokenImpl != address(0) &&
-        engineConstants.sTokenImpl != address(0) &&
         engineConstants.rewardsController != address(0) &&
         engineConstants.collector != address(0) &&
         address(engineConstants.ratesStrategyFactory) != address(0),
       'ONLY_NONZERO_ENGINE_CONSTANTS'
+    );
+
+    require(
+      aTokenImpl != address(0) &&
+        vTokenImpl != address(0) &&
+        sTokenImpl != address(0),
+      'ONLY_NONZERO_TOKEN_IMPLS'
     );
 
     require(
@@ -71,12 +84,12 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
       'ONLY_NONZERO_ENGINE_LIBRARIES'
     );
 
+    ATOKEN_IMPL = aTokenImpl;
+    VTOKEN_IMPL = vTokenImpl;
+    STOKEN_IMPL = sTokenImpl;
     POOL = engineConstants.pool;
     POOL_CONFIGURATOR = engineConstants.poolConfigurator;
     ORACLE = engineConstants.oracle;
-    ATOKEN_IMPL = engineConstants.aTokenImpl;
-    VTOKEN_IMPL = engineConstants.vTokenImpl;
-    STOKEN_IMPL = engineConstants.sTokenImpl;
     REWARDS_CONTROLLER = engineConstants.rewardsController;
     COLLECTOR = engineConstants.collector;
     RATE_STRATEGY_FACTORY = engineConstants.ratesStrategyFactory;
@@ -217,9 +230,6 @@ contract AaveV3ConfigEngine is IAaveV3ConfigEngine {
         poolConfigurator: POOL_CONFIGURATOR,
         ratesStrategyFactory: RATE_STRATEGY_FACTORY,
         oracle: ORACLE,
-        aTokenImpl: ATOKEN_IMPL,
-        vTokenImpl: VTOKEN_IMPL,
-        sTokenImpl: STOKEN_IMPL,
         rewardsController: REWARDS_CONTROLLER,
         collector: COLLECTOR
       });
