@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.12;
+pragma solidity ^0.8.18;
 
 import {CapsEngine} from './libraries/CapsEngine.sol';
 import {BorrowEngine} from './libraries/BorrowEngine.sol';

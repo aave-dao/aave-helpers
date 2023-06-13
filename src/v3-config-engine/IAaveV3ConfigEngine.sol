@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.18;
 
 import {IPool, IPoolConfigurator, IAaveOracle} from 'aave-address-book/AaveV3.sol';
 import {IV3RateStrategyFactory} from './IV3RateStrategyFactory.sol';

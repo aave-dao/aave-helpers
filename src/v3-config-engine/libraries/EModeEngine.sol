@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.12;
+pragma solidity ^0.8.18;
 
 import {EngineFlags} from '../EngineFlags.sol';
 import {DataTypes} from 'aave-address-book/AaveV3.sol';
