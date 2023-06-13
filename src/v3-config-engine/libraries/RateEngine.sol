@@ -42,18 +42,6 @@ library RateEngine {
         strategiesParams[i].stableRateExcessOffset == EngineFlags.KEEP_CURRENT ||
         strategiesParams[i].optimalStableToTotalDebtRatio == EngineFlags.KEEP_CURRENT;
 
-      bool notAllKeepCurrent = strategiesParams[i].variableRateSlope1 != EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].variableRateSlope2 != EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].optimalUsageRatio != EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].baseVariableBorrowRate != EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].stableRateSlope1 != EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].stableRateSlope2 != EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].baseStableRateOffset != EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].stableRateExcessOffset != EngineFlags.KEEP_CURRENT ||
-        strategiesParams[i].optimalStableToTotalDebtRatio != EngineFlags.KEEP_CURRENT;
-
-      require(notAllKeepCurrent, 'ALL_PARAMS_KEEP_CURRENT');
-
       if (atLeastOneKeepCurrent) {
         IV3RateStrategyFactory.RateStrategyParams memory currentStrategyData = rateStrategiesFactory
           .getStrategyDataOfAsset(ids[i]);
