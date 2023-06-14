@@ -38,6 +38,7 @@ contract CommonTestBase is Test {
    * @param asset the asset to deal
    * @param user the user to deal to
    * @param amount the amount to deal
+   * @return bool true if the caller has changed due to prank usage
    */
   function _patchedDeal(address asset, address user, uint256 amount) internal returns (bool) {
     if (block.chainid == ChainIds.MAINNET) {
