@@ -11,6 +11,7 @@ import {AaveV3AvalancheCollateralUpdateWrongBonus, AaveV3AvalancheCollateralUpda
 import {AaveV3PolygonBorrowUpdate} from './mocks/AaveV3PolygonBorrowUpdate.sol';
 import {AaveV3PolygonPriceFeedUpdate} from './mocks/AaveV3PolygonPriceFeedUpdate.sol';
 import {AaveV3PolygonEModeCategoryUpdate, AaveV3AvalancheEModeCategoryUpdateEdgeBonus} from './mocks/AaveV3PolygonEModeCategoryUpdate.sol';
+import {AaveV3AvalancheEModeCategoryUpdateNoChange} from './mocks/AaveV3AvalancheEModeCategoryUpdateNoChange.sol';
 import {AaveV3EthereumAssetEModeUpdate} from './mocks/AaveV3EthereumAssetEModeUpdate.sol';
 import {AaveV3OptimismMockRatesUpdate} from './mocks/AaveV3OptimismMockRatesUpdate.sol';
 import {DeployRatesFactoryPolLib, DeployRatesFactoryEthLib, DeployRatesFactoryAvaLib, DeployRatesFactoryArbLib, DeployRatesFactoryOptLib} from '../../scripts/V3RateStrategyFactory.s.sol';
@@ -50,6 +51,15 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
     uint256 ltv,
     uint256 liquidationThreshold,
     uint256 liquidationBonus
+  );
+
+  event EModeCategoryAdded(
+    uint8 indexed categoryId,
+    uint256 ltv,
+    uint256 liquidationThreshold,
+    uint256 liquidationBonus,
+    address oracle,
+    string label
   );
 
   function testListings() public {
@@ -624,6 +634,64 @@ contract AaveV3ConfigEngineTest is ProtocolV3_0_1TestBase {
 
     vm.expectRevert(bytes('INVALID_LT_LB_RATIO'));
     payload.execute();
+  }
+
+  // TODO manage this after testFail* deprecation.
+  function testFailEModeCategoryUpdatesNoChange() public {
+    vm.selectFork(avalancheFork);
+
+    IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
+    AaveV3AvalancheEModeCategoryUpdateNoChange payload = new AaveV3AvalancheEModeCategoryUpdateNoChange(
+      engine
+    );
+
+    DataTypes.EModeCategory memory eModeCategoryDataBefore = AaveV3Avalanche
+      .POOL
+      .getEModeCategoryData(1);
+
+    vm.startPrank(AaveV3Avalanche.ACL_ADMIN);
+    AaveV3Avalanche.ACL_MANAGER.addPoolAdmin(address(payload));
+    vm.stopPrank();
+
+    vm.expectEmit(true, true, true, true);
+    emit EModeCategoryAdded(
+      1,
+      eModeCategoryDataBefore.ltv,
+      eModeCategoryDataBefore.liquidationThreshold,
+      eModeCategoryDataBefore.liquidationBonus,
+      eModeCategoryDataBefore.priceSource,
+      eModeCategoryDataBefore.label
+    );
+
+    payload.execute();
+  }
+
+  // Same as testFailEModeCategoryUpdatesNoChange, but this time should work, as we are not expecting any event emitted
+  function testEModeCategoryUpdatesNoChange() public {
+    vm.selectFork(avalancheFork);
+
+    IAaveV3ConfigEngine engine = IAaveV3ConfigEngine(DeployEngineAvaLib.deploy());
+    AaveV3AvalancheEModeCategoryUpdateNoChange payload = new AaveV3AvalancheEModeCategoryUpdateNoChange(
+      engine
+    );
+
+    vm.startPrank(AaveV3Avalanche.ACL_ADMIN);
+    AaveV3Avalanche.ACL_MANAGER.addPoolAdmin(address(payload));
+    vm.stopPrank();
+
+    DataTypes.EModeCategory memory eModeCategoryDataBefore = AaveV3Avalanche
+      .POOL
+      .getEModeCategoryData(1);
+
+    createConfigurationSnapshot('preTestEngineEModeCategoryNoChange', AaveV3Avalanche.POOL);
+
+    payload.execute();
+
+    createConfigurationSnapshot('postTestEngineEModeCategoryNoChange', AaveV3Avalanche.POOL);
+
+    diffReports('preTestEngineEModeCategoryNoChange', 'postTestEngineEModeCategoryNoChange');
+
+    _validateEmodeCategory(AaveV3Avalanche.POOL_ADDRESSES_PROVIDER, 1, eModeCategoryDataBefore);
   }
 
   function testAssetEModeUpdates() public {
