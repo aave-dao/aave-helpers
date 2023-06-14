@@ -40,42 +40,42 @@ contract CommonTestBase is Test {
    * @param amount the amount to deal
    */
   function _patchedDeal(address asset, address user, uint256 amount) internal {
+    (, address oldSender, ) = vm.readCallers();
     // TODO: once https://github.com/foundry-rs/foundry/pull/4884 merged scripts need to be adjusted
     if (block.chainid == ChainIds.MAINNET) {
       // GUSD
       if (asset == AaveV2EthereumAssets.GUSD_UNDERLYING) {
         vm.prank(0x22FFDA6813f4F34C520bf36E5Ea01167bC9DF159);
         IERC20(asset).transfer(user, amount);
-        return;
       }
       // SNX
-      if (asset == AaveV2EthereumAssets.SNX_UNDERLYING) {
+      else if (asset == AaveV2EthereumAssets.SNX_UNDERLYING) {
         vm.prank(0xAc86855865CbF31c8f9FBB68C749AD5Bd72802e3);
         IERC20(asset).transfer(user, amount);
-        return;
       }
       // sUSD
-      if (asset == AaveV2EthereumAssets.sUSD_UNDERLYING) {
+      else if (asset == AaveV2EthereumAssets.sUSD_UNDERLYING) {
         vm.prank(0x99F4176EE457afedFfCB1839c7aB7A030a5e4A92);
         IERC20(asset).transfer(user, amount);
-        return;
       }
       // stETH
-      if (asset == AaveV2EthereumAssets.stETH_UNDERLYING) {
+      else if (asset == AaveV2EthereumAssets.stETH_UNDERLYING) {
         vm.prank(0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0);
         IERC20(asset).transfer(user, amount);
-        return;
       }
-    }
-    if (block.chainid == ChainIds.OPTIMISM) {
+    } else if (block.chainid == ChainIds.OPTIMISM) {
       // sUSD
       if (asset == AaveV3OptimismAssets.sUSD_UNDERLYING) {
         vm.prank(AaveV3OptimismAssets.sUSD_A_TOKEN);
         IERC20(asset).transfer(user, amount);
-        return;
       }
+    } else {
+      deal(asset, user, amount);
     }
-    deal(asset, user, amount);
+    (, address newSender, ) = vm.readCallers();
+    if (oldSender != newSender) {
+      vm.startPrank(oldSender);
+    }
   }
 
   /**
@@ -91,10 +91,10 @@ contract CommonTestBase is Test {
       // USDT
       if (asset == AaveV2EthereumAssets.USDT_UNDERLYING) {
         PatchedIERC20(asset).approve(spender, amount);
-        return;
       }
+    } else {
+      IERC20(asset).approve(spender, amount);
     }
-    IERC20(asset).approve(spender, amount);
   }
 
   /**

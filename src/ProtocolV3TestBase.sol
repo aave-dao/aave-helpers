@@ -214,8 +214,6 @@ contract ProtocolV3TestBase is CommonTestBase {
     vm.startPrank(user);
     uint256 aTokenBefore = IERC20(config.aToken).balanceOf(user);
     _patchedDeal(config.underlying, user, amount);
-    // TODO: woraround as `_patchedDeal` changes prank context & there's currently no way to revert
-    vm.startPrank(user);
     _patchedApprove(config.underlying, address(pool), amount);
     console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
     pool.deposit(config.underlying, amount, user, 0);
