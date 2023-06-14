@@ -14,17 +14,6 @@ struct ReserveTokens {
   address variableDebtToken;
 }
 
-/**
- * https://github.com/foundry-rs/foundry/issues/2655#issuecomment-1208383099
- */
-interface PatchedIERC20 {
-  function approve(address spender, uint256 amount) external;
-
-  function transferFrom(address from, address to, uint256 value) external;
-
-  function balanceOf(address account) external view returns (uint256);
-}
-
 contract CommonTestBase is Test {
   using stdJson for string;
 
@@ -89,27 +78,8 @@ contract CommonTestBase is Test {
     bool patched = _patchedDeal(asset, user, amount);
     if (patched) {
       vm.startPrank(oldSender);
-    }
-
-    deal(asset, user, amount);
-  }
-
-  /**
-   * Some ERC20 are not perfectly spec compatible.
-   * This method patches the approve for them
-   * @notice for now only patching assets used on aave pools (for a more complete list check https://github.com/d-xo/weird-erc20)
-   * @param asset the asset to approve
-   * @param spender the spender to approve
-   * @param amount the amount to approve
-   */
-  function _patchedApprove(address asset, address spender, uint256 amount) internal {
-    if (block.chainid == ChainIds.MAINNET) {
-      // USDT
-      if (asset == AaveV2EthereumAssets.USDT_UNDERLYING) {
-        PatchedIERC20(asset).approve(spender, amount);
-      }
     } else {
-      IERC20(asset).approve(spender, amount);
+      deal(asset, user, amount);
     }
   }
 
