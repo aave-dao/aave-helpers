@@ -78,7 +78,6 @@ contract ProtocolV2TestBase is CommonTestBase {
    */
   function e2eTest(ILendingPool pool, address user) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    deal(user, 1000 ether);
     uint256 snapshot = vm.snapshot();
     _supplyWithdrawFlow(configs, pool, user);
     vm.revertTo(snapshot);
@@ -196,7 +195,7 @@ contract ProtocolV2TestBase is CommonTestBase {
   ) internal {
     vm.startPrank(user);
     uint256 aTokenBefore = IERC20(config.aToken).balanceOf(user);
-    _patchedDeal(config.underlying, user, amount);
+    deal2(config.underlying, user, amount);
     _patchedApprove(config.underlying, address(pool), amount);
     pool.deposit(config.underlying, amount, user, 0);
     console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
@@ -280,7 +279,7 @@ contract ProtocolV2TestBase is CommonTestBase {
     vm.startPrank(user);
     address debtToken = stable ? config.stableDebtToken : config.variableDebtToken;
     uint256 debtBefore = IERC20(debtToken).balanceOf(user);
-    deal(config.underlying, user, amount);
+    deal2(config.underlying, user, amount);
     IERC20(config.underlying).approve(address(pool), amount);
     console.log('REPAY: %s, Amount: %s', config.symbol, amount);
     pool.repay(config.underlying, amount, stable ? 1 : 2, user);
