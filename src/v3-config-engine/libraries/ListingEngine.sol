@@ -139,7 +139,7 @@ library ListingEngine {
     }
 
     return
-      RepackedListings(
+      IEngine.RepackedListings(
         ids,
         basics,
         borrowsUpdates,
