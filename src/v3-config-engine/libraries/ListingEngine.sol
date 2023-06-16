@@ -22,7 +22,7 @@ library ListingEngine {
   ) external {
     require(listings.length != 0, 'AT_LEAST_ONE_ASSET_REQUIRED');
 
-    RepackedListings memory repacked = _repackListing(listings);
+    IEngine.RepackedListings memory repacked = _repackListing(listings);
 
     engineLibraries.priceFeedEngine.functionDelegateCall(
       abi.encodeWithSelector(
@@ -80,7 +80,7 @@ library ListingEngine {
 
   function _repackListing(
     IEngine.ListingWithCustomImpl[] calldata listings
-  ) internal pure returns (RepackedListings memory) {
+  ) internal pure returns (IEngine.RepackedListings memory) {
     address[] memory ids = new address[](listings.length);
     IEngine.BorrowUpdate[] memory borrowsUpdates = new IEngine.BorrowUpdate[](listings.length);
     IEngine.CollateralUpdate[] memory collateralsUpdates = new IEngine.CollateralUpdate[](
