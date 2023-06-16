@@ -98,6 +98,17 @@ interface IAaveV3ConfigEngine {
     uint8 eModeCategory; // If `O`, no eMode category will be set
   }
 
+  struct RepackedListings {
+    address[] ids;
+    Basic[] basics;
+    BorrowUpdate[] borrowsUpdates;
+    CollateralUpdate[] collateralsUpdates;
+    PriceFeedUpdate[] priceFeedsUpdates;
+    AssetEModeUpdate[] assetsEModeUpdates;
+    CapsUpdate[] capsUpdates;
+    IV3RateStrategyFactory.RateStrategyParams[] rates;
+  }
+
   struct TokenImplementations {
     address aToken;
     address vToken;
