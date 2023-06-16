@@ -22,22 +22,13 @@ library ListingEngine {
   ) external {
     require(listings.length != 0, 'AT_LEAST_ONE_ASSET_REQUIRED');
 
-    (
-      address[] memory ids,
-      IEngine.Basic[] memory basics,
-      IEngine.BorrowUpdate[] memory borrowsUpdates,
-      IEngine.CollateralUpdate[] memory collateralsUpdates,
-      IEngine.PriceFeedUpdate[] memory priceFeedsUpdates,
-      IEngine.AssetEModeUpdate[] memory assetsEModeUpdates,
-      IEngine.CapsUpdate[] memory capsUpdates,
-      IV3RateStrategyFactory.RateStrategyParams[] memory rates
-    ) = _repackListing(listings);
+    IEngine.RepackedListings memory repacked = _repackListing(listings);
 
     engineLibraries.priceFeedEngine.functionDelegateCall(
       abi.encodeWithSelector(
         PriceFeedEngine.executePriceFeedsUpdate.selector,
         engineConstants,
-        priceFeedsUpdates
+        repacked.priceFeedsUpdates
       )
     );
 
@@ -47,20 +38,24 @@ library ListingEngine {
       engineConstants.ratesStrategyFactory,
       engineConstants.collector,
       engineConstants.rewardsController,
-      ids,
-      basics,
-      rates
+      repacked.ids,
+      repacked.basics,
+      repacked.rates
     );
 
     engineLibraries.capsEngine.functionDelegateCall(
-      abi.encodeWithSelector(CapsEngine.executeCapsUpdate.selector, engineConstants, capsUpdates)
+      abi.encodeWithSelector(
+        CapsEngine.executeCapsUpdate.selector,
+        engineConstants,
+        repacked.capsUpdates
+      )
     );
 
     engineLibraries.borrowEngine.functionDelegateCall(
       abi.encodeWithSelector(
         BorrowEngine.executeBorrowSide.selector,
         engineConstants,
-        borrowsUpdates
+        repacked.borrowsUpdates
       )
     );
 
@@ -68,7 +63,7 @@ library ListingEngine {
       abi.encodeWithSelector(
         CollateralEngine.executeCollateralSide.selector,
         engineConstants,
-        collateralsUpdates
+        repacked.collateralsUpdates
       )
     );
 
@@ -78,27 +73,14 @@ library ListingEngine {
       abi.encodeWithSelector(
         EModeEngine.executeAssetsEModeUpdate.selector,
         engineConstants,
-        assetsEModeUpdates
+        repacked.assetsEModeUpdates
       )
     );
   }
 
   function _repackListing(
     IEngine.ListingWithCustomImpl[] calldata listings
-  )
-    internal
-    pure
-    returns (
-      address[] memory,
-      IEngine.Basic[] memory,
-      IEngine.BorrowUpdate[] memory,
-      IEngine.CollateralUpdate[] memory,
-      IEngine.PriceFeedUpdate[] memory,
-      IEngine.AssetEModeUpdate[] memory,
-      IEngine.CapsUpdate[] memory,
-      IV3RateStrategyFactory.RateStrategyParams[] memory
-    )
-  {
+  ) internal pure returns (IEngine.RepackedListings memory) {
     address[] memory ids = new address[](listings.length);
     IEngine.BorrowUpdate[] memory borrowsUpdates = new IEngine.BorrowUpdate[](listings.length);
     IEngine.CollateralUpdate[] memory collateralsUpdates = new IEngine.CollateralUpdate[](
@@ -156,16 +138,17 @@ library ListingEngine {
       });
     }
 
-    return (
-      ids,
-      basics,
-      borrowsUpdates,
-      collateralsUpdates,
-      priceFeedsUpdates,
-      assetsEModeUpdates,
-      capsUpdates,
-      rates
-    );
+    return
+      RepackedListings(
+        ids,
+        basics,
+        borrowsUpdates,
+        collateralsUpdates,
+        priceFeedsUpdates,
+        assetsEModeUpdates,
+        capsUpdates,
+        rates
+      );
   }
 
   /// @dev mandatory configurations for any asset getting listed, including oracle config and basic init
