@@ -801,7 +801,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     );
     require(
       strategy.getBaseStableBorrowRate() == expectedStrategyValues.baseStableBorrowRate,
-      '_validateInterestRateStrategy() : INVALID_BASE_VARIABLE_BORROW'
+      '_validateInterestRateStrategy() : INVALID_BASE_STABLE_BORROW'
     );
     require(
       strategy.getStableRateSlope1() == expectedStrategyValues.stableRateSlope1,
