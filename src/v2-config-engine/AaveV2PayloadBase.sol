@@ -59,8 +59,4 @@ abstract contract AaveV2PayloadBase {
     virtual
     returns (IEngine.RateStrategyUpdate[] memory)
   {}
-
-  /// @dev the lack of support for immutable strings kinds of forces for this
-  /// Besides that, it can actually be useful being able to change the naming, but remote
-  function getPoolContext() public view virtual returns (IEngine.PoolContext memory);
 }

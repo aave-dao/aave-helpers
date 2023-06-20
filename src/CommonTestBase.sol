@@ -5,23 +5,13 @@ import 'forge-std/StdJson.sol';
 import 'forge-std/Test.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
+import {AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {ChainIds} from './ChainIds.sol';
 
 struct ReserveTokens {
   address aToken;
   address stableDebtToken;
   address variableDebtToken;
-}
-
-/**
- * https://github.com/foundry-rs/foundry/issues/2655#issuecomment-1208383099
- */
-interface PatchedIERC20 {
-  function approve(address spender, uint256 amount) external;
-
-  function transferFrom(address from, address to, uint256 value) external;
-
-  function balanceOf(address account) external view returns (uint256);
 }
 
 contract CommonTestBase is Test {
@@ -37,55 +27,60 @@ contract CommonTestBase is Test {
    * @param asset the asset to deal
    * @param user the user to deal to
    * @param amount the amount to deal
+   * @return bool true if the caller has changed due to prank usage
    */
-  function _patchedDeal(address asset, address user, uint256 amount) internal {
-    // TODO: once https://github.com/foundry-rs/foundry/pull/4884 merged scripts need to be adjusted
+  function _patchedDeal(address asset, address user, uint256 amount) internal returns (bool) {
     if (block.chainid == ChainIds.MAINNET) {
       // GUSD
       if (asset == AaveV2EthereumAssets.GUSD_UNDERLYING) {
         vm.prank(0x22FFDA6813f4F34C520bf36E5Ea01167bC9DF159);
         IERC20(asset).transfer(user, amount);
-        return;
+        return true;
       }
       // SNX
       if (asset == AaveV2EthereumAssets.SNX_UNDERLYING) {
         vm.prank(0xAc86855865CbF31c8f9FBB68C749AD5Bd72802e3);
         IERC20(asset).transfer(user, amount);
-        return;
+        return true;
       }
       // sUSD
       if (asset == AaveV2EthereumAssets.sUSD_UNDERLYING) {
         vm.prank(0x99F4176EE457afedFfCB1839c7aB7A030a5e4A92);
         IERC20(asset).transfer(user, amount);
-        return;
+        return true;
       }
       // stETH
       if (asset == AaveV2EthereumAssets.stETH_UNDERLYING) {
         vm.prank(0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0);
         IERC20(asset).transfer(user, amount);
-        return;
+        return true;
       }
     }
-    deal(asset, user, amount);
+    if (block.chainid == ChainIds.OPTIMISM) {
+      // sUSD
+      if (asset == AaveV3OptimismAssets.sUSD_UNDERLYING) {
+        vm.prank(AaveV3OptimismAssets.sUSD_A_TOKEN);
+        IERC20(asset).transfer(user, amount);
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
-   * Some ERC20 are not perfectly spec compatible.
-   * This method patches the approve for them
-   * @notice for now only patching assets used on aave pools (for a more complete list check https://github.com/d-xo/weird-erc20)
-   * @param asset the asset to approve
-   * @param spender the spender to approve
-   * @param amount the amount to approve
+   * Patched version of deal
+   * @param asset to deal
+   * @param user to deal to
+   * @param amount to deal
    */
-  function _patchedApprove(address asset, address spender, uint256 amount) internal {
-    if (block.chainid == ChainIds.MAINNET) {
-      // USDT
-      if (asset == AaveV2EthereumAssets.USDT_UNDERLYING) {
-        PatchedIERC20(asset).approve(spender, amount);
-        return;
-      }
+  function deal2(address asset, address user, uint256 amount) internal {
+    (, address oldSender, ) = vm.readCallers();
+    bool patched = _patchedDeal(asset, user, amount);
+    if (patched) {
+      vm.startPrank(oldSender);
+    } else {
+      deal(asset, user, amount);
     }
-    IERC20(asset).approve(spender, amount);
   }
 
   /**

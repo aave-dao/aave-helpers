@@ -4,10 +4,20 @@ pragma solidity >=0.7.5 <0.9.0;
 import 'forge-std/Test.sol';
 import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
+import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+
+interface IERC20Detailed is IERC20 {
+  function name() external view returns (string memory);
+
+  function symbol() external view returns (string memory);
+
+  function decimals() external view returns (uint8);
+}
 
 struct ReserveConfig {
   string symbol;
@@ -25,6 +35,7 @@ struct ReserveConfig {
   bool borrowingEnabled;
   address interestRateStrategy;
   bool stableBorrowRateEnabled;
+  bool isPaused;
   bool isActive;
   bool isFrozen;
   bool isSiloed;
@@ -54,6 +65,9 @@ struct InterestStrategyValues {
 }
 
 contract ProtocolV3TestBase is CommonTestBase {
+  using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
+  using SafeERC20 for IERC20;
+
   /**
    * @dev Generates a markdown compatible snapshot of the whole pool configuration into `/reports`.
    * @param reportName filename suffix for the generated reports.
@@ -94,18 +108,87 @@ contract ProtocolV3TestBase is CommonTestBase {
   /**
    * @dev Makes a e2e test including withdrawals/borrows and supplies to various reserves.
    * @param pool the pool that should be tested
-   * @param user the user to run the tests for
    */
-  function e2eTest(IPool pool, address user) public {
+  function e2eTest(IPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    deal(user, 1000 ether);
+    ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
+    for (uint256 i; i < configs.length; i++) {
+      if (_includeInE2e(configs[i])) {
+        // there's a foundry bug causing issues when this is outside the loop
+        uint256 snapshot = vm.snapshot();
+        e2eTestAsset(pool, collateralConfig, configs[i]);
+        vm.revertTo(snapshot);
+      }
+    }
+  }
+
+  function e2eTestAsset(
+    IPool pool,
+    ReserveConfig memory collateralConfig,
+    ReserveConfig memory testAssetConfig
+  ) public {
+    console.log(
+      'E2E: Collateral %s, TestAsset %s',
+      collateralConfig.symbol,
+      testAssetConfig.symbol
+    );
+    address collateralSupplier = vm.addr(3);
+    address testAssetSupplier = vm.addr(4);
+    require(collateralConfig.usageAsCollateralEnabled, 'COLLATERAL_CONFIG_MUST_BE_COLLATERAL');
+    uint256 testAssetAmount = _getTokenAmountByDollarValue(pool, testAssetConfig, 100);
+    if (
+      (testAssetConfig.supplyCap * 10 ** testAssetConfig.decimals) <
+      IERC20(testAssetConfig.aToken).totalSupply() + testAssetAmount
+    ) {
+      console.log('Skip: %s, supply cap fully utilized', testAssetConfig.symbol);
+      return;
+    }
+    _deposit(collateralConfig, pool, collateralSupplier, 10_000 * 10 ** collateralConfig.decimals);
+    _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
     uint256 snapshot = vm.snapshot();
-    _supplyWithdrawFlow(configs, pool, user);
+    // test withdrawal
+    _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
+    _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
     vm.revertTo(snapshot);
-    _variableBorrowFlow(configs, pool, user);
-    vm.revertTo(snapshot);
-    _stableBorrowFlow(configs, pool, user);
-    vm.revertTo(snapshot);
+    // test variable borrowing
+    if (testAssetConfig.borrowingEnabled) {
+      _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
+      vm.revertTo(snapshot);
+      // test stable borrowing
+      if (testAssetConfig.stableBorrowRateEnabled) {
+        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
+        vm.revertTo(snapshot);
+      }
+    }
+  }
+
+  /**
+   * Reserves that are frozen or not active should not be included in e2e test suite
+   */
+  function _includeInE2e(ReserveConfig memory config) internal pure returns (bool) {
+    return !config.isFrozen && config.isActive && !config.isPaused;
+  }
+
+  function _getTokenAmountByDollarValue(
+    IPool pool,
+    ReserveConfig memory config,
+    uint256 dollarValue
+  ) internal view returns (uint256) {
+    IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
+    IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
+    uint256 latestAnswer = oracle.getAssetPrice(config.underlying);
+    return (dollarValue * 10 ** (8 + config.decimals)) / latestAnswer;
+  }
+
+  function _e2eTestBorrowRepay(
+    IPool pool,
+    address borrower,
+    ReserveConfig memory testAssetConfig,
+    uint256 amount,
+    bool stable
+  ) internal {
+    this._borrow(testAssetConfig, pool, borrower, amount, stable);
+    _repay(testAssetConfig, pool, borrower, amount, stable);
   }
 
   /**
@@ -121,72 +204,19 @@ contract ProtocolV3TestBase is CommonTestBase {
     revert('ERROR: No collateral found');
   }
 
-  /**
-   * @dev tests that all assets can be deposited & withdrawn
-   */
-  function _supplyWithdrawFlow(ReserveConfig[] memory configs, IPool pool, address user) internal {
-    // test all basic interactions
-    for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 100 * 10 ** configs[i].decimals;
-      if (!configs[i].isFrozen) {
-        _deposit(configs[i], pool, user, amount);
-        _skipBlocks(1000);
-        assertEq(_withdraw(configs[i], pool, user, amount), amount);
-        _deposit(configs[i], pool, user, amount);
-        _skipBlocks(1000);
-        assertGe(_withdraw(configs[i], pool, user, type(uint256).max), amount);
-      } else {
-        console.log('SKIP: REASON_FROZEN %s', configs[i].symbol);
-      }
-    }
-  }
-
-  /**
-   * @dev tests that all assets with borrowing enabled can be borrowed
-   */
-  function _variableBorrowFlow(ReserveConfig[] memory configs, IPool pool, address user) internal {
-    // put 1M whatever collateral, which should be enough to borrow 1 of each
-    ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
-    _deposit(collateralConfig, pool, user, 1000000 ether);
-    for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 10 ** configs[i].decimals;
-      if (configs[i].borrowingEnabled) {
-        _deposit(configs[i], pool, EOA, amount * 2);
-        this._borrow(configs[i], pool, user, amount, false);
-      } else {
-        console.log('SKIP: BORROWING_DISABLED %s', configs[i].symbol);
-      }
-    }
-  }
-
-  /**
-   * @dev tests that all assets with stable borrowing enabled can be borrowed
-   */
-  function _stableBorrowFlow(ReserveConfig[] memory configs, IPool pool, address user) internal {
-    // put 1M whatever collateral, which should be enough to borrow 1 of each
-    ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
-    _deposit(collateralConfig, pool, user, 1000000 ether);
-    for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 10 ** configs[i].decimals;
-      if (configs[i].borrowingEnabled && configs[i].stableBorrowRateEnabled) {
-        _deposit(configs[i], pool, EOA, amount * 2);
-        this._borrow(configs[i], pool, user, amount, true);
-      } else {
-        console.log('SKIP: STABLE_BORROWING_DISABLED %s', configs[i].symbol);
-      }
-    }
-  }
-
   function _deposit(
     ReserveConfig memory config,
     IPool pool,
     address user,
     uint256 amount
   ) internal {
+    require(!config.isFrozen, 'DEPOSIT(): FROZEN_RESERVE');
+    require(config.isActive, 'DEPOSIT(): INACTIVE_RESERVE');
+    require(!config.isPaused, 'DEPOSIT(): PAUSED_RESERVE');
     vm.startPrank(user);
     uint256 aTokenBefore = IERC20(config.aToken).balanceOf(user);
-    deal(config.underlying, user, amount);
-    IERC20(config.underlying).approve(address(pool), amount);
+    deal2(config.underlying, user, amount);
+    IERC20(config.underlying).safeApprove(address(pool), amount);
     console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
     pool.deposit(config.underlying, amount, user, 0);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
@@ -241,8 +271,8 @@ contract ProtocolV3TestBase is CommonTestBase {
     vm.startPrank(user);
     address debtToken = stable ? config.stableDebtToken : config.variableDebtToken;
     uint256 debtBefore = IERC20(debtToken).balanceOf(user);
-    deal(config.underlying, user, amount);
-    IERC20(config.underlying).approve(address(pool), amount);
+    deal2(config.underlying, user, amount);
+    IERC20(config.underlying).safeApprove(address(pool), amount);
     console.log('REPAY: %s, Amount: %s', config.symbol, amount);
     pool.repay(config.underlying, amount, stable ? 1 : 2, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
@@ -370,6 +400,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       vm.serializeBool(key, 'usageAsCollateralEnabled', config.usageAsCollateralEnabled);
       vm.serializeBool(key, 'borrowingEnabled', config.borrowingEnabled);
       vm.serializeBool(key, 'stableBorrowRateEnabled', config.stableBorrowRateEnabled);
+      vm.serializeBool(key, 'isPaused', config.isPaused);
       vm.serializeBool(key, 'isActive', config.isActive);
       vm.serializeBool(key, 'isFrozen', config.isFrozen);
       vm.serializeBool(key, 'isSiloed', config.isSiloed);
@@ -385,6 +416,8 @@ contract ProtocolV3TestBase is CommonTestBase {
         'aTokenImpl',
         ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, config.aToken)
       );
+      vm.serializeString(key, 'aTokenSymbol', IERC20Detailed(config.aToken).symbol());
+      vm.serializeString(key, 'aTokenName', IERC20Detailed(config.aToken).name());
       vm.serializeAddress(
         key,
         'stableDebtTokenImpl',
@@ -393,6 +426,12 @@ contract ProtocolV3TestBase is CommonTestBase {
           config.stableDebtToken
         )
       );
+      vm.serializeString(
+        key,
+        'stableDebtTokenSymbol',
+        IERC20Detailed(config.stableDebtToken).symbol()
+      );
+      vm.serializeString(key, 'stableDebtTokenName', IERC20Detailed(config.stableDebtToken).name());
       vm.serializeAddress(
         key,
         'variableDebtTokenImpl',
@@ -400,6 +439,16 @@ contract ProtocolV3TestBase is CommonTestBase {
           vm,
           config.variableDebtToken
         )
+      );
+      vm.serializeString(
+        key,
+        'variableDebtTokenSymbol',
+        IERC20Detailed(config.variableDebtToken).symbol()
+      );
+      vm.serializeString(
+        key,
+        'variableDebtTokenName',
+        IERC20Detailed(config.variableDebtToken).name()
       );
       vm.serializeAddress(key, 'oracle', address(assetOracle));
       if (address(assetOracle) != address(0)) {
@@ -480,7 +529,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     vars.configs = new ReserveConfig[](vars.reserves.length);
 
     for (uint256 i = 0; i < vars.reserves.length; i++) {
-      vars.configs[i] = _getStructReserveConfig(pool, poolDataProvider, vars.reserves[i]);
+      vars.configs[i] = _getStructReserveConfig(pool, vars.reserves[i]);
       ReserveTokens memory reserveTokens = _getStructReserveTokens(
         poolDataProvider,
         vars.configs[i].underlying
@@ -506,51 +555,40 @@ contract ProtocolV3TestBase is CommonTestBase {
 
   function _getStructReserveConfig(
     IPool pool,
-    IPoolDataProvider pdp,
     IPoolDataProvider.TokenData memory reserve
   ) internal view virtual returns (ReserveConfig memory) {
     ReserveConfig memory localConfig;
-    (
-      uint256 decimals,
-      uint256 ltv,
-      uint256 liquidationThreshold,
-      uint256 liquidationBonus,
-      uint256 reserveFactor,
-      bool usageAsCollateralEnabled,
-      bool borrowingEnabled,
-      bool stableBorrowRateEnabled,
-      bool isActive,
-      bool isFrozen
-    ) = pdp.getReserveConfigurationData(reserve.tokenAddress);
-    localConfig.symbol = reserve.symbol;
-    localConfig.underlying = reserve.tokenAddress;
-    localConfig.decimals = decimals;
-    localConfig.ltv = ltv;
-    localConfig.liquidationThreshold = liquidationThreshold;
-    localConfig.liquidationBonus = liquidationBonus;
-    localConfig.reserveFactor = reserveFactor;
-    localConfig.usageAsCollateralEnabled = usageAsCollateralEnabled;
-    localConfig.borrowingEnabled = borrowingEnabled;
-    localConfig.stableBorrowRateEnabled = stableBorrowRateEnabled;
+    DataTypes.ReserveConfigurationMap memory configuration = pool.getConfiguration(
+      reserve.tokenAddress
+    );
     localConfig.interestRateStrategy = pool
       .getReserveData(reserve.tokenAddress)
       .interestRateStrategyAddress;
-    localConfig.isActive = isActive;
-    localConfig.isFrozen = isFrozen;
-    localConfig.isSiloed = pdp.getSiloedBorrowing(reserve.tokenAddress);
-    (localConfig.borrowCap, localConfig.supplyCap) = pdp.getReserveCaps(reserve.tokenAddress);
-    localConfig.debtCeiling = pdp.getDebtCeiling(reserve.tokenAddress);
-    localConfig.eModeCategory = pdp.getReserveEModeCategory(reserve.tokenAddress);
-    localConfig.liquidationProtocolFee = pdp.getLiquidationProtocolFee(reserve.tokenAddress);
+    (
+      localConfig.ltv,
+      localConfig.liquidationThreshold,
+      localConfig.liquidationBonus,
+      localConfig.decimals,
+      localConfig.reserveFactor,
+      localConfig.eModeCategory
+    ) = configuration.getParams();
+    (
+      localConfig.isActive,
+      localConfig.isFrozen,
+      localConfig.borrowingEnabled,
+      localConfig.stableBorrowRateEnabled,
+      localConfig.isPaused
+    ) = configuration.getFlags();
+    localConfig.symbol = reserve.symbol;
+    localConfig.underlying = reserve.tokenAddress;
+    localConfig.usageAsCollateralEnabled = localConfig.liquidationThreshold != 0;
+    localConfig.isSiloed = configuration.getSiloedBorrowing();
+    (localConfig.borrowCap, localConfig.supplyCap) = configuration.getCaps();
+    localConfig.debtCeiling = configuration.getDebtCeiling();
+    localConfig.liquidationProtocolFee = configuration.getLiquidationProtocolFee();
+    localConfig.isBorrowableInIsolation = configuration.getBorrowableInIsolation();
 
-    // TODO this should be improved, but at the moment is simpler to avoid importing the
-    // ReserveConfiguration library
-    localConfig.isBorrowableInIsolation =
-      (pool.getConfiguration(reserve.tokenAddress).data &
-        ~uint256(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDFFFFFFFFFFFFFFF)) !=
-      0;
-
-    localConfig.isFlashloanable = false; // TODO pdp.getFlashLoanEnabled(reserve.tokenAddress) once updated address book
+    localConfig.isFlashloanable = false;
 
     return localConfig;
   }
@@ -574,6 +612,7 @@ contract ProtocolV3TestBase is CommonTestBase {
         borrowingEnabled: config.borrowingEnabled,
         interestRateStrategy: config.interestRateStrategy,
         stableBorrowRateEnabled: config.stableBorrowRateEnabled,
+        isPaused: config.isPaused,
         isActive: config.isActive,
         isFrozen: config.isFrozen,
         isSiloed: config.isSiloed,
@@ -762,7 +801,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     );
     require(
       strategy.getBaseStableBorrowRate() == expectedStrategyValues.baseStableBorrowRate,
-      '_validateInterestRateStrategy() : INVALID_BASE_VARIABLE_BORROW'
+      '_validateInterestRateStrategy() : INVALID_BASE_STABLE_BORROW'
     );
     require(
       strategy.getStableRateSlope1() == expectedStrategyValues.stableRateSlope1,
@@ -1007,53 +1046,44 @@ contract ProtocolV3TestBase is CommonTestBase {
 }
 
 contract ProtocolV3_0_1TestBase is ProtocolV3TestBase {
+  using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
+
   function _getStructReserveConfig(
     IPool pool,
-    IPoolDataProvider pdp,
     IPoolDataProvider.TokenData memory reserve
   ) internal view override returns (ReserveConfig memory) {
     ReserveConfig memory localConfig;
-    (
-      uint256 decimals,
-      uint256 ltv,
-      uint256 liquidationThreshold,
-      uint256 liquidationBonus,
-      uint256 reserveFactor,
-      bool usageAsCollateralEnabled,
-      bool borrowingEnabled,
-      bool stableBorrowRateEnabled,
-      bool isActive,
-      bool isFrozen
-    ) = pdp.getReserveConfigurationData(reserve.tokenAddress);
-    localConfig.symbol = reserve.symbol;
-    localConfig.underlying = reserve.tokenAddress;
-    localConfig.decimals = decimals;
-    localConfig.ltv = ltv;
-    localConfig.liquidationThreshold = liquidationThreshold;
-    localConfig.liquidationBonus = liquidationBonus;
-    localConfig.reserveFactor = reserveFactor;
-    localConfig.usageAsCollateralEnabled = usageAsCollateralEnabled;
-    localConfig.borrowingEnabled = borrowingEnabled;
-    localConfig.stableBorrowRateEnabled = stableBorrowRateEnabled;
+    DataTypes.ReserveConfigurationMap memory configuration = pool.getConfiguration(
+      reserve.tokenAddress
+    );
     localConfig.interestRateStrategy = pool
       .getReserveData(reserve.tokenAddress)
       .interestRateStrategyAddress;
-    localConfig.isActive = isActive;
-    localConfig.isFrozen = isFrozen;
-    localConfig.isSiloed = pdp.getSiloedBorrowing(reserve.tokenAddress);
-    (localConfig.borrowCap, localConfig.supplyCap) = pdp.getReserveCaps(reserve.tokenAddress);
-    localConfig.debtCeiling = pdp.getDebtCeiling(reserve.tokenAddress);
-    localConfig.eModeCategory = pdp.getReserveEModeCategory(reserve.tokenAddress);
-    localConfig.liquidationProtocolFee = pdp.getLiquidationProtocolFee(reserve.tokenAddress);
+    (
+      localConfig.ltv,
+      localConfig.liquidationThreshold,
+      localConfig.liquidationBonus,
+      localConfig.decimals,
+      localConfig.reserveFactor,
+      localConfig.eModeCategory
+    ) = configuration.getParams();
+    (
+      localConfig.isActive,
+      localConfig.isFrozen,
+      localConfig.borrowingEnabled,
+      localConfig.stableBorrowRateEnabled,
+      localConfig.isPaused
+    ) = configuration.getFlags();
+    localConfig.symbol = reserve.symbol;
+    localConfig.underlying = reserve.tokenAddress;
+    localConfig.usageAsCollateralEnabled = localConfig.liquidationThreshold != 0;
+    localConfig.isSiloed = configuration.getSiloedBorrowing();
+    (localConfig.borrowCap, localConfig.supplyCap) = configuration.getCaps();
+    localConfig.debtCeiling = configuration.getDebtCeiling();
+    localConfig.liquidationProtocolFee = configuration.getLiquidationProtocolFee();
+    localConfig.isBorrowableInIsolation = configuration.getBorrowableInIsolation();
 
-    // TODO this should be improved, but at the moment is simpler to avoid importing the
-    // ReserveConfiguration library
-    localConfig.isBorrowableInIsolation =
-      (pool.getConfiguration(reserve.tokenAddress).data &
-        ~uint256(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFDFFFFFFFFFFFFFFF)) !=
-      0;
-
-    localConfig.isFlashloanable = pdp.getFlashLoanEnabled(reserve.tokenAddress);
+    localConfig.isFlashloanable = configuration.getFlashLoanEnabled();
 
     return localConfig;
   }

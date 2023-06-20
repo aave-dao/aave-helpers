@@ -4,6 +4,7 @@ pragma solidity >=0.7.5 <0.9.0;
 import 'forge-std/Test.sol';
 import {IAaveOracle, ILendingPool, ILendingPoolAddressesProvider, ILendingPoolConfigurator, IAaveProtocolDataProvider, DataTypes, TokenData, ILendingRateOracle, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV2.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
@@ -46,6 +47,8 @@ struct InterestStrategyValues {
 }
 
 contract ProtocolV2TestBase is CommonTestBase {
+  using SafeERC20 for IERC20;
+
   /**
    * @dev Generates a markdown compatible snapshot of the whole pool configuration into `/reports`.
    * @param reportName filename suffix for the generated reports.
@@ -78,7 +81,6 @@ contract ProtocolV2TestBase is CommonTestBase {
    */
   function e2eTest(ILendingPool pool, address user) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    deal(user, 1000 ether);
     uint256 snapshot = vm.snapshot();
     _supplyWithdrawFlow(configs, pool, user);
     vm.revertTo(snapshot);
@@ -196,10 +198,8 @@ contract ProtocolV2TestBase is CommonTestBase {
   ) internal {
     vm.startPrank(user);
     uint256 aTokenBefore = IERC20(config.aToken).balanceOf(user);
-    _patchedDeal(config.underlying, user, amount);
-    // TODO: woraround as `_patchedDeal` changes prank context & there's currently no way to revert
-    vm.startPrank(user);
-    _patchedApprove(config.underlying, address(pool), amount);
+    deal2(config.underlying, user, amount);
+    IERC20(config.underlying).safeApprove(address(pool), amount);
     pool.deposit(config.underlying, amount, user, 0);
     console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
@@ -282,8 +282,8 @@ contract ProtocolV2TestBase is CommonTestBase {
     vm.startPrank(user);
     address debtToken = stable ? config.stableDebtToken : config.variableDebtToken;
     uint256 debtBefore = IERC20(debtToken).balanceOf(user);
-    deal(config.underlying, user, amount);
-    IERC20(config.underlying).approve(address(pool), amount);
+    deal2(config.underlying, user, amount);
+    IERC20(config.underlying).safeApprove(address(pool), amount);
     console.log('REPAY: %s, Amount: %s', config.symbol, amount);
     pool.repay(config.underlying, amount, stable ? 1 : 2, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
