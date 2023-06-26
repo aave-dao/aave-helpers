@@ -295,10 +295,7 @@ library GovHelpers {
    */
   function executePayload(Vm vm, address payloadAddress) internal {
     address executor = _getExecutor();
-    Payload[] memory proposals = new Payload[](1);
-    proposals[0] = Payload(payloadAddress, 'execute()', '');
-    uint256 proposalId = _queueProposalToL2ExecutorStorage(vm, executor, proposals);
-    CommonExecutor(executor).execute(proposalId);
+    executePayload(vm, payloadAddress, executor);
   }
 
   /**
@@ -309,8 +306,34 @@ library GovHelpers {
    * @param executor address of the executor
    */
   function executePayload(Vm vm, address payloadAddress, address executor) internal {
-    if (_getExecutor() == executor) {
-      executePayload(vm, payloadAddress);
+    if (
+      block.chainid == ChainIds.MAINNET &&
+      (executor == AaveGovernanceV2.SHORT_EXECUTOR || executor == AaveGovernanceV2.LONG_EXECUTOR)
+    ) {
+      address[] memory targets = new address[](1);
+      targets[0] = payloadAddress;
+      uint256[] memory values = new uint256[](1);
+      string[] memory signatures = new string[](1);
+      signatures[0] = 'execute()';
+      bytes[] memory calldatas = new bytes[](1);
+      bool[] memory withDelegatecalls = new bool[](1);
+      withDelegatecalls[0] = true;
+      SPropCreateParams memory proposal = SPropCreateParams(
+        executor,
+        targets,
+        values,
+        signatures,
+        calldatas,
+        withDelegatecalls,
+        bytes32(0)
+      );
+      uint256 proposalId = createTestProposal(vm, proposal);
+      passVoteAndExecute(vm, proposalId);
+    } else if (_getExecutor() == executor) {
+      Payload[] memory proposals = new Payload[](1);
+      proposals[0] = Payload(payloadAddress, 'execute()', '');
+      uint256 proposalId = _queueProposalToL2ExecutorStorage(vm, executor, proposals);
+      CommonExecutor(executor).execute(proposalId);
     } else {
       MockExecutor mockExecutor = new MockExecutor();
       vm.etch(executor, address(mockExecutor).code);
@@ -367,6 +390,8 @@ library GovHelpers {
         bytes32(_arrLocation(proposalBaseSlot, i, 1)),
         bytes32(uint256(uint160(params[i].target)))
       );
+      // values
+      vm.store(l2Executor, bytes32(_arrLocation(proposalBaseSlot + 1, i, 1)), bytes32(0));
       // signatures
       if (bytes(params[i].signature).length > 31) revert LongBytesNotSupportedYet();
       vm.store(
@@ -398,6 +423,118 @@ library GovHelpers {
     vm.store(l2Executor, bytes32(proposalBaseSlot + 5), bytes32(block.timestamp));
     return proposalCount;
   }
+
+  // /**
+  //  * @notice Executor storage is the same on all l2s
+  //  * @param vm vm
+  //  * @param params proposal
+  // WIP: not sure if worth it
+  //  */
+  // function _queueProposalToL1ExecutorStorage(
+  //   Vm vm,
+  //   address l1Executor,
+  //   Payload[] memory params
+  // ) internal returns (uint256) {
+  //   // count is stored in slot 5
+  //   uint256 proposalCount = uint256(vm.load(address(AaveGovernanceV2.GOV), bytes32(uint256(3))));
+  //   // bump counter by 1
+  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(uint256(3)), bytes32(proposalCount + 1));
+
+  //   // set storage array sizes
+  //   // proposals
+  //   uint256 proposalBaseSlot = _getStorageSlotUintMapping(4, proposalCount);
+  //   // id
+  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot), bytes32(proposalCount));
+  //   // creator
+  //   vm.store(
+  //     address(AaveGovernanceV2.GOV),
+  //     bytes32(proposalBaseSlot + 1),
+  //     bytes32(uint256(uint160(msg.sender)))
+  //   );
+  //   vm.store(
+  //     address(AaveGovernanceV2.GOV),
+  //     bytes32(proposalBaseSlot + 2),
+  //     bytes32(uint256(uint160(l1Executor)))
+  //   );
+  //   // targets
+  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 3), bytes32(params.length));
+  //   // values
+  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 4), bytes32(params.length));
+  //   // signatures
+  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 5), bytes32(params.length));
+  //   // calldatas
+  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 6), bytes32(params.length));
+  //   // withDelegateCalls
+  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 7), bytes32(params.length));
+  //   // startBlock
+  //   vm.store(
+  //     address(AaveGovernanceV2.GOV),
+  //     bytes32(proposalBaseSlot + 8),
+  //     bytes32(block.number - 1)
+  //   );
+  //   // endBlock
+  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 9), bytes32(block.number));
+  //   // executionTime
+  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 10), bytes32(params.length));
+  //   // forVotes
+  //   vm.store(
+  //     address(AaveGovernanceV2.GOV),
+  //     bytes32(proposalBaseSlot + 11),
+  //     bytes32(uint256(10_000_000 ether))
+  //   );
+  //   // strategy
+  //   vm.store(
+  //     address(AaveGovernanceV2.GOV),
+  //     bytes32(proposalBaseSlot + 15),
+  //     bytes32(uint256(uint160(0xb7e383ef9B1E9189Fc0F71fb30af8aa14377429e)))
+  //   );
+  //   // store actual values
+  //   for (uint256 i = 0; i < params.length; i++) {
+  //     // targets
+  //     vm.store(
+  //       address(AaveGovernanceV2.GOV),
+  //       bytes32(_arrLocation(proposalBaseSlot + 3, i, 1)),
+  //       bytes32(uint256(uint160(params[i].target)))
+  //     );
+  //     // values
+  //     vm.store(
+  //       address(AaveGovernanceV2.GOV),
+  //       bytes32(_arrLocation(proposalBaseSlot + 4, i, 1)),
+  //       bytes32(0)
+  //     );
+  //     // signatures
+  //     if (bytes(params[i].signature).length > 31) revert LongBytesNotSupportedYet();
+  //     vm.store(
+  //       address(AaveGovernanceV2.GOV),
+  //       bytes32(_arrLocation(proposalBaseSlot + 5, i, 1)),
+  //       bytes32(
+  //         bytes.concat(
+  //           bytes31(bytes(params[i].signature)),
+  //           bytes1(uint8(bytes(params[i].signature).length * 2))
+  //         )
+  //       )
+  //     );
+  //     // calldatas
+  //     if (params[i].callData.length > 31) revert LongBytesNotSupportedYet();
+  //     vm.store(
+  //       address(AaveGovernanceV2.GOV),
+  //       bytes32(_arrLocation(proposalBaseSlot + 6, i, 1)),
+  //       bytes32(
+  //         bytes.concat(
+  //           bytes31(bytes(params[i].callData)),
+  //           bytes1(uint8(bytes(params[i].callData).length * 2))
+  //         )
+  //       )
+  //     );
+  //     // withDelegateCalls
+  //     vm.store(
+  //       address(AaveGovernanceV2.GOV),
+  //       bytes32(_arrLocation(proposalBaseSlot + 7, i, 1)),
+  //       bytes32(uint256(1))
+  //     );
+  //   }
+  //   return proposalCount;
+  // }
 
   function _getExecutor() internal view returns (address) {
     if (block.chainid == ChainIds.OPTIMISM) return AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR;
