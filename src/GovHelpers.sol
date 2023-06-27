@@ -446,7 +446,7 @@ library GovHelpers {
       // console2.log(proposal.forVotes);
       // console2.log(address(proposal.strategy));
       // console2.log(proposal.executionTime);
-      // console2.log(uint256(AaveGovernanceV2.GOV.getProposalState(proposalId)));
+      console2.log(uint256(AaveGovernanceV2.GOV.getProposalState(proposalId)));
 
       AaveGovernanceV2.GOV.execute(proposalId);
     } else if (_getExecutor() == executor) {
@@ -580,6 +580,7 @@ library GovHelpers {
       bytes32(proposalBaseSlot + 1),
       bytes32(uint256(uint160(msg.sender)))
     );
+    // executor
     vm.store(
       address(AaveGovernanceV2.GOV),
       bytes32(proposalBaseSlot + 2),
@@ -618,7 +619,7 @@ library GovHelpers {
     vm.store(
       address(AaveGovernanceV2.GOV),
       bytes32(proposalBaseSlot + 11),
-      bytes32(uint256(10_000_000 ether)) // TODO: calculate needed amount
+      bytes32(uint256(15_000_000 ether)) // TODO: calculate needed amount
     );
     // strategy
     vm.store(
@@ -641,7 +642,13 @@ library GovHelpers {
       // queue hash on executor
       vm.store(
         l1Executor,
-        bytes32(_getStorageSlotBytes32Mapping(3, queueHash)),
+        bytes32(
+          _getStorageSlotBytes32Mapping(
+            // the mapping slot is 3 on short and 7 on long
+            l1Executor == AaveGovernanceV2.SHORT_EXECUTOR ? 3 : 7,
+            queueHash
+          )
+        ),
         bytes32(uint256(1))
       );
       // targets
