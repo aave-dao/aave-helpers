@@ -448,7 +448,7 @@ library GovHelpers {
       // console2.log(proposal.executionTime);
       // console2.log(uint256(AaveGovernanceV2.GOV.getProposalState(proposalId)));
 
-      CommonExecutor(executor).execute(proposalId);
+      AaveGovernanceV2.GOV.execute(proposalId);
     } else if (_getExecutor() == executor) {
       Payload[] memory proposals = new Payload[](1);
       proposals[0] = Payload(payloadAddress, 'execute()', '');
