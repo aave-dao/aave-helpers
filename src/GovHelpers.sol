@@ -22,6 +22,132 @@ interface CommonExecutor {
   function execute(uint256 actionsSetId) external payable;
 }
 
+interface IProposalValidator {
+  /**
+   * @dev Called to validate a proposal (e.g when creating new proposal in Governance)
+   * @param governance Governance Contract
+   * @param user Address of the proposal creator
+   * @param blockNumber Block Number against which to make the test (e.g proposal creation block -1).
+   * @return boolean, true if can be created
+   **/
+  function validateCreatorOfProposal(
+    IAaveGovernanceV2 governance,
+    address user,
+    uint256 blockNumber
+  ) external view returns (bool);
+
+  /**
+   * @dev Called to validate the cancellation of a proposal
+   * @param governance Governance Contract
+   * @param user Address of the proposal creator
+   * @param blockNumber Block Number against which to make the test (e.g proposal creation block -1).
+   * @return boolean, true if can be cancelled
+   **/
+  function validateProposalCancellation(
+    IAaveGovernanceV2 governance,
+    address user,
+    uint256 blockNumber
+  ) external view returns (bool);
+
+  /**
+   * @dev Returns whether a user has enough Proposition Power to make a proposal.
+   * @param governance Governance Contract
+   * @param user Address of the user to be challenged.
+   * @param blockNumber Block Number against which to make the challenge.
+   * @return true if user has enough power
+   **/
+  function isPropositionPowerEnough(
+    IAaveGovernanceV2 governance,
+    address user,
+    uint256 blockNumber
+  ) external view returns (bool);
+
+  /**
+   * @dev Returns the minimum Proposition Power needed to create a proposition.
+   * @param governance Governance Contract
+   * @param blockNumber Blocknumber at which to evaluate
+   * @return minimum Proposition Power needed
+   **/
+  function getMinimumPropositionPowerNeeded(
+    IAaveGovernanceV2 governance,
+    uint256 blockNumber
+  ) external view returns (uint256);
+
+  /**
+   * @dev Returns whether a proposal passed or not
+   * @param governance Governance Contract
+   * @param proposalId Id of the proposal to set
+   * @return true if proposal passed
+   **/
+  function isProposalPassed(
+    IAaveGovernanceV2 governance,
+    uint256 proposalId
+  ) external view returns (bool);
+
+  /**
+   * @dev Check whether a proposal has reached quorum, ie has enough FOR-voting-power
+   * Here quorum is not to understand as number of votes reached, but number of for-votes reached
+   * @param governance Governance Contract
+   * @param proposalId Id of the proposal to verify
+   * @return voting power needed for a proposal to pass
+   **/
+  function isQuorumValid(
+    IAaveGovernanceV2 governance,
+    uint256 proposalId
+  ) external view returns (bool);
+
+  /**
+   * @dev Check whether a proposal has enough extra FOR-votes than AGAINST-votes
+   * FOR VOTES - AGAINST VOTES > VOTE_DIFFERENTIAL * voting supply
+   * @param governance Governance Contract
+   * @param proposalId Id of the proposal to verify
+   * @return true if enough For-Votes
+   **/
+  function isVoteDifferentialValid(
+    IAaveGovernanceV2 governance,
+    uint256 proposalId
+  ) external view returns (bool);
+
+  /**
+   * @dev Calculates the minimum amount of Voting Power needed for a proposal to Pass
+   * @param votingSupply Total number of oustanding voting tokens
+   * @return voting power needed for a proposal to pass
+   **/
+  function getMinimumVotingPowerNeeded(uint256 votingSupply) external view returns (uint256);
+
+  /**
+   * @dev Get proposition threshold constant value
+   * @return the proposition threshold value (100 <=> 1%)
+   **/
+  function PROPOSITION_THRESHOLD() external view returns (uint256);
+
+  /**
+   * @dev Get voting duration constant value
+   * @return the voting duration value in seconds
+   **/
+  function VOTING_DURATION() external view returns (uint256);
+
+  /**
+   * @dev Get the vote differential threshold constant value
+   * to compare with % of for votes/total supply - % of against votes/total supply
+   * @return the vote differential threshold value (100 <=> 1%)
+   **/
+  function VOTE_DIFFERENTIAL() external view returns (uint256);
+
+  /**
+   * @dev Get quorum threshold constant value
+   * to compare with % of for votes/total supply
+   * @return the quorum threshold value (100 <=> 1%)
+   **/
+  function MINIMUM_QUORUM() external view returns (uint256);
+
+  /**
+   * @dev precision helper: 100% = 10000
+   * @return one hundred percents with our chosen precision
+   **/
+  function ONE_HUNDRED_WITH_PRECISION() external view returns (uint256);
+}
+
 library GovHelpers {
   error ExecutorNotFound();
   error LongBytesNotSupportedYet();
@@ -310,25 +436,19 @@ library GovHelpers {
       block.chainid == ChainIds.MAINNET &&
       (executor == AaveGovernanceV2.SHORT_EXECUTOR || executor == AaveGovernanceV2.LONG_EXECUTOR)
     ) {
-      address[] memory targets = new address[](1);
-      targets[0] = payloadAddress;
-      uint256[] memory values = new uint256[](1);
-      string[] memory signatures = new string[](1);
-      signatures[0] = 'execute()';
-      bytes[] memory calldatas = new bytes[](1);
-      bool[] memory withDelegatecalls = new bool[](1);
-      withDelegatecalls[0] = true;
-      SPropCreateParams memory proposal = SPropCreateParams(
-        executor,
-        targets,
-        values,
-        signatures,
-        calldatas,
-        withDelegatecalls,
-        bytes32(0)
-      );
-      uint256 proposalId = createTestProposal(vm, proposal);
-      passVoteAndExecute(vm, proposalId);
+      Payload[] memory proposals = new Payload[](1);
+      proposals[0] = Payload(payloadAddress, 'execute()', '');
+      uint256 proposalId = _queueProposalToL1ExecutorStorage(vm, executor, proposals);
+      // IAaveGovernanceV2.ProposalWithoutVotes memory proposal = AaveGovernanceV2.GOV.getProposalById(
+      //   proposalId
+      // );
+      // console2.log(address(proposal.executor));
+      // console2.log(proposal.forVotes);
+      // console2.log(address(proposal.strategy));
+      // console2.log(proposal.executionTime);
+      // console2.log(uint256(AaveGovernanceV2.GOV.getProposalState(proposalId)));
+
+      CommonExecutor(executor).execute(proposalId);
     } else if (_getExecutor() == executor) {
       Payload[] memory proposals = new Payload[](1);
       proposals[0] = Payload(payloadAddress, 'execute()', '');
@@ -341,8 +461,18 @@ library GovHelpers {
     }
   }
 
-  function _getStorageSlotUintMapping(uint256 slot, uint256 key) internal pure returns (uint256) {
-    return uint256(keccak256(abi.encode(key, slot)));
+  function _getStorageSlotUintMapping(
+    uint256 baseSlot,
+    uint256 key
+  ) internal pure returns (uint256) {
+    return uint256(keccak256(abi.encode(key, baseSlot)));
+  }
+
+  function _getStorageSlotBytes32Mapping(
+    uint256 baseSlot,
+    bytes32 key
+  ) internal pure returns (uint256) {
+    return uint256(keccak256(abi.encode(key, baseSlot)));
   }
 
   function _arrLocation(
@@ -424,117 +554,134 @@ library GovHelpers {
     return proposalCount;
   }
 
-  // /**
-  //  * @notice Executor storage is the same on all l2s
-  //  * @param vm vm
-  //  * @param params proposal
-  // WIP: not sure if worth it
-  //  */
-  // function _queueProposalToL1ExecutorStorage(
-  //   Vm vm,
-  //   address l1Executor,
-  //   Payload[] memory params
-  // ) internal returns (uint256) {
-  //   // count is stored in slot 5
-  //   uint256 proposalCount = uint256(vm.load(address(AaveGovernanceV2.GOV), bytes32(uint256(3))));
-  //   // bump counter by 1
-  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(uint256(3)), bytes32(proposalCount + 1));
+  /**
+   * @notice Creates a proposal via storage overwrites
+   * @param vm vm
+   * @param params proposal
+   */
+  function _queueProposalToL1ExecutorStorage(
+    Vm vm,
+    address l1Executor,
+    Payload[] memory params
+  ) internal returns (uint256) {
+    // count is stored in slot 5
+    uint256 proposalCount = uint256(vm.load(address(AaveGovernanceV2.GOV), bytes32(uint256(3))));
+    // bump counter by 1
+    vm.store(address(AaveGovernanceV2.GOV), bytes32(uint256(3)), bytes32(proposalCount + 1));
 
-  //   // set storage array sizes
-  //   // proposals
-  //   uint256 proposalBaseSlot = _getStorageSlotUintMapping(4, proposalCount);
-  //   // id
-  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot), bytes32(proposalCount));
-  //   // creator
-  //   vm.store(
-  //     address(AaveGovernanceV2.GOV),
-  //     bytes32(proposalBaseSlot + 1),
-  //     bytes32(uint256(uint160(msg.sender)))
-  //   );
-  //   vm.store(
-  //     address(AaveGovernanceV2.GOV),
-  //     bytes32(proposalBaseSlot + 2),
-  //     bytes32(uint256(uint160(l1Executor)))
-  //   );
-  //   // targets
-  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 3), bytes32(params.length));
-  //   // values
-  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 4), bytes32(params.length));
-  //   // signatures
-  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 5), bytes32(params.length));
-  //   // calldatas
-  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 6), bytes32(params.length));
-  //   // withDelegateCalls
-  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 7), bytes32(params.length));
-  //   // startBlock
-  //   vm.store(
-  //     address(AaveGovernanceV2.GOV),
-  //     bytes32(proposalBaseSlot + 8),
-  //     bytes32(block.number - 1)
-  //   );
-  //   // endBlock
-  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 9), bytes32(block.number));
-  //   // executionTime
-  //   vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 10), bytes32(params.length));
-  //   // forVotes
-  //   vm.store(
-  //     address(AaveGovernanceV2.GOV),
-  //     bytes32(proposalBaseSlot + 11),
-  //     bytes32(uint256(10_000_000 ether))
-  //   );
-  //   // strategy
-  //   vm.store(
-  //     address(AaveGovernanceV2.GOV),
-  //     bytes32(proposalBaseSlot + 15),
-  //     bytes32(uint256(uint160(0xb7e383ef9B1E9189Fc0F71fb30af8aa14377429e)))
-  //   );
-  //   // store actual values
-  //   for (uint256 i = 0; i < params.length; i++) {
-  //     // targets
-  //     vm.store(
-  //       address(AaveGovernanceV2.GOV),
-  //       bytes32(_arrLocation(proposalBaseSlot + 3, i, 1)),
-  //       bytes32(uint256(uint160(params[i].target)))
-  //     );
-  //     // values
-  //     vm.store(
-  //       address(AaveGovernanceV2.GOV),
-  //       bytes32(_arrLocation(proposalBaseSlot + 4, i, 1)),
-  //       bytes32(0)
-  //     );
-  //     // signatures
-  //     if (bytes(params[i].signature).length > 31) revert LongBytesNotSupportedYet();
-  //     vm.store(
-  //       address(AaveGovernanceV2.GOV),
-  //       bytes32(_arrLocation(proposalBaseSlot + 5, i, 1)),
-  //       bytes32(
-  //         bytes.concat(
-  //           bytes31(bytes(params[i].signature)),
-  //           bytes1(uint8(bytes(params[i].signature).length * 2))
-  //         )
-  //       )
-  //     );
-  //     // calldatas
-  //     if (params[i].callData.length > 31) revert LongBytesNotSupportedYet();
-  //     vm.store(
-  //       address(AaveGovernanceV2.GOV),
-  //       bytes32(_arrLocation(proposalBaseSlot + 6, i, 1)),
-  //       bytes32(
-  //         bytes.concat(
-  //           bytes31(bytes(params[i].callData)),
-  //           bytes1(uint8(bytes(params[i].callData).length * 2))
-  //         )
-  //       )
-  //     );
-  //     // withDelegateCalls
-  //     vm.store(
-  //       address(AaveGovernanceV2.GOV),
-  //       bytes32(_arrLocation(proposalBaseSlot + 7, i, 1)),
-  //       bytes32(uint256(1))
-  //     );
-  //   }
-  //   return proposalCount;
-  // }
+    // set storage array sizes
+    // proposals
+    uint256 proposalBaseSlot = _getStorageSlotUintMapping(4, proposalCount);
+    // id
+    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot), bytes32(proposalCount));
+    // creator
+    vm.store(
+      address(AaveGovernanceV2.GOV),
+      bytes32(proposalBaseSlot + 1),
+      bytes32(uint256(uint160(msg.sender)))
+    );
+    vm.store(
+      address(AaveGovernanceV2.GOV),
+      bytes32(proposalBaseSlot + 2),
+      bytes32(uint256(uint160(l1Executor)))
+    );
+    // targets
+    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 3), bytes32(params.length));
+    // values
+    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 4), bytes32(params.length));
+    // signatures
+    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 5), bytes32(params.length));
+    // calldatas
+    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 6), bytes32(params.length));
+    // withDelegateCalls
+    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 7), bytes32(params.length));
+    // block math
+    uint256 dalay = AaveGovernanceV2.GOV.getVotingDelay();
+    uint256 duration = IProposalValidator(l1Executor).VOTING_DURATION();
+    uint256 executionDelay = IExecutorWithTimelock(l1Executor).getDelay();
+    uint256 executionTime = block.timestamp - executionDelay;
+    // startBlock
+    vm.store(
+      address(AaveGovernanceV2.GOV),
+      bytes32(proposalBaseSlot + 8),
+      bytes32(block.number - dalay - duration - 1)
+    );
+    // endBlock
+    vm.store(
+      address(AaveGovernanceV2.GOV),
+      bytes32(proposalBaseSlot + 9),
+      bytes32(block.number - 1)
+    );
+    // executionTime
+    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 10), bytes32(executionTime));
+    // forVotes
+    vm.store(
+      address(AaveGovernanceV2.GOV),
+      bytes32(proposalBaseSlot + 11),
+      bytes32(uint256(10_000_000 ether)) // TODO: calculate needed amount
+    );
+    // strategy
+    vm.store(
+      address(AaveGovernanceV2.GOV),
+      bytes32(proposalBaseSlot + 13),
+      bytes32(uint256(uint160(0xb7e383ef9B1E9189Fc0F71fb30af8aa14377429e)) << 16) // TODO: fetch strategy
+    );
+    // store actual values
+    for (uint256 i = 0; i < params.length; i++) {
+      bytes32 queueHash = keccak256(
+        abi.encode(params[i].target, 0, params[i].signature, params[i].callData, true)
+      );
+      // queue hash on executor
+      vm.store(
+        l1Executor,
+        bytes32(_getStorageSlotBytes32Mapping(3, queueHash)),
+        bytes32(uint256(1))
+      );
+      // targets
+      vm.store(
+        address(AaveGovernanceV2.GOV),
+        bytes32(_arrLocation(proposalBaseSlot + 3, i, 1)),
+        bytes32(uint256(uint160(params[i].target)))
+      );
+      // values
+      vm.store(
+        address(AaveGovernanceV2.GOV),
+        bytes32(_arrLocation(proposalBaseSlot + 4, i, 1)),
+        bytes32(0)
+      );
+      // signatures
+      if (bytes(params[i].signature).length > 31) revert LongBytesNotSupportedYet();
+      vm.store(
+        address(AaveGovernanceV2.GOV),
+        bytes32(_arrLocation(proposalBaseSlot + 5, i, 1)),
+        bytes32(
+          bytes.concat(
+            bytes31(bytes(params[i].signature)),
+            bytes1(uint8(bytes(params[i].signature).length * 2))
+          )
+        )
+      );
+      // calldatas
+      if (params[i].callData.length > 31) revert LongBytesNotSupportedYet();
+      vm.store(
+        address(AaveGovernanceV2.GOV),
+        bytes32(_arrLocation(proposalBaseSlot + 6, i, 1)),
+        bytes32(
+          bytes.concat(
+            bytes31(bytes(params[i].callData)),
+            bytes1(uint8(bytes(params[i].callData).length * 2))
+          )
+        )
+      );
+      // withDelegateCalls
+      vm.store(
+        address(AaveGovernanceV2.GOV),
+        bytes32(_arrLocation(proposalBaseSlot + 7, i, 1)),
+        bytes32(uint256(1))
+      );
+    }
+    return proposalCount;
+  }
 
   function _getExecutor() internal view returns (address) {
     if (block.chainid == ChainIds.OPTIMISM) return AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR;
