@@ -424,6 +424,26 @@ library GovHelpers {
     address l1Executor,
     Payload[] memory params
   ) internal returns (uint256) {
+    //  struct Proposal {
+    //   uint256 id; // 0
+    //   address creator; // 1
+    //   IExecutorWithTimelock executor; // 2
+    //   address[] targets; // 3
+    //   uint256[] values; // 4
+    //   string[] signatures; // 5
+    //   bytes[] calldatas; // 6
+    //   bool[] withDelegatecalls; // 7
+    //   uint256 startBlock; // 8
+    //   uint256 endBlock; // 9
+    //   uint256 executionTime; // 10
+    //   uint256 forVotes; // 11
+    //   uint256 againstVotes; // 12
+    //   bool executed; // 13 0-8
+    //   bool canceled; // 13 9-16
+    //   address strategy; // 13 16-176
+    //   bytes32 ipfsHash; // 14
+    //   mapping(address => Vote) votes; // 15
+    // }
     // count is stored in slot 5
     uint256 proposalCount = uint256(vm.load(address(AaveGovernanceV2.GOV), bytes32(uint256(3))));
     // bump counter by 1
