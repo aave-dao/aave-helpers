@@ -13,6 +13,7 @@ import {AaveV3Fantom} from 'aave-address-book/AaveV3Fantom.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {ChainIds} from './ChainIds.sol';
+import {StorageHelpers} from './StorageHelpers.sol';
 
 interface CommonExecutor {
   /**
@@ -407,7 +408,7 @@ library GovHelpers {
    */
   function executeActionSet(Vm vm, uint256 actionSetId) internal {
     address executor = _getExecutor();
-    uint256 proposalBaseSlot = _getStorageSlotUintMapping(6, actionSetId);
+    uint256 proposalBaseSlot = StorageHelpers.getStorageSlotUintMapping(6, actionSetId);
     vm.store(executor, bytes32(proposalBaseSlot + 5), bytes32(block.timestamp));
     CommonExecutor(executor).execute(actionSetId);
   }
@@ -439,15 +440,6 @@ library GovHelpers {
       Payload[] memory proposals = new Payload[](1);
       proposals[0] = Payload(payloadAddress, 'execute()', '');
       uint256 proposalId = _queueProposalToL1ExecutorStorage(vm, executor, proposals);
-      // IAaveGovernanceV2.ProposalWithoutVotes memory proposal = AaveGovernanceV2.GOV.getProposalById(
-      //   proposalId
-      // );
-      // console2.log(address(proposal.executor));
-      // console2.log(proposal.forVotes);
-      // console2.log(address(proposal.strategy));
-      // console2.log(proposal.executionTime);
-      console2.log(uint256(AaveGovernanceV2.GOV.getProposalState(proposalId)));
-
       AaveGovernanceV2.GOV.execute(proposalId);
     } else if (_getExecutor() == executor) {
       Payload[] memory proposals = new Payload[](1);
@@ -459,28 +451,6 @@ library GovHelpers {
       vm.etch(executor, address(mockExecutor).code);
       MockExecutor(executor).execute(payloadAddress);
     }
-  }
-
-  function _getStorageSlotUintMapping(
-    uint256 baseSlot,
-    uint256 key
-  ) internal pure returns (uint256) {
-    return uint256(keccak256(abi.encode(key, baseSlot)));
-  }
-
-  function _getStorageSlotBytes32Mapping(
-    uint256 baseSlot,
-    bytes32 key
-  ) internal pure returns (uint256) {
-    return uint256(keccak256(abi.encode(key, baseSlot)));
-  }
-
-  function _arrLocation(
-    uint256 slot,
-    uint256 index,
-    uint256 elementSize
-  ) internal pure returns (uint256) {
-    return uint256(keccak256(abi.encode(slot))) + (index * elementSize);
   }
 
   /**
@@ -500,7 +470,7 @@ library GovHelpers {
 
     // set storage array sizes
     // actionSetSlot
-    uint256 proposalBaseSlot = _getStorageSlotUintMapping(6, proposalCount);
+    uint256 proposalBaseSlot = StorageHelpers.getStorageSlotUintMapping(6, proposalCount);
     // targets
     vm.store(l2Executor, bytes32(proposalBaseSlot), bytes32(params.length));
     // values
@@ -517,16 +487,20 @@ library GovHelpers {
       // targets
       vm.store(
         l2Executor,
-        bytes32(_arrLocation(proposalBaseSlot, i, 1)),
+        bytes32(StorageHelpers.arrLocation(proposalBaseSlot, i, 1)),
         bytes32(uint256(uint160(params[i].target)))
       );
       // values
-      vm.store(l2Executor, bytes32(_arrLocation(proposalBaseSlot + 1, i, 1)), bytes32(0));
+      vm.store(
+        l2Executor,
+        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 1, i, 1)),
+        bytes32(0)
+      );
       // signatures
       if (bytes(params[i].signature).length > 31) revert LongBytesNotSupportedYet();
       vm.store(
         l2Executor,
-        bytes32(_arrLocation(proposalBaseSlot + 2, i, 1)),
+        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 2, i, 1)),
         bytes32(
           bytes.concat(
             bytes31(bytes(params[i].signature)),
@@ -538,7 +512,7 @@ library GovHelpers {
       if (params[i].callData.length > 31) revert LongBytesNotSupportedYet();
       vm.store(
         l2Executor,
-        bytes32(_arrLocation(proposalBaseSlot + 3, i, 1)),
+        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 3, i, 1)),
         bytes32(
           bytes.concat(
             bytes31(bytes(params[i].callData)),
@@ -547,7 +521,11 @@ library GovHelpers {
         )
       );
       // withDelegateCalls
-      vm.store(l2Executor, bytes32(_arrLocation(proposalBaseSlot + 4, i, 1)), bytes32(uint256(1)));
+      vm.store(
+        l2Executor,
+        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 4, i, 1)),
+        bytes32(uint256(1))
+      );
     }
     // executiontime
     vm.store(l2Executor, bytes32(proposalBaseSlot + 5), bytes32(block.timestamp));
@@ -571,7 +549,7 @@ library GovHelpers {
 
     // set storage array sizes
     // proposals
-    uint256 proposalBaseSlot = _getStorageSlotUintMapping(4, proposalCount);
+    uint256 proposalBaseSlot = StorageHelpers.getStorageSlotUintMapping(4, proposalCount);
     // id
     vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot), bytes32(proposalCount));
     // creator
@@ -597,15 +575,15 @@ library GovHelpers {
     // withDelegateCalls
     vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 7), bytes32(params.length));
     // block math
-    uint256 dalay = AaveGovernanceV2.GOV.getVotingDelay();
-    uint256 duration = IProposalValidator(l1Executor).VOTING_DURATION();
-    uint256 executionDelay = IExecutorWithTimelock(l1Executor).getDelay();
-    uint256 executionTime = block.timestamp - executionDelay;
+    uint256 dalay = AaveGovernanceV2.GOV.getVotingDelay(); // (blocks) delay in voting blocks before voting can happen
+    uint256 duration = IProposalValidator(l1Executor).VOTING_DURATION(); // (blocks) duration of the voting
+    uint256 executionTime = block.timestamp;
+    // @dev the block timings are not accurate, but enough to satisfy execution
     // startBlock
     vm.store(
       address(AaveGovernanceV2.GOV),
       bytes32(proposalBaseSlot + 8),
-      bytes32(block.number - dalay - duration - 1)
+      bytes32(block.number - (dalay + duration))
     );
     // endBlock
     vm.store(
@@ -643,7 +621,7 @@ library GovHelpers {
       vm.store(
         l1Executor,
         bytes32(
-          _getStorageSlotBytes32Mapping(
+          StorageHelpers.getStorageSlotBytes32Mapping(
             // the mapping slot is 3 on short and 7 on long
             l1Executor == AaveGovernanceV2.SHORT_EXECUTOR ? 3 : 7,
             queueHash
@@ -654,20 +632,20 @@ library GovHelpers {
       // targets
       vm.store(
         address(AaveGovernanceV2.GOV),
-        bytes32(_arrLocation(proposalBaseSlot + 3, i, 1)),
+        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 3, i, 1)),
         bytes32(uint256(uint160(params[i].target)))
       );
       // values
       vm.store(
         address(AaveGovernanceV2.GOV),
-        bytes32(_arrLocation(proposalBaseSlot + 4, i, 1)),
+        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 4, i, 1)),
         bytes32(0)
       );
       // signatures
       if (bytes(params[i].signature).length > 31) revert LongBytesNotSupportedYet();
       vm.store(
         address(AaveGovernanceV2.GOV),
-        bytes32(_arrLocation(proposalBaseSlot + 5, i, 1)),
+        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 5, i, 1)),
         bytes32(
           bytes.concat(
             bytes31(bytes(params[i].signature)),
@@ -679,7 +657,7 @@ library GovHelpers {
       if (params[i].callData.length > 31) revert LongBytesNotSupportedYet();
       vm.store(
         address(AaveGovernanceV2.GOV),
-        bytes32(_arrLocation(proposalBaseSlot + 6, i, 1)),
+        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 6, i, 1)),
         bytes32(
           bytes.concat(
             bytes31(bytes(params[i].callData)),
@@ -690,7 +668,7 @@ library GovHelpers {
       // withDelegateCalls
       vm.store(
         address(AaveGovernanceV2.GOV),
-        bytes32(_arrLocation(proposalBaseSlot + 7, i, 1)),
+        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 7, i, 1)),
         bytes32(uint256(1))
       );
     }

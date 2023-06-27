@@ -55,17 +55,17 @@ contract GovernanceMainnetExecutorTest is Test {
     vm.createSelectFork('mainnet', 17570714);
   }
 
-  // function testCreateProposalShort() public {
-  //   PayloadWithEmit payload = new PayloadWithEmit();
-  //   vm.expectEmit(true, true, true, true);
-  //   emit TestEvent();
-  //   GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.SHORT_EXECUTOR);
-  // }
+  function testCreateProposalShort() public {
+    PayloadWithEmit payload = new PayloadWithEmit();
+    vm.expectEmit(true, true, true, true);
+    emit TestEvent();
+    GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.SHORT_EXECUTOR);
+  }
 
   function testCreateProposalLong() public {
     PayloadWithEmit payload = new PayloadWithEmit();
-    // vm.expectEmit(true, true, true, true);
-    // emit TestEvent();
+    vm.expectEmit(true, true, true, true);
+    emit TestEvent();
     GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.LONG_EXECUTOR);
   }
 }
