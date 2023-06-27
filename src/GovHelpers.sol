@@ -624,12 +624,19 @@ library GovHelpers {
     vm.store(
       address(AaveGovernanceV2.GOV),
       bytes32(proposalBaseSlot + 13),
-      bytes32(uint256(uint160(0xb7e383ef9B1E9189Fc0F71fb30af8aa14377429e)) << 16) // TODO: fetch strategy
+      bytes32(uint256(uint160(AaveGovernanceV2.GOV.getGovernanceStrategy())) << 16)
     );
     // store actual values
     for (uint256 i = 0; i < params.length; i++) {
       bytes32 queueHash = keccak256(
-        abi.encode(params[i].target, 0, params[i].signature, params[i].callData, true)
+        abi.encode(
+          params[i].target,
+          0,
+          params[i].signature,
+          params[i].callData,
+          executionTime,
+          true
+        )
       );
       // queue hash on executor
       vm.store(
