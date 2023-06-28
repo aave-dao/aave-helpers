@@ -13,9 +13,7 @@ on:
 jobs:
   test:
     uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@main
-    secrets:
-      RPC_POLYGON: ${{secrets.RPC_POLYGON}}
-      RPC_MAINNET: ${{secrets.RPC_MAINNET}}
+    secrets: inherit
   release:
     needs: [test]
     uses: bgd-labs/github-workflows/.github/workflows/release.yml@main
