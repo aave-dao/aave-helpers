@@ -64,6 +64,9 @@ struct InterestStrategyValues {
   uint256 variableRateSlope2;
 }
 
+/**
+ * only applicable to harmony at this point
+ */
 contract ProtocolV3TestBase is CommonTestBase {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
   using SafeERC20 for IERC20;
@@ -588,7 +591,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     localConfig.liquidationProtocolFee = configuration.getLiquidationProtocolFee();
     localConfig.isBorrowableInIsolation = configuration.getBorrowableInIsolation();
 
-    localConfig.isFlashloanable = false;
+    localConfig.isFlashloanable = configuration.getFlashLoanEnabled();
 
     return localConfig;
   }
@@ -1045,7 +1048,10 @@ contract ProtocolV3TestBase is CommonTestBase {
   }
 }
 
-contract ProtocolV3_0_1TestBase is ProtocolV3TestBase {
+/**
+ * only applicable to v3 harmony at this point
+ */
+contract ProtocolV3LegacyTestBase is ProtocolV3TestBase {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
 
   function _getStructReserveConfig(
@@ -1083,7 +1089,7 @@ contract ProtocolV3_0_1TestBase is ProtocolV3TestBase {
     localConfig.liquidationProtocolFee = configuration.getLiquidationProtocolFee();
     localConfig.isBorrowableInIsolation = configuration.getBorrowableInIsolation();
 
-    localConfig.isFlashloanable = configuration.getFlashLoanEnabled();
+    localConfig.isFlashloanable = false;
 
     return localConfig;
   }
