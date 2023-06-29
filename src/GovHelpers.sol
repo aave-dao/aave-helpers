@@ -151,18 +151,18 @@ library GovHelpers {
   }
 
   function createProposal(
-    address executor,
     Payload[] memory payloads,
-    bytes32 ipfsHash
+    bytes32 ipfsHash,
+    address executor
   ) internal returns (uint256) {
     return _createProposal(executor, payloads, ipfsHash, false);
   }
 
   function createProposal(
-    address executor,
     Payload[] memory payloads,
     bytes32 ipfsHash,
-    bool emitLog
+    bool emitLog,
+    address executor
   ) internal returns (uint256) {
     return _createProposal(executor, payloads, ipfsHash, emitLog);
   }
@@ -223,8 +223,8 @@ library GovHelpers {
    */
   function createTestProposal(
     Vm vm,
-    address executor,
-    Payload[] memory payloads
+    Payload[] memory payloads,
+    address executor
   ) internal returns (uint256) {
     vm.deal(AaveMisc.ECOSYSTEM_RESERVE, 1 ether);
     vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
@@ -266,7 +266,7 @@ library GovHelpers {
    */
   function executeLatestActionSet(Vm vm, address executor) internal {
     uint256 proposalCount = uint256(vm.load(executor, bytes32(uint256(5))));
-    executeActionSet(vm, executor, proposalCount - 1);
+    executeActionSet(vm, proposalCount - 1, executor);
   }
 
   /**
@@ -274,7 +274,7 @@ library GovHelpers {
    * @param vm Vm instance passed down from test
    * @param actionSetId id of actionset to execute
    */
-  function executeActionSet(Vm vm, address executor, uint256 actionSetId) internal {
+  function executeActionSet(Vm vm, uint256 actionSetId, address executor) internal {
     uint256 proposalBaseSlot = StorageHelpers.getStorageSlotUintMapping(6, actionSetId);
     vm.store(executor, bytes32(proposalBaseSlot + 5), bytes32(block.timestamp));
     CommonExecutor(executor).execute(actionSetId);
@@ -287,7 +287,7 @@ library GovHelpers {
    * @param executor address of the executor
    * @param payloadAddress address of payload to execute
    */
-  function executePayload(Vm vm, address executor, address payloadAddress) internal {
+  function executePayload(Vm vm, address payloadAddress, address executor) internal {
     if (
       block.chainid == ChainIds.MAINNET &&
       (executor == AaveGovernanceV2.SHORT_EXECUTOR || executor == AaveGovernanceV2.LONG_EXECUTOR)
@@ -563,8 +563,6 @@ library GovHelpers {
   }
 
   function _isKnownL2Executor(address executor) internal view returns (bool) {
-    console2.log(executor);
-    console2.log(block.chainid);
     if (executor == AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR && block.chainid == ChainIds.OPTIMISM)
       return true;
     if (executor == AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR && block.chainid == ChainIds.POLYGON)

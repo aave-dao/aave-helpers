@@ -32,7 +32,7 @@ contract AaveV2ConfigEngineTest is ProtocolV2TestBase {
 
     createConfigurationSnapshot('preTestV2RatesUpdates', AaveV2Ethereum.POOL);
 
-    GovHelpers.executePayload(vm, AaveGovernanceV2.SHORT_EXECUTOR, address(payload));
+    GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.SHORT_EXECUTOR);
 
     createConfigurationSnapshot('postTestV2RatesUpdates', AaveV2Ethereum.POOL);
 
