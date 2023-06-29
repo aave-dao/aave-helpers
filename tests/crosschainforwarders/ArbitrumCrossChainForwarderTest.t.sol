@@ -71,8 +71,10 @@ contract ArbitrumCrossChainForwarderTest is ProtocolV3TestBase {
     GovHelpers.Payload[] memory payloads = new GovHelpers.Payload[](1);
     payloads[0] = GovHelpers.Payload({
       target: address(forwarder),
+      value: 0,
       signature: 'execute(address)',
-      callData: abi.encode(address(payloadWithEmit))
+      callData: abi.encode(address(payloadWithEmit)),
+      withDelegatecall: true
     });
 
     uint256 proposalId = GovHelpers.createProposal(
@@ -141,6 +143,6 @@ contract ArbitrumCrossChainForwarderTest is ProtocolV3TestBase {
     // 4. execute the proposal
     vm.expectEmit(true, true, true, true);
     emit TestEvent();
-    GovHelpers.executeLatestActionSet(vm);
+    GovHelpers.executeLatestActionSet(vm, ARBITRUM_BRIDGE_EXECUTOR);
   }
 }

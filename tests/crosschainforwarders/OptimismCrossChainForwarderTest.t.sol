@@ -42,6 +42,8 @@ contract OptimismCrossChainForwarderTest is ProtocolV3TestBase {
     vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
     GovHelpers.Payload[] memory payloads = new GovHelpers.Payload[](1);
     payloads[0] = GovHelpers.Payload({
+      value: 0,
+      withDelegatecall: true,
       target: address(forwarder),
       signature: 'execute(address)',
       callData: abi.encode(address(payloadWithEmit))
@@ -73,6 +75,6 @@ contract OptimismCrossChainForwarderTest is ProtocolV3TestBase {
     // 4. execute proposal on l2
     vm.expectEmit(true, true, true, true);
     emit TestEvent();
-    GovHelpers.executeLatestActionSet(vm);
+    GovHelpers.executeLatestActionSet(vm, OPTIMISM_BRIDGE_EXECUTOR);
   }
 }

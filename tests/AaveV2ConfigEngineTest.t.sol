@@ -9,10 +9,10 @@ import {AaveV2Ethereum} from 'aave-address-book/AaveAddressBook.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {IV2RateStrategyFactory} from '../src/v2-config-engine/IV2RateStrategyFactory.sol';
-import {TestWithExecutor} from '../src/GovHelpers.sol';
+import {GovHelpers} from '../src/GovHelpers.sol';
 import '../src/ProtocolV2TestBase.sol';
 
-contract AaveV2ConfigEngineTest is ProtocolV2TestBase, TestWithExecutor {
+contract AaveV2ConfigEngineTest is ProtocolV2TestBase {
   using stdStorage for StdStorage;
 
   function testV2RateStrategiesUpdates() public {
@@ -32,8 +32,7 @@ contract AaveV2ConfigEngineTest is ProtocolV2TestBase, TestWithExecutor {
 
     createConfigurationSnapshot('preTestV2RatesUpdates', AaveV2Ethereum.POOL);
 
-    _selectPayloadExecutor(AaveGovernanceV2.SHORT_EXECUTOR);
-    _executePayload(address(payload));
+    GovHelpers.executePayload(vm, AaveGovernanceV2.SHORT_EXECUTOR, address(payload));
 
     createConfigurationSnapshot('postTestV2RatesUpdates', AaveV2Ethereum.POOL);
 

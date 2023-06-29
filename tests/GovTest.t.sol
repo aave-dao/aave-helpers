@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
-import {GovHelpers, TestWithExecutor} from '../src/GovHelpers.sol';
+import {GovHelpers} from '../src/GovHelpers.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
@@ -44,7 +44,7 @@ contract GovernanceL2ExecutorTest is Test {
     PayloadWithEmit payload = new PayloadWithEmit();
     vm.expectEmit(true, true, true, true);
     emit TestEvent();
-    GovHelpers.executePayload(vm, address(payload));
+    GovHelpers.executePayload(vm, AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR, address(payload));
   }
 }
 
@@ -59,14 +59,14 @@ contract GovernanceMainnetExecutorTest is Test {
     PayloadWithEmit payload = new PayloadWithEmit();
     vm.expectEmit(true, true, true, true);
     emit TestEvent();
-    GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.SHORT_EXECUTOR);
+    GovHelpers.executePayload(vm, AaveGovernanceV2.SHORT_EXECUTOR, address(payload));
   }
 
   function testCreateProposalLong() public {
     PayloadWithEmit payload = new PayloadWithEmit();
     vm.expectEmit(true, true, true, true);
     emit TestEvent();
-    GovHelpers.executePayload(vm, address(payload), AaveGovernanceV2.LONG_EXECUTOR);
+    GovHelpers.executePayload(vm, AaveGovernanceV2.LONG_EXECUTOR, address(payload));
   }
 }
 

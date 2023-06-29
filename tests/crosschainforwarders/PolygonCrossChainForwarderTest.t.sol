@@ -23,7 +23,7 @@ contract PolygonCrossChainForwarderTest is ProtocolV3TestBase {
 
   address public constant FX_CHILD_ADDRESS = 0x8397259c983751DAf40400790063935a11afa28a;
 
-  address public constant POLYGON_BRIDGE_EXECUTOR = 0xdc9A35B16DB4e126cFeDC41322b3a36454B1F772;
+  address public constant POLYGON_BRIDGE_EXECUTOR = AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR;
 
   PayloadWithEmit public payloadWithEmit;
 
@@ -47,6 +47,8 @@ contract PolygonCrossChainForwarderTest is ProtocolV3TestBase {
     vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
     GovHelpers.Payload[] memory payloads = new GovHelpers.Payload[](1);
     payloads[0] = GovHelpers.Payload({
+      value: 0,
+      withDelegatecall: true,
       target: address(forwarder),
       signature: 'execute(address)',
       callData: abi.encode(address(payloadWithEmit))
@@ -78,6 +80,6 @@ contract PolygonCrossChainForwarderTest is ProtocolV3TestBase {
     // 4. Forward time & execute proposal
     vm.expectEmit(true, true, true, true);
     emit TestEvent();
-    GovHelpers.executeLatestActionSet(vm);
+    GovHelpers.executeLatestActionSet(vm, POLYGON_BRIDGE_EXECUTOR);
   }
 }
