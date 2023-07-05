@@ -74,6 +74,7 @@ library GovHelpers {
   }
 
   function buildMainnet(address payloadAddress) internal pure returns (Payload memory) {
+    require(payloadAddress != address(0), 'NON_ZERO_TARGET');
     require(
       payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_OPTIMISM &&
         payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_METIS &&
@@ -128,6 +129,7 @@ library GovHelpers {
     address forwarder,
     address payloadAddress
   ) private pure returns (Payload memory) {
+    require(payloadAddress != address(0), 'NON_ZERO_TARGET');
     return
       Payload({
         target: forwarder,
