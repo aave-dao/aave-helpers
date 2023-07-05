@@ -156,10 +156,8 @@ contract ProtocolV2TestBase is CommonTestBase {
     uint256 amount,
     bool stable
   ) internal {
-    uint256 snapshot = vm.snapshot();
     this._borrow(testAssetConfig, pool, borrower, amount, stable);
     _repay(testAssetConfig, pool, borrower, amount, stable);
-    vm.revertTo(snapshot);
   }
 
   /**
