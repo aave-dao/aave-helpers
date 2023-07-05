@@ -201,10 +201,13 @@ contract ProtocolV3TestBase is CommonTestBase {
     ReserveConfig[] memory configs
   ) private pure returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
-      if (configs[i].usageAsCollateralEnabled && !configs[i].stableBorrowRateEnabled)
-        return configs[i];
+      if (
+        _includeInE2e(configs[i]) &&
+        configs[i].usageAsCollateralEnabled &&
+        !configs[i].stableBorrowRateEnabled
+      ) return configs[i];
     }
-    revert('ERROR: No collateral found');
+    revert('ERROR: No usable collateral found');
   }
 
   function _deposit(

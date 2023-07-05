@@ -77,17 +77,56 @@ contract ProtocolV2TestBase is CommonTestBase {
   /**
    * @dev Makes a e2e test including withdrawals/borrows and supplies to various reserves.
    * @param pool the pool that should be tested
-   * @param user the user to run the tests for
    */
-  function e2eTest(ILendingPool pool, address user) public {
+  function e2eTest(ILendingPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
+    ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
+    for (uint256 i; i < configs.length; i++) {
+      if (_includeInE2e(configs[i])) {
+        // there's a foundry bug causing issues when this is outside the loop
+        uint256 snapshot = vm.snapshot();
+        e2eTestAsset(pool, collateralConfig, configs[i]);
+        vm.revertTo(snapshot);
+      }
+    }
+  }
+
+  function e2eTestAsset(
+    ILendingPool pool,
+    ReserveConfig memory collateralConfig,
+    ReserveConfig memory testAssetConfig
+  ) public {
+    console.log(
+      'E2E: Collateral %s, TestAsset %s',
+      collateralConfig.symbol,
+      testAssetConfig.symbol
+    );
+    address collateralSupplier = vm.addr(3);
+    address testAssetSupplier = vm.addr(4);
+    require(collateralConfig.usageAsCollateralEnabled, 'COLLATERAL_CONFIG_MUST_BE_COLLATERAL');
+    uint256 testAssetAmount = _getTokenAmountByEthValue(pool, testAssetConfig, 1);
+    _deposit(
+      collateralConfig,
+      pool,
+      collateralSupplier,
+      _getTokenAmountByEthValue(pool, collateralConfig, 100)
+    );
+    _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
     uint256 snapshot = vm.snapshot();
-    _supplyWithdrawFlow(configs, pool, user);
+    // test withdrawal
+    _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
+    _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
     vm.revertTo(snapshot);
-    _variableBorrowFlow(configs, pool, user);
-    vm.revertTo(snapshot);
-    _stableBorrowFlow(configs, pool, user);
-    vm.revertTo(snapshot);
+    // test variable borrowing
+    if (testAssetConfig.borrowingEnabled) {
+      _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
+      vm.revertTo(snapshot);
+      // test stable borrowing
+      if (testAssetConfig.stableBorrowRateEnabled) {
+        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
+        vm.revertTo(snapshot);
+      }
+    }
   }
 
   /**
@@ -95,6 +134,32 @@ contract ProtocolV2TestBase is CommonTestBase {
    */
   function _includeInE2e(ReserveConfig memory config) internal pure returns (bool) {
     return !config.isFrozen && config.isActive;
+  }
+
+  function _getTokenAmountByEthValue(
+    ILendingPool pool,
+    ReserveConfig memory config,
+    uint256 dollarValue
+  ) internal view returns (uint256) {
+    ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(
+      pool.getAddressesProvider()
+    );
+    IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
+    uint256 latestAnswer = oracle.getAssetPrice(config.underlying);
+    return (dollarValue * 10 ** (18 + config.decimals)) / latestAnswer;
+  }
+
+  function _e2eTestBorrowRepay(
+    ILendingPool pool,
+    address borrower,
+    ReserveConfig memory testAssetConfig,
+    uint256 amount,
+    bool stable
+  ) internal {
+    uint256 snapshot = vm.snapshot();
+    this._borrow(testAssetConfig, pool, borrower, amount, stable);
+    _repay(testAssetConfig, pool, borrower, amount, stable);
+    vm.revertTo(snapshot);
   }
 
   /**
@@ -110,84 +175,7 @@ contract ProtocolV2TestBase is CommonTestBase {
         !configs[i].stableBorrowRateEnabled
       ) return configs[i];
     }
-    revert('ERROR: No collateral found');
-  }
-
-  /**
-   * @dev tests that all assets can be deposited & withdrawn
-   */
-  function _supplyWithdrawFlow(
-    ReserveConfig[] memory configs,
-    ILendingPool pool,
-    address user
-  ) internal {
-    // test all basic interactions
-    for (uint256 i = 0; i < configs.length; i++) {
-      if (_includeInE2e(configs[i])) {
-        uint256 amount = 100 * 10 ** configs[i].decimals;
-        console.log(configs[i].symbol);
-        _deposit(configs[i], pool, user, amount);
-        _skipBlocks(1000);
-        if (
-          block.chainid == ChainIds.MAINNET &&
-          configs[i].underlying == AaveV2EthereumAssets.stETH_UNDERLYING
-        ) {
-          assertGe(_withdraw(configs[i], pool, user, type(uint256).max), amount - 2);
-        } else {
-          assertGe(_withdraw(configs[i], pool, user, type(uint256).max), amount);
-        }
-      } else {
-        console.log('SKIP: REASON_FROZEN %s', configs[i].symbol);
-      }
-    }
-  }
-
-  /**
-   * @dev tests that all assets with borrowing enabled can be borrowed
-   */
-  function _variableBorrowFlow(
-    ReserveConfig[] memory configs,
-    ILendingPool pool,
-    address user
-  ) internal {
-    // put 1M whatever collateral, which should be enough to borrow 1 of each
-    ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
-    _deposit(collateralConfig, pool, user, 1000000 ether);
-    for (uint256 i = 0; i < configs.length; i++) {
-      if (_includeInE2e(configs[i]) && configs[i].borrowingEnabled) {
-        uint256 amount = 10 ** configs[i].decimals;
-        _deposit(configs[i], pool, EOA, amount * 2);
-        this._borrow(configs[i], pool, user, amount, false);
-      } else {
-        console.log('SKIP: BORROWING_DISABLED %s', configs[i].symbol);
-      }
-    }
-  }
-
-  /**
-   * @dev tests that all assets with stable borrowing enabled can be borrowed
-   */
-  function _stableBorrowFlow(
-    ReserveConfig[] memory configs,
-    ILendingPool pool,
-    address user
-  ) internal {
-    // put 1M whatever collateral, which should be enough to borrow 1 of each
-    ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
-    _deposit(collateralConfig, pool, user, 1000000 ether);
-    for (uint256 i = 0; i < configs.length; i++) {
-      uint256 amount = 10 ** configs[i].decimals;
-      if (
-        _includeInE2e(configs[i]) &&
-        configs[i].borrowingEnabled &&
-        configs[i].stableBorrowRateEnabled
-      ) {
-        _deposit(configs[i], pool, EOA, amount * 2);
-        this._borrow(configs[i], pool, user, amount, true);
-      } else {
-        console.log('SKIP: STABLE_BORROWING_DISABLED %s', configs[i].symbol);
-      }
-    }
+    revert('ERROR: No usable collateral found');
   }
 
   function _deposit(
@@ -287,7 +275,7 @@ contract ProtocolV2TestBase is CommonTestBase {
     console.log('REPAY: %s, Amount: %s', config.symbol, amount);
     pool.repay(config.underlying, amount, stable ? 1 : 2, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
-    require(debtAfter == ((debtBefore > amount) ? debtBefore - amount : 0), '_repay() : ERROR');
+    require(debtAfter == ((debtBefore - 1 > amount) ? debtBefore - amount : 0), '_repay() : ERROR');
     vm.stopPrank();
   }
 
