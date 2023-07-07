@@ -80,7 +80,7 @@ contract ProtocolV2TestBase is CommonTestBase {
    */
   function e2eTest(ILendingPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
+    ReserveConfig memory collateralConfig = _getGoodCollateral(configs);
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
         // there's a foundry bug causing issues when this is outside the loop
@@ -163,9 +163,9 @@ contract ProtocolV2TestBase is CommonTestBase {
   }
 
   /**
-   * @dev returns the first collateral in the list that cannot be borrowed in stable mode
+   * @dev returns a "good" collateral in the list that cannot be borrowed in stable mode
    */
-  function _getFirstCollateral(
+  function _getGoodCollateral(
     ReserveConfig[] memory configs
   ) private pure returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {

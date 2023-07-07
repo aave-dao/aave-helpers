@@ -114,7 +114,7 @@ contract ProtocolV3TestBase is CommonTestBase {
    */
   function e2eTest(IPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
+    ReserveConfig memory collateralConfig = _getGoodCollateral(pool, configs, 1000);
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
         // there's a foundry bug causing issues when this is outside the loop
@@ -146,7 +146,12 @@ contract ProtocolV3TestBase is CommonTestBase {
       console.log('Skip: %s, supply cap fully utilized', testAssetConfig.symbol);
       return;
     }
-    _deposit(collateralConfig, pool, collateralSupplier, 10_000 * 10 ** collateralConfig.decimals);
+    _deposit(
+      collateralConfig,
+      pool,
+      collateralSupplier,
+      _getTokenAmountByDollarValue(pool, collateralConfig, 10000)
+    );
     _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
     uint256 snapshot = vm.snapshot();
     // test withdrawal
@@ -195,16 +200,28 @@ contract ProtocolV3TestBase is CommonTestBase {
   }
 
   /**
-   * @dev returns the first collateral in the list that cannot be borrowed in stable mode
+   * @dev returns a "good" collateral in the list that cannot be borrowed in stable mode
    */
-  function _getFirstCollateral(
-    ReserveConfig[] memory configs
-  ) private pure returns (ReserveConfig memory config) {
+  function _getGoodCollateral(
+    IPool pool,
+    ReserveConfig[] memory configs,
+    uint256 minSupplyCapDollarMargin
+  ) private view returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
       if (
+        // not frozen etc
         _includeInE2e(configs[i]) &&
+        // usable as collateral
         configs[i].usageAsCollateralEnabled &&
-        !configs[i].stableBorrowRateEnabled
+        // not stable borrowable as this makes testing stable borrowing unnecessary hard to reason about
+        !configs[i].stableBorrowRateEnabled &&
+        // supply cap not yet reached
+        ((configs[i].supplyCap * 10 ** configs[i].decimals) >
+          IERC20(configs[i].aToken).totalSupply()) &&
+        (// supply cap margin big enough
+        (configs[i].supplyCap * 10 ** configs[i].decimals) -
+          IERC20(configs[i].aToken).totalSupply() >
+          _getTokenAmountByDollarValue(pool, configs[i], minSupplyCapDollarMargin))
       ) return configs[i];
     }
     revert('ERROR: No usable collateral found');
