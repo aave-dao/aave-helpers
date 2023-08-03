@@ -6,6 +6,7 @@ import {CrosschainForwarderPolygon} from '../src/crosschainforwarders/Crosschain
 import {CrosschainForwarderOptimism} from '../src/crosschainforwarders/CrosschainForwarderOptimism.sol';
 import {CrosschainForwarderArbitrum} from '../src/crosschainforwarders/CrosschainForwarderArbitrum.sol';
 import {CrosschainForwarderMetis} from '../src/crosschainforwarders/CrosschainForwarderMetis.sol';
+import {CrosschainForwarderBase} from '../src/crosschainforwarders/CrosschainForwarderBase.sol';
 
 contract DeployPol is EthereumScript {
   function run() external broadcast {
@@ -28,5 +29,11 @@ contract DeployArb is EthereumScript {
 contract DeployMet is EthereumScript {
   function run() external broadcast {
     new CrosschainForwarderMetis();
+  }
+}
+
+contract DeployBase is EthereumScript {
+  function run() external broadcast {
+    new CrosschainForwarderBase();
   }
 }
