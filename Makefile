@@ -31,7 +31,7 @@ deploy-forwarder-pol :;  forge script scripts/CrosschainForwarders.s.sol:DeployP
 deploy-forwarder-opt :;  forge script scripts/CrosschainForwarders.s.sol:DeployOpt --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-forwarder-arb :;  forge script scripts/CrosschainForwarders.s.sol:DeployArb --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-forwarder-met :;  forge script scripts/CrosschainForwarders.s.sol:DeployMet --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
-deploy-forwarder-base :;  forge script scripts/CrosschainForwarders.s.sol:DeployBase --rpc-url base --broadcast --ledger --mnemonics foo --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
+deploy-forwarder-base :;  forge script scripts/CrosschainForwarders.s.sol:DeployBase --rpc-url mainnet --broadcast --ledger --mnemonics foo --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-steward-eth :; forge script scripts/RiskStewards.s.sol:DeployEth --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-steward-pol :; forge script scripts/RiskStewards.s.sol:DeployPol --rpc-url polygon --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-steward-opt :; forge script scripts/RiskStewards.s.sol:DeployOpt --rpc-url optimism --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
