@@ -81,10 +81,9 @@ contract ProtocolV2TestBase is CommonTestBase {
   function e2eTest(ILendingPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ReserveConfig memory collateralConfig = _getGoodCollateral(configs);
+    uint256 snapshot = vm.snapshot();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
-        // there's a foundry bug causing issues when this is outside the loop
-        uint256 snapshot = vm.snapshot();
         e2eTestAsset(pool, collateralConfig, configs[i]);
         vm.revertTo(snapshot);
       }
