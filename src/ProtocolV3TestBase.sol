@@ -4,6 +4,7 @@ pragma solidity >=0.7.5 <0.9.0;
 import 'forge-std/Test.sol';
 import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
@@ -63,8 +64,12 @@ struct InterestStrategyValues {
   uint256 variableRateSlope2;
 }
 
+/**
+ * only applicable to harmony at this point
+ */
 contract ProtocolV3TestBase is CommonTestBase {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
+  using SafeERC20 for IERC20;
 
   /**
    * @dev Generates a markdown compatible snapshot of the whole pool configuration into `/reports`.
@@ -109,11 +114,10 @@ contract ProtocolV3TestBase is CommonTestBase {
    */
   function e2eTest(IPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
+    ReserveConfig memory collateralConfig = _getGoodCollateral(pool, configs, 1000);
+    uint256 snapshot = vm.snapshot();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
-        // there's a foundry bug causing issues when this is outside the loop
-        uint256 snapshot = vm.snapshot();
         e2eTestAsset(pool, collateralConfig, configs[i]);
         vm.revertTo(snapshot);
       }
@@ -141,7 +145,12 @@ contract ProtocolV3TestBase is CommonTestBase {
       console.log('Skip: %s, supply cap fully utilized', testAssetConfig.symbol);
       return;
     }
-    _deposit(collateralConfig, pool, collateralSupplier, 10_000 * 10 ** collateralConfig.decimals);
+    _deposit(
+      collateralConfig,
+      pool,
+      collateralSupplier,
+      _getTokenAmountByDollarValue(pool, collateralConfig, 10000)
+    );
     _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
     uint256 snapshot = vm.snapshot();
     // test withdrawal
@@ -190,16 +199,31 @@ contract ProtocolV3TestBase is CommonTestBase {
   }
 
   /**
-   * @dev returns the first collateral in the list that cannot be borrowed in stable mode
+   * @dev returns a "good" collateral in the list that cannot be borrowed in stable mode
    */
-  function _getFirstCollateral(
-    ReserveConfig[] memory configs
-  ) private pure returns (ReserveConfig memory config) {
+  function _getGoodCollateral(
+    IPool pool,
+    ReserveConfig[] memory configs,
+    uint256 minSupplyCapDollarMargin
+  ) private view returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
-      if (configs[i].usageAsCollateralEnabled && !configs[i].stableBorrowRateEnabled)
-        return configs[i];
+      if (
+        // not frozen etc
+        _includeInE2e(configs[i]) &&
+        // usable as collateral
+        configs[i].usageAsCollateralEnabled &&
+        // not stable borrowable as this makes testing stable borrowing unnecessary hard to reason about
+        !configs[i].stableBorrowRateEnabled &&
+        // supply cap not yet reached
+        ((configs[i].supplyCap * 10 ** configs[i].decimals) >
+          IERC20(configs[i].aToken).totalSupply()) &&
+        (// supply cap margin big enough
+        (configs[i].supplyCap * 10 ** configs[i].decimals) -
+          IERC20(configs[i].aToken).totalSupply() >
+          _getTokenAmountByDollarValue(pool, configs[i], minSupplyCapDollarMargin))
+      ) return configs[i];
     }
-    revert('ERROR: No collateral found');
+    revert('ERROR: No usable collateral found');
   }
 
   function _deposit(
@@ -213,10 +237,8 @@ contract ProtocolV3TestBase is CommonTestBase {
     require(!config.isPaused, 'DEPOSIT(): PAUSED_RESERVE');
     vm.startPrank(user);
     uint256 aTokenBefore = IERC20(config.aToken).balanceOf(user);
-    _patchedDeal(config.underlying, user, amount);
-    // TODO: woraround as `_patchedDeal` changes prank context & there's currently no way to revert
-    vm.startPrank(user);
-    _patchedApprove(config.underlying, address(pool), amount);
+    deal2(config.underlying, user, amount);
+    IERC20(config.underlying).safeApprove(address(pool), amount);
     console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
     pool.deposit(config.underlying, amount, user, 0);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
@@ -271,9 +293,8 @@ contract ProtocolV3TestBase is CommonTestBase {
     vm.startPrank(user);
     address debtToken = stable ? config.stableDebtToken : config.variableDebtToken;
     uint256 debtBefore = IERC20(debtToken).balanceOf(user);
-    _patchedDeal(config.underlying, user, amount);
-    vm.startPrank(user);
-    IERC20(config.underlying).approve(address(pool), amount);
+    deal2(config.underlying, user, amount);
+    IERC20(config.underlying).safeApprove(address(pool), amount);
     console.log('REPAY: %s, Amount: %s', config.symbol, amount);
     pool.repay(config.underlying, amount, stable ? 1 : 2, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
@@ -589,7 +610,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     localConfig.liquidationProtocolFee = configuration.getLiquidationProtocolFee();
     localConfig.isBorrowableInIsolation = configuration.getBorrowableInIsolation();
 
-    localConfig.isFlashloanable = false;
+    localConfig.isFlashloanable = configuration.getFlashLoanEnabled();
 
     return localConfig;
   }
@@ -802,7 +823,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     );
     require(
       strategy.getBaseStableBorrowRate() == expectedStrategyValues.baseStableBorrowRate,
-      '_validateInterestRateStrategy() : INVALID_BASE_VARIABLE_BORROW'
+      '_validateInterestRateStrategy() : INVALID_BASE_STABLE_BORROW'
     );
     require(
       strategy.getStableRateSlope1() == expectedStrategyValues.stableRateSlope1,
@@ -1077,7 +1098,10 @@ contract ProtocolV3TestBase is CommonTestBase {
   }
 }
 
-contract ProtocolV3_0_1TestBase is ProtocolV3TestBase {
+/**
+ * only applicable to v3 harmony at this point
+ */
+contract ProtocolV3LegacyTestBase is ProtocolV3TestBase {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
 
   function _getStructReserveConfig(
@@ -1115,7 +1139,7 @@ contract ProtocolV3_0_1TestBase is ProtocolV3TestBase {
     localConfig.liquidationProtocolFee = configuration.getLiquidationProtocolFee();
     localConfig.isBorrowableInIsolation = configuration.getBorrowableInIsolation();
 
-    localConfig.isFlashloanable = configuration.getFlashLoanEnabled();
+    localConfig.isFlashloanable = false;
 
     return localConfig;
   }
