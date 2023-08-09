@@ -96,7 +96,7 @@
         "symbol": "1INCH",
         "underlying": "0x111111111117dC0aa78b770fA6A738034120C302",
         "usageAsCollateralEnabled": true,
-        "variableDebtToken": "0x1b7D3F4b3c032a5AE656e30eeA4e8E1Ba376068F",
+        "variableDebtToken": "0xd180D7fdD4092f07428eFE801E17BC03576b3192",
         "variableDebtTokenImpl": "0xaC725CB59D16C81061BDeA61041a8A5e73DA9EC6",
         "variableDebtTokenName": "Aave Ethereum Variable Debt 1INCH",
         "variableDebtTokenSymbol": "variableDebtEth1INCH"
