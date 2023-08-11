@@ -43,13 +43,15 @@ library GovHelpers {
   }
 
   function ipfsHashFile(Vm vm, string memory filePath, bool upload) internal returns (bytes32) {
-    string[] memory inputs = new string[](6);
+    string[] memory inputs = new string[](8);
     inputs[0] = 'npx';
-    inputs[1] = 'aave-cli';
-    inputs[2] = 'ipfs';
-    inputs[3] = filePath;
-    inputs[4] = '-u';
-    inputs[5] = vm.toString(upload);
+    inputs[1] = '--yes';
+    inputs[2] = '-s';
+    inputs[3] = '@bgd-labs/aave-cli';
+    inputs[4] = 'ipfs';
+    inputs[5] = filePath;
+    inputs[6] = '-u';
+    inputs[7] = vm.toString(upload);
     bytes memory bs58Hash = vm.ffi(inputs);
     // currenty there is no better way as ffi silently fails
     // revisit once https://github.com/foundry-rs/foundry/pull/4908 progresses

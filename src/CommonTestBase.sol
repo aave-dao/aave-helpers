@@ -93,14 +93,16 @@ contract CommonTestBase is Test {
     string memory beforePath = string(abi.encodePacked('./reports/', reportBefore, '.json'));
     string memory afterPath = string(abi.encodePacked('./reports/', reportAfter, '.json'));
 
-    string[] memory inputs = new string[](7);
+    string[] memory inputs = new string[](9);
     inputs[0] = 'npx';
-    inputs[1] = 'aave-cli';
-    inputs[2] = 'diff-snapshots';
-    inputs[3] = beforePath;
-    inputs[4] = afterPath;
-    inputs[5] = '-o';
-    inputs[6] = outPath;
+    inputs[1] = '--yes';
+    inputs[2] = '-s';
+    inputs[3] = '@bgd-labs/aave-cli';
+    inputs[4] = 'diff-snapshots';
+    inputs[5] = beforePath;
+    inputs[6] = afterPath;
+    inputs[7] = '-o';
+    inputs[8] = outPath;
     vm.ffi(inputs);
   }
 
