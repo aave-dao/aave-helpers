@@ -60,6 +60,10 @@ abstract contract MetisScript is WithChainIdValidation {
   constructor() WithChainIdValidation(ChainIds.METIS) {}
 }
 
+abstract contract BasenetScript is WithChainIdValidation {
+  constructor() WithChainIdValidation(ChainIds.BASENET) {}
+}
+
 library Create2Utils {
   address public constant CREATE2_FACTORY = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
 

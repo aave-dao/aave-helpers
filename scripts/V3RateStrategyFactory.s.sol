@@ -11,16 +11,15 @@ import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
+import {AaveV3Basenet} from 'aave-address-book/AaveV3Basenet.sol';
 import {ITransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/interfaces/ITransparentProxyFactory.sol';
 import {V3RateStrategyFactory} from '../src/v3-config-engine/V3RateStrategyFactory.sol';
 
 library DeployRatesFactoryLib {
   // TODO check also by param, potentially there could be different contracts, but with exactly same params
-  function _getUniqueStrategiesOnPool(IPool pool)
-    internal
-    view
-    returns (IDefaultInterestRateStrategy[] memory)
-  {
+  function _getUniqueStrategiesOnPool(
+    IPool pool
+  ) internal view returns (IDefaultInterestRateStrategy[] memory) {
     address[] memory listedAssets = pool.getReservesList();
     IDefaultInterestRateStrategy[] memory uniqueRateStrategies = new IDefaultInterestRateStrategy[](
       listedAssets.length
@@ -140,6 +139,20 @@ library DeployRatesFactoryMetLib {
   }
 }
 
+library DeployRatesFactoryBasLib {
+  function deploy() internal returns (address, address[] memory) {
+    return
+      DeployRatesFactoryLib._createAndSetupRatesFactory(
+        AaveV3Basenet.POOL_ADDRESSES_PROVIDER,
+        0x05225Cd708bCa9253789C1374e4337a019e99D56,
+        0xc85b1E333aecc99340b2320493Fe2d22b8734795
+        // 0x810a339fb0a80d3c700804AC45b04cfc10C1803A
+        // AaveMisc.TRANSPARENT_PROXY_FACTORY_BASENET,
+        // AaveMisc.PROXY_ADMIN_BASENET
+      );
+  }
+}
+
 contract DeployRatesFactoryEth is EthereumScript {
   function run() external broadcast {
     DeployRatesFactoryEthLib.deploy();
@@ -173,5 +186,11 @@ contract DeployRatesFactoryAva is AvalancheScript {
 contract DeployRatesFactoryMet is MetisScript {
   function run() external broadcast {
     DeployRatesFactoryMetLib.deploy();
+  }
+}
+
+contract DeployRatesFactoryBas is BasenetScript {
+  function run() external broadcast {
+    DeployRatesFactoryBasLib.deploy();
   }
 }

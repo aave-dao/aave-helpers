@@ -19,6 +19,7 @@ arbitrum = "${RPC_ARBITRUM}"
 fantom = "${RPC_FANTOM}"
 harmony = "${RPC_HARMONY}"
 metis = "${RPC_METIS}"
+basenet = "${RPC_BASENET}"
 
 [etherscan]
 mainnet={key="${ETHERSCAN_API_KEY_MAINNET}",chainId=1}
@@ -27,5 +28,6 @@ avalanche={key="${ETHERSCAN_API_KEY_AVALANCHE}",chainId=43114}
 polygon={key="${ETHERSCAN_API_KEY_POLYGON}",chainId=137}
 arbitrum={key="${ETHERSCAN_API_KEY_ARBITRUM}",chainId=42161}
 fantom={key="${ETHERSCAN_API_KEY_FANTOM}",chainId=250}
+basenet={key="${ETHERSCAN_API_KEY_BASENET}",chain=8453}
 
 # See more config options https://github.com/gakonst/foundry/tree/master/config
