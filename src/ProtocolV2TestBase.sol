@@ -186,7 +186,7 @@ contract ProtocolV2TestBase is CommonTestBase {
     vm.startPrank(user);
     uint256 aTokenBefore = IERC20(config.aToken).balanceOf(user);
     deal2(config.underlying, user, amount);
-    IERC20(config.underlying).safeApprove(address(pool), amount);
+    IERC20(config.underlying).forceApprove(address(pool), amount);
     pool.deposit(config.underlying, amount, user, 0);
     console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
@@ -270,7 +270,7 @@ contract ProtocolV2TestBase is CommonTestBase {
     address debtToken = stable ? config.stableDebtToken : config.variableDebtToken;
     uint256 debtBefore = IERC20(debtToken).balanceOf(user);
     deal2(config.underlying, user, amount);
-    IERC20(config.underlying).safeApprove(address(pool), amount);
+    IERC20(config.underlying).forceApprove(address(pool), amount);
     console.log('REPAY: %s, Amount: %s', config.symbol, amount);
     pool.repay(config.underlying, amount, stable ? 1 : 2, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
