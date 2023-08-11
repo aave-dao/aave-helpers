@@ -59,3 +59,15 @@ abstract contract HarmonyScript is WithChainIdValidation {
 abstract contract MetisScript is WithChainIdValidation {
   constructor() WithChainIdValidation(ChainIds.METIS) {}
 }
+
+abstract contract BaseScript is WithChainIdValidation {
+  constructor() WithChainIdValidation(ChainIds.BASE) {}
+}
+
+abstract contract BSCScript is WithChainIdValidation {
+  constructor() WithChainIdValidation(ChainIds.BSC) {}
+}
+
+abstract contract SepoliaScript is WithChainIdValidation {
+  constructor() WithChainIdValidation(ChainIds.SEPOLIA) {}
+}
