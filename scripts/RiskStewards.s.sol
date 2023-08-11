@@ -76,7 +76,7 @@ contract DeployBas is BasenetScript {
   function run() external broadcast {
     new CapsPlusRiskSteward(
       AaveV3Basenet.AAVE_PROTOCOL_DATA_PROVIDER,
-      IAaveV3ConfigEngine(0xc7751400F809cdB0C167F87985083C558a0610F7),
+      IAaveV3ConfigEngine(AaveV3Basenet.LISTING_ENGINE),
       0xfbeB4AcB31340bA4de9C87B11dfBf7e2bc8C0bF1
     );
   }

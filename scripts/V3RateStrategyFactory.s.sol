@@ -144,11 +144,8 @@ library DeployRatesFactoryBasLib {
     return
       DeployRatesFactoryLib._createAndSetupRatesFactory(
         AaveV3Basenet.POOL_ADDRESSES_PROVIDER,
-        0x05225Cd708bCa9253789C1374e4337a019e99D56,
-        0xc85b1E333aecc99340b2320493Fe2d22b8734795
-        // 0x810a339fb0a80d3c700804AC45b04cfc10C1803A
-        // AaveMisc.TRANSPARENT_PROXY_FACTORY_BASENET,
-        // AaveMisc.PROXY_ADMIN_BASENET
+        AaveMisc.TRANSPARENT_PROXY_FACTORY_BASENET,
+        AaveMisc.PROXY_ADMIN_BASENET
       );
   }
 }

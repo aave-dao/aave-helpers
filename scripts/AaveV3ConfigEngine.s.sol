@@ -232,7 +232,7 @@ library DeployEngineBasenetLib {
     IEngine.EngineConstants memory engineConstants = IEngine.EngineConstants({
       pool: AaveV3Basenet.POOL,
       poolConfigurator: AaveV3Basenet.POOL_CONFIGURATOR,
-      ratesStrategyFactory: IV3RateStrategyFactory(0x0D1Fe8eAdb0a3e44C4Cc9D73De8dA50C1E475832),
+      ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Basenet.RATES_FACTORY),
       oracle: AaveV3Basenet.ORACLE,
       rewardsController: AaveV3Basenet.DEFAULT_INCENTIVES_CONTROLLER,
       collector: address(AaveV3Basenet.COLLECTOR)
