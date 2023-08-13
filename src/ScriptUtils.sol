@@ -60,8 +60,8 @@ abstract contract MetisScript is WithChainIdValidation {
   constructor() WithChainIdValidation(ChainIds.METIS) {}
 }
 
-abstract contract BasenetScript is WithChainIdValidation {
-  constructor() WithChainIdValidation(ChainIds.BASENET) {}
+abstract contract BaseScript is WithChainIdValidation {
+  constructor() WithChainIdValidation(ChainIds.BASE) {}
 }
 
 library Create2Utils {
