@@ -18,6 +18,7 @@ arbitrum = "${RPC_ARBITRUM}"
 fantom = "${RPC_FANTOM}"
 harmony = "${RPC_HARMONY}"
 metis = "${RPC_METIS}"
+zkevm = "${RPC_ZKEVM}"
 
 [etherscan]
 mainnet={key="${ETHERSCAN_API_KEY_MAINNET}",chainId=1}
