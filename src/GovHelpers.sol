@@ -81,7 +81,8 @@ library GovHelpers {
       payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_OPTIMISM &&
         payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_METIS &&
         payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_ARBITRUM &&
-        payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_POLYGON,
+        payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_POLYGON &&
+        payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_BASE,
       'PAYLOAD_CANT_BE_FORWARDER'
     );
 
@@ -123,6 +124,14 @@ library GovHelpers {
     return
       _buildL2({
         forwarder: AaveGovernanceV2.CROSSCHAIN_FORWARDER_METIS,
+        payloadAddress: payloadAddress
+      });
+  }
+
+  function buildBase(address payloadAddress) internal pure returns (Payload memory) {
+    return
+      _buildL2({
+        forwarder: AaveGovernanceV2.CROSSCHAIN_FORWARDER_BASE,
         payloadAddress: payloadAddress
       });
   }
@@ -574,6 +583,8 @@ library GovHelpers {
     if (executor == AaveGovernanceV2.METIS_BRIDGE_EXECUTOR && block.chainid == ChainIds.METIS)
       return true;
     if (executor == AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR && block.chainid == ChainIds.ARBITRUM)
+      return true;
+    if (executor == AaveGovernanceV2.BASE_BRIDGE_EXECUTOR && block.chainid == ChainIds.BASE)
       return true;
     // not a l2, but following same interface & stroage
     if (executor == AaveGovernanceV2.ARC_TIMELOCK && block.chainid == ChainIds.MAINNET) return true;
