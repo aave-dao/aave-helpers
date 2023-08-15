@@ -15,13 +15,11 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian {
   using SafeERC20 for IERC20;
 
   event SwapCanceled(address fromToken, address toToken, uint256 amount);
-  event SwapRequested(address fromToken, address toToken, uint256 amount);
-  event TokenUpdated(address indexed token, bool allowed);
+  event SwapRequested(address fromToken, address toToken, address fromOracle, address toOracle, uint256 amount, address recipient);
 
   error Invalid0xAddress();
   error InvalidAmount();
   error InvalidRecipient();
-  error InvalidToken();
   error OracleNotSet();
 
   address public constant BAL80WETH20 = 0x5c6Ee304399DBdB9C8Ef030aB642B10820DB8F56;
@@ -41,20 +39,21 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian {
   function swap(
     address fromToken,
     address toToken,
+    address fromOracle,
+    address toOracle,
     address recipient,
     uint256 amount,
     uint256 slippage
   ) external onlyOwner {
+    if (fromToken == address(0) || toToken == address(0)) revert Invalid0xAddress();
     if (amount == 0) revert InvalidAmount();
-    if (recipient != address(this) && recipient != address(AaveV3Ethereum.COLLECTOR)) {
-      revert InvalidRecipient();
-    }
 
     IERC20(fromToken).forceApprove(milkman, amount);
 
     (address priceChecker, bytes memory data) = _getPriceCheckerAndData(
-      fromToken,
-      toToken,
+        toToken,
+      fromOracle,
+      toOracle,
       slippage
     );
 
@@ -67,20 +66,23 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian {
       data
     );
 
-    emit SwapRequested(fromToken, toToken, amount);
+    emit SwapRequested(fromToken, toToken, fromOracle, toOracle, amount, recipient);
   }
 
   function cancelSwap(
     address tradeMilkman,
     address fromToken,
     address toToken,
+    address fromOracle,
+    address toOracle,
     address recipient,
     uint256 amount,
     uint256 slippage
   ) external onlyOwnerOrGuardian {
     (address priceChecker, bytes memory data) = _getPriceCheckerAndData(
-      fromToken,
       toToken,
+      fromOracle,
+      toOracle,
       slippage
     );
 
@@ -125,9 +127,11 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian {
   function getExpectedOut(
     uint256 amount,
     address fromToken,
-    address toToken
+    address toToken,
+    address fromOracle,
+    address toOracle
   ) public view returns (uint256) {
-    (address priceChecker, bytes memory data) = _getPriceCheckerAndData(fromToken, toToken, 0);
+    (address priceChecker, bytes memory data) = _getPriceCheckerAndData(toToken, fromOracle, toOracle, 0);
 
     (, bytes memory _data) = abi.decode(data, (uint256, bytes));
 
@@ -141,8 +145,9 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian {
   }
 
   function _getPriceCheckerAndData(
-    address fromToken,
     address toToken,
+    address fromOracle,
+    address toOracle,
     uint256 slippage
   ) internal view returns (address, bytes memory) {
     if (toToken == BAL80WETH20) {
@@ -150,23 +155,20 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian {
     } else {
       return (
         chainlinkPriceChecker,
-        abi.encode(slippage, _getChainlinkCheckerData(fromToken, toToken))
+        abi.encode(slippage, _getChainlinkCheckerData(fromOracle, toOracle))
       );
     }
   }
 
   function _getChainlinkCheckerData(
-    address fromToken,
-    address toToken
+    address fromOracle,
+    address toOracle
   ) internal view returns (bytes memory) {
-    address oracleOne = tokenChainlinkOracle[fromToken];
-    address oracleTwo = tokenChainlinkOracle[toToken];
-
-    if (oracleOne == address(0) || oracleTwo == address(0)) revert OracleNotSet();
+    if (fromOracle == address(0) || toOracle == address(0)) revert OracleNotSet();
 
     address[] memory paths = new address[](2);
-    paths[0] = oracleOne;
-    paths[1] = oracleTwo;
+    paths[0] = fromOracle;
+    paths[1] = toOracle;
 
     bool[] memory reverses = new bool[](2);
     reverses[1] = true;
