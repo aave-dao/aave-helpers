@@ -8,7 +8,7 @@ import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 
 import {BaseSwapPayload} from './BaseSwapPayload.sol';
 
-abstract contract DepositV2SwapPayload is BaseSwapPayload {
+abstract contract DepositV3SwapPayload is BaseSwapPayload {
   using SafeERC20 for IERC20;
 
   event DepositedIntoV3(address indexed token, uint256 amount);

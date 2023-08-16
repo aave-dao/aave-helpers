@@ -16,13 +16,8 @@ the DAO while protecting funds from MEV exploits and bad slippage.
 
 AaveCOWSwaps is a permissioned smart contract, and it has two potential privileged users: the owner and the guardian.
 The owner will be the DAO (however, ownership can be transferred) and the guardian is an address to be chosen by the
-DAO to act an asset manager. The role of the asset manager (guardian) is to more easily swap tokens for the DAO without
-the need to go through the full governance flow. AaveCOWSwaps can hold funds and swap for other tokens and keep them in
-case the DAO chooses so. AaveCOWSwaps can only withdraw tokens to the Collector contract.
-
-The curator contract can also deposit tokens it holds into Aave V3 pools or Aave V2 pools. It an also cancel pending swaps.
-
-The tokens the curator can trade from and to have to previously been voted by the DAO.
+DAO to more easily cancel swaps without relying on governance. AaveCOWSwaps can hold funds and swap for other tokens
+and keep them in case the DAO chooses so. AaveCOWSwaps can only withdraw tokens to the Collector contract.
 
 ### Methods
 
@@ -30,14 +25,15 @@ The tokens the curator can trade from and to have to previously been voted by th
 function swap(
     address fromToken,
     address toToken,
+    address fromOracle,
+    address toOracle,
     address recipient,
     uint256 amount,
     uint256 slippage
   ) external onlyOwnerOrGuardian
 ```
 
-Swaps `fromToken` to `toToken` in the specified `amount`. The recipient of the `toToken` can either be the AaveCOWSwaps
-or the Collector.
+Swaps `fromToken` to `toToken` in the specified `amount`. The recipient of the `toToken` and sends the acquired funds to the recipient.
 
 Slippage is specified in basis points, for example `100` is 1% slippage. The maximum amount would be `10_000` for 100% slippage.
 
@@ -67,16 +63,18 @@ Trades in the low thousands and less are not really worth swapping because gas c
 
 The [CoW Swap UI](https://swap.cow.fi/#/1/swap/WETH) can be checked to get an estimate of slippage if executing at that time.
 
-AaveCOWSwaps uses Chainlink oracles for its slippage protection feature. The oracles have to be set by governance when allowing
-fromTokens and toTokens. Governance should enforce that all oracles set are base-USD (ie: V3 oracles and not V2 oracles). AaveCOWSwaps
-supports base-ETH swaps as well, but both bases have to be the same. For example USDC/ETH to AAVE/ETH or USDC/USD to AAVE/USD. It
-does not support USDC/ETH to AAVE/USD swaps and this can lead to bad trades because of price differences.
+AaveCOWSwaps uses Chainlink oracles for its slippage protection feature. Governance should enforce that all oracles set are
+base-USD (ie: V3 oracles and not V2 oracles). AaveCOWSwaps supports base-ETH swaps as well, but both bases have to be the same.
+For example USDC/ETH to AAVE/ETH or USDC/USD to AAVE/USD. It does not support USDC/ETH to AAVE/USD swaps and this can lead to
+bad trades because of price differences.
 
 ```
 function cancelSwap(
     address tradeMilkman,
     address fromToken,
     address toToken,
+    address fromOracle,
+    address toOracle,
     address recipient,
     uint256 amount,
     uint256 slippage
@@ -87,27 +85,6 @@ This methods cancels a pending trade. Trades should take just a couple of minute
 should move fast to cancel.
 
 Most likely, this function will be called when a swap is not getting executed because slippage might be too tight and there's no match for it.
-
-`function depositTokenIntoV2(address token, uint256 amount) external onlyOwnerOrGuardian`
-
-Deposits funds held on AaveCurator into Aave V2 on behalf of the Collector.
-
-`function depositTokenIntoV3(address token, uint256 amount) external onlyOwnerOrGuardian`
-
-Deposits funds held on AaveCurator into Aave V3 on behalf of the Collector.
-
-`function setAllowedFromToken(address token, address oracle, bool allowed) external onlyOwner`
-
-Sets an allowed token to be able to swap from. It can be set to allowed == false in order to block swaps from this token.
-The address of the Oracle needs to be a Chainlink oracle that has a base in USD (ie: AAVE/USD oracle).
-
-`function setAllowedToToken(address token, address oracle, bool allowed) external onlyOwner`
-
-Sets an allowed token to be able to swap to. It can be set to allowed == false in order to block swaps from this token.
-The address of the Oracle needs to be a Chainlink oracle that has a base in USD (ie: USDC/USD oracle).
-
-Both `setAllowedFromToken` and `setAllowedToToken` can be combined to only allower AaveCurator to do specific swaps that
-the DAO approves of beforehand. For example, only swapping to stables from known tokens.
 
 `function setMilkmanAddress(address _milkman) external onlyOwner`
 
@@ -121,7 +98,7 @@ to a new address, this function let's the contract update the address.
 Allows to update the Chainlink Price Checker (read about price checkers [here](https://github.com/charlesndalton/milkman#price-checkers))
 if the price checker were to be upgraded.
 
-`function withdrawToCollector(address[] calldata tokens) external onlyOwnerOrGuardian`
+`function emergencyTokenTransfer(address token, address recipient, uint256 amount) external onlyRescueGuardian`
 
 Withdrawal function for funds to leave AaveCurator. They can only be withdrawn to the Aave Collector contract.
 
@@ -135,6 +112,14 @@ Withdrawal function for funds to leave AaveCurator. They can only be withdrawn t
 
 Read-only function to get an idea of how many tokens to expect when performing a swap. This helper can be used
 to determine the slippage percentage to submit on the swap.
+
+### Potential Extensions
+
+This library includes some abstract payloads to be used by developers to more easily swap and then handle the acquired assets.
+
+`function deposit(address token, uint256 amount) external onlyOwnerOrGuardian`
+
+Deposits funds held on AaveCurator into Aave V2/Aave V3 on behalf of the Collector, depending on the payload used.
 
 ### Deployed Address
 

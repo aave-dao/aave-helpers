@@ -11,6 +11,17 @@ import {ISwapPayload} from './interfaces/ISwapPayload.sol';
 abstract contract BaseSwapPayload is ISwapPayload {
   using SafeERC20 for IERC20;
 
+  /*
+   * When going through the governance flow, address(this) will be the Executor.
+   * Setting a SELF variable in order to set the payload address as the receiver
+   * in case funds are to be deposited later on.
+   */
+  address internal immutable SELF;
+
+  constructor() {
+    SELF = address(this);
+  }
+
   function _deposit(address token, uint256 amount) internal virtual {
     IERC20(token).safeTransfer(address(AaveV2Ethereum.COLLECTOR), amount);
   }

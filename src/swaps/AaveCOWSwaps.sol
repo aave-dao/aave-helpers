@@ -4,6 +4,7 @@ pragma solidity 0.8.19;
 
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
+import {Rescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
 import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
 import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initializable.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
@@ -11,7 +12,7 @@ import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {IPriceChecker} from './interfaces/IExpectedOutCalculator.sol';
 import {IMilkman} from './interfaces/IMilkman.sol';
 
-contract AaveCOWSwaps is Initializable, OwnableWithGuardian {
+contract AaveCOWSwaps is Initializable, OwnableWithGuardian, Rescuable {
   using SafeERC20 for IERC20;
 
   event SwapCanceled(address fromToken, address toToken, uint256 amount);
@@ -28,9 +29,6 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian {
   address public chainlinkPriceChecker = 0xe80a1C615F75AFF7Ed8F08c9F21f9d00982D666c;
   address public milkman = 0x11C76AD590ABDFFCD980afEC9ad951B160F02797;
 
-  /// @notice Chainlink Oracle address for given token (supports only USD bases)
-  mapping(address tokenAddress => address) public tokenChainlinkOracle;
-
   function initialize() external initializer {
     _transferOwnership(_msgSender());
     _updateGuardian(_msgSender());
@@ -46,6 +44,7 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian {
     uint256 slippage
   ) external onlyOwner {
     if (fromToken == address(0) || toToken == address(0)) revert Invalid0xAddress();
+    if (recipient == address(0)) revert InvalidRecipient();
     if (amount == 0) revert InvalidAmount();
 
     IERC20(fromToken).forceApprove(milkman, amount);
@@ -113,17 +112,6 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian {
     chainlinkPriceChecker = _priceChecker;
   }
 
-  /// @notice Transfer any tokens on this contract to Aave V3 Collector
-  /// @param tokens List of token addresses
-  function withdrawToCollector(address[] calldata tokens) external onlyOwnerOrGuardian {
-    for (uint256 i = 0; i < tokens.length; ++i) {
-      IERC20(tokens[i]).safeTransfer(
-        address(AaveV3Ethereum.COLLECTOR),
-        IERC20(tokens[i]).balanceOf(address(this))
-      );
-    }
-  }
-
   function getExpectedOut(
     uint256 amount,
     address fromToken,
@@ -142,6 +130,10 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian {
         toToken,
         _data
       );
+  }
+
+  function whoCanRescue() public view override returns (address) {
+    return owner();
   }
 
   function _getPriceCheckerAndData(
@@ -163,7 +155,7 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian {
   function _getChainlinkCheckerData(
     address fromOracle,
     address toOracle
-  ) internal view returns (bytes memory) {
+  ) internal pure returns (bytes memory) {
     if (fromOracle == address(0) || toOracle == address(0)) revert OracleNotSet();
 
     address[] memory paths = new address[](2);
