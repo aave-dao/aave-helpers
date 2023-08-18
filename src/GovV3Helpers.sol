@@ -3,7 +3,9 @@ pragma solidity >=0.8.0 <0.9.0;
 
 import {Vm} from 'forge-std/Vm.sol';
 import {console2} from 'forge-std/console2.sol';
-
+import {ChainIds} from './ChainIds.sol';
+import {PayloadsControllerUtils, IGovernancePowerStrategy, IPayloadsControllerCore, IGovernanceCore} from 'aave-address-book/GovernanceV3.sol';
+import {AaveV3EthereumGovV3} from 'aave-address-book/AaveV3Ethereum.sol';
 
 library GovHelpers {
   error ExecutorNotFound();
@@ -50,16 +52,273 @@ library GovHelpers {
     return ipfsHashFile(vm, filePath, false);
   }
 
-  function buildPayload(address payloadAddress) internal pure returns (Payload memory) {
-   require(payloadAddress != address(0), 'NON_ZERO_TARGET');
+  function buildAction(
+    address payloadAddress,
+    PayloadsControllerUtils.AccessControl accessLevel
+  ) internal returns (IPayloadsControllerCore.ExecutionAction) {
+    address payloadsController = _getPayloadsController(block.chainid);
+    require(payloadsController != address(0), 'INVALID CHAIN ID');
+    require(payloadAddress != address(0), 'INVALID PAYLOAD ADDRESS');
+    require(
+      accessLevel != PayloadsControllerUtils.AccessControl.Level_null,
+      'INVALID ACCESS LEVEL'
+    );
+
     return
-      Payload({
-      target: payloadAddress,
-      value: 0,
-      signature: 'execute()',
-      callData: '',
-      withDelegatecall: true
-    });
+      IPayloadsControllerCore.ExecutionAction({
+        target: payloadAddress,
+        withDelegateCall: true,
+        accessLevel: accessLevel,
+        value: 0,
+        signature: 'execute()',
+        callData: ''
+      });
   }
 
+  function createPayload(
+    ExecutionAction[] memory actions,
+    PayloadsControllerUtils.AccessControl accessLevel
+  ) internal returns (uint256) {
+    address payloadsController = _getPayloadsController(block.chainid);
+    require(payloadsController != address(0), 'INVALID CHAIN ID');
+    require(actions.length > 0, 'INVALID ACTIONS');
+
+    return IPayloadsControllerCore(payloadsController).createPayload(actions);
+  }
+
+  function buildMainnet(
+    uint256 payloadId,
+    PayloadsControllerUtils.AccessControl accessLevel
+  ) internal pure returns (Payload memory) {
+    require(
+      accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
+      'INCORRECT ACCESS LEVEL'
+    );
+    return
+      _buildPayload(
+        AaveV3EthereumGovV3.PAYLOADS_CONTROLLER,
+        ChainIds.MAINNET,
+        accessLevel,
+        payloadId
+      );
+  }
+
+  function buildOptimism(
+    uint256 payloadId,
+    PayloadsControllerUtils.AccessControl accessLevel
+  ) internal pure returns (Payload memory) {
+    require(
+      accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
+      'INCORRECT ACCESS LEVEL'
+    );
+    return
+      _buildPayload(
+        AaveV3OptimismGovV3.PAYLOADS_CONTROLLER,
+        ChainIds.OPTIMISM,
+        accessLevel,
+        payloadId
+      );
+  }
+
+  function buildArbitrum(
+    uint256 payloadId,
+    PayloadsControllerUtils.AccessControl accessLevel
+  ) internal pure returns (Payload memory) {
+    require(
+      accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
+      'INCORRECT ACCESS LEVEL'
+    );
+    return
+      _buildPayload(
+        AaveV3ArbitrumGovV3.PAYLOADS_CONTROLLER,
+        ChainIds.ARBITRUM,
+        accessLevel,
+        payloadId
+      );
+  }
+
+  function buildPolygon(
+    uint256 payloadId,
+    PayloadsControllerUtils.AccessControl accessLevel
+  ) internal pure returns (Payload memory) {
+    require(
+      accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
+      'INCORRECT ACCESS LEVEL'
+    );
+    return
+      _buildPayload(
+        AaveV3PolygonGovV3.PAYLOADS_CONTROLLER,
+        ChainIds.POLYGON,
+        accessLevel,
+        payloadId
+      );
+  }
+
+  function buildMetis(
+    uint256 payloadId,
+    PayloadsControllerUtils.AccessControl accessLevel
+  ) internal pure returns (Payload memory) {
+    require(
+      accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
+      'INCORRECT ACCESS LEVEL'
+    );
+    return
+      _buildPayload(AaveV3MetisGovV3.PAYLOADS_CONTROLLER, ChainIds.METIS, accessLevel, payloadId);
+  }
+
+  function buildBase(
+    uint256 payloadId,
+    PayloadsControllerUtils.AccessControl accessLevel
+  ) internal pure returns (Payload memory) {
+    require(
+      accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
+      'INCORRECT ACCESS LEVEL'
+    );
+    return
+      _buildPayload(AaveV3BaseGovV3.PAYLOADS_CONTROLLER, ChainIds.BASE, accessLevel, payloadId);
+  }
+
+  function buildAvalanche(
+    uint256 payloadId,
+    PayloadsControllerUtils.AccessControl accessLevel
+  ) internal pure returns (Payload memory) {
+    require(
+      accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
+      'INCORRECT ACCESS LEVEL'
+    );
+    return
+      _buildPayload(
+        AaveV3AvalancheGovV3.PAYLOADS_CONTROLLER,
+        ChainIds.AVALANCHE,
+        accessLevel,
+        payloadId
+      );
+  }
+
+  function buildOptimism(
+    uint256 payloadId,
+    PayloadsControllerUtils.AccessControl accessLevel
+  ) internal pure returns (Payload memory) {
+    require(
+      accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
+      'INCORRECT ACCESS LEVEL'
+    );
+    return
+      _buildPayload(
+        AaveV3OptimismGovV3.PAYLOADS_CONTROLLER,
+        ChainIds.OPTIMISM,
+        accessLevel,
+        payloadId
+      );
+  }
+
+  function _buildPayload(
+    address payloadsController,
+    uint256 chainId,
+    PayloadsControllerUtils.AccessControl accessLevel,
+    uint256 payloadId
+  ) internal returns (PayloadsControllerUtils.Payload) {
+    return
+      PayloadsControllerUtils.Payload({
+        chain: chainId,
+        accessLevel: accessLevel,
+        payloadsController: payloadsController,
+        payloadId: payloadId
+      });
+  }
+
+  function createProposal(
+    Payload[] memory payloads,
+    address votingPortal,
+    bytes32 ipfsHash
+  ) internal returns (uint256) {
+    return _createProposal(payloads, ipfsHash, votingPortal, false);
+  }
+
+  function createProposal(
+    Payload[] memory payloads,
+    address votingPortal,
+    bytes32 ipfsHash,
+    bool emitLog
+  ) internal returns (uint256) {
+    return _createProposal(payloads, ipfsHash, votingPortal, emitLog);
+  }
+
+  function _createProposal(
+    PayloadsControllerUtils.Payload[] memory payloads,
+    bytes32 ipfsHash,
+    address votingPortal,
+    bool emitLog
+  ) private returns (uint256) {
+    require(block.chainid == ChainIds.MAINNET, 'MAINNET_ONLY');
+    require(payloads.length != 0, 'MINIMUM_ONE_PAYLOAD');
+    require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
+    require(votingPortal != address(0), 'INVALID_VOTING_PORTAL');
+
+    if (emitLog) {
+      console2.logBytes(
+        abi.encodeWithSelector(
+          AaveV3EthereumGovV3.GOVERNANCE.createProposal.selector,
+          payloads,
+          votingPortal,
+          ipfsHash
+        )
+      );
+    }
+    return IGovernanceCore(AaveV3EthereumGovV3.GOVERNANCE).create(payloads, votingPortal, ipfsHash);
+  }
+
+  function executePayload(Vm vm, uint256 payloadId) internal {
+    address payloadsController = _getPayloadsController(block.chainid);
+    require(payloadsController != address(0), 'INVALID CHAIN ID');
+
+    IPayloadsControllerCore.Payload memory payload = IPayloadsControllerCore(payloadsController)
+      .getPayloadById(payloadId);
+    require(
+      payloadId.state == IPayloadsControllerCore.PayloadState.Created,
+      'PAYLOAD DOES NOT EXIST'
+    );
+
+    // override storage so payload can be executed
+    //    payload.state = PayloadState.Queued;
+    stdstore
+      .target(address(metaRpg))
+      .sig('_payloads(uint40)')
+      .with_key(uint40(payloadId))
+      .depth(2)
+      .checked_write(IPayloadsControllerCore.PayloadsState.Queued);
+
+    //    payload.queuedAt = uint40(block.timestamp);
+    stdstore
+      .target(address(metaRpg))
+      .sig('_payloads(uint40)')
+      .with_key(uint40(payloadId))
+      .depth(4)
+      .checked_write(block.timestamp);
+
+    // skip to after queue delay
+    skip(payload.delay + 1);
+
+    IPayloadsControllerCore(payloadsController).executePayload(payloadId);
+  }
+
+  function _getPayloadsController(uint256 chainId) internal pure returns (address) {
+    if (chainId == ChainIds.MAINNET) {
+      return AaveV3EthereumGovV3.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.POLYGON) {
+      return AaveV3PolygonGovV3.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.AVALANCHE) {
+      return AaveV3AvalancheGovV3.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.OPTIMISM) {
+      return AaveV3OptimismGovV3.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.ARBITRUM) {
+      return AaveV3ArbitrumGovV3.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.METIS) {
+      return AaveV3MetisGovV3.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.BASE) {
+      return AaveV3BaseGovV3.PAYLOADS_CONTROLLER;
+    }
+
+    return address(0);
+  }
 }
