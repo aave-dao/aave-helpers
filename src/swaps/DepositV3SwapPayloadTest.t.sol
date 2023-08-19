@@ -11,12 +11,11 @@ import {BaseSwapPayload} from './BaseSwapPayload.sol';
 import {DepositV3SwapPayload} from './DepositV3SwapPayload.sol';
 
 contract MyPayload is DepositV3SwapPayload {
-    function execute() external {
-    }
+  function execute() external {}
 
-    function deposit(address token, uint256 amount) external {
-        _deposit(token, amount);
-    }
+  function deposit(address token, uint256 amount) external {
+    _deposit(token, amount);
+  }
 }
 
 contract DepositV3SwapPayloadTest is Test {
@@ -54,4 +53,3 @@ contract DepositV3SwapPayloadTest is Test {
     );
   }
 }
-

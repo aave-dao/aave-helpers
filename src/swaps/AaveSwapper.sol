@@ -12,11 +12,19 @@ import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {IPriceChecker} from './interfaces/IExpectedOutCalculator.sol';
 import {IMilkman} from './interfaces/IMilkman.sol';
 
-contract AaveCOWSwaps is Initializable, OwnableWithGuardian, Rescuable {
+contract AaveSwapper is Initializable, OwnableWithGuardian, Rescuable {
   using SafeERC20 for IERC20;
 
   event SwapCanceled(address fromToken, address toToken, uint256 amount);
-  event SwapRequested(address fromToken, address toToken, address fromOracle, address toOracle, uint256 amount, address recipient);
+  event SwapRequested(
+    address fromToken,
+    address toToken,
+    address fromOracle,
+    address toOracle,
+    uint256 amount,
+    address recipient,
+    uint256 slippage
+  );
 
   error Invalid0xAddress();
   error InvalidAmount();
@@ -24,10 +32,6 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian, Rescuable {
   error OracleNotSet();
 
   address public constant BAL80WETH20 = 0x5c6Ee304399DBdB9C8Ef030aB642B10820DB8F56;
-  address public constant BPT_PRICE_CHECKER = 0xBeA6AAC5bDCe0206A9f909d80a467C93A7D6Da7c;
-
-  address public chainlinkPriceChecker = 0xe80a1C615F75AFF7Ed8F08c9F21f9d00982D666c;
-  address public milkman = 0x11C76AD590ABDFFCD980afEC9ad951B160F02797;
 
   function initialize() external initializer {
     _transferOwnership(_msgSender());
@@ -35,6 +39,8 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian, Rescuable {
   }
 
   function swap(
+    address milkman,
+    address priceChecker,
     address fromToken,
     address toToken,
     address fromOracle,
@@ -49,12 +55,7 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian, Rescuable {
 
     IERC20(fromToken).forceApprove(milkman, amount);
 
-    (address priceChecker, bytes memory data) = _getPriceCheckerAndData(
-        toToken,
-      fromOracle,
-      toOracle,
-      slippage
-    );
+    bytes memory data = _getPriceCheckerAndData(toToken, fromOracle, toOracle, slippage);
 
     IMilkman(milkman).requestSwapExactTokensForTokens(
       amount,
@@ -65,11 +66,12 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian, Rescuable {
       data
     );
 
-    emit SwapRequested(fromToken, toToken, fromOracle, toOracle, amount, recipient);
+    emit SwapRequested(fromToken, toToken, fromOracle, toOracle, amount, recipient, slippage);
   }
 
   function cancelSwap(
     address tradeMilkman,
+    address priceChecker,
     address fromToken,
     address toToken,
     address fromOracle,
@@ -78,12 +80,7 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian, Rescuable {
     uint256 amount,
     uint256 slippage
   ) external onlyOwnerOrGuardian {
-    (address priceChecker, bytes memory data) = _getPriceCheckerAndData(
-      toToken,
-      fromOracle,
-      toOracle,
-      slippage
-    );
+    bytes memory data = _getPriceCheckerAndData(toToken, fromOracle, toOracle, slippage);
 
     IMilkman(tradeMilkman).cancelSwap(
       amount,
@@ -102,24 +99,15 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian, Rescuable {
     emit SwapCanceled(fromToken, toToken, amount);
   }
 
-  function setMilkmanAddress(address _milkman) external onlyOwner {
-    if (_milkman == address(0)) revert Invalid0xAddress();
-    milkman = _milkman;
-  }
-
-  function setChainlinkPriceChecker(address _priceChecker) external onlyOwner {
-    if (_priceChecker == address(0)) revert Invalid0xAddress();
-    chainlinkPriceChecker = _priceChecker;
-  }
-
   function getExpectedOut(
+    address priceChecker,
     uint256 amount,
     address fromToken,
     address toToken,
     address fromOracle,
     address toOracle
   ) public view returns (uint256) {
-    (address priceChecker, bytes memory data) = _getPriceCheckerAndData(toToken, fromOracle, toOracle, 0);
+    bytes memory data = _getPriceCheckerAndData(toToken, fromOracle, toOracle, 0);
 
     (, bytes memory _data) = abi.decode(data, (uint256, bytes));
 
@@ -141,14 +129,11 @@ contract AaveCOWSwaps is Initializable, OwnableWithGuardian, Rescuable {
     address fromOracle,
     address toOracle,
     uint256 slippage
-  ) internal view returns (address, bytes memory) {
+  ) internal pure returns (bytes memory) {
     if (toToken == BAL80WETH20) {
-      return (BPT_PRICE_CHECKER, abi.encode(slippage, ''));
+      return abi.encode(slippage, '');
     } else {
-      return (
-        chainlinkPriceChecker,
-        abi.encode(slippage, _getChainlinkCheckerData(fromOracle, toOracle))
-      );
+      return abi.encode(slippage, _getChainlinkCheckerData(fromOracle, toOracle));
     }
   }
 

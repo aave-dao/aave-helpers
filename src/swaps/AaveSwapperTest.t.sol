@@ -8,37 +8,48 @@ import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethe
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 
-import {AaveCOWSwaps} from './AaveCOWSwaps.sol';
+import {AaveSwapper} from './AaveSwapper.sol';
 
-contract AaveCOWSwapsTest is Test {
+contract AaveSwapperTest is Test {
   event DepositedIntoV2(address indexed token, uint256 amount);
   event DepositedIntoV3(address indexed token, uint256 amount);
   event GuardianUpdated(address oldGuardian, address newGuardian);
   event SwapCanceled(address fromToken, address toToken, uint256 amount);
-  event SwapRequested(address fromToken, address toToken, address fromOracle, address toOracle, uint256 amount, address recipient);
+  event SwapRequested(
+    address fromToken,
+    address toToken,
+    address fromOracle,
+    address toOracle,
+    uint256 amount,
+    address recipient,
+    uint256 slippage
+  );
   event TokenUpdated(address indexed token, bool allowed);
 
   address public constant BAL80WETH20 = 0x5c6Ee304399DBdB9C8Ef030aB642B10820DB8F56;
+  address public constant BPT_PRICE_CHECKER = 0xBeA6AAC5bDCe0206A9f909d80a467C93A7D6Da7c;
+  address public constant CHAINLINK_PRICE_CHECKER = 0xe80a1C615F75AFF7Ed8F08c9F21f9d00982D666c;
+  address public constant MILKMAN = 0x11C76AD590ABDFFCD980afEC9ad951B160F02797;
 
-  AaveCOWSwaps public swaps;
+  AaveSwapper public swaps;
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('mainnet'), 17779177);
 
     vm.startPrank(AaveGovernanceV2.SHORT_EXECUTOR);
-    swaps = new AaveCOWSwaps();
+    swaps = new AaveSwapper();
     vm.stopPrank();
   }
 }
 
-contract Initialize is AaveCOWSwapsTest {
+contract Initialize is AaveSwapperTest {
   function test_revertsIf_alreadyInitialized() public {
     vm.expectRevert('Initializable: contract is already initialized');
     swaps.initialize();
   }
 }
 
-contract TransferOwnership is AaveCOWSwapsTest {
+contract TransferOwnership is AaveSwapperTest {
   function test_revertsIf_invalidCaller() public {
     vm.expectRevert('Ownable: caller is not the owner');
     swaps.transferOwnership(makeAddr('new-admin'));
@@ -54,7 +65,7 @@ contract TransferOwnership is AaveCOWSwapsTest {
   }
 }
 
-contract UpdateGuardian is AaveCOWSwapsTest {
+contract UpdateGuardian is AaveSwapperTest {
   function test_revertsIf_invalidCaller() public {
     vm.expectRevert('ONLY_BY_OWNER_OR_GUARDIAN');
     swaps.updateGuardian(makeAddr('new-admin'));
@@ -72,7 +83,7 @@ contract UpdateGuardian is AaveCOWSwapsTest {
   }
 }
 
-contract RemoveGuardian is AaveCOWSwapsTest {
+contract RemoveGuardian is AaveSwapperTest {
   function test_revertsIf_invalidCaller() public {
     vm.expectRevert('ONLY_BY_OWNER_OR_GUARDIAN');
     swaps.updateGuardian(address(0));
@@ -89,57 +100,13 @@ contract RemoveGuardian is AaveCOWSwapsTest {
   }
 }
 
-contract SetMilkman is AaveCOWSwapsTest {
-  function test_revertsIf_invalidCaller() public {
-    vm.expectRevert('Ownable: caller is not the owner');
-    swaps.setMilkmanAddress(makeAddr('new-milkman'));
-  }
-
-  function test_revertsIf_invalid0xAddress() public {
-    vm.startPrank(AaveGovernanceV2.SHORT_EXECUTOR);
-    vm.expectRevert(AaveCOWSwaps.Invalid0xAddress.selector);
-    swaps.setMilkmanAddress(address(0));
-    vm.stopPrank();
-  }
-
-  function test_successful() public {
-    address newMilkman = makeAddr('new-milkman');
-    vm.startPrank(AaveGovernanceV2.SHORT_EXECUTOR);
-    swaps.setMilkmanAddress(newMilkman);
-    vm.stopPrank();
-
-    assertEq(swaps.milkman(), newMilkman);
-  }
-}
-
-contract SetChainlinkPriceChecker is AaveCOWSwapsTest {
-  function test_revertsIf_invalidCaller() public {
-    vm.expectRevert('Ownable: caller is not the owner');
-    swaps.setChainlinkPriceChecker(makeAddr('new-chainlink'));
-  }
-
-  function test_revertsIf_invalid0xAddress() public {
-    vm.startPrank(AaveGovernanceV2.SHORT_EXECUTOR);
-    vm.expectRevert(AaveCOWSwaps.Invalid0xAddress.selector);
-    swaps.setChainlinkPriceChecker(address(0));
-    vm.stopPrank();
-  }
-
-  function test_successful() public {
-    address newChainlink = makeAddr('new-milkman');
-    vm.startPrank(AaveGovernanceV2.SHORT_EXECUTOR);
-    swaps.setChainlinkPriceChecker(newChainlink);
-    vm.stopPrank();
-
-    assertEq(swaps.chainlinkPriceChecker(), newChainlink);
-  }
-}
-
-contract AaveCOWSwapsSwap is AaveCOWSwapsTest {
+contract AaveSwapperSwap is AaveSwapperTest {
   function test_revertsIf_invalidCaller() public {
     uint256 amount = 1_000e18;
     vm.expectRevert('Ownable: caller is not the owner');
     swaps.swap(
+      MILKMAN,
+      CHAINLINK_PRICE_CHECKER,
       AaveV2EthereumAssets.WETH_UNDERLYING,
       AaveV2EthereumAssets.AAVE_UNDERLYING,
       AaveV2EthereumAssets.WETH_ORACLE,
@@ -152,8 +119,10 @@ contract AaveCOWSwapsSwap is AaveCOWSwapsTest {
 
   function test_revertsIf_amountIsZero() public {
     vm.startPrank(AaveGovernanceV2.SHORT_EXECUTOR);
-    vm.expectRevert(AaveCOWSwaps.InvalidAmount.selector);
+    vm.expectRevert(AaveSwapper.InvalidAmount.selector);
     swaps.swap(
+      MILKMAN,
+      CHAINLINK_PRICE_CHECKER,
       AaveV2EthereumAssets.WETH_UNDERLYING,
       AaveV2EthereumAssets.AAVE_UNDERLYING,
       AaveV2EthereumAssets.WETH_ORACLE,
@@ -167,8 +136,10 @@ contract AaveCOWSwapsSwap is AaveCOWSwapsTest {
 
   function test_revertsIf_fromTokenIsZeroAddress() public {
     vm.startPrank(AaveGovernanceV2.SHORT_EXECUTOR);
-    vm.expectRevert(AaveCOWSwaps.Invalid0xAddress.selector);
+    vm.expectRevert(AaveSwapper.Invalid0xAddress.selector);
     swaps.swap(
+      MILKMAN,
+      CHAINLINK_PRICE_CHECKER,
       address(0),
       AaveV2EthereumAssets.AAVE_UNDERLYING,
       AaveV2EthereumAssets.WETH_ORACLE,
@@ -182,8 +153,10 @@ contract AaveCOWSwapsSwap is AaveCOWSwapsTest {
 
   function test_revertsIf_toTokenIsZeroAddress() public {
     vm.startPrank(AaveGovernanceV2.SHORT_EXECUTOR);
-    vm.expectRevert(AaveCOWSwaps.Invalid0xAddress.selector);
+    vm.expectRevert(AaveSwapper.Invalid0xAddress.selector);
     swaps.swap(
+      MILKMAN,
+      CHAINLINK_PRICE_CHECKER,
       AaveV2EthereumAssets.WETH_UNDERLYING,
       address(0),
       AaveV2EthereumAssets.WETH_ORACLE,
@@ -197,8 +170,10 @@ contract AaveCOWSwapsSwap is AaveCOWSwapsTest {
 
   function test_revertsIf_invalidRecipient() public {
     vm.startPrank(AaveGovernanceV2.SHORT_EXECUTOR);
-    vm.expectRevert(AaveCOWSwaps.InvalidRecipient.selector);
+    vm.expectRevert(AaveSwapper.InvalidRecipient.selector);
     swaps.swap(
+      MILKMAN,
+      CHAINLINK_PRICE_CHECKER,
       AaveV2EthereumAssets.AAVE_UNDERLYING,
       AaveV2EthereumAssets.USDC_UNDERLYING,
       AaveV2EthereumAssets.AAVE_ORACLE,
@@ -221,9 +196,12 @@ contract AaveCOWSwapsSwap is AaveCOWSwapsTest {
       AaveV2EthereumAssets.AAVE_ORACLE,
       AaveV2EthereumAssets.USDC_ORACLE,
       1_000e18,
-      address(AaveV2Ethereum.COLLECTOR)
+      address(AaveV2Ethereum.COLLECTOR),
+      200
     );
     swaps.swap(
+      MILKMAN,
+      CHAINLINK_PRICE_CHECKER,
       AaveV2EthereumAssets.AAVE_UNDERLYING,
       AaveV2EthereumAssets.USDC_UNDERLYING,
       AaveV2EthereumAssets.AAVE_ORACLE,
@@ -236,12 +214,13 @@ contract AaveCOWSwapsSwap is AaveCOWSwapsTest {
   }
 }
 
-contract CancelSwap is AaveCOWSwapsTest {
+contract CancelSwap is AaveSwapperTest {
   function test_revertsIf_invalidCaller() public {
     uint256 amount = 1_000e18;
     vm.expectRevert('ONLY_BY_OWNER_OR_GUARDIAN');
     swaps.cancelSwap(
       makeAddr('milkman-instance'),
+      CHAINLINK_PRICE_CHECKER,
       AaveV2EthereumAssets.WETH_UNDERLYING,
       AaveV2EthereumAssets.AAVE_UNDERLYING,
       AaveV2EthereumAssets.WETH_ORACLE,
@@ -256,6 +235,8 @@ contract CancelSwap is AaveCOWSwapsTest {
     deal(AaveV2EthereumAssets.AAVE_UNDERLYING, address(swaps), 1_000e18);
     vm.startPrank(AaveGovernanceV2.SHORT_EXECUTOR);
     swaps.swap(
+      MILKMAN,
+      CHAINLINK_PRICE_CHECKER,
       AaveV2EthereumAssets.AAVE_UNDERLYING,
       AaveV2EthereumAssets.USDC_UNDERLYING,
       AaveV2EthereumAssets.AAVE_ORACLE,
@@ -268,6 +249,7 @@ contract CancelSwap is AaveCOWSwapsTest {
     vm.expectRevert();
     swaps.cancelSwap(
       makeAddr('not-milkman-instance'),
+      CHAINLINK_PRICE_CHECKER,
       AaveV2EthereumAssets.AAVE_UNDERLYING,
       AaveV2EthereumAssets.USDC_UNDERLYING,
       AaveV2EthereumAssets.AAVE_ORACLE,
@@ -290,9 +272,12 @@ contract CancelSwap is AaveCOWSwapsTest {
       AaveV2EthereumAssets.AAVE_ORACLE,
       AaveV2EthereumAssets.USDC_ORACLE,
       1_000e18,
-      address(AaveV2Ethereum.COLLECTOR)
+      address(AaveV2Ethereum.COLLECTOR),
+      200
     );
     swaps.swap(
+      MILKMAN,
+      CHAINLINK_PRICE_CHECKER,
       AaveV2EthereumAssets.AAVE_UNDERLYING,
       AaveV2EthereumAssets.USDC_UNDERLYING,
       AaveV2EthereumAssets.AAVE_ORACLE,
@@ -310,6 +295,7 @@ contract CancelSwap is AaveCOWSwapsTest {
     );
     swaps.cancelSwap(
       0xd0B587b7712a495499d45F761e234839d7E8D026, // Address generated by tests
+      CHAINLINK_PRICE_CHECKER,
       AaveV2EthereumAssets.AAVE_UNDERLYING,
       AaveV2EthereumAssets.USDC_UNDERLYING,
       AaveV2EthereumAssets.AAVE_ORACLE,
@@ -322,10 +308,14 @@ contract CancelSwap is AaveCOWSwapsTest {
   }
 }
 
-contract EmergencyTokenTransfer is AaveCOWSwapsTest {
+contract EmergencyTokenTransfer is AaveSwapperTest {
   function test_revertsIf_invalidCaller() public {
     vm.expectRevert('ONLY_RESCUE_GUARDIAN');
-    swaps.emergencyTokenTransfer(AaveV2EthereumAssets.BAL_UNDERLYING, address(AaveV2Ethereum.COLLECTOR), 1_000e6);
+    swaps.emergencyTokenTransfer(
+      AaveV2EthereumAssets.BAL_UNDERLYING,
+      address(AaveV2Ethereum.COLLECTOR),
+      1_000e6
+    );
   }
 
   function test_successful_governanceCaller() public {
@@ -346,7 +336,11 @@ contract EmergencyTokenTransfer is AaveCOWSwapsTest {
     );
 
     vm.startPrank(AaveGovernanceV2.SHORT_EXECUTOR);
-    swaps.emergencyTokenTransfer(AaveV2EthereumAssets.AAVE_UNDERLYING, address(AaveV2Ethereum.COLLECTOR), aaveAmount);
+    swaps.emergencyTokenTransfer(
+      AaveV2EthereumAssets.AAVE_UNDERLYING,
+      address(AaveV2Ethereum.COLLECTOR),
+      aaveAmount
+    );
     vm.stopPrank();
 
     assertEq(
@@ -357,11 +351,12 @@ contract EmergencyTokenTransfer is AaveCOWSwapsTest {
   }
 }
 
-contract GetExpectedOut is AaveCOWSwapsTest {
+contract GetExpectedOut is AaveSwapperTest {
   function test_revertsIf_fromOracleIsAddressZero() public {
     uint256 amount = 1e18;
-    vm.expectRevert(AaveCOWSwaps.OracleNotSet.selector);
+    vm.expectRevert(AaveSwapper.OracleNotSet.selector);
     swaps.getExpectedOut(
+      CHAINLINK_PRICE_CHECKER,
       amount,
       AaveV2EthereumAssets.AAVE_UNDERLYING,
       AaveV2EthereumAssets.USDC_UNDERLYING,
@@ -372,8 +367,9 @@ contract GetExpectedOut is AaveCOWSwapsTest {
 
   function test_revertsIf_toOracleIsAddressZero() public {
     uint256 amount = 1e18;
-    vm.expectRevert(AaveCOWSwaps.OracleNotSet.selector);
+    vm.expectRevert(AaveSwapper.OracleNotSet.selector);
     swaps.getExpectedOut(
+      CHAINLINK_PRICE_CHECKER,
       amount,
       AaveV2EthereumAssets.AAVE_UNDERLYING,
       AaveV2EthereumAssets.USDC_UNDERLYING,
@@ -392,6 +388,7 @@ contract GetExpectedOut is AaveCOWSwapsTest {
      */
     uint256 amount = 1e18;
     uint256 expected = swaps.getExpectedOut(
+      CHAINLINK_PRICE_CHECKER,
       amount,
       AaveV2EthereumAssets.AAVE_UNDERLYING,
       AaveV2EthereumAssets.USDC_UNDERLYING,
@@ -406,6 +403,7 @@ contract GetExpectedOut is AaveCOWSwapsTest {
   function test_aaveToUsdc() public {
     uint256 amount = 1e18;
     uint256 expected = swaps.getExpectedOut(
+      CHAINLINK_PRICE_CHECKER,
       amount,
       AaveV3EthereumAssets.AAVE_UNDERLYING,
       AaveV3EthereumAssets.USDC_UNDERLYING,
@@ -420,6 +418,7 @@ contract GetExpectedOut is AaveCOWSwapsTest {
   function test_ethToDai() public {
     uint256 amount = 1e18;
     uint256 expected = swaps.getExpectedOut(
+      CHAINLINK_PRICE_CHECKER,
       amount,
       AaveV3EthereumAssets.WETH_UNDERLYING,
       AaveV3EthereumAssets.DAI_UNDERLYING,
@@ -434,6 +433,7 @@ contract GetExpectedOut is AaveCOWSwapsTest {
   function test_ethToBal() public {
     uint256 amount = 1e18;
     uint256 expected = swaps.getExpectedOut(
+      CHAINLINK_PRICE_CHECKER,
       amount,
       AaveV3EthereumAssets.WETH_UNDERLYING,
       AaveV3EthereumAssets.BAL_UNDERLYING,
@@ -449,6 +449,7 @@ contract GetExpectedOut is AaveCOWSwapsTest {
   function test_balTo80BAL20WETH() public {
     uint256 amount = 100e18;
     uint256 expected = swaps.getExpectedOut(
+      BPT_PRICE_CHECKER,
       amount,
       AaveV3EthereumAssets.BAL_UNDERLYING,
       BAL80WETH20,
