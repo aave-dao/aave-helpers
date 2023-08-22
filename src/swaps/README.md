@@ -1,28 +1,30 @@
-# Aave <> CoW Swap: AaveCOWSwaps
+# Aave <> CoW Swap: AaveSwapper
 
-The AaveCOWSwaps is a smart contract tool deveoped in order to more easily allow the Aave DAO to swap its tokens.
+The AaveSwapper is a smart contract tool deveoped in order to more easily allow the Aave DAO to swap its tokens.
 Up until now, the DAO relied on custom one-use contracts in order to accomplish the swap of one token for another.
 Some examples include the BAL <> AAVE swap from 2022, the acquisition of CRV or the acquisition of B-80BAL-20WETH.
 All the instances listed above required significant time to develop, test, and review, all while reinventing the
 wheel every time for something that should be easy to reuse.
 
-AaveCOWSwaps facilitates swaps of tokens by the DAO without the constant need to review the contracts that do so.
+AaveSwapper facilitates swaps of tokens by the DAO without the constant need to review the contracts that do so.
 
 ## How It Works
 
-AaveCOWSwaps relies on [Milkman](https://github.com/charlesndalton/milkman), a smart contract that builds on top of
+AaveSwapper relies on [Milkman](https://github.com/charlesndalton/milkman), a smart contract that builds on top of
 [COW Swap](https://swap.cow.fi/#/faq/protocol), under the hood in order to find the best possible swap execution for
 the DAO while protecting funds from MEV exploits and bad slippage.
 
-AaveCOWSwaps is a permissioned smart contract, and it has two potential privileged users: the owner and the guardian.
+AaveSwapper is a permissioned smart contract, and it has two potential privileged users: the owner and the guardian.
 The owner will be the DAO (however, ownership can be transferred) and the guardian is an address to be chosen by the
-DAO to more easily cancel swaps without relying on governance. AaveCOWSwaps can hold funds and swap for other tokens
-and keep them in case the DAO chooses so. AaveCOWSwaps can only withdraw tokens to the Collector contract.
+DAO to more easily cancel swaps without relying on governance. AaveSwapper can hold funds and swap for other tokens
+and keep them in case the DAO chooses so. AaveSwapper can only withdraw tokens to the Collector contract.
 
 ### Methods
 
 ```
 function swap(
+    address milkman,
+    address priceChecker,
     address fromToken,
     address toToken,
     address fromOracle,
@@ -50,7 +52,7 @@ does not mean that's what the trade will definitely trade at. CoW Swap finds the
 competing at market prices for swaps all the time and they are incentivized to keep prices tight in order to get picked as executors.
 
 Some tokens that are not "standard" ERC-20, such as Aave Interest Bearing Tokens (aTokens) are more gas consuming because the solvers
-take into account the costs of wrapping and unwrapping the tokens. AaveCOWSwaps supports aToken to aToken swaps though it is easier to
+take into account the costs of wrapping and unwrapping the tokens. AaveSwapper supports aToken to aToken swaps though it is easier to
 swap between underlyings.
 
 Depending on the tokens and amounts, slippage will have to vary. A good heuristic is:
@@ -63,14 +65,15 @@ Trades in the low thousands and less are not really worth swapping because gas c
 
 The [CoW Swap UI](https://swap.cow.fi/#/1/swap/WETH) can be checked to get an estimate of slippage if executing at that time.
 
-AaveCOWSwaps uses Chainlink oracles for its slippage protection feature. Governance should enforce that all oracles set are
-base-USD (ie: V3 oracles and not V2 oracles). AaveCOWSwaps supports base-ETH swaps as well, but both bases have to be the same.
+AaveSwapper uses Chainlink oracles for its slippage protection feature. Governance should enforce that all oracles set are
+base-USD (ie: V3 oracles and not V2 oracles). AaveSwapper supports base-ETH swaps as well, but both bases have to be the same.
 For example USDC/ETH to AAVE/ETH or USDC/USD to AAVE/USD. It does not support USDC/ETH to AAVE/USD swaps and this can lead to
 bad trades because of price differences.
 
 ```
 function cancelSwap(
     address tradeMilkman,
+    address priceChecker,
     address fromToken,
     address toToken,
     address fromOracle,
@@ -86,21 +89,23 @@ should move fast to cancel.
 
 Most likely, this function will be called when a swap is not getting executed because slippage might be too tight and there's no match for it.
 
-`function setMilkmanAddress(address _milkman) external onlyOwner`
+```
 
-Milkman is a [smart contract](https://github.com/charlesndalton/milkman) that programatically submits trades on COW Swap via
-smart contracts. COW Swap otherwise uses an off-chain AIP. The team listens to events emitted by Milkman and then handles
-trading afterward. Milkman then checks orders submitted to see if they meet the parameters specified. In case Milkman is upgraded
-to a new address, this function let's the contract update the address.
+  function getExpectedOut(
+    address priceChecker,
+    uint256 amount,
+    address fromToken,
+    address toToken,
+    address fromOracle,
+    address toOracle
+  ) public view returns (uint256)
+```
 
-`function setChainlinkPriceChecker(address _priceChecker) external onlyOwner`
-
-Allows to update the Chainlink Price Checker (read about price checkers [here](https://github.com/charlesndalton/milkman#price-checkers))
-if the price checker were to be upgraded.
+Get the expected amount of tokens when doing a swap. Informational only.
 
 `function emergencyTokenTransfer(address token, address recipient, uint256 amount) external onlyRescueGuardian`
 
-Withdrawal function for funds to leave AaveCurator. They can only be withdrawn to the Aave Collector contract.
+Withdrawal function for funds to leave AaveCurator. Only the owner can call this function.
 
 ```
   function _getPriceCheckerAndData(
