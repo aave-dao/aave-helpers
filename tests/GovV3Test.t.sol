@@ -7,12 +7,13 @@ import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 
-contract GovernanceTest is Test {
+contract GovernanceV3Test is Test {
   function setUp() public {
     vm.createSelectFork('sepolia', 4136682);
   }
 
   function testCreateProposal() public {
+    GovV3Helpers.executePayload(vm, 1);
     // PayloadsControllerUtils.ExecutionAction[]
     //   memory actions = new PayloadsControllerUtils.ExecutionAction[](2);
     // actions[0] = GovV3Helpers.buildMainnet(1);

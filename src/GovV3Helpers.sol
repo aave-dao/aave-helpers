@@ -5,6 +5,8 @@ import {Vm} from 'forge-std/Vm.sol';
 import {console2} from 'forge-std/console2.sol';
 import {ChainIds} from './ChainIds.sol';
 import {PayloadsControllerUtils, IGovernancePowerStrategy, IPayloadsControllerCore, IGovernanceCore} from 'aave-address-book/GovernanceV3.sol';
+import {AaveV3SepoliaGovV3} from 'aave-address-book/AaveV3Sepolia.sol';
+import {StorageHelpers} from './StorageHelpers.sol';
 
 // import {AaveV3EthereumGovV3} from 'aave-address-book/AaveV3Ethereum.sol';
 library AaveV3EthereumGovV3 {
@@ -287,31 +289,50 @@ library GovV3Helpers {
 
     IPayloadsControllerCore.Payload memory payload = IPayloadsControllerCore(payloadsController)
       .getPayloadById(payloadId);
-    require(
-      payload.state == IPayloadsControllerCore.PayloadState.Created,
-      'PAYLOAD DOES NOT EXIST'
+    require(payload.state != IPayloadsControllerCore.PayloadState.None, 'PAYLOAD DOES NOT EXIST');
+
+    // struct Payload {
+    //   address creator; 0: 160
+    //   PayloadsControllerUtils.AccessControl maximumAccessLevelRequired; 0: 160-168
+    //   PayloadState state; 0: 168-176
+    //   uint40 createdAt; 0: 176-216
+    //   uint40 queuedAt; 0: 216-256
+    //   uint40 executedAt; 1: 40
+    //   uint40 cancelledAt; 1: 40-80
+    //   uint40 expirationTime; 80-120
+    //   uint40 delay; 120-160
+    //   uint40 gracePeriod; 160-200
+    //   ExecutionAction[] actions; 200-256
+    // }
+
+    uint256 proposalBaseSlot = StorageHelpers.getStorageSlotUintMapping(3, payloadId);
+    vm.store(
+      payloadsController,
+      bytes32(proposalBaseSlot),
+      bytes32(
+        abi.encodePacked(
+          uint40(block.timestamp - payload.delay - 1), //payload.queuedAt,
+          payload.createdAt,
+          IPayloadsControllerCore.PayloadState.Queued, // overwriting state to be queued
+          payload.maximumAccessLevelRequired,
+          payload.creator
+        )
+      )
     );
-
-    // override storage so payload can be executed
-    //    payload.state = PayloadState.Queued;
-    // StdStorage memory stdstore;
-    // stdstore
-    //   .target(address(payloadsController))
-    //   .sig('_payloads(uint40)')
-    //   .with_key(uint40(payloadId))
-    //   .depth(2)
-    //   .checked_write(uint8(IPayloadsControllerCore.PayloadState.Queued));
-
-    // //    payload.queuedAt = uint40(block.timestamp);
-    // stdStorage
-    //   .target(address(payloadsController))
-    //   .sig('_payloads(uint40)')
-    //   .with_key(uint40(payloadId))
-    //   .depth(4)
-    //   .checked_write(block.timestamp);
-
-    // skip to after queue delay
-    // skip(payload.delay + 1);
+    // vm.store(
+    //   payloadsController,
+    //   bytes32(proposalBaseSlot + 1),
+    //   bytes32(
+    //     abi.encodePacked(
+    //       uint56(payload.actions.length),
+    //       payload.gracePeriod,
+    //       payload.delay,
+    //       payload.expirationTime,
+    //       payload.cancelledAt,
+    //       payload.executedAt
+    //     )
+    //   )
+    // );
 
     IPayloadsControllerCore(payloadsController).executePayload(payloadId);
   }
@@ -331,6 +352,8 @@ library GovV3Helpers {
       return AaveV3MetisGovV3.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.BASE) {
       return AaveV3BaseGovV3.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.SEPOLIA) {
+      return AaveV3SepoliaGovV3.PAYLOADS_CONTROLLER;
     }
 
     return address(0);
