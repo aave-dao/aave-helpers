@@ -2,22 +2,49 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import {Vm} from 'forge-std/Vm.sol';
+import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
 import {console2} from 'forge-std/console2.sol';
 import {ChainIds} from './ChainIds.sol';
 import {PayloadsControllerUtils, IGovernancePowerStrategy, IPayloadsControllerCore, IGovernanceCore} from 'aave-address-book/GovernanceV3.sol';
-import {AaveV3EthereumGovV3} from 'aave-address-book/AaveV3Ethereum.sol';
 
-library GovHelpers {
+// import {AaveV3EthereumGovV3} from 'aave-address-book/AaveV3Ethereum.sol';
+library AaveV3EthereumGovV3 {
+  address constant PAYLOADS_CONTROLLER = address(0);
+}
+
+library AaveV3OptimismGovV3 {
+  address constant PAYLOADS_CONTROLLER = address(0);
+}
+
+library AaveV3ArbitrumGovV3 {
+  address constant PAYLOADS_CONTROLLER = address(0);
+}
+
+library AaveV3FantomGovV3 {
+  address constant PAYLOADS_CONTROLLER = address(0);
+}
+
+library AaveV3MetisGovV3 {
+  address constant PAYLOADS_CONTROLLER = address(0);
+}
+
+library AaveV3PolygonGovV3 {
+  address constant PAYLOADS_CONTROLLER = address(0);
+}
+
+library AaveV3AvalancheGovV3 {
+  address constant PAYLOADS_CONTROLLER = address(0);
+}
+
+library AaveV3BaseGovV3 {
+  address constant PAYLOADS_CONTROLLER = address(0);
+}
+
+library GovV3Helpers {
+  using StdStorage for stdStorage;
+
   error ExecutorNotFound();
   error LongBytesNotSupportedYet();
-
-  struct Payload {
-    address target;
-    uint256 value;
-    string signature;
-    bytes callData;
-    bool withDelegatecall;
-  }
 
   function ipfsHashFile(Vm vm, string memory filePath, bool upload) internal returns (bytes32) {
     string[] memory inputs = new string[](8);
@@ -76,7 +103,7 @@ library GovHelpers {
   }
 
   function createPayload(
-    ExecutionAction[] memory actions,
+    IPayloadsControllerCore.ExecutionAction[] memory actions,
     PayloadsControllerUtils.AccessControl accessLevel
   ) internal returns (uint256) {
     address payloadsController = _getPayloadsController(block.chainid);
@@ -89,7 +116,7 @@ library GovHelpers {
   function buildMainnet(
     uint256 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
-  ) internal pure returns (Payload memory) {
+  ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
       accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
       'INCORRECT ACCESS LEVEL'
@@ -106,7 +133,7 @@ library GovHelpers {
   function buildOptimism(
     uint256 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
-  ) internal pure returns (Payload memory) {
+  ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
       accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
       'INCORRECT ACCESS LEVEL'
@@ -123,7 +150,7 @@ library GovHelpers {
   function buildArbitrum(
     uint256 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
-  ) internal pure returns (Payload memory) {
+  ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
       accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
       'INCORRECT ACCESS LEVEL'
@@ -140,7 +167,7 @@ library GovHelpers {
   function buildPolygon(
     uint256 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
-  ) internal pure returns (Payload memory) {
+  ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
       accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
       'INCORRECT ACCESS LEVEL'
@@ -157,7 +184,7 @@ library GovHelpers {
   function buildMetis(
     uint256 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
-  ) internal pure returns (Payload memory) {
+  ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
       accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
       'INCORRECT ACCESS LEVEL'
@@ -169,7 +196,7 @@ library GovHelpers {
   function buildBase(
     uint256 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
-  ) internal pure returns (Payload memory) {
+  ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
       accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
       'INCORRECT ACCESS LEVEL'
@@ -181,7 +208,7 @@ library GovHelpers {
   function buildAvalanche(
     uint256 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
-  ) internal pure returns (Payload memory) {
+  ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
       accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
       'INCORRECT ACCESS LEVEL'
@@ -198,7 +225,7 @@ library GovHelpers {
   function buildOptimism(
     uint256 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
-  ) internal pure returns (Payload memory) {
+  ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
       accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
       'INCORRECT ACCESS LEVEL'
@@ -228,7 +255,7 @@ library GovHelpers {
   }
 
   function createProposal(
-    Payload[] memory payloads,
+    PayloadsControllerUtils.Payload[] memory payloads,
     address votingPortal,
     bytes32 ipfsHash
   ) internal returns (uint256) {
@@ -236,7 +263,7 @@ library GovHelpers {
   }
 
   function createProposal(
-    Payload[] memory payloads,
+    PayloadsControllerUtils.Payload[] memory payloads,
     address votingPortal,
     bytes32 ipfsHash,
     bool emitLog
@@ -281,23 +308,23 @@ library GovHelpers {
 
     // override storage so payload can be executed
     //    payload.state = PayloadState.Queued;
-    stdstore
-      .target(address(metaRpg))
+    stdStorage
+      .target(address(payloadsController))
       .sig('_payloads(uint40)')
       .with_key(uint40(payloadId))
       .depth(2)
       .checked_write(IPayloadsControllerCore.PayloadsState.Queued);
 
     //    payload.queuedAt = uint40(block.timestamp);
-    stdstore
-      .target(address(metaRpg))
+    stdStorage
+      .target(address(payloadsController))
       .sig('_payloads(uint40)')
       .with_key(uint40(payloadId))
       .depth(4)
       .checked_write(block.timestamp);
 
     // skip to after queue delay
-    skip(payload.delay + 1);
+    // skip(payload.delay + 1);
 
     IPayloadsControllerCore(payloadsController).executePayload(payloadId);
   }
