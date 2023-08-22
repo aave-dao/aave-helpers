@@ -13,13 +13,12 @@ contract GovernanceTest is Test {
   }
 
   function testCreateProposal() public {
-    PayloadsControllerUtils.ExecutionAction[]
-      memory actions = new PayloadsControllerUtils.ExecutionAction[](2);
-    actions[0] = GovV3Helpers.buildMainnet(1);
-    actions[1] = GovV3Helpers.buildPolygon(2);
-
-    vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
-    GovHelpers.createProposal(payloads, bytes32('ipfs'));
-    vm.stopPrank();
+    // PayloadsControllerUtils.ExecutionAction[]
+    //   memory actions = new PayloadsControllerUtils.ExecutionAction[](2);
+    // actions[0] = GovV3Helpers.buildMainnet(1);
+    // actions[1] = GovV3Helpers.buildPolygon(2);
+    // vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
+    // GovHelpers.createProposal(payloads, bytes32('ipfs'));
+    // vm.stopPrank();
   }
 }

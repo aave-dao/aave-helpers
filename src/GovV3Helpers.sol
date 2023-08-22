@@ -2,7 +2,6 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import {Vm} from 'forge-std/Vm.sol';
-import {StdStorage, stdStorage} from 'forge-std/StdStorage.sol';
 import {console2} from 'forge-std/console2.sol';
 import {ChainIds} from './ChainIds.sol';
 import {PayloadsControllerUtils, IGovernancePowerStrategy, IPayloadsControllerCore, IGovernanceCore} from 'aave-address-book/GovernanceV3.sol';
@@ -10,6 +9,7 @@ import {PayloadsControllerUtils, IGovernancePowerStrategy, IPayloadsControllerCo
 // import {AaveV3EthereumGovV3} from 'aave-address-book/AaveV3Ethereum.sol';
 library AaveV3EthereumGovV3 {
   address constant PAYLOADS_CONTROLLER = address(0);
+  IGovernanceCore constant GOVERNANCE = IGovernanceCore(address(0));
 }
 
 library AaveV3OptimismGovV3 {
@@ -41,8 +41,6 @@ library AaveV3BaseGovV3 {
 }
 
 library GovV3Helpers {
-  using StdStorage for stdStorage;
-
   error ExecutorNotFound();
   error LongBytesNotSupportedYet();
 
@@ -82,7 +80,7 @@ library GovV3Helpers {
   function buildAction(
     address payloadAddress,
     PayloadsControllerUtils.AccessControl accessLevel
-  ) internal returns (IPayloadsControllerCore.ExecutionAction) {
+  ) internal returns (IPayloadsControllerCore.ExecutionAction memory) {
     address payloadsController = _getPayloadsController(block.chainid);
     require(payloadsController != address(0), 'INVALID CHAIN ID');
     require(payloadAddress != address(0), 'INVALID PAYLOAD ADDRESS');
@@ -114,7 +112,7 @@ library GovV3Helpers {
   }
 
   function buildMainnet(
-    uint256 payloadId,
+    uint40 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
   ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
@@ -130,25 +128,8 @@ library GovV3Helpers {
       );
   }
 
-  function buildOptimism(
-    uint256 payloadId,
-    PayloadsControllerUtils.AccessControl accessLevel
-  ) internal pure returns (PayloadsControllerUtils.Payload memory) {
-    require(
-      accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
-      'INCORRECT ACCESS LEVEL'
-    );
-    return
-      _buildPayload(
-        AaveV3OptimismGovV3.PAYLOADS_CONTROLLER,
-        ChainIds.OPTIMISM,
-        accessLevel,
-        payloadId
-      );
-  }
-
   function buildArbitrum(
-    uint256 payloadId,
+    uint40 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
   ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
@@ -165,7 +146,7 @@ library GovV3Helpers {
   }
 
   function buildPolygon(
-    uint256 payloadId,
+    uint40 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
   ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
@@ -182,7 +163,7 @@ library GovV3Helpers {
   }
 
   function buildMetis(
-    uint256 payloadId,
+    uint40 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
   ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
@@ -194,7 +175,7 @@ library GovV3Helpers {
   }
 
   function buildBase(
-    uint256 payloadId,
+    uint40 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
   ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
@@ -206,7 +187,7 @@ library GovV3Helpers {
   }
 
   function buildAvalanche(
-    uint256 payloadId,
+    uint40 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
   ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
@@ -223,7 +204,7 @@ library GovV3Helpers {
   }
 
   function buildOptimism(
-    uint256 payloadId,
+    uint40 payloadId,
     PayloadsControllerUtils.AccessControl accessLevel
   ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     require(
@@ -243,8 +224,8 @@ library GovV3Helpers {
     address payloadsController,
     uint256 chainId,
     PayloadsControllerUtils.AccessControl accessLevel,
-    uint256 payloadId
-  ) internal returns (PayloadsControllerUtils.Payload) {
+    uint40 payloadId
+  ) internal pure returns (PayloadsControllerUtils.Payload memory) {
     return
       PayloadsControllerUtils.Payload({
         chain: chainId,
@@ -292,36 +273,42 @@ library GovV3Helpers {
         )
       );
     }
-    return IGovernanceCore(AaveV3EthereumGovV3.GOVERNANCE).create(payloads, votingPortal, ipfsHash);
+    return
+      IGovernanceCore(AaveV3EthereumGovV3.GOVERNANCE).createProposal(
+        payloads,
+        votingPortal,
+        ipfsHash
+      );
   }
 
-  function executePayload(Vm vm, uint256 payloadId) internal {
+  function executePayload(Vm vm, uint40 payloadId) internal {
     address payloadsController = _getPayloadsController(block.chainid);
     require(payloadsController != address(0), 'INVALID CHAIN ID');
 
     IPayloadsControllerCore.Payload memory payload = IPayloadsControllerCore(payloadsController)
       .getPayloadById(payloadId);
     require(
-      payloadId.state == IPayloadsControllerCore.PayloadState.Created,
+      payload.state == IPayloadsControllerCore.PayloadState.Created,
       'PAYLOAD DOES NOT EXIST'
     );
 
     // override storage so payload can be executed
     //    payload.state = PayloadState.Queued;
-    stdStorage
-      .target(address(payloadsController))
-      .sig('_payloads(uint40)')
-      .with_key(uint40(payloadId))
-      .depth(2)
-      .checked_write(IPayloadsControllerCore.PayloadsState.Queued);
+    // StdStorage memory stdstore;
+    // stdstore
+    //   .target(address(payloadsController))
+    //   .sig('_payloads(uint40)')
+    //   .with_key(uint40(payloadId))
+    //   .depth(2)
+    //   .checked_write(uint8(IPayloadsControllerCore.PayloadState.Queued));
 
-    //    payload.queuedAt = uint40(block.timestamp);
-    stdStorage
-      .target(address(payloadsController))
-      .sig('_payloads(uint40)')
-      .with_key(uint40(payloadId))
-      .depth(4)
-      .checked_write(block.timestamp);
+    // //    payload.queuedAt = uint40(block.timestamp);
+    // stdStorage
+    //   .target(address(payloadsController))
+    //   .sig('_payloads(uint40)')
+    //   .with_key(uint40(payloadId))
+    //   .depth(4)
+    //   .checked_write(block.timestamp);
 
     // skip to after queue delay
     // skip(payload.delay + 1);
