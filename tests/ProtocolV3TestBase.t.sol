@@ -4,6 +4,8 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {ProtocolV3LegacyTestBase, ProtocolV3TestBase, ReserveConfig} from '../src/ProtocolV3TestBase.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
+import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
+
 import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 
 contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
@@ -54,6 +56,16 @@ contract ProtocolV3TestE2ETestAll is ProtocolV3TestBase {
 
   function test_e2e() public {
     e2eTest(AaveV3Optimism.POOL);
+  }
+}
+
+contract ProtocolV3TestE2ETestAllMainnet is ProtocolV3TestBase {
+  function setUp() public {
+    vm.createSelectFork('mainnet', 17990597);
+  }
+
+  function test_e2e() public {
+    e2eTest(AaveV3Ethereum.POOL);
   }
 }
 

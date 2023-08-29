@@ -10,6 +10,7 @@ import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 
 interface IERC20Detailed is IERC20 {
   function name() external view returns (string memory);
@@ -120,6 +121,8 @@ contract ProtocolV3TestBase is CommonTestBase {
       if (_includeInE2e(configs[i])) {
         e2eTestAsset(pool, collateralConfig, configs[i]);
         vm.revertTo(snapshot);
+      } else {
+        console.log('E2E: TestAsset %s SKIPPED', configs[i].symbol);
       }
     }
   }
@@ -138,33 +141,54 @@ contract ProtocolV3TestBase is CommonTestBase {
     address testAssetSupplier = vm.addr(4);
     require(collateralConfig.usageAsCollateralEnabled, 'COLLATERAL_CONFIG_MUST_BE_COLLATERAL');
     uint256 testAssetAmount = _getTokenAmountByDollarValue(pool, testAssetConfig, 100);
-    if (
-      (testAssetConfig.supplyCap * 10 ** testAssetConfig.decimals) <
-      IERC20(testAssetConfig.aToken).totalSupply() + testAssetAmount
-    ) {
-      console.log('Skip: %s, supply cap fully utilized', testAssetConfig.symbol);
-      return;
-    }
-    _deposit(
-      collateralConfig,
-      pool,
-      collateralSupplier,
-      _getTokenAmountByDollarValue(pool, collateralConfig, 10000)
-    );
-    _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
-    uint256 snapshot = vm.snapshot();
-    // test withdrawal
-    _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
-    _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
-    vm.revertTo(snapshot);
-    // test variable borrowing
-    if (testAssetConfig.borrowingEnabled) {
-      _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
-      vm.revertTo(snapshot);
-      // test stable borrowing
-      if (testAssetConfig.stableBorrowRateEnabled) {
-        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
+    // GHO is a special case as it cannot be supplied
+    if (testAssetConfig.underlying == AaveV3EthereumAssets.GHO_UNDERLYING) {
+      _deposit(
+        collateralConfig,
+        pool,
+        collateralSupplier,
+        _getTokenAmountByDollarValue(pool, collateralConfig, 10000)
+      );
+      uint256 snapshot = vm.snapshot();
+      // test variable borrowing
+      if (testAssetConfig.borrowingEnabled) {
+        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
         vm.revertTo(snapshot);
+        // test stable borrowing
+        if (testAssetConfig.stableBorrowRateEnabled) {
+          _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
+          vm.revertTo(snapshot);
+        }
+      }
+    } else {
+      if (
+        (testAssetConfig.supplyCap * 10 ** testAssetConfig.decimals) <
+        IERC20(testAssetConfig.aToken).totalSupply() + testAssetAmount
+      ) {
+        console.log('Skip: %s, supply cap fully utilized', testAssetConfig.symbol);
+        return;
+      }
+      _deposit(
+        collateralConfig,
+        pool,
+        collateralSupplier,
+        _getTokenAmountByDollarValue(pool, collateralConfig, 10000)
+      );
+      _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
+      uint256 snapshot = vm.snapshot();
+      // test withdrawal
+      _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
+      _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
+      vm.revertTo(snapshot);
+      // test variable borrowing
+      if (testAssetConfig.borrowingEnabled) {
+        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
+        vm.revertTo(snapshot);
+        // test stable borrowing
+        if (testAssetConfig.stableBorrowRateEnabled) {
+          _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
+          vm.revertTo(snapshot);
+        }
       }
     }
   }
