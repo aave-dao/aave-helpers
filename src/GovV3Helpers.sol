@@ -2,81 +2,25 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import {Vm} from 'forge-std/Vm.sol';
-import {console2} from 'forge-std/console2.sol';
 import {ChainIds} from './ChainIds.sol';
+import {IpfsUtils} from './IpfsUtils.sol';
+import {console2} from 'forge-std/console2.sol';
 import {PayloadsControllerUtils, IGovernancePowerStrategy, IPayloadsControllerCore, IGovernanceCore} from 'aave-address-book/GovernanceV3.sol';
-import {AaveV3SepoliaGovV3} from 'aave-address-book/AaveV3Sepolia.sol';
+import {GovernanceV3Sepolia} from 'aave-address-book/GovernanceV3Sepolia.sol';
+import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
+import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
+import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
+import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
+import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 
-// import {AaveV3EthereumGovV3} from 'aave-address-book/AaveV3Ethereum.sol';
-library AaveV3EthereumGovV3 {
-  address constant PAYLOADS_CONTROLLER = address(0);
-  IGovernanceCore constant GOVERNANCE = IGovernanceCore(address(0));
-}
-
-library AaveV3OptimismGovV3 {
-  address constant PAYLOADS_CONTROLLER = address(0);
-}
-
-library AaveV3ArbitrumGovV3 {
-  address constant PAYLOADS_CONTROLLER = address(0);
-}
-
-library AaveV3FantomGovV3 {
-  address constant PAYLOADS_CONTROLLER = address(0);
-}
-
-library AaveV3MetisGovV3 {
-  address constant PAYLOADS_CONTROLLER = address(0);
-}
-
-library AaveV3PolygonGovV3 {
-  address constant PAYLOADS_CONTROLLER = address(0);
-}
-
-library AaveV3AvalancheGovV3 {
-  address constant PAYLOADS_CONTROLLER = address(0);
-}
-
-library AaveV3BaseGovV3 {
-  address constant PAYLOADS_CONTROLLER = address(0);
-}
-
 library GovV3Helpers {
+  error CannotFindPayloadsController();
   error ExecutorNotFound();
   error LongBytesNotSupportedYet();
 
-  function ipfsHashFile(Vm vm, string memory filePath, bool upload) internal returns (bytes32) {
-    string[] memory inputs = new string[](8);
-    inputs[0] = 'npx';
-    inputs[1] = '--yes';
-    inputs[2] = '-s';
-    inputs[3] = '@bgd-labs/aave-cli';
-    inputs[4] = 'ipfs';
-    inputs[5] = filePath;
-    inputs[6] = '-u';
-    inputs[7] = vm.toString(upload);
-    bytes memory bs58Hash = vm.ffi(inputs);
-    // currenty there is no better way as ffi silently fails
-    // revisit once https://github.com/foundry-rs/foundry/pull/4908 progresses
-    require(
-      bs58Hash.length != 0,
-      'CALCULATED_HASH_IS_ZERO_CHECK_IF_YARN_DEPENDENCIES_ARE_INSTALLED'
-    );
-    console2.logString('Info: This preview will only work when the file has been uploaded to ipfs');
-    console2.logString(
-      string(
-        abi.encodePacked(
-          'Preview: https://app.aave.com/governance/ipfs-preview/?ipfsHash=',
-          vm.toString(bs58Hash)
-        )
-      )
-    );
-    return bytes32(bs58Hash);
-  }
-
   function ipfsHashFile(Vm vm, string memory filePath) internal returns (bytes32) {
-    return ipfsHashFile(vm, filePath, false);
+    return IpfsUtils.ipfsHashFile(vm, filePath, false);
   }
 
   function buildAction(
@@ -123,7 +67,7 @@ library GovV3Helpers {
     );
     return
       _buildPayload(
-        AaveV3EthereumGovV3.PAYLOADS_CONTROLLER,
+        GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
         ChainIds.MAINNET,
         accessLevel,
         payloadId
@@ -140,7 +84,7 @@ library GovV3Helpers {
     );
     return
       _buildPayload(
-        AaveV3ArbitrumGovV3.PAYLOADS_CONTROLLER,
+        GovernanceV3Arbitrum.PAYLOADS_CONTROLLER,
         ChainIds.ARBITRUM,
         accessLevel,
         payloadId
@@ -157,36 +101,36 @@ library GovV3Helpers {
     );
     return
       _buildPayload(
-        AaveV3PolygonGovV3.PAYLOADS_CONTROLLER,
+        GovernanceV3Polygon.PAYLOADS_CONTROLLER,
         ChainIds.POLYGON,
         accessLevel,
         payloadId
       );
   }
 
-  function buildMetis(
-    uint40 payloadId,
-    PayloadsControllerUtils.AccessControl accessLevel
-  ) internal pure returns (PayloadsControllerUtils.Payload memory) {
-    require(
-      accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
-      'INCORRECT ACCESS LEVEL'
-    );
-    return
-      _buildPayload(AaveV3MetisGovV3.PAYLOADS_CONTROLLER, ChainIds.METIS, accessLevel, payloadId);
-  }
+  // function buildMetis(
+  //   uint40 payloadId,
+  //   PayloadsControllerUtils.AccessControl accessLevel
+  // ) internal pure returns (PayloadsControllerUtils.Payload memory) {
+  //   require(
+  //     accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
+  //     'INCORRECT ACCESS LEVEL'
+  //   );
+  //   return
+  //     _buildPayload(AaveV3MetisGovV3.PAYLOADS_CONTROLLER, ChainIds.METIS, accessLevel, payloadId);
+  // }
 
-  function buildBase(
-    uint40 payloadId,
-    PayloadsControllerUtils.AccessControl accessLevel
-  ) internal pure returns (PayloadsControllerUtils.Payload memory) {
-    require(
-      accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
-      'INCORRECT ACCESS LEVEL'
-    );
-    return
-      _buildPayload(AaveV3BaseGovV3.PAYLOADS_CONTROLLER, ChainIds.BASE, accessLevel, payloadId);
-  }
+  // function buildBase(
+  //   uint40 payloadId,
+  //   PayloadsControllerUtils.AccessControl accessLevel
+  // ) internal pure returns (PayloadsControllerUtils.Payload memory) {
+  //   require(
+  //     accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
+  //     'INCORRECT ACCESS LEVEL'
+  //   );
+  //   return
+  //     _buildPayload(AaveV3BaseGovV3.PAYLOADS_CONTROLLER, ChainIds.BASE, accessLevel, payloadId);
+  // }
 
   function buildAvalanche(
     uint40 payloadId,
@@ -198,7 +142,7 @@ library GovV3Helpers {
     );
     return
       _buildPayload(
-        AaveV3AvalancheGovV3.PAYLOADS_CONTROLLER,
+        GovernanceV3Avalanche.PAYLOADS_CONTROLLER,
         ChainIds.AVALANCHE,
         accessLevel,
         payloadId
@@ -215,7 +159,7 @@ library GovV3Helpers {
     );
     return
       _buildPayload(
-        AaveV3OptimismGovV3.PAYLOADS_CONTROLLER,
+        GovernanceV3Optimism.PAYLOADS_CONTROLLER,
         ChainIds.OPTIMISM,
         accessLevel,
         payloadId
@@ -268,7 +212,7 @@ library GovV3Helpers {
     if (emitLog) {
       console2.logBytes(
         abi.encodeWithSelector(
-          AaveV3EthereumGovV3.GOVERNANCE.createProposal.selector,
+          GovernanceV3Ethereum.GOVERNANCE.createProposal.selector,
           payloads,
           votingPortal,
           ipfsHash
@@ -276,7 +220,7 @@ library GovV3Helpers {
       );
     }
     return
-      IGovernanceCore(AaveV3EthereumGovV3.GOVERNANCE).createProposal(
+      IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).createProposal(
         payloads,
         votingPortal,
         ipfsHash
@@ -339,23 +283,21 @@ library GovV3Helpers {
 
   function _getPayloadsController(uint256 chainId) internal pure returns (address) {
     if (chainId == ChainIds.MAINNET) {
-      return AaveV3EthereumGovV3.PAYLOADS_CONTROLLER;
+      return GovernanceV3Ethereum.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.POLYGON) {
-      return AaveV3PolygonGovV3.PAYLOADS_CONTROLLER;
+      return GovernanceV3Polygon.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.AVALANCHE) {
-      return AaveV3AvalancheGovV3.PAYLOADS_CONTROLLER;
+      return GovernanceV3Avalanche.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.OPTIMISM) {
-      return AaveV3OptimismGovV3.PAYLOADS_CONTROLLER;
+      return GovernanceV3Optimism.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.ARBITRUM) {
-      return AaveV3ArbitrumGovV3.PAYLOADS_CONTROLLER;
-    } else if (chainId == ChainIds.METIS) {
-      return AaveV3MetisGovV3.PAYLOADS_CONTROLLER;
-    } else if (chainId == ChainIds.BASE) {
-      return AaveV3BaseGovV3.PAYLOADS_CONTROLLER;
-    } else if (chainId == ChainIds.SEPOLIA) {
-      return AaveV3SepoliaGovV3.PAYLOADS_CONTROLLER;
+      return GovernanceV3Arbitrum.PAYLOADS_CONTROLLER;
+      // } else if (chainId == ChainIds.METIS) {
+      //   return AaveV3MetisGovV3.PAYLOADS_CONTROLLER;
+      // } else if (chainId == ChainIds.BASE) {
+      //   return AaveV3BaseGovV3.PAYLOADS_CONTROLLER;
     }
 
-    return address(0);
+    revert CannotFindPayloadsController();
   }
 }
