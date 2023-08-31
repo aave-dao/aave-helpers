@@ -4,6 +4,7 @@ pragma solidity >=0.7.5 <0.9.0;
 import 'forge-std/StdJson.sol';
 import 'forge-std/Test.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
@@ -59,6 +60,12 @@ contract CommonTestBase is Test {
       // LDO
       if (asset == AaveV3EthereumAssets.LDO_UNDERLYING) {
         vm.startPrank(0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c);
+        IERC20(asset).transfer(user, amount);
+        return true;
+      }
+      // AAVE
+      if (asset == AaveV3EthereumAssets.AAVE_UNDERLYING) {
+        vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
         IERC20(asset).transfer(user, amount);
         return true;
       }
