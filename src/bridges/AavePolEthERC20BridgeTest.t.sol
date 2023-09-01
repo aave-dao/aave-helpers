@@ -45,6 +45,21 @@ contract BridgeTest is AavePolEthERC20BridgeTest {
     bridgePolygon.bridge(AaveV3EthereumAssets.USDC_UNDERLYING, 1_000e6);
   }
 
+  function test_revertsIf_notOwner() public {
+    vm.selectFork(polygonFork);
+
+    uint256 amount = 1_000e6;
+
+    vm.startPrank(USDC_WHALE);
+    IERC20(AaveV3PolygonAssets.USDC_UNDERLYING).transfer(address(bridgePolygon), amount);
+    vm.stopPrank();
+
+    bridgePolygon.transferOwnership(AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
+
+    vm.expectRevert('Ownable: caller is not the owner');
+    bridgePolygon.bridge(AaveV3PolygonAssets.USDC_UNDERLYING, amount);
+  }
+
   function test_successful() public {
     vm.selectFork(polygonFork);
 
@@ -54,9 +69,13 @@ contract BridgeTest is AavePolEthERC20BridgeTest {
     IERC20(AaveV3PolygonAssets.USDC_UNDERLYING).transfer(address(bridgePolygon), amount);
     vm.stopPrank();
 
+    bridgePolygon.transferOwnership(AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
+
+    vm.startPrank(AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
     vm.expectEmit();
     emit Bridge(AaveV3PolygonAssets.USDC_UNDERLYING, amount);
     bridgePolygon.bridge(AaveV3PolygonAssets.USDC_UNDERLYING, amount);
+    vm.stopPrank();
   }
 }
 

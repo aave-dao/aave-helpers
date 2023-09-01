@@ -42,7 +42,7 @@ contract AavePolEthERC20Bridge is Ownable, Rescuable, IAavePolEthERC20Bridge {
    * @param token Polygon address of ERC20 token to withdraw
    * @param amount Amount of tokens to withdraw
    */
-  function bridge(address token, uint256 amount) external {
+  function bridge(address token, uint256 amount) external onlyOwner {
     if (block.chainid != ChainIds.POLYGON) revert InvalidChain();
 
     IERC20Polygon(token).withdraw(amount);
