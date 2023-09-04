@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+import {Vm} from 'forge-std/Vm.sol';
 
 library ChainIds {
   uint256 internal constant MAINNET = 1;
@@ -15,4 +16,43 @@ library ChainIds {
   uint256 internal constant AVALANCHE = 43114;
   uint256 internal constant SEPOLIA = 11155111;
   uint256 internal constant HARMONY = 1666600000;
+}
+
+library ChainHelpers {
+  error UnknownChainId();
+
+  function selectChain(Vm vm, uint256 chainId) internal returns (uint256, uint256) {
+    uint256 previousFork = vm.activeFork();
+    uint256 newFork;
+    if (chainId == ChainIds.MAINNET) {
+      newFork = vm.createFork(vm.rpcUrl('mainnet'));
+    } else if (chainId == ChainIds.OPTIMISM) {
+      newFork = vm.createFork(vm.rpcUrl('optimism'));
+    } else if (chainId == ChainIds.BSC) {
+      newFork = vm.createFork(vm.rpcUrl('bsc'));
+    } else if (chainId == ChainIds.POLYGON) {
+      newFork = vm.createFork(vm.rpcUrl('polygon'));
+    } else if (chainId == ChainIds.FANTOM) {
+      newFork = vm.createFork(vm.rpcUrl('fantom'));
+    } else if (chainId == ChainIds.ZK_SYNC) {
+      newFork = vm.createFork(vm.rpcUrl('tkSync'));
+    } else if (chainId == ChainIds.METIS) {
+      newFork = vm.createFork(vm.rpcUrl('metis'));
+    } else if (chainId == ChainIds.ZK_EVM) {
+      newFork = vm.createFork(vm.rpcUrl('zkEvm'));
+    } else if (chainId == ChainIds.BASE) {
+      newFork = vm.createFork(vm.rpcUrl('base'));
+    } else if (chainId == ChainIds.ARBITRUM) {
+      newFork = vm.createFork(vm.rpcUrl('arbitrum'));
+    } else if (chainId == ChainIds.AVALANCHE) {
+      newFork = vm.createFork(vm.rpcUrl('avalanche'));
+    } else if (chainId == ChainIds.SEPOLIA) {
+      newFork = vm.createFork(vm.rpcUrl('sepolia'));
+    } else if (chainId == ChainIds.HARMONY) {
+      newFork = vm.createFork(vm.rpcUrl('harmony'));
+    } else {
+      revert UnknownChainId();
+    }
+    return (previousFork, newFork);
+  }
 }
