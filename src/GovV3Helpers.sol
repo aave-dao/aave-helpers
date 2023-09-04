@@ -14,7 +14,12 @@ import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 
+interface FixedGov {
+  function getCancellationFee() external view returns (uint256);
+}
+
 library GovV3Helpers {
+  error CanNotFindPayload();
   error CannotFindPayloadsController();
   error ExecutorNotFound();
   error LongBytesNotSupportedYet();
@@ -98,18 +103,24 @@ library GovV3Helpers {
     IPayloadsControllerCore(payloadsController).executePayload(payloadId);
   }
 
-  function buildMainnet(Vm vm, uint256 payloadId, address payloadAddress) internal {}
+  function buildMainnet(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.MAINNET, actions);
+  }
 
   function _buildPayload(
     Vm vm,
     uint256 chainId,
-    uint40 payloadId
+    IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (PayloadsControllerUtils.Payload memory) {
     address payloadsController = _getPayloadsController(chainId);
-    PayloadsControllerUtils.AccessControl accessLevel = _validatePayloadAndGetAccessLevel(
+    (PayloadsControllerUtils.AccessControl accessLevel, uint40 payloadId) = _findAndValidatePayload(
       vm,
       chainId,
-      payloadsController
+      payloadsController,
+      actions
     );
     return
       PayloadsControllerUtils.Payload({
@@ -120,24 +131,60 @@ library GovV3Helpers {
       });
   }
 
-  function _validatePayloadAndGetAccessLevel(
+  function _findAndValidatePayload(
     Vm vm,
     uint256 chainId,
-    address payloadsController
-  ) internal returns (PayloadsControllerUtils.AccessControl accessLevel) {
-    (uint256 prevFork, uint256 newFork) = ChainHelpers.selectChain(vm, chainId);
-    address controller = _getPayloadsController(chainId);
-
+    address payloadsController,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.AccessControl, uint40) {
+    (uint256 prevFork, ) = ChainHelpers.selectChain(vm, chainId);
+    (uint40 payloadId, IPayloadsControllerCore.Payload memory payload) = _findPayloadId(
+      payloadsController,
+      actions
+    );
+    require(
+      payload.state == IPayloadsControllerCore.PayloadState.Created,
+      'MUST_BE_IN_CREATED_STATE'
+    );
+    // TODO: expiry validation
     vm.selectFork(prevFork);
+    return (payload.maximumAccessLevelRequired, payloadId);
   }
 
-  function _findPayloadId(address payloadsController) internal view returns (uint40) {
+  function _findPayloadId(
+    address payloadsController,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal view returns (uint40, IPayloadsControllerCore.Payload memory) {
     uint40 count = IPayloadsControllerCore(payloadsController).getPayloadsCount();
-    for (uint40 i = count - 1; i >= 0; i++) {
+    for (uint40 payloadId = count - 1; payloadId >= 0; payloadId++) {
       IPayloadsControllerCore.Payload memory payload = IPayloadsControllerCore(payloadsController)
-        .getPayloadById(i);
-      // if(payload.actions)
+        .getPayloadById(payloadId);
+      if (_actionsAreEqual(actions, payload.actions)) {
+        return (payloadId, payload);
+      }
     }
+    revert CanNotFindPayload();
+  }
+
+  function _actionsAreEqual(
+    IPayloadsControllerCore.ExecutionAction[] memory actionsA,
+    IPayloadsControllerCore.ExecutionAction[] memory actionsB
+  ) internal pure returns (bool) {
+    // must be equal size for equlity
+    if (actionsA.length != actionsB.length) return false;
+    for (uint256 actionId = 0; actionId < actionsA.length; actionId++) {
+      if (actionsA[actionId].target != actionsB[actionId].target) return false;
+      if (actionsA[actionId].withDelegateCall != actionsB[actionId].withDelegateCall) return false;
+      if (actionsA[actionId].accessLevel != actionsB[actionId].accessLevel) return false;
+      if (actionsA[actionId].value != actionsB[actionId].value) return false;
+      if (
+        keccak256(abi.encodePacked(actionsA[actionId].signature)) !=
+        keccak256(abi.encodePacked(actionsB[actionId].signature))
+      ) return false;
+      if (keccak256(actionsA[actionId].callData) != keccak256(actionsB[actionId].callData))
+        return false;
+    }
+    return true;
   }
 
   // function buildMainnet(
@@ -249,19 +296,11 @@ library GovV3Helpers {
   //     );
   // }
 
-  function _buildPayload(
-    address payloadsController,
-    uint256 chainId,
-    PayloadsControllerUtils.AccessControl accessLevel,
-    uint40 payloadId
-  ) internal pure returns (PayloadsControllerUtils.Payload memory) {
-    return
-      PayloadsControllerUtils.Payload({
-        chain: chainId,
-        accessLevel: accessLevel,
-        payloadsController: payloadsController,
-        payloadId: payloadId
-      });
+  function createProposal(
+    PayloadsControllerUtils.Payload[] memory payloads,
+    bytes32 ipfsHash
+  ) internal returns (uint256) {
+    return createProposal(payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH, ipfsHash);
   }
 
   function createProposal(
@@ -282,7 +321,7 @@ library GovV3Helpers {
     require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
     require(votingPortal != address(0), 'INVALID_VOTING_PORTAL');
 
-    for (uint256 i; i < payloads.length; i++) {}
+    uint256 fee = FixedGov(GovernanceV3Ethereum.GOVERNANCE).getCancellationFee();
 
     console2.logBytes(
       abi.encodeWithSelector(
@@ -293,7 +332,7 @@ library GovV3Helpers {
       )
     );
     return
-      IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).createProposal(
+      IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).createProposal{value: fee}(
         payloads,
         votingPortal,
         ipfsHash

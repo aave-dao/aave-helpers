@@ -103,55 +103,10 @@ contract GovernanceV3Test is Test {
       memory actions = new IPayloadsControllerCore.ExecutionAction[](2);
     actions[0] = GovV3Helpers.buildAction(address(pl1));
     actions[1] = GovV3Helpers.buildAction(address(pl2));
-    uint40 payloadId = GovV3Helpers.createPayload(actions);
-  }
+    GovV3Helpers.createPayload(actions);
 
-  function test_mainnetProposalCreation() public {
     PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
-    /**
-     * Upside:
-     * - it's simple & analog to how it worked on gov v2
-     * Downside:
-     * - 0 chance to validate that `1` is the payload we want to execute
-     */
-    payloads[0] = buildMainnet(1);
-
-    /**
-     * Upside:
-     * - we can at least validate the payload Id exists on the l2 and is in created state
-     * - we could log the payloadAddresses with explorer links so people can easily double check
-     * Downside:
-     * - still no forced validation that payloadId is the correct one
-     */
-    payloads[0] = buildMainnet(vm, 1);
-
-    /**
-     * Upside:
-     * - easier for the user
-     * Downside:
-     * - can be quite fragile as payloadAddress, must not be unique
-     * - quite implicit
-     */
-    payloads[0] = buildMainnet(vm, payloadAddress);
-
-    /**
-     * Upside:
-     * - like 2, but with some basic guarantee that payloadAddress is at least included in actions
-     * Downside:
-     * - a bit cumbersome as both id and address are needed
-     */
-    payloads[0] = buildMainnet(vm, 1, payloadAddress);
-
-    /**
-     * Upside:
-     * - allows us to find the payloadId based on exact actions match. Therefore best assurance
-     * Downside:
-     * - quite verbose & cumbersome to use i guess?
-     */
-    IPayloadsControllerCore.ExecutionAction[]
-      memory actions = new IPayloadsControllerCore.ExecutionAction[](2);
-    actions[0] = GovV3Helpers.buildAction(address(pl1));
-    actions[1] = GovV3Helpers.buildAction(address(pl2));
-    payloads[0] = buildMainnet(vm, actions);
+    payloads[0] = GovV3Helpers.buildMainnet(vm, actions);
+    GovV3Helpers.createProposal(payloads, bytes32(uint256(1)));
   }
 }
