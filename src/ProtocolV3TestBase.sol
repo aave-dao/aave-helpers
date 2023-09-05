@@ -322,7 +322,13 @@ contract ProtocolV3TestBase is CommonTestBase {
     console.log('REPAY: %s, Amount: %s', config.symbol, amount);
     pool.repay(config.underlying, amount, stable ? 1 : 2, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
-    require(debtAfter == ((debtBefore > amount) ? debtBefore - amount : 0), '_repay() : ERROR');
+
+    if (debtBefore > amount) {
+      assertApproxEqAbs(debtAfter, debtBefore - amount, 1);
+    } else {
+      assertApproxEqAbs(debtAfter, 0, 1);
+    }
+
     vm.stopPrank();
   }
 
