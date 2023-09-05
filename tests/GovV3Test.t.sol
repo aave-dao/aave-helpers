@@ -2,9 +2,11 @@
 pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
-import {GovV3Helpers, PayloadsControllerUtils, IPayloadsControllerCore, GovV3StorageHelpers} from '../src/GovV3Helpers.sol';
+import {GovV3Helpers, PayloadsControllerUtils, IPayloadsControllerCore, GovV3StorageHelpers, IGovernanceCore} from '../src/GovV3Helpers.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
+import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
+
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 
 interface Mock {
@@ -19,6 +21,14 @@ contract GovernanceV3Test is Test {
   function setUp() public {
     vm.createSelectFork('mainnet', 18061912);
     payload = new PayloadWithEmit();
+  }
+
+  function test_injectProposalIntoGovernance() public {
+    uint256 count = IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).getProposalsCount();
+    PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
+    GovV3StorageHelpers.injectProposal(vm, payloads, address(0));
+    uint256 countAfter = IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).getProposalsCount();
+    assertEq(countAfter, count + 1);
   }
 
   function test_injectPayloadIntoPayloadsController() public {
@@ -93,24 +103,24 @@ contract GovernanceV3Test is Test {
   /**
    * Demo: this is more or less how a payload creation script could look like
    */
-  function test_payloadCreation() public {
-    // 1. deploy payloads
-    PayloadWithEmit pl1 = new PayloadWithEmit();
-    PayloadWithEmit pl2 = new PayloadWithEmit();
+  // function test_payloadCreation() public {
+  //   // 1. deploy payloads
+  //   PayloadWithEmit pl1 = new PayloadWithEmit();
+  //   PayloadWithEmit pl2 = new PayloadWithEmit();
 
-    // 2. create action & register action
-    IPayloadsControllerCore.ExecutionAction[]
-      memory actions = new IPayloadsControllerCore.ExecutionAction[](2);
-    actions[0] = GovV3Helpers.buildAction(address(pl1));
-    actions[1] = GovV3Helpers.buildAction(address(pl2));
-    GovV3Helpers.createPayload(actions);
+  //   // 2. create action & register action
+  //   IPayloadsControllerCore.ExecutionAction[]
+  //     memory actions = new IPayloadsControllerCore.ExecutionAction[](2);
+  //   actions[0] = GovV3Helpers.buildAction(address(pl1));
+  //   actions[1] = GovV3Helpers.buildAction(address(pl2));
+  //   GovV3Helpers.createPayload(actions);
 
-    // 3. create the actual proposal
-    PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
-    payloads[0] = GovV3Helpers.buildMainnet(vm, actions);
-    deal(AaveMisc.ECOSYSTEM_RESERVE, 0.5e18);
-    vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
-    GovV3Helpers.createProposal(payloads, bytes32(uint256(1)));
-    vm.stopPrank();
-  }
+  //   // 3. create the actual proposal
+  //   PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
+  //   payloads[0] = GovV3Helpers.buildMainnet(vm, actions);
+  //   deal(AaveMisc.ECOSYSTEM_RESERVE, 0.5e18);
+  //   vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
+  //   GovV3Helpers.createProposal(payloads, bytes32(uint256(1)));
+  //   vm.stopPrank();
+  // }
 }

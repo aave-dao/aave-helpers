@@ -142,7 +142,7 @@ library GovV3Helpers {
       payload.state == IPayloadsControllerCore.PayloadState.Created,
       'MUST_BE_IN_CREATED_STATE'
     );
-    // TODO: expiry validation
+    require(payload.expirationTime >= block.timestamp, 'EXPIRATION_MUST_BE_IN_THE_FUTURE');
     vm.selectFork(prevFork);
     return (payload.maximumAccessLevelRequired, payloadId);
   }
@@ -182,115 +182,6 @@ library GovV3Helpers {
     }
     return true;
   }
-
-  // function buildMainnet(
-  //   uint40 payloadId,
-  //   PayloadsControllerUtils.AccessControl accessLevel
-  // ) internal pure returns (PayloadsControllerUtils.Payload memory) {
-  //   require(
-  //     accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
-  //     'INCORRECT ACCESS LEVEL'
-  //   );
-  //   return
-  //     _buildPayload(
-  //       GovernanceV3Ethereum.PAYLOADS_CONTROLLER,
-  //       ChainIds.MAINNET,
-  //       accessLevel,
-  //       payloadId
-  //     );
-  // }
-
-  // function buildArbitrum(
-  //   uint40 payloadId,
-  //   PayloadsControllerUtils.AccessControl accessLevel
-  // ) internal pure returns (PayloadsControllerUtils.Payload memory) {
-  //   require(
-  //     accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
-  //     'INCORRECT ACCESS LEVEL'
-  //   );
-  //   return
-  //     _buildPayload(
-  //       GovernanceV3Arbitrum.PAYLOADS_CONTROLLER,
-  //       ChainIds.ARBITRUM,
-  //       accessLevel,
-  //       payloadId
-  //     );
-  // }
-
-  // function buildPolygon(
-  //   uint40 payloadId,
-  //   PayloadsControllerUtils.AccessControl accessLevel
-  // ) internal pure returns (PayloadsControllerUtils.Payload memory) {
-  //   require(
-  //     accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
-  //     'INCORRECT ACCESS LEVEL'
-  //   );
-  //   return
-  //     _buildPayload(
-  //       GovernanceV3Polygon.PAYLOADS_CONTROLLER,
-  //       ChainIds.POLYGON,
-  //       accessLevel,
-  //       payloadId
-  //     );
-  // }
-
-  // function buildMetis(
-  //   uint40 payloadId,
-  //   PayloadsControllerUtils.AccessControl accessLevel
-  // ) internal pure returns (PayloadsControllerUtils.Payload memory) {
-  //   require(
-  //     accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
-  //     'INCORRECT ACCESS LEVEL'
-  //   );
-  //   return
-  //     _buildPayload(AaveV3MetisGovV3.PAYLOADS_CONTROLLER, ChainIds.METIS, accessLevel, payloadId);
-  // }
-
-  // function buildBase(
-  //   uint40 payloadId,
-  //   PayloadsControllerUtils.AccessControl accessLevel
-  // ) internal pure returns (PayloadsControllerUtils.Payload memory) {
-  //   require(
-  //     accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
-  //     'INCORRECT ACCESS LEVEL'
-  //   );
-  //   return
-  //     _buildPayload(AaveV3BaseGovV3.PAYLOADS_CONTROLLER, ChainIds.BASE, accessLevel, payloadId);
-  // }
-
-  // function buildAvalanche(
-  //   uint40 payloadId,
-  //   PayloadsControllerUtils.AccessControl accessLevel
-  // ) internal pure returns (PayloadsControllerUtils.Payload memory) {
-  //   require(
-  //     accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
-  //     'INCORRECT ACCESS LEVEL'
-  //   );
-  //   return
-  //     _buildPayload(
-  //       GovernanceV3Avalanche.PAYLOADS_CONTROLLER,
-  //       ChainIds.AVALANCHE,
-  //       accessLevel,
-  //       payloadId
-  //     );
-  // }
-
-  // function buildOptimism(
-  //   uint40 payloadId,
-  //   PayloadsControllerUtils.AccessControl accessLevel
-  // ) internal pure returns (PayloadsControllerUtils.Payload memory) {
-  //   require(
-  //     accessLevel > PayloadsControllerUtils.AccessControl.Level_null,
-  //     'INCORRECT ACCESS LEVEL'
-  //   );
-  //   return
-  //     _buildPayload(
-  //       GovernanceV3Optimism.PAYLOADS_CONTROLLER,
-  //       ChainIds.OPTIMISM,
-  //       accessLevel,
-  //       payloadId
-  //     );
-  // }
 
   function createProposal(
     PayloadsControllerUtils.Payload[] memory payloads,
@@ -357,34 +248,56 @@ library GovV3Helpers {
   }
 }
 
-// struct Payload {
-//   address creator; 0: 160
-//   PayloadsControllerUtils.AccessControl maximumAccessLevelRequired; 0: 160-168
-//   PayloadState state; 0: 168-176
-//   uint40 createdAt; 0: 176-216
-//   uint40 queuedAt; 0: 216-256
-//   uint40 executedAt; 1: 40
-//   uint40 cancelledAt; 1: 40-80
-//   uint40 expirationTime; 1: 80-120
-//   uint40 delay; 1: 120-160
-//   uint40 gracePeriod; 1: 160-200
-//   ExecutionAction[] actions; 2: 0
-// }
-// struct ExecutionAction {
-//   address target; 0: 160
-//   bool withDelegateCall; 0: 160-168
-//   PayloadsControllerUtils.AccessControl accessLevel; 0: 168-176
-//   uint256 value; 1:
-//   string signature; 2:
-//   bytes callData; 3:
-// }
 library GovV3StorageHelpers {
   error LongBytesNotSupportedYet();
+
+  uint256 constant PROPOSALS_COUNT_SLOT = 3;
+  uint256 constant PROPOSALS_SLOT = 7;
 
   uint256 constant PAYLOADS_COUNT_SLOT = 1;
   uint256 constant ACCESS_LEVEL_TO_EXECUTOR_SLOT = 2;
   uint256 constant PAYLOADS_SLOT = 3;
 
+  function injectProposal(
+    Vm vm,
+    PayloadsControllerUtils.Payload[] memory payloads,
+    address votingPortal
+  ) internal returns (uint256) {
+    uint256 count = IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).getProposalsCount();
+
+    // overwrite payloads count
+    vm.store(
+      GovernanceV3Ethereum.GOVERNANCE,
+      bytes32(PROPOSALS_COUNT_SLOT),
+      bytes32(uint256(count + 1))
+    );
+  }
+
+  function readyProposal() internal {}
+
+  // ### PayoadsController Storage ###
+  // struct Payload {
+  //   address creator; 0: 160
+  //   PayloadsControllerUtils.AccessControl maximumAccessLevelRequired; 0: 160-168
+  //   PayloadState state; 0: 168-176
+  //   uint40 createdAt; 0: 176-216
+  //   uint40 queuedAt; 0: 216-256
+  //   uint40 executedAt; 1: 40
+  //   uint40 cancelledAt; 1: 40-80
+  //   uint40 expirationTime; 1: 80-120
+  //   uint40 delay; 1: 120-160
+  //   uint40 gracePeriod; 1: 160-200
+  //   ExecutionAction[] actions; 2: 0
+  // }
+  //
+  // struct ExecutionAction {
+  //   address target; 0: 160
+  //   bool withDelegateCall; 0: 160-168
+  //   PayloadsControllerUtils.AccessControl accessLevel; 0: 168-176
+  //   uint256 value; 1:
+  //   string signature; 2:
+  //   bytes callData; 3:
+  // }
   /**
    * Injects the payload into storage
    * @param vm Vm
