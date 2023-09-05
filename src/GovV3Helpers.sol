@@ -14,10 +14,6 @@ import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 
-interface FixedGov {
-  function getCancellationFee() external view returns (uint256);
-}
-
 library GovV3Helpers {
   error CanNotFindPayload();
   error CannotFindPayloadsController();
@@ -321,7 +317,7 @@ library GovV3Helpers {
     require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
     require(votingPortal != address(0), 'INVALID_VOTING_PORTAL');
 
-    uint256 fee = FixedGov(GovernanceV3Ethereum.GOVERNANCE).getCancellationFee();
+    uint256 fee = IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).getCancellationFee();
 
     console2.logBytes(
       abi.encodeWithSelector(

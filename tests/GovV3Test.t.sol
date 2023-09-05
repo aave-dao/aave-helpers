@@ -71,7 +71,7 @@ contract GovernanceV3Test is Test {
    * it omits the actual governance by directly executing on the payloadController
    */
   function test_executePayloadViaId() public {
-    // 1. create action & register on payloadscontrolelr
+    // 1. create action & register on payloadscontroller
     IPayloadsControllerCore.ExecutionAction[]
       memory actions = new IPayloadsControllerCore.ExecutionAction[](2);
     actions[0] = GovV3Helpers.buildAction(address(payload));
@@ -105,8 +105,12 @@ contract GovernanceV3Test is Test {
     actions[1] = GovV3Helpers.buildAction(address(pl2));
     GovV3Helpers.createPayload(actions);
 
+    // 3. create the actual proposal
     PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
     payloads[0] = GovV3Helpers.buildMainnet(vm, actions);
+    deal(AaveMisc.ECOSYSTEM_RESERVE, 0.5e18);
+    vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
     GovV3Helpers.createProposal(payloads, bytes32(uint256(1)));
+    vm.stopPrank();
   }
 }
