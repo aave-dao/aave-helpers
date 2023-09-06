@@ -46,7 +46,7 @@ contract GovernanceV3Test is Test {
     );
 
     uint40 countBefore = payloadsController.getPayloadsCount();
-    GovV3StorageHelpers.injectPayload(vm, address(payloadsController), actions);
+    GovV3StorageHelpers.injectPayload(vm, payloadsController, actions);
     uint40 countAfter = payloadsController.getPayloadsCount();
     // assure count is bumped by one
     assertEq(countAfter, countBefore + 1);
@@ -70,7 +70,7 @@ contract GovernanceV3Test is Test {
       GovV3Helpers._getPayloadsController(block.chainid)
     );
 
-    GovV3StorageHelpers.readyPayloadId(vm, address(payloadsController), payloadId);
+    GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
     IPayloadsControllerCore.Payload memory pl = payloadsController.getPayloadById(payloadId);
     assertEq(uint256(pl.state), uint256(IPayloadsControllerCore.PayloadState.Queued));
     assertEq(pl.queuedAt, 1693729594);

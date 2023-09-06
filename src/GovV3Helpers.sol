@@ -43,8 +43,6 @@ library GovV3Helpers {
     address payloadAddress,
     PayloadsControllerUtils.AccessControl accessLevel
   ) internal returns (IPayloadsControllerCore.ExecutionAction memory) {
-    address payloadsController = _getPayloadsController(block.chainid);
-    require(payloadsController != address(0), 'INVALID CHAIN ID');
     require(payloadAddress != address(0), 'INVALID PAYLOAD ADDRESS');
     require(
       accessLevel != PayloadsControllerUtils.AccessControl.Level_null,
@@ -65,20 +63,20 @@ library GovV3Helpers {
   function createPayload(
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (uint40) {
-    address payloadsController = _getPayloadsController(block.chainid);
+    IPayloadsControllerCore payloadsController = _getPayloadsController(block.chainid);
     require(actions.length > 0, 'INVALID ACTIONS');
 
-    return IPayloadsControllerCore(payloadsController).createPayload(actions);
+    return payloadsController.createPayload(actions);
   }
 
   function executePayload(Vm vm, address payloadAddress) internal {
-    address payloadsController = _getPayloadsController(block.chainid);
+    IPayloadsControllerCore payloadsController = _getPayloadsController(block.chainid);
     IPayloadsControllerCore.ExecutionAction[]
       memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
     actions[0] = buildAction(payloadAddress);
     uint40 payloadId = GovV3StorageHelpers.injectPayload(vm, payloadsController, actions);
     GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
-    IPayloadsControllerCore(payloadsController).executePayload(payloadId);
+    payloadsController.executePayload(payloadId);
   }
 
   /**
@@ -87,16 +85,13 @@ library GovV3Helpers {
    * @param payloadId id of the payload
    */
   function executePayload(Vm vm, uint40 payloadId) internal {
-    address payloadsController = _getPayloadsController(block.chainid);
-    require(payloadsController != address(0), 'INVALID CHAIN ID');
-
-    IPayloadsControllerCore.Payload memory payload = IPayloadsControllerCore(payloadsController)
-      .getPayloadById(payloadId);
+    IPayloadsControllerCore payloadsController = _getPayloadsController(block.chainid);
+    IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(payloadId);
     require(payload.state != IPayloadsControllerCore.PayloadState.None, 'PAYLOAD DOES NOT EXIST');
 
     GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
 
-    IPayloadsControllerCore(payloadsController).executePayload(payloadId);
+    payloadsController.executePayload(payloadId);
   }
 
   function buildMainnet(
@@ -111,7 +106,7 @@ library GovV3Helpers {
     uint256 chainId,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (PayloadsControllerUtils.Payload memory) {
-    address payloadsController = _getPayloadsController(chainId);
+    IPayloadsControllerCore payloadsController = _getPayloadsController(chainId);
     (PayloadsControllerUtils.AccessControl accessLevel, uint40 payloadId) = _findAndValidatePayload(
       vm,
       chainId,
@@ -122,7 +117,7 @@ library GovV3Helpers {
       PayloadsControllerUtils.Payload({
         chain: chainId,
         accessLevel: accessLevel,
-        payloadsController: payloadsController,
+        payloadsController: address(payloadsController),
         payloadId: payloadId
       });
   }
@@ -130,7 +125,7 @@ library GovV3Helpers {
   function _findAndValidatePayload(
     Vm vm,
     uint256 chainId,
-    address payloadsController,
+    IPayloadsControllerCore payloadsController,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (PayloadsControllerUtils.AccessControl, uint40) {
     (uint256 prevFork, ) = ChainHelpers.selectChain(vm, chainId);
@@ -148,13 +143,12 @@ library GovV3Helpers {
   }
 
   function _findPayloadId(
-    address payloadsController,
+    IPayloadsControllerCore payloadsController,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal view returns (uint40, IPayloadsControllerCore.Payload memory) {
-    uint40 count = IPayloadsControllerCore(payloadsController).getPayloadsCount();
+    uint40 count = payloadsController.getPayloadsCount();
     for (uint40 payloadId = count - 1; payloadId >= 0; payloadId++) {
-      IPayloadsControllerCore.Payload memory payload = IPayloadsControllerCore(payloadsController)
-        .getPayloadById(payloadId);
+      IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(payloadId);
       if (_actionsAreEqual(actions, payload.actions)) {
         return (payloadId, payload);
       }
@@ -208,7 +202,7 @@ library GovV3Helpers {
     require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
     require(votingPortal != address(0), 'INVALID_VOTING_PORTAL');
 
-    uint256 fee = IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).getCancellationFee();
+    uint256 fee = GovernanceV3Ethereum.GOVERNANCE.getCancellationFee();
 
     console2.logBytes(
       abi.encodeWithSelector(
@@ -219,14 +213,10 @@ library GovV3Helpers {
       )
     );
     return
-      IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).createProposal{value: fee}(
-        payloads,
-        votingPortal,
-        ipfsHash
-      );
+      GovernanceV3Ethereum.GOVERNANCE.createProposal{value: fee}(payloads, votingPortal, ipfsHash);
   }
 
-  function _getPayloadsController(uint256 chainId) internal pure returns (address) {
+  function _getPayloadsController(uint256 chainId) internal pure returns (IPayloadsControllerCore) {
     if (chainId == ChainIds.MAINNET) {
       return GovernanceV3Ethereum.PAYLOADS_CONTROLLER;
     }
@@ -297,26 +287,29 @@ library GovV3StorageHelpers {
     PayloadsControllerUtils.Payload[] memory payloads,
     address votingPortal
   ) internal returns (uint256) {
-    uint256 count = IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).getProposalsCount();
+    uint256 count = GovernanceV3Ethereum.GOVERNANCE.getProposalsCount();
     uint256 proposalBaseSlot = StorageHelpers.getStorageSlotUintMapping(PROPOSALS_SLOT, count);
 
     // overwrite proposals count
     vm.store(
-      GovernanceV3Ethereum.GOVERNANCE,
+      address(GovernanceV3Ethereum.GOVERNANCE),
       bytes32(PROPOSALS_COUNT_SLOT),
       bytes32(uint256(count + 1))
     );
     // overwrite array size
     vm.store(
-      GovernanceV3Ethereum.GOVERNANCE,
+      address(GovernanceV3Ethereum.GOVERNANCE),
       bytes32(proposalBaseSlot + 7),
       bytes32(uint256(payloads.length))
     );
     // overwrite single array slots
     for (uint256 i = 0; i < payloads.length; i++) {
       bytes32 slot = bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 7, i, 2));
-      vm.store(GovernanceV3Ethereum.GOVERNANCE, slot, bytes32(payloads[i].chain));
-      bytes32 storageBefore = vm.load(GovernanceV3Ethereum.GOVERNANCE, bytes32(uint256(slot) + 1));
+      vm.store(address(GovernanceV3Ethereum.GOVERNANCE), slot, bytes32(payloads[i].chain));
+      bytes32 storageBefore = vm.load(
+        address(GovernanceV3Ethereum.GOVERNANCE),
+        bytes32(uint256(slot) + 1)
+      );
       // write target
       storageBefore = StorageHelpers.maskValueToBitsAtPosition(
         0,
@@ -339,7 +332,7 @@ library GovV3StorageHelpers {
         bytes32(uint256(payloads[i].payloadId))
       );
       // persist
-      vm.store(GovernanceV3Ethereum.GOVERNANCE, bytes32(uint256(slot) + 1), storageBefore);
+      vm.store(address(GovernanceV3Ethereum.GOVERNANCE), bytes32(uint256(slot) + 1), storageBefore);
     }
     return count;
   }
@@ -377,16 +370,16 @@ library GovV3StorageHelpers {
    */
   function injectPayload(
     Vm vm,
-    address payloadsController,
+    IPayloadsControllerCore payloadsController,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (uint40) {
-    uint40 count = IPayloadsControllerCore(payloadsController).getPayloadsCount();
+    uint40 count = payloadsController.getPayloadsCount();
     uint256 payloadBaseSlot = StorageHelpers.getStorageSlotUintMapping(PAYLOADS_SLOT, count);
 
     // overwrite payloads count
     StorageHelpers.writeBitsInStorageSlot(
       vm,
-      payloadsController,
+      address(payloadsController),
       bytes32(PAYLOADS_COUNT_SLOT),
       176,
       216,
@@ -396,7 +389,7 @@ library GovV3StorageHelpers {
     // overwrite payload state
     StorageHelpers.writeBitsInStorageSlot(
       vm,
-      payloadsController,
+      address(payloadsController),
       bytes32(payloadBaseSlot),
       168,
       176,
@@ -406,20 +399,24 @@ library GovV3StorageHelpers {
     // overwrite gracePeriod
     StorageHelpers.writeBitsInStorageSlot(
       vm,
-      payloadsController,
+      address(payloadsController),
       bytes32(payloadBaseSlot + 1),
       160,
       200,
-      bytes32(uint256(IPayloadsControllerCore(payloadsController).GRACE_PERIOD()))
+      bytes32(uint256(payloadsController.GRACE_PERIOD()))
     );
 
     // overwrite array size
-    vm.store(payloadsController, bytes32(payloadBaseSlot + 2), bytes32(uint256(actions.length)));
+    vm.store(
+      address(payloadsController),
+      bytes32(payloadBaseSlot + 2),
+      bytes32(uint256(actions.length))
+    );
 
     // overwrite single array slots
     for (uint256 i = 0; i < actions.length; i++) {
       bytes32 slot = bytes32(StorageHelpers.arrLocation(payloadBaseSlot + 2, i, 4));
-      bytes32 storageBefore = vm.load(payloadsController, slot);
+      bytes32 storageBefore = vm.load(address(payloadsController), slot);
       // write target
       storageBefore = StorageHelpers.maskValueToBitsAtPosition(
         0,
@@ -442,11 +439,11 @@ library GovV3StorageHelpers {
         bytes32(uint256(actions[i].accessLevel))
       );
       // persist
-      vm.store(payloadsController, slot, storageBefore);
+      vm.store(address(payloadsController), slot, storageBefore);
       // write signatures
       if (bytes(actions[i].signature).length > 31) revert LongBytesNotSupportedYet();
       vm.store(
-        payloadsController,
+        address(payloadsController),
         bytes32(uint256(slot) + 2),
         bytes32(
           bytes.concat(
@@ -465,12 +462,15 @@ library GovV3StorageHelpers {
    * @param payloadsController address
    * @param payloadId id of the payload
    */
-  function readyPayloadId(Vm vm, address payloadsController, uint40 payloadId) internal {
-    IPayloadsControllerCore.Payload memory payload = IPayloadsControllerCore(payloadsController)
-      .getPayloadById(payloadId);
+  function readyPayloadId(
+    Vm vm,
+    IPayloadsControllerCore payloadsController,
+    uint40 payloadId
+  ) internal {
+    IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(payloadId);
     require(payload.state != IPayloadsControllerCore.PayloadState.None, 'PAYLOAD DOES NOT EXIST');
     uint256 payloadBaseSlot = StorageHelpers.getStorageSlotUintMapping(PAYLOADS_SLOT, payloadId);
-    bytes32 storageBefore = vm.load(payloadsController, bytes32(payloadBaseSlot));
+    bytes32 storageBefore = vm.load(address(payloadsController), bytes32(payloadBaseSlot));
     // write state
     storageBefore = StorageHelpers.maskValueToBitsAtPosition(
       168,
@@ -486,7 +486,7 @@ library GovV3StorageHelpers {
       bytes32(uint256(uint40(block.timestamp - payload.delay - 1)))
     );
     // persist
-    vm.store(payloadsController, bytes32(payloadBaseSlot), storageBefore);
+    vm.store(address(payloadsController), bytes32(payloadBaseSlot), storageBefore);
   }
 
   function toUInt256(bool x) internal pure returns (uint r) {
