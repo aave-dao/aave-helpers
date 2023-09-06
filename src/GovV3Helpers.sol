@@ -148,6 +148,15 @@ library GovV3Helpers {
   }
 
   function createProposal(
+    PayloadsControllerUtils.Payload memory payload,
+    bytes32 ipfsHash
+  ) internal returns (uint256) {
+    PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
+    payloads[0] = payload;
+    return createProposal(payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH, ipfsHash);
+  }
+
+  function createProposal(
     PayloadsControllerUtils.Payload[] memory payloads,
     address votingPortal,
     bytes32 ipfsHash
