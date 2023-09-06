@@ -376,7 +376,9 @@ library GovV3StorageHelpers {
     return count;
   }
 
-  function readyProposal() internal {}
+  function readyProposal(Vm vm, uint256 proposalId) internal {
+    uint256 proposalBaseSlot = StorageHelpers.getStorageSlotUintMapping(PROPOSALS_SLOT, proposalId);
+  }
 
   // ### PayoadsController Storage ###
   // struct Payload {

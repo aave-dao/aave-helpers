@@ -33,6 +33,8 @@ contract GovernanceV3Test is Test {
       proposalId
     );
     assertEq(proposal.payloads.length, payloads.length);
+    GovV3StorageHelpers.readyProposal(vm, proposalId);
+    GovernanceV3Ethereum.GOVERNANCE.executeProposal(proposalId);
   }
 
   function test_injectPayloadIntoPayloadsController() public {
