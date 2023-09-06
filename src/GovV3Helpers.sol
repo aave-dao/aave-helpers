@@ -36,12 +36,33 @@ library GovV3Helpers {
   function buildAction(
     address payloadAddress
   ) internal returns (IPayloadsControllerCore.ExecutionAction memory) {
-    return buildAction(payloadAddress, PayloadsControllerUtils.AccessControl.Level_1);
+    return
+      buildAction({
+        payloadAddress: payloadAddress,
+        accessLevel: PayloadsControllerUtils.AccessControl.Level_1,
+        value: 0,
+        withDelegateCall: true,
+        signature: 'execute()',
+        callData: ''
+      });
   }
 
+  /**
+   * @dev builds a action to be registered on a payloadsController
+   * @param payloadAddress address of the payload to be executed
+   * @param accessLevel accessLevel required by the payload
+   * @param value eth value to be sent to the payload
+   * @param withDelegateCall determines if payload thould be executed via delgatecall
+   * @param signature signature to be executed on the payload
+   * @param callData calldata for the signature
+   */
   function buildAction(
     address payloadAddress,
-    PayloadsControllerUtils.AccessControl accessLevel
+    PayloadsControllerUtils.AccessControl accessLevel,
+    uint256 value,
+    bool withDelegateCall,
+    string memory signature,
+    bytes memory callData
   ) internal returns (IPayloadsControllerCore.ExecutionAction memory) {
     require(payloadAddress != address(0), 'INVALID PAYLOAD ADDRESS');
     require(
@@ -52,25 +73,53 @@ library GovV3Helpers {
     return
       IPayloadsControllerCore.ExecutionAction({
         target: payloadAddress,
-        withDelegateCall: true,
+        withDelegateCall: withDelegateCall,
         accessLevel: accessLevel,
-        value: 0,
-        signature: 'execute()',
-        callData: ''
+        value: value,
+        signature: signature,
+        callData: callData
       });
   }
 
+  /**
+   * Registers a payload with the provided actions on the networjḱ PayloadsController
+   * @param actions actions
+   * @return uint40 payloadId
+   */
   function createPayload(
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (uint40) {
-    IPayloadsControllerCore payloadsController = _getPayloadsController(block.chainid);
+    IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
     require(actions.length > 0, 'INVALID ACTIONS');
 
     return payloadsController.createPayload(actions);
   }
 
+  /**
+   * @dev This method allows you to directly execute a payloadId, no matter the state of the payload
+   * @notice This method is for test purposes only.
+   * @param vm Vm
+   * @param payloadId id of the payload
+   */
+  function executePayload(Vm vm, uint40 payloadId) internal {
+    IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
+    IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(payloadId);
+    require(payload.state != IPayloadsControllerCore.PayloadState.None, 'PAYLOAD DOES NOT EXIST');
+
+    GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
+
+    payloadsController.executePayload(payloadId);
+  }
+
+  /**
+   * @dev executes a payloadAddress via payloadsController by injecting it into storage and executing it afterwards.
+   * Injecting into storage is a convinience method to reduce the txs executed from 2 to 1, this allows awaiting emitted events on the payloadsController.
+   * @notice This method is for test purposes only.
+   * @param vm Vm
+   * @param payloadAddress address of the payload to execute
+   */
   function executePayload(Vm vm, address payloadAddress) internal {
-    IPayloadsControllerCore payloadsController = _getPayloadsController(block.chainid);
+    IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
     IPayloadsControllerCore.ExecutionAction[]
       memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
     actions[0] = buildAction(payloadAddress);
@@ -80,101 +129,15 @@ library GovV3Helpers {
   }
 
   /**
-   * @dev This method allows you to directly execute a payloadId, no matter the state of the payload
+   * Builds a payload to be executed via governance
    * @param vm Vm
-   * @param payloadId id of the payload
+   * @param actions actions array
    */
-  function executePayload(Vm vm, uint40 payloadId) internal {
-    IPayloadsControllerCore payloadsController = _getPayloadsController(block.chainid);
-    IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(payloadId);
-    require(payload.state != IPayloadsControllerCore.PayloadState.None, 'PAYLOAD DOES NOT EXIST');
-
-    GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
-
-    payloadsController.executePayload(payloadId);
-  }
-
-  function buildMainnet(
+  function buildMainnetPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (PayloadsControllerUtils.Payload memory) {
     return _buildPayload(vm, ChainIds.MAINNET, actions);
-  }
-
-  function _buildPayload(
-    Vm vm,
-    uint256 chainId,
-    IPayloadsControllerCore.ExecutionAction[] memory actions
-  ) internal returns (PayloadsControllerUtils.Payload memory) {
-    IPayloadsControllerCore payloadsController = _getPayloadsController(chainId);
-    (PayloadsControllerUtils.AccessControl accessLevel, uint40 payloadId) = _findAndValidatePayload(
-      vm,
-      chainId,
-      payloadsController,
-      actions
-    );
-    return
-      PayloadsControllerUtils.Payload({
-        chain: chainId,
-        accessLevel: accessLevel,
-        payloadsController: address(payloadsController),
-        payloadId: payloadId
-      });
-  }
-
-  function _findAndValidatePayload(
-    Vm vm,
-    uint256 chainId,
-    IPayloadsControllerCore payloadsController,
-    IPayloadsControllerCore.ExecutionAction[] memory actions
-  ) internal returns (PayloadsControllerUtils.AccessControl, uint40) {
-    (uint256 prevFork, ) = ChainHelpers.selectChain(vm, chainId);
-    (uint40 payloadId, IPayloadsControllerCore.Payload memory payload) = _findPayloadId(
-      payloadsController,
-      actions
-    );
-    require(
-      payload.state == IPayloadsControllerCore.PayloadState.Created,
-      'MUST_BE_IN_CREATED_STATE'
-    );
-    require(payload.expirationTime >= block.timestamp, 'EXPIRATION_MUST_BE_IN_THE_FUTURE');
-    vm.selectFork(prevFork);
-    return (payload.maximumAccessLevelRequired, payloadId);
-  }
-
-  function _findPayloadId(
-    IPayloadsControllerCore payloadsController,
-    IPayloadsControllerCore.ExecutionAction[] memory actions
-  ) internal view returns (uint40, IPayloadsControllerCore.Payload memory) {
-    uint40 count = payloadsController.getPayloadsCount();
-    for (uint40 payloadId = count - 1; payloadId >= 0; payloadId++) {
-      IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(payloadId);
-      if (_actionsAreEqual(actions, payload.actions)) {
-        return (payloadId, payload);
-      }
-    }
-    revert CanNotFindPayload();
-  }
-
-  function _actionsAreEqual(
-    IPayloadsControllerCore.ExecutionAction[] memory actionsA,
-    IPayloadsControllerCore.ExecutionAction[] memory actionsB
-  ) internal pure returns (bool) {
-    // must be equal size for equlity
-    if (actionsA.length != actionsB.length) return false;
-    for (uint256 actionId = 0; actionId < actionsA.length; actionId++) {
-      if (actionsA[actionId].target != actionsB[actionId].target) return false;
-      if (actionsA[actionId].withDelegateCall != actionsB[actionId].withDelegateCall) return false;
-      if (actionsA[actionId].accessLevel != actionsB[actionId].accessLevel) return false;
-      if (actionsA[actionId].value != actionsB[actionId].value) return false;
-      if (
-        keccak256(abi.encodePacked(actionsA[actionId].signature)) !=
-        keccak256(abi.encodePacked(actionsB[actionId].signature))
-      ) return false;
-      if (keccak256(actionsA[actionId].callData) != keccak256(actionsB[actionId].callData))
-        return false;
-    }
-    return true;
   }
 
   function createProposal(
@@ -190,6 +153,27 @@ library GovV3Helpers {
     bytes32 ipfsHash
   ) internal returns (uint256) {
     return _createProposal(payloads, ipfsHash, votingPortal);
+  }
+
+  function getPayloadsController(uint256 chainId) internal pure returns (IPayloadsControllerCore) {
+    if (chainId == ChainIds.MAINNET) {
+      return GovernanceV3Ethereum.PAYLOADS_CONTROLLER;
+    }
+    //  else if (chainId == ChainIds.POLYGON) {
+    //   return GovernanceV3Polygon.PAYLOADS_CONTROLLER;
+    // } else if (chainId == ChainIds.AVALANCHE) {
+    //   return GovernanceV3Avalanche.PAYLOADS_CONTROLLER;
+    // } else if (chainId == ChainIds.OPTIMISM) {
+    //   return GovernanceV3Optimism.PAYLOADS_CONTROLLER;
+    // } else if (chainId == ChainIds.ARBITRUM) {
+    //   return GovernanceV3Arbitrum.PAYLOADS_CONTROLLER;
+    // } else if (chainId == ChainIds.METIS) {
+    //   return GovernanceV3Metis.PAYLOADS_CONTROLLER;
+    // } else if (chainId == ChainIds.BASE) {
+    //   return GovernanceV3Base.PAYLOADS_CONTROLLER;
+    // }
+
+    revert CannotFindPayloadsController();
   }
 
   function _createProposal(
@@ -216,25 +200,80 @@ library GovV3Helpers {
       GovernanceV3Ethereum.GOVERNANCE.createProposal{value: fee}(payloads, votingPortal, ipfsHash);
   }
 
-  function _getPayloadsController(uint256 chainId) internal pure returns (IPayloadsControllerCore) {
-    if (chainId == ChainIds.MAINNET) {
-      return GovernanceV3Ethereum.PAYLOADS_CONTROLLER;
-    }
-    //  else if (chainId == ChainIds.POLYGON) {
-    //   return GovernanceV3Polygon.PAYLOADS_CONTROLLER;
-    // } else if (chainId == ChainIds.AVALANCHE) {
-    //   return GovernanceV3Avalanche.PAYLOADS_CONTROLLER;
-    // } else if (chainId == ChainIds.OPTIMISM) {
-    //   return GovernanceV3Optimism.PAYLOADS_CONTROLLER;
-    // } else if (chainId == ChainIds.ARBITRUM) {
-    //   return GovernanceV3Arbitrum.PAYLOADS_CONTROLLER;
-    // } else if (chainId == ChainIds.METIS) {
-    //   return GovernanceV3Metis.PAYLOADS_CONTROLLER;
-    // } else if (chainId == ChainIds.BASE) {
-    //   return GovernanceV3Base.PAYLOADS_CONTROLLER;
-    // }
+  function _buildPayload(
+    Vm vm,
+    uint256 chainId,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    IPayloadsControllerCore payloadsController = getPayloadsController(chainId);
+    (PayloadsControllerUtils.AccessControl accessLevel, uint40 payloadId) = _findAndValidatePayload(
+      vm,
+      chainId,
+      payloadsController,
+      actions
+    );
+    return
+      PayloadsControllerUtils.Payload({
+        chain: chainId,
+        accessLevel: accessLevel,
+        payloadsController: address(payloadsController),
+        payloadId: payloadId
+      });
+  }
 
-    revert CannotFindPayloadsController();
+  function _findAndValidatePayload(
+    Vm vm,
+    uint256 chainId,
+    IPayloadsControllerCore payloadsController,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) private returns (PayloadsControllerUtils.AccessControl, uint40) {
+    (uint256 prevFork, ) = ChainHelpers.selectChain(vm, chainId);
+    (uint40 payloadId, IPayloadsControllerCore.Payload memory payload) = _findPayloadId(
+      payloadsController,
+      actions
+    );
+    require(
+      payload.state == IPayloadsControllerCore.PayloadState.Created,
+      'MUST_BE_IN_CREATED_STATE'
+    );
+    require(payload.expirationTime >= block.timestamp, 'EXPIRATION_MUST_BE_IN_THE_FUTURE');
+    vm.selectFork(prevFork);
+    return (payload.maximumAccessLevelRequired, payloadId);
+  }
+
+  function _findPayloadId(
+    IPayloadsControllerCore payloadsController,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) private view returns (uint40, IPayloadsControllerCore.Payload memory) {
+    uint40 count = payloadsController.getPayloadsCount();
+    for (uint40 payloadId = count - 1; payloadId >= 0; payloadId++) {
+      IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(payloadId);
+      if (_actionsAreEqual(actions, payload.actions)) {
+        return (payloadId, payload);
+      }
+    }
+    revert CanNotFindPayload();
+  }
+
+  function _actionsAreEqual(
+    IPayloadsControllerCore.ExecutionAction[] memory actionsA,
+    IPayloadsControllerCore.ExecutionAction[] memory actionsB
+  ) private pure returns (bool) {
+    // must be equal size for equlity
+    if (actionsA.length != actionsB.length) return false;
+    for (uint256 actionId = 0; actionId < actionsA.length; actionId++) {
+      if (actionsA[actionId].target != actionsB[actionId].target) return false;
+      if (actionsA[actionId].withDelegateCall != actionsB[actionId].withDelegateCall) return false;
+      if (actionsA[actionId].accessLevel != actionsB[actionId].accessLevel) return false;
+      if (actionsA[actionId].value != actionsB[actionId].value) return false;
+      if (
+        keccak256(abi.encodePacked(actionsA[actionId].signature)) !=
+        keccak256(abi.encodePacked(actionsB[actionId].signature))
+      ) return false;
+      if (keccak256(actionsA[actionId].callData) != keccak256(actionsB[actionId].callData))
+        return false;
+    }
+    return true;
   }
 }
 

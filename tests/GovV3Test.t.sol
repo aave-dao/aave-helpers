@@ -24,13 +24,14 @@ contract GovernanceV3Test is Test {
   }
 
   function test_injectProposalIntoGovernance() public {
-    uint256 count = IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).getProposalsCount();
+    uint256 count = GovernanceV3Ethereum.GOVERNANCE.getProposalsCount();
     PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
     uint256 proposalId = GovV3StorageHelpers.injectProposal(vm, payloads, address(0));
-    uint256 countAfter = IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).getProposalsCount();
+    uint256 countAfter = GovernanceV3Ethereum.GOVERNANCE.getProposalsCount();
     assertEq(countAfter, count + 1);
-    IGovernanceCore.Proposal memory proposal = IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE)
-      .getProposal(proposalId);
+    IGovernanceCore.Proposal memory proposal = GovernanceV3Ethereum.GOVERNANCE.getProposal(
+      proposalId
+    );
     assertEq(proposal.payloads.length, payloads.length);
   }
 
@@ -41,9 +42,7 @@ contract GovernanceV3Test is Test {
     actions[0] = GovV3Helpers.buildAction(address(payload));
     actions[1] = GovV3Helpers.buildAction(address(payload));
 
-    IPayloadsControllerCore payloadsController = IPayloadsControllerCore(
-      GovV3Helpers._getPayloadsController(block.chainid)
-    );
+    IPayloadsControllerCore payloadsController = GovV3Helpers.getPayloadsController(block.chainid);
 
     uint40 countBefore = payloadsController.getPayloadsCount();
     GovV3StorageHelpers.injectPayload(vm, payloadsController, actions);
@@ -66,9 +65,7 @@ contract GovernanceV3Test is Test {
     actions[0] = GovV3Helpers.buildAction(address(payload));
     uint40 payloadId = GovV3Helpers.createPayload(actions);
 
-    IPayloadsControllerCore payloadsController = IPayloadsControllerCore(
-      GovV3Helpers._getPayloadsController(block.chainid)
-    );
+    IPayloadsControllerCore payloadsController = GovV3Helpers.getPayloadsController(block.chainid);
 
     GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
     IPayloadsControllerCore.Payload memory pl = payloadsController.getPayloadById(payloadId);
@@ -105,6 +102,7 @@ contract GovernanceV3Test is Test {
 
   /**
    * Demo: this is more or less how a payload creation script could look like
+   * Disclaimer: Doesn't work yet as aave token is not yet upgraded so proposals cannot be created
    */
   // function test_payloadCreation() public {
   //   // 1. deploy payloads
