@@ -378,6 +378,25 @@ library GovV3StorageHelpers {
 
   function readyProposal(Vm vm, uint256 proposalId) internal {
     uint256 proposalBaseSlot = StorageHelpers.getStorageSlotUintMapping(PROPOSALS_SLOT, proposalId);
+    bytes32 storageBefore = vm.load(
+      address(GovernanceV3Ethereum.GOVERNANCE),
+      bytes32(proposalBaseSlot)
+    );
+    // set state
+    storageBefore = StorageHelpers.maskValueToBitsAtPosition(
+      0,
+      8,
+      storageBefore,
+      bytes32(uint256(IGovernanceCore.State.Queued))
+    );
+    // set creation time
+    storageBefore = StorageHelpers.maskValueToBitsAtPosition(
+      16,
+      56,
+      storageBefore,
+      bytes32(uint256(block.timestamp - GovernanceV3Ethereum.GOVERNANCE.PROPOSAL_EXPIRATION_TIME()))
+    );
+    vm.store(address(GovernanceV3Ethereum.GOVERNANCE), bytes32(proposalBaseSlot), storageBefore);
   }
 
   // ### PayoadsController Storage ###

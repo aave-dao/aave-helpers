@@ -34,6 +34,10 @@ contract GovernanceV3Test is Test {
     );
     assertEq(proposal.payloads.length, payloads.length);
     GovV3StorageHelpers.readyProposal(vm, proposalId);
+    IGovernanceCore.Proposal memory readiedProposal = GovernanceV3Ethereum.GOVERNANCE.getProposal(
+      proposalId
+    );
+    assertEq(uint256(readiedProposal.state), uint256(IGovernanceCore.State.Queued));
     GovernanceV3Ethereum.GOVERNANCE.executeProposal(proposalId);
   }
 
