@@ -26,9 +26,12 @@ contract GovernanceV3Test is Test {
   function test_injectProposalIntoGovernance() public {
     uint256 count = IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).getProposalsCount();
     PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
-    GovV3StorageHelpers.injectProposal(vm, payloads, address(0));
+    uint256 proposalId = GovV3StorageHelpers.injectProposal(vm, payloads, address(0));
     uint256 countAfter = IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).getProposalsCount();
     assertEq(countAfter, count + 1);
+    IGovernanceCore.Proposal memory proposal = IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE)
+      .getProposal(proposalId);
+    assertEq(proposal.payloads.length, payloads.length);
   }
 
   function test_injectPayloadIntoPayloadsController() public {

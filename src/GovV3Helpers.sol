@@ -258,19 +258,90 @@ library GovV3StorageHelpers {
   uint256 constant ACCESS_LEVEL_TO_EXECUTOR_SLOT = 2;
   uint256 constant PAYLOADS_SLOT = 3;
 
+  // enum State {
+  //     Null, // proposal does not exists
+  //     Created, // created, waiting for a cooldown to initiate the balances snapshot
+  //     Active, // balances snapshot set, voting in progress
+  //     Queued, // voting results submitted, but proposal is under grace period when guardian can cancel it
+  //     Executed, // results sent to the execution chain(s)
+  //     Failed, // voting was not successful
+  //     Cancelled, // got cancelled by guardian, or because proposition power of creator dropped below allowed minimum
+  //     Expired
+  //   }
+  // struct Proposal {
+  //   State state; 0: 0-8
+  //   PayloadsControllerUtils.AccessControl accessLevel; 0: 8-16
+  //   uint40 creationTime; 0: 16-56
+  //   uint24 votingDuration; 0: 56-96
+  //   uint40 votingActivationTime; 0: 96-136
+  //   uint40 queuingTime; 0: 136-176
+  //   uint40 cancelTimestamp; 0: 176-216
+  //   address creator; 1
+  //   address votingPortal; 2
+  //   bytes32 snapshotBlockHash; 3
+  //   bytes32 ipfsHash; 4
+  //   uint128 forVotes; 5: 0-128
+  //   uint128 againstVotes; 5: 128-256
+  //   uint256 cancellationFee; 6
+  //   PayloadsControllerUtils.Payload[] payloads; 7
+  // }
+  // struct Payload {
+  //   uint256 chain; 0
+  //   AccessControl accessLevel; 1: 0-8
+  //   address payloadsController; 1: 8-168 // address which holds the logic to execute after success proposal voting
+  //   uint40 payloadId; 1: 168-208 // number of the payload placed to payloadsController, max is: ~10¹²
+  // }
+
   function injectProposal(
     Vm vm,
     PayloadsControllerUtils.Payload[] memory payloads,
     address votingPortal
   ) internal returns (uint256) {
     uint256 count = IGovernanceCore(GovernanceV3Ethereum.GOVERNANCE).getProposalsCount();
+    uint256 proposalBaseSlot = StorageHelpers.getStorageSlotUintMapping(PROPOSALS_SLOT, count);
 
-    // overwrite payloads count
+    // overwrite proposals count
     vm.store(
       GovernanceV3Ethereum.GOVERNANCE,
       bytes32(PROPOSALS_COUNT_SLOT),
       bytes32(uint256(count + 1))
     );
+    // overwrite array size
+    vm.store(
+      GovernanceV3Ethereum.GOVERNANCE,
+      bytes32(proposalBaseSlot + 7),
+      bytes32(uint256(payloads.length))
+    );
+    // overwrite single array slots
+    for (uint256 i = 0; i < payloads.length; i++) {
+      bytes32 slot = bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 7, i, 2));
+      vm.store(GovernanceV3Ethereum.GOVERNANCE, slot, bytes32(payloads[i].chain));
+      bytes32 storageBefore = vm.load(GovernanceV3Ethereum.GOVERNANCE, bytes32(uint256(slot) + 1));
+      // write target
+      storageBefore = StorageHelpers.maskValueToBitsAtPosition(
+        0,
+        8,
+        storageBefore,
+        bytes32(uint256(uint8(payloads[i].accessLevel)))
+      );
+      // write delegateCall
+      storageBefore = StorageHelpers.maskValueToBitsAtPosition(
+        8,
+        168,
+        storageBefore,
+        bytes32(uint256(uint160(payloads[i].payloadsController)))
+      );
+      // write accesslevel
+      storageBefore = StorageHelpers.maskValueToBitsAtPosition(
+        168,
+        208,
+        storageBefore,
+        bytes32(uint256(payloads[i].payloadId))
+      );
+      // persist
+      vm.store(GovernanceV3Ethereum.GOVERNANCE, bytes32(uint256(slot) + 1), storageBefore);
+    }
+    return count;
   }
 
   function readyProposal() internal {}
@@ -310,7 +381,7 @@ library GovV3StorageHelpers {
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (uint40) {
     uint40 count = IPayloadsControllerCore(payloadsController).getPayloadsCount();
-    uint256 proposalBaseSlot = StorageHelpers.getStorageSlotUintMapping(PAYLOADS_SLOT, count);
+    uint256 payloadBaseSlot = StorageHelpers.getStorageSlotUintMapping(PAYLOADS_SLOT, count);
 
     // overwrite payloads count
     StorageHelpers.writeBitsInStorageSlot(
@@ -326,7 +397,7 @@ library GovV3StorageHelpers {
     StorageHelpers.writeBitsInStorageSlot(
       vm,
       payloadsController,
-      bytes32(proposalBaseSlot),
+      bytes32(payloadBaseSlot),
       168,
       176,
       bytes32(uint256(IPayloadsControllerCore.PayloadState.Created))
@@ -336,18 +407,18 @@ library GovV3StorageHelpers {
     StorageHelpers.writeBitsInStorageSlot(
       vm,
       payloadsController,
-      bytes32(proposalBaseSlot + 1),
+      bytes32(payloadBaseSlot + 1),
       160,
       200,
       bytes32(uint256(IPayloadsControllerCore(payloadsController).GRACE_PERIOD()))
     );
 
     // overwrite array size
-    vm.store(payloadsController, bytes32(proposalBaseSlot + 2), bytes32(uint256(actions.length)));
+    vm.store(payloadsController, bytes32(payloadBaseSlot + 2), bytes32(uint256(actions.length)));
 
     // overwrite single array slots
     for (uint256 i = 0; i < actions.length; i++) {
-      bytes32 slot = bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 2, i, 4));
+      bytes32 slot = bytes32(StorageHelpers.arrLocation(payloadBaseSlot + 2, i, 4));
       bytes32 storageBefore = vm.load(payloadsController, slot);
       // write target
       storageBefore = StorageHelpers.maskValueToBitsAtPosition(
@@ -398,8 +469,8 @@ library GovV3StorageHelpers {
     IPayloadsControllerCore.Payload memory payload = IPayloadsControllerCore(payloadsController)
       .getPayloadById(payloadId);
     require(payload.state != IPayloadsControllerCore.PayloadState.None, 'PAYLOAD DOES NOT EXIST');
-    uint256 proposalBaseSlot = StorageHelpers.getStorageSlotUintMapping(PAYLOADS_SLOT, payloadId);
-    bytes32 storageBefore = vm.load(payloadsController, bytes32(proposalBaseSlot));
+    uint256 payloadBaseSlot = StorageHelpers.getStorageSlotUintMapping(PAYLOADS_SLOT, payloadId);
+    bytes32 storageBefore = vm.load(payloadsController, bytes32(payloadBaseSlot));
     // write state
     storageBefore = StorageHelpers.maskValueToBitsAtPosition(
       168,
@@ -415,7 +486,7 @@ library GovV3StorageHelpers {
       bytes32(uint256(uint40(block.timestamp - payload.delay - 1)))
     );
     // persist
-    vm.store(payloadsController, bytes32(proposalBaseSlot), storageBefore);
+    vm.store(payloadsController, bytes32(payloadBaseSlot), storageBefore);
   }
 
   function toUInt256(bool x) internal pure returns (uint r) {
