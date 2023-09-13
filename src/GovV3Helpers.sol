@@ -6,12 +6,13 @@ import {ChainIds, ChainHelpers} from './ChainIds.sol';
 import {IpfsUtils} from './IpfsUtils.sol';
 import {console2} from 'forge-std/console2.sol';
 import {PayloadsControllerUtils, IGovernancePowerStrategy, IPayloadsControllerCore, IGovernanceCore} from 'aave-address-book/GovernanceV3.sol';
-import {GovernanceV3Sepolia} from 'aave-address-book/GovernanceV3Sepolia.sol';
 import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
+import {GovernanceV3Metis} from 'aave-address-book/GovernanceV3Metis.sol';
+import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 
 library GovV3Helpers {
@@ -35,7 +36,7 @@ library GovV3Helpers {
    */
   function buildAction(
     address payloadAddress
-  ) internal returns (IPayloadsControllerCore.ExecutionAction memory) {
+  ) internal pure returns (IPayloadsControllerCore.ExecutionAction memory) {
     return
       buildAction({
         payloadAddress: payloadAddress,
@@ -63,7 +64,7 @@ library GovV3Helpers {
     bool withDelegateCall,
     string memory signature,
     bytes memory callData
-  ) internal returns (IPayloadsControllerCore.ExecutionAction memory) {
+  ) internal pure returns (IPayloadsControllerCore.ExecutionAction memory) {
     require(payloadAddress != address(0), 'INVALID PAYLOAD ADDRESS');
     require(
       accessLevel != PayloadsControllerUtils.AccessControl.Level_null,
@@ -140,6 +141,55 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.MAINNET, actions);
   }
 
+  function buildPolygonPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.POLYGON, actions);
+  }
+
+  function buildAvalanchePayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.AVALANCHE, actions);
+  }
+
+  function buildArbitrumPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.ARBITRUM, actions);
+  }
+
+  function buildOptimismPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.OPTIMISM, actions);
+  }
+
+  function buildMetisPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.METIS, actions);
+  }
+
+  function buildBasePayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.BASE, actions);
+  }
+
+  function buildBSCPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.BSC, actions);
+  }
+
   function createProposal(
     PayloadsControllerUtils.Payload[] memory payloads,
     bytes32 ipfsHash
@@ -167,20 +217,19 @@ library GovV3Helpers {
   function getPayloadsController(uint256 chainId) internal pure returns (IPayloadsControllerCore) {
     if (chainId == ChainIds.MAINNET) {
       return GovernanceV3Ethereum.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.POLYGON) {
+      return GovernanceV3Polygon.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.AVALANCHE) {
+      return GovernanceV3Avalanche.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.OPTIMISM) {
+      return GovernanceV3Optimism.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.ARBITRUM) {
+      return GovernanceV3Arbitrum.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.METIS) {
+      return GovernanceV3Metis.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.BASE) {
+      return GovernanceV3Base.PAYLOADS_CONTROLLER;
     }
-    //  else if (chainId == ChainIds.POLYGON) {
-    //   return GovernanceV3Polygon.PAYLOADS_CONTROLLER;
-    // } else if (chainId == ChainIds.AVALANCHE) {
-    //   return GovernanceV3Avalanche.PAYLOADS_CONTROLLER;
-    // } else if (chainId == ChainIds.OPTIMISM) {
-    //   return GovernanceV3Optimism.PAYLOADS_CONTROLLER;
-    // } else if (chainId == ChainIds.ARBITRUM) {
-    //   return GovernanceV3Arbitrum.PAYLOADS_CONTROLLER;
-    // } else if (chainId == ChainIds.METIS) {
-    //   return GovernanceV3Metis.PAYLOADS_CONTROLLER;
-    // } else if (chainId == ChainIds.BASE) {
-    //   return GovernanceV3Base.PAYLOADS_CONTROLLER;
-    // }
 
     revert CannotFindPayloadsController();
   }
