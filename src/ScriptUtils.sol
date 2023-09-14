@@ -60,6 +60,18 @@ abstract contract MetisScript is WithChainIdValidation {
   constructor() WithChainIdValidation(ChainIds.METIS) {}
 }
 
+abstract contract BaseScript is WithChainIdValidation {
+  constructor() WithChainIdValidation(ChainIds.BASE) {}
+}
+
+abstract contract BSCScript is WithChainIdValidation {
+  constructor() WithChainIdValidation(ChainIds.BSC) {}
+}
+
+abstract contract SepoliaScript is WithChainIdValidation {
+  constructor() WithChainIdValidation(ChainIds.SEPOLIA) {}
+}
+
 library Create2Utils {
   address public constant CREATE2_FACTORY = 0x4e59b44847b379578588920cA78FbF26c0B4956C;
 
