@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.19;
+pragma solidity ^0.8.0;
 
 interface IAavePolEthERC20Bridge {
   function bridge(address token, uint256 amount) external;
