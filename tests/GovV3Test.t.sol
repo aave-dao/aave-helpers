@@ -38,8 +38,7 @@ contract GovernanceV3Test is Test {
       proposalId
     );
     assertEq(uint256(readiedProposal.state), uint256(IGovernanceCore.State.Queued));
-    // TODO: need to execute proposal before this can work
-    // GovernanceV3Ethereum.GOVERNANCE.executeProposal(proposalId);
+    GovernanceV3Ethereum.GOVERNANCE.executeProposal(proposalId);
   }
 
   function test_injectPayloadIntoPayloadsController() public {
