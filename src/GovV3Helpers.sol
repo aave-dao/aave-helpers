@@ -25,6 +25,36 @@ library GovV3Helpers {
     return IpfsUtils.ipfsHashFile(vm, filePath, false);
   }
 
+  function getVotingProofs(Vm vm, uint256 proposalId, address voter) internal {
+    string[] memory inputs = new string[](9);
+    inputs[0] = 'npx';
+    inputs[1] = '--yes';
+    inputs[2] = '-s';
+    inputs[3] = '@bgd-labs/aave-cli@0.0.24-34c06df8b6ba4225f0828e126ea62096c8e57d9f.0';
+    inputs[4] = 'getVotingProofs';
+    inputs[5] = '--proposalId';
+    inputs[6] = vm.toString(proposalId);
+    inputs[7] = '--voter';
+    inputs[8] = vm.toString(voter);
+    Vm.FfiResult memory f = vm.tryFfi(inputs);
+    require(f.exit_code == 0, 'ffi failed');
+    return f.stdout;
+  }
+
+  function getStorageRoots(Vm vm) internal {
+    string[] memory inputs = new string[](7);
+    inputs[0] = 'npx';
+    inputs[1] = '--yes';
+    inputs[2] = '-s';
+    inputs[3] = '@bgd-labs/aave-cli@0.0.24-34c06df8b6ba4225f0828e126ea62096c8e57d9f.0';
+    inputs[4] = 'getStorageRoots';
+    inputs[5] = '--proposalId';
+    inputs[6] = vm.toString(proposalId);
+    Vm.FfiResult memory f = vm.tryFfi(inputs);
+    require(f.exit_code == 0, 'ffi failed');
+    return f.stdout;
+  }
+
   /**
    * @dev builds a action to be registered on a payloadsController
    * - assumes accesscontrol level 1
