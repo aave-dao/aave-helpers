@@ -7,6 +7,11 @@
 | description | value before | value after |
 | --- | --- | --- |
 | eModeCategory | 0 | 1 |
+| eMode.label | - | ETH correlated |
+| eMode.ltv | - | 90 % |
+| eMode.liquidationThreshold | - | 93 % |
+| eMode.liquidationBonus | - | 1 % |
+| eMode.priceSource | - | 0x0000000000000000000000000000000000000000 |
 
 
 ## Raw diff
