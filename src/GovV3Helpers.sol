@@ -150,6 +150,16 @@ library GovV3Helpers {
     return payloadsController.createPayload(actions);
   }
 
+  function createPayload(
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (uint40) {
+    IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
+    IPayloadsControllerCore.ExecutionAction[]
+      memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
+    actions[0] = action;
+    return payloadsController.createPayload(actions);
+  }
+
   /**
    * @dev This method allows you to directly execute a payloadId, no matter the state of the payload
    * @notice This method is for test purposes only.
