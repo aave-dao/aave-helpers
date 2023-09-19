@@ -130,4 +130,12 @@ contract GovernanceV3Test is Test {
   //   GovV3Helpers.createProposal(payloads, bytes32(uint256(1)));
   //   vm.stopPrank();
   // }
+
+  function test_voteViaProof() public {
+    GovV3Helpers.getVotingProofs(vm, 44, 0x076d6da60aAAC6c97A8a0fE8057f9564203Ee545);
+  }
+
+  function test_registerStorageRoots() public {
+    GovV3Helpers.getStorageRoots(vm, 44);
+  }
 }

@@ -6,6 +6,7 @@ import {ChainIds, ChainHelpers} from './ChainIds.sol';
 import {IpfsUtils} from './IpfsUtils.sol';
 import {console2} from 'forge-std/console2.sol';
 import {PayloadsControllerUtils, IGovernancePowerStrategy, IPayloadsControllerCore, IGovernanceCore} from 'aave-address-book/GovernanceV3.sol';
+import {IVotingMachineWithProofs} from 'aave-address-book/governance-v3/IVotingMachineWithProofs.sol';
 import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
@@ -20,39 +21,62 @@ library GovV3Helpers {
   error CannotFindPayloadsController();
   error ExecutorNotFound();
   error LongBytesNotSupportedYet();
+  error FfiFailed();
+
+  struct StorageRootResponse {
+    address account;
+    bytes32 blockHash;
+    bytes blockHeaderRLP;
+    bytes accountStateProofRLP;
+  }
 
   function ipfsHashFile(Vm vm, string memory filePath) internal returns (bytes32) {
     return IpfsUtils.ipfsHashFile(vm, filePath, false);
   }
 
-  function getVotingProofs(Vm vm, uint256 proposalId, address voter) internal {
-    string[] memory inputs = new string[](9);
+  function getVotingProofs(
+    Vm vm,
+    uint256 proposalId,
+    address voter
+  ) internal returns (IVotingMachineWithProofs.VotingBalanceProof[] memory) {
+    string[] memory inputs = new string[](10);
     inputs[0] = 'npx';
     inputs[1] = '--yes';
     inputs[2] = '-s';
-    inputs[3] = '@bgd-labs/aave-cli@0.0.24-34c06df8b6ba4225f0828e126ea62096c8e57d9f.0';
-    inputs[4] = 'getVotingProofs';
-    inputs[5] = '--proposalId';
-    inputs[6] = vm.toString(proposalId);
-    inputs[7] = '--voter';
-    inputs[8] = vm.toString(voter);
+    inputs[3] = '@bgd-labs/aave-cli@0.0.24-4c3312572ba1eb196152981db889a8c0831aff75.0';
+    inputs[4] = 'governance';
+    inputs[5] = 'getVotingProofs';
+    inputs[6] = '--proposalId';
+    inputs[7] = vm.toString(proposalId);
+    inputs[8] = '--voter';
+    inputs[9] = vm.toString(voter);
     Vm.FfiResult memory f = vm.tryFfi(inputs);
-    require(f.exit_code == 0, 'ffi failed');
-    return f.stdout;
+    if (f.exit_code != 0) {
+      console2.logString(string(f.stderr));
+      revert FfiFailed();
+    }
+    return abi.decode(f.stdout, (IVotingMachineWithProofs.VotingBalanceProof[]));
   }
 
-  function getStorageRoots(Vm vm) internal {
-    string[] memory inputs = new string[](7);
+  function getStorageRoots(
+    Vm vm,
+    uint256 proposalId
+  ) internal returns (StorageRootResponse[] memory) {
+    string[] memory inputs = new string[](8);
     inputs[0] = 'npx';
     inputs[1] = '--yes';
     inputs[2] = '-s';
-    inputs[3] = '@bgd-labs/aave-cli@0.0.24-34c06df8b6ba4225f0828e126ea62096c8e57d9f.0';
-    inputs[4] = 'getStorageRoots';
-    inputs[5] = '--proposalId';
-    inputs[6] = vm.toString(proposalId);
+    inputs[3] = '@bgd-labs/aave-cli@0.0.24-4c3312572ba1eb196152981db889a8c0831aff75.0';
+    inputs[4] = 'governance';
+    inputs[5] = 'getStorageRoots';
+    inputs[6] = '--proposalId';
+    inputs[7] = vm.toString(proposalId);
     Vm.FfiResult memory f = vm.tryFfi(inputs);
-    require(f.exit_code == 0, 'ffi failed');
-    return f.stdout;
+    if (f.exit_code != 0) {
+      console2.logString(string(f.stderr));
+      revert FfiFailed();
+    }
+    return abi.decode(f.stdout, (StorageRootResponse[]));
   }
 
   /**

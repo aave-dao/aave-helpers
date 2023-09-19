@@ -4,6 +4,8 @@ import {Vm} from 'forge-std/Vm.sol';
 import {console2} from 'forge-std/console2.sol';
 
 library IpfsUtils {
+  error FfiFailed();
+
   function ipfsHashFile(Vm vm, string memory filePath, bool upload) internal returns (bytes32) {
     string[] memory inputs = new string[](7);
     inputs[0] = 'npx';
@@ -16,7 +18,10 @@ library IpfsUtils {
       inputs[6] = '-u';
     }
     Vm.FfiResult memory f = vm.tryFfi(inputs);
-    require(f.exit_code == 0, 'ffi failed');
+    if (f.exit_code != 0) {
+      console2.logString(string(f.stderr));
+      revert FfiFailed();
+    }
     require(f.stdout.length != 0, 'CALCULATED_HASH_IS_ZERO');
     console2.logString('Info: This preview will only work when the file has been uploaded to ipfs');
     console2.logString(
