@@ -448,7 +448,7 @@ library GovV3Helpers {
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) private view returns (uint40, IPayloadsControllerCore.Payload memory) {
     uint40 count = payloadsController.getPayloadsCount();
-    for (uint40 payloadId = count - 1; payloadId >= 0; payloadId++) {
+    for (uint40 payloadId = count - 1; payloadId >= 0; payloadId--) {
       IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(payloadId);
       if (_actionsAreEqual(actions, payload.actions)) {
         return (payloadId, payload);
