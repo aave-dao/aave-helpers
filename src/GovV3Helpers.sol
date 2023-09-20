@@ -205,11 +205,25 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.MAINNET, actions);
   }
 
+  function buildMainnetPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.MAINNET, action);
+  }
+
   function buildPolygonPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (PayloadsControllerUtils.Payload memory) {
     return _buildPayload(vm, ChainIds.POLYGON, actions);
+  }
+
+  function buildPolygonPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.POLYGON, action);
   }
 
   function buildAvalanchePayload(
@@ -219,11 +233,25 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.AVALANCHE, actions);
   }
 
+  function buildAvalanchePayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.AVALANCHE, action);
+  }
+
   function buildArbitrumPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (PayloadsControllerUtils.Payload memory) {
     return _buildPayload(vm, ChainIds.ARBITRUM, actions);
+  }
+
+  function buildArbitrumPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.ARBITRUM, action);
   }
 
   function buildOptimismPayload(
@@ -233,11 +261,25 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.OPTIMISM, actions);
   }
 
+  function buildOptimismPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.OPTIMISM, action);
+  }
+
   function buildMetisPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (PayloadsControllerUtils.Payload memory) {
     return _buildPayload(vm, ChainIds.METIS, actions);
+  }
+
+  function buildMetisPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.METIS, action);
   }
 
   function buildBasePayload(
@@ -247,11 +289,25 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.BASE, actions);
   }
 
+  function buildBasePayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.BASE, action);
+  }
+
   function buildBSCPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (PayloadsControllerUtils.Payload memory) {
     return _buildPayload(vm, ChainIds.BSC, actions);
+  }
+
+  function buildBSCPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.BSC, action);
   }
 
   function createProposal(
@@ -327,6 +383,30 @@ library GovV3Helpers {
     uint256 chainId,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (PayloadsControllerUtils.Payload memory) {
+    IPayloadsControllerCore payloadsController = getPayloadsController(chainId);
+    (PayloadsControllerUtils.AccessControl accessLevel, uint40 payloadId) = _findAndValidatePayload(
+      vm,
+      chainId,
+      payloadsController,
+      actions
+    );
+    return
+      PayloadsControllerUtils.Payload({
+        chain: chainId,
+        accessLevel: accessLevel,
+        payloadsController: address(payloadsController),
+        payloadId: payloadId
+      });
+  }
+
+  function _buildPayload(
+    Vm vm,
+    uint256 chainId,
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    IPayloadsControllerCore.ExecutionAction[]
+      memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
+    actions[0] = action;
     IPayloadsControllerCore payloadsController = getPayloadsController(chainId);
     (PayloadsControllerUtils.AccessControl accessLevel, uint40 payloadId) = _findAndValidatePayload(
       vm,
