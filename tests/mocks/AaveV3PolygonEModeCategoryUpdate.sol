@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import '../../src/v3-config-engine/AaveV3PayloadBase.sol';
+import '../../src/v3-config-engine/AaveV3Payload.sol';
 
 /**
  * @dev Smart contract for a mock update, to be able to test
  * IMPORTANT Parameters are pseudo-random, DON'T USE THIS ANYHOW IN PRODUCTION
- * @dev Inheriting directly from AaveV3PayloadBase for being able to inject a custom engine
+ * @dev Inheriting directly from AaveV3Payload for being able to inject a custom engine
  * @author BGD Labs
  */
-contract AaveV3PolygonEModeCategoryUpdate is AaveV3PayloadBase {
-  constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
+contract AaveV3PolygonEModeCategoryUpdate is AaveV3Payload {
+  constructor(IEngine customEngine) AaveV3Payload(customEngine) {}
 
   function eModeCategoriesUpdates()
     public
@@ -40,11 +40,11 @@ contract AaveV3PolygonEModeCategoryUpdate is AaveV3PayloadBase {
 /**
  * @dev Smart contract for a mock update, to be able to test
  * IMPORTANT Parameters are pseudo-random, DON'T USE THIS ANYHOW IN PRODUCTION
- * @dev Inheriting directly from AaveV3PayloadBase for being able to inject a custom engine
+ * @dev Inheriting directly from AaveV3Payload for being able to inject a custom engine
  * @author BGD Labs
  */
-contract AaveV3AvalancheEModeCategoryUpdateEdgeBonus is AaveV3PayloadBase {
-  constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
+contract AaveV3AvalancheEModeCategoryUpdateEdgeBonus is AaveV3Payload {
+  constructor(IEngine customEngine) AaveV3Payload(customEngine) {}
 
   function eModeCategoriesUpdates()
     public

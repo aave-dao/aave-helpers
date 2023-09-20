@@ -8,8 +8,8 @@ import '../../src/v3-config-engine/AaveV3PayloadAvalanche.sol';
  * IMPORTANT Parameters are pseudo-random, DON'T USE THIS ANYHOW IN PRODUCTION
  * @author BGD Labs
  */
-contract AaveV3AvalancheEModeCategoryUpdateNoChange is AaveV3PayloadBase {
-  constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
+contract AaveV3AvalancheEModeCategoryUpdateNoChange is AaveV3Payload {
+  constructor(IEngine customEngine) AaveV3Payload(customEngine) {}
 
   function eModeCategoriesUpdates()
     public

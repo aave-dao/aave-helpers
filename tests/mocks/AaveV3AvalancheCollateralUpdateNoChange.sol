@@ -2,14 +2,15 @@
 pragma solidity ^0.8.0;
 
 import '../../src/v3-config-engine/AaveV3PayloadAvalanche.sol';
+import {AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
 
 /**
  * @dev Smart contract for a mock collateral update with no changes, for testing purposes
  * IMPORTANT Parameters are pseudo-random, DON'T USE THIS ANYHOW IN PRODUCTION
  * @author BGD Labs
  */
-contract AaveV3AvalancheCollateralUpdateNoChange is AaveV3PayloadBase {
-  constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
+contract AaveV3AvalancheCollateralUpdateNoChange is AaveV3Payload {
+  constructor(IEngine customEngine) AaveV3Payload(customEngine) {}
 
   function collateralsUpdates() public pure override returns (IEngine.CollateralUpdate[] memory) {
     IEngine.CollateralUpdate[] memory collateralsUpdate = new IEngine.CollateralUpdate[](1);

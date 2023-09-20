@@ -4,7 +4,7 @@ pragma solidity ^0.8.18;
 import {IPool, IPoolConfigurator, IAaveOracle} from 'aave-address-book/AaveV3.sol';
 import {IV3RateStrategyFactory} from './IV3RateStrategyFactory.sol';
 
-/// @dev Examples here assume the usage of the `AaveV3PayloadBase` base contracts
+/// @dev Examples here assume the usage of the `AaveV3Payload` base contracts
 /// contained in this same repository
 interface IAaveV3ConfigEngine {
   struct Basic {

@@ -3,15 +3,15 @@ pragma solidity ^0.8.0;
 
 import '../../src/v3-config-engine/AaveV3PayloadEthereum.sol';
 import {IV3RateStrategyFactory} from '../../src/v3-config-engine/IV3RateStrategyFactory.sol';
-import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
+import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 
 /**
  * @dev Smart contract for a mock caps update, for testing purposes
  * IMPORTANT Parameters are pseudo-random, DON'T USE THIS ANYHOW IN PRODUCTION
  * @author BGD Labs
  */
-contract AaveV3EthereumMockCustomListing is AaveV3PayloadBase {
-  constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
+contract AaveV3EthereumMockCustomListing is AaveV3Payload {
+  constructor(IEngine customEngine) AaveV3Payload(customEngine) {}
 
   function newListingsCustom()
     public
