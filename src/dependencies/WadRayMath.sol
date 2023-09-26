@@ -2,7 +2,7 @@
 // From commit https://github.com/aave/protocol-v2/commit/92a731ec2c536734924f5a55d3e6db0385b0c824
 pragma solidity >=0.6.12;
 
-import {Errors} from '../dependencies/Errors.sol';
+import {Errors} from 'aave-address-book/AaveV2.sol';
 
 /**
  * @title WadRayMath library

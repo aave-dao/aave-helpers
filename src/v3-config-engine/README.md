@@ -26,24 +26,33 @@ Change collateral-related parameters? Same approach as previous, you only need t
 
 Change Borrow-related parameters? Same as previous, just define the update within a `borrowsUpdates()` function, and the base payload will take care of the rest.
 
+Change eMode category configuration? Same as previous, just define the update within a `eModeCategoriesUpdates()` function, and the base payload will take care of the rest.
+
+Change eMode category of a particular asset? Same as previous, just define the update within a `assetsEModeUpdates()` function, and the base payload will take care of the rest.
+
 ### Internal aspects to consider
 
-- Frequently, at the same time that you want to do an update of parameters or listing, you also want to do something extra before or after (e.g. create an eMode category that you will use for the new asset to be listed).
+- Frequently, at the same time that you want to do an update of parameters or listing, you also want to do something extra before or after.
 The `Base Aave v3 Payload` defines `_preExecute()` and `_postExecute()` hook functions, that you can redefine on your payload and will the execute before and after all configs changes/listings you define.
 
-- The payload also allow you to group changes of parameters and listings, just by defining at the same time the aforementioned `newListings()`, `capsUpdate()` and/or `collateralsUpdates()`. For reference, the execution ordering is the following:
+- The payload also allow you to group changes of parameters and listings, just by defining at the same time the aforementioned `newListings()`, `capsUpdate()` and/or `collateralsUpdates()` and so on. For reference, the execution ordering is the following:
   1. `_preExecute()`
-  2. `newListingsCustom()`
+  2. `eModeCategoriesUpdates()`
   3. `newListings()`
-  4. `capsUpdates()`
-  5. `priceFeedsUpdates()`
-  6. `borrowsUpdates()`
-  7. `collateralsUpdates()`
-  8. `_postExecute()`
+  4. `newListingsCustom()`
+  5. `borrowsUpdates()`
+  6. `collateralsUpdates()`
+  7. `rateStrategiesUpdates()`
+  8. `priceFeedsUpdates()`
+  9. `assetsEModeUpdates()`
+  10. `capsUpdates()`
+  11. `_postExecute()`
 
 ## Links to examples
 - [Simple mock listing on Aave v3 Polygon](../test/mocks/AaveV3PolygonMockListing.sol)
 - [Simple custom mock listing on Aave V3 Ethereum with custom token impl](../test/mocks/AaveV3EthereumMockCustomListing.sol)
+- [Mock e-mode category update on Aave V3 Polygon](../test/mocks/AaveV3PolygonEModeCategoryUpdate.sol)
+- [Mock e-mode asset update on Aave V3 Ethereum](../test/mocks/AaveV3EthereumEModeAssetUpdate.sol)
 - [Mock caps updates (only supply, keeping current borrow cap) on Aave v3 Ethereum](../test/mocks/AaveV3EthereumMockCapUpdate.sol)
 - [Mock collateral updates (changing some, keeping current values on others), on Aave v3 Avalanche](../test/mocks/AaveV3AvalancheCollateralUpdate.sol)
 - [Mock borrow updates (changing some, keeping current values on others), on Aave v3 Polygon](../test/mocks/AaveV3PolygonBorrowUpdate.sol)

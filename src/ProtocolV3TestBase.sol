@@ -10,6 +10,7 @@ import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 
 interface IERC20Detailed is IERC20 {
   function name() external view returns (string memory);
@@ -120,6 +121,8 @@ contract ProtocolV3TestBase is CommonTestBase {
       if (_includeInE2e(configs[i])) {
         e2eTestAsset(pool, collateralConfig, configs[i]);
         vm.revertTo(snapshot);
+      } else {
+        console.log('E2E: TestAsset %s SKIPPED', configs[i].symbol);
       }
     }
   }
@@ -138,33 +141,54 @@ contract ProtocolV3TestBase is CommonTestBase {
     address testAssetSupplier = vm.addr(4);
     require(collateralConfig.usageAsCollateralEnabled, 'COLLATERAL_CONFIG_MUST_BE_COLLATERAL');
     uint256 testAssetAmount = _getTokenAmountByDollarValue(pool, testAssetConfig, 100);
-    if (
-      (testAssetConfig.supplyCap * 10 ** testAssetConfig.decimals) <
-      IERC20(testAssetConfig.aToken).totalSupply() + testAssetAmount
-    ) {
-      console.log('Skip: %s, supply cap fully utilized', testAssetConfig.symbol);
-      return;
-    }
-    _deposit(
-      collateralConfig,
-      pool,
-      collateralSupplier,
-      _getTokenAmountByDollarValue(pool, collateralConfig, 10000)
-    );
-    _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
-    uint256 snapshot = vm.snapshot();
-    // test withdrawal
-    _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
-    _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
-    vm.revertTo(snapshot);
-    // test variable borrowing
-    if (testAssetConfig.borrowingEnabled) {
-      _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
-      vm.revertTo(snapshot);
-      // test stable borrowing
-      if (testAssetConfig.stableBorrowRateEnabled) {
-        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
+    // GHO is a special case as it cannot be supplied
+    if (testAssetConfig.underlying == AaveV3EthereumAssets.GHO_UNDERLYING) {
+      _deposit(
+        collateralConfig,
+        pool,
+        collateralSupplier,
+        _getTokenAmountByDollarValue(pool, collateralConfig, 10000)
+      );
+      uint256 snapshot = vm.snapshot();
+      // test variable borrowing
+      if (testAssetConfig.borrowingEnabled) {
+        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
         vm.revertTo(snapshot);
+        // test stable borrowing
+        if (testAssetConfig.stableBorrowRateEnabled) {
+          _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
+          vm.revertTo(snapshot);
+        }
+      }
+    } else {
+      if (
+        (testAssetConfig.supplyCap * 10 ** testAssetConfig.decimals) <
+        IERC20(testAssetConfig.aToken).totalSupply() + testAssetAmount
+      ) {
+        console.log('Skip: %s, supply cap fully utilized', testAssetConfig.symbol);
+        return;
+      }
+      _deposit(
+        collateralConfig,
+        pool,
+        collateralSupplier,
+        _getTokenAmountByDollarValue(pool, collateralConfig, 10000)
+      );
+      _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
+      uint256 snapshot = vm.snapshot();
+      // test withdrawal
+      _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
+      _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
+      vm.revertTo(snapshot);
+      // test variable borrowing
+      if (testAssetConfig.borrowingEnabled) {
+        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
+        vm.revertTo(snapshot);
+        // test stable borrowing
+        if (testAssetConfig.stableBorrowRateEnabled) {
+          _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
+          vm.revertTo(snapshot);
+        }
       }
     }
   }
@@ -298,7 +322,11 @@ contract ProtocolV3TestBase is CommonTestBase {
     console.log('REPAY: %s, Amount: %s', config.symbol, amount);
     pool.repay(config.underlying, amount, stable ? 1 : 2, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
-    require(debtAfter == ((debtBefore > amount) ? debtBefore - amount : 0), '_repay() : ERROR');
+    if (amount >= debtBefore) {
+      assertEq(debtAfter, 0, '_repay() : ERROR MUST_BE_ZERO');
+    } else {
+      assertApproxEqAbs(debtAfter, debtBefore - amount, 1, '_repay() : ERROR MAX_ONE_OFF');
+    }
     vm.stopPrank();
   }
 
@@ -711,82 +739,82 @@ contract ProtocolV3TestBase is CommonTestBase {
     ReserveConfig memory config = _findReserveConfig(allConfigs, expectedConfig.underlying);
     require(
       keccak256(bytes(config.symbol)) == keccak256(bytes(expectedConfig.symbol)),
-      '_validateConfigsInAave() : INVALID_SYMBOL'
+      '_validateReserveConfig() : INVALID_SYMBOL'
     );
     require(
       config.underlying == expectedConfig.underlying,
-      '_validateConfigsInAave() : INVALID_UNDERLYING'
+      '_validateReserveConfig() : INVALID_UNDERLYING'
     );
-    require(config.decimals == expectedConfig.decimals, '_validateConfigsInAave: INVALID_DECIMALS');
-    require(config.ltv == expectedConfig.ltv, '_validateConfigsInAave: INVALID_LTV');
+    require(config.decimals == expectedConfig.decimals, '_validateReserveConfig: INVALID_DECIMALS');
+    require(config.ltv == expectedConfig.ltv, '_validateReserveConfig: INVALID_LTV');
     require(
       config.liquidationThreshold == expectedConfig.liquidationThreshold,
-      '_validateConfigsInAave: INVALID_LIQ_THRESHOLD'
+      '_validateReserveConfig: INVALID_LIQ_THRESHOLD'
     );
     require(
       config.liquidationBonus == expectedConfig.liquidationBonus,
-      '_validateConfigsInAave: INVALID_LIQ_BONUS'
+      '_validateReserveConfig: INVALID_LIQ_BONUS'
     );
     require(
       config.liquidationProtocolFee == expectedConfig.liquidationProtocolFee,
-      '_validateConfigsInAave: INVALID_LIQUIDATION_PROTOCOL_FEE'
+      '_validateReserveConfig: INVALID_LIQUIDATION_PROTOCOL_FEE'
     );
     require(
       config.reserveFactor == expectedConfig.reserveFactor,
-      '_validateConfigsInAave: INVALID_RESERVE_FACTOR'
+      '_validateReserveConfig: INVALID_RESERVE_FACTOR'
     );
 
     require(
       config.usageAsCollateralEnabled == expectedConfig.usageAsCollateralEnabled,
-      '_validateConfigsInAave: INVALID_USAGE_AS_COLLATERAL'
+      '_validateReserveConfig: INVALID_USAGE_AS_COLLATERAL'
     );
     require(
       config.borrowingEnabled == expectedConfig.borrowingEnabled,
-      '_validateConfigsInAave: INVALID_BORROWING_ENABLED'
+      '_validateReserveConfig: INVALID_BORROWING_ENABLED'
     );
     require(
       config.stableBorrowRateEnabled == expectedConfig.stableBorrowRateEnabled,
-      '_validateConfigsInAave: INVALID_STABLE_BORROW_ENABLED'
+      '_validateReserveConfig: INVALID_STABLE_BORROW_ENABLED'
     );
     require(
       config.isActive == expectedConfig.isActive,
-      '_validateConfigsInAave: INVALID_IS_ACTIVE'
+      '_validateReserveConfig: INVALID_IS_ACTIVE'
     );
     require(
       config.isFrozen == expectedConfig.isFrozen,
-      '_validateConfigsInAave: INVALID_IS_FROZEN'
+      '_validateReserveConfig: INVALID_IS_FROZEN'
     );
     require(
       config.isSiloed == expectedConfig.isSiloed,
-      '_validateConfigsInAave: INVALID_IS_SILOED'
+      '_validateReserveConfig: INVALID_IS_SILOED'
     );
     require(
       config.isBorrowableInIsolation == expectedConfig.isBorrowableInIsolation,
-      '_validateConfigsInAave: INVALID_IS_BORROWABLE_IN_ISOLATION'
+      '_validateReserveConfig: INVALID_IS_BORROWABLE_IN_ISOLATION'
     );
     require(
       config.isFlashloanable == expectedConfig.isFlashloanable,
-      '_validateConfigsInAave: INVALID_IS_FLASHLOANABLE'
+      '_validateReserveConfig: INVALID_IS_FLASHLOANABLE'
     );
     require(
       config.supplyCap == expectedConfig.supplyCap,
-      '_validateConfigsInAave: INVALID_SUPPLY_CAP'
+      '_validateReserveConfig: INVALID_SUPPLY_CAP'
     );
     require(
       config.borrowCap == expectedConfig.borrowCap,
-      '_validateConfigsInAave: INVALID_BORROW_CAP'
+      '_validateReserveConfig: INVALID_BORROW_CAP'
     );
     require(
       config.debtCeiling == expectedConfig.debtCeiling,
-      '_validateConfigsInAave: INVALID_DEBT_CEILING'
+      '_validateReserveConfig: INVALID_DEBT_CEILING'
     );
     require(
       config.eModeCategory == expectedConfig.eModeCategory,
-      '_validateConfigsInAave: INVALID_EMODE_CATEGORY'
+      '_validateReserveConfig: INVALID_EMODE_CATEGORY'
     );
     require(
       config.interestRateStrategy == expectedConfig.interestRateStrategy,
-      '_validateConfigsInAave: INVALID_INTEREST_RATE_STRATEGY'
+      '_validateReserveConfig: INVALID_INTEREST_RATE_STRATEGY'
     );
   }
 
@@ -1011,7 +1039,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     require(
       IInitializableAdminUpgradeabilityProxy(config.aToken).implementation() ==
         expectedImpls.aToken,
-      '_validateReserveTokensImpls() : INVALID_ATOKEN_IMPL'
+      '_validateReserveTokensImpls() : INVALID_VARIABLE_DEBT_IMPL'
     );
     require(
       IInitializableAdminUpgradeabilityProxy(config.variableDebtToken).implementation() ==
@@ -1021,7 +1049,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     require(
       IInitializableAdminUpgradeabilityProxy(config.stableDebtToken).implementation() ==
         expectedImpls.stableDebtToken,
-      '_validateReserveTokensImpls() : INVALID_ATOKEN_IMPL'
+      '_validateReserveTokensImpls() : INVALID_STABLE_DEBT_IMPL'
     );
     vm.stopPrank();
   }
@@ -1064,6 +1092,37 @@ contract ProtocolV3TestBase is CommonTestBase {
     if (countCategory < expectedAssets.length) {
       revert('_getAssetOnEmodeCategory(): LESS_ASSETS_IN_CATEGORY_THAN_EXPECTED');
     }
+  }
+
+  function _validateEmodeCategory(
+    IPoolAddressesProvider addressesProvider,
+    uint256 category,
+    DataTypes.EModeCategory memory expectedCategoryData
+  ) internal view {
+    address poolAddress = addressesProvider.getPool();
+    DataTypes.EModeCategory memory currentCategoryData = IPool(poolAddress).getEModeCategoryData(
+      uint8(category)
+    );
+    require(
+      keccak256(bytes(currentCategoryData.label)) == keccak256(bytes(expectedCategoryData.label)),
+      '_validateEmodeCategory(): INVALID_LABEL'
+    );
+    require(
+      currentCategoryData.ltv == expectedCategoryData.ltv,
+      '_validateEmodeCategory(): INVALID_LTV'
+    );
+    require(
+      currentCategoryData.liquidationThreshold == expectedCategoryData.liquidationThreshold,
+      '_validateEmodeCategory(): INVALID_LT'
+    );
+    require(
+      currentCategoryData.liquidationBonus == expectedCategoryData.liquidationBonus,
+      '_validateEmodeCategory(): INVALID_LB'
+    );
+    require(
+      currentCategoryData.priceSource == expectedCategoryData.priceSource,
+      '_validateEmodeCategory(): INVALID_PRICE_SOURCE'
+    );
   }
 }
 

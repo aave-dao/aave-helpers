@@ -21,12 +21,14 @@ deploy-engine-arb :;  forge script scripts/AaveV3ConfigEngine.s.sol:DeployEngine
 deploy-engine-pol :;  forge script scripts/AaveV3ConfigEngine.s.sol:DeployEnginePol --rpc-url polygon --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-engine-ava :; forge script scripts/AaveV3ConfigEngine.s.sol:DeployEngineAva --rpc-url avalanche --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-engine-met :; forge script scripts/AaveV3ConfigEngine.s.sol:DeployEngineMet --rpc-url metis --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
+deploy-engine-bas :; forge script scripts/AaveV3ConfigEngine.s.sol:DeployEngineBas --rpc-url base --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-rates-factory-eth :; forge script scripts/V3RateStrategyFactory.s.sol:DeployRatesFactoryEth --rpc-url mainnet --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-rates-factory-pol :; forge script scripts/V3RateStrategyFactory.s.sol:DeployRatesFactoryPol --rpc-url polygon --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-rates-factory-opt :; forge script scripts/V3RateStrategyFactory.s.sol:DeployRatesFactoryOpt --rpc-url optimism --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-rates-factory-arb :; forge script scripts/V3RateStrategyFactory.s.sol:DeployRatesFactoryArb --rpc-url arbitrum --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-rates-factory-ava :; forge script scripts/V3RateStrategyFactory.s.sol:DeployRatesFactoryAva --rpc-url avalanche --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-rates-factory-met :; forge script scripts/V3RateStrategyFactory.s.sol:DeployRatesFactoryMet --rpc-url metis --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
+deploy-rates-factory-bas :; forge script scripts/V3RateStrategyFactory.s.sol:DeployRatesFactoryBas --rpc-url base --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-forwarder-pol :;  forge script scripts/CrosschainForwarders.s.sol:DeployPol --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-forwarder-opt :;  forge script scripts/CrosschainForwarders.s.sol:DeployOpt --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-forwarder-arb :;  forge script scripts/CrosschainForwarders.s.sol:DeployArb --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
@@ -37,6 +39,7 @@ deploy-steward-opt :; forge script scripts/RiskStewards.s.sol:DeployOpt --rpc-ur
 deploy-steward-arb :; forge script scripts/RiskStewards.s.sol:DeployArb --rpc-url arbitrum --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-steward-ava :; forge script scripts/RiskStewards.s.sol:DeployAva --rpc-url avalanche --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-steward-met :; forge script scripts/RiskStewards.s.sol:DeployMet --rpc-url metis --broadcast --ledger --legacy --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
+deploy-steward-bas :; forge script scripts/RiskStewards.s.sol:DeployBas --rpc-url base --broadcast --ledger --legacy --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 
 deploy-rates-factory-v2-eth :; forge script scripts/V2RateStrategyFactory.s.sol:DeployV2RatesFactoryEth --mnemonics random --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-rates-factory-v2-eth-amm :; forge script scripts/V2RateStrategyFactory.s.sol:DeployV2RatesFactoryEthAMM --mnemonics random --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv

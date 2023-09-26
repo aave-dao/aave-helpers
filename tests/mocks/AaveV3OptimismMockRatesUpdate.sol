@@ -2,14 +2,15 @@
 pragma solidity ^0.8.0;
 
 import '../../src/v3-config-engine/AaveV3PayloadOptimism.sol';
+import {AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 
 /**
  * @dev Smart contract for a mock rate strategy params update, for testing purposes
  * IMPORTANT Parameters are pseudo-random, DON'T USE THIS ANYHOW IN PRODUCTION
  * @author BGD Labs
  */
-contract AaveV3OptimismMockRatesUpdate is AaveV3PayloadBase {
-  constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
+contract AaveV3OptimismMockRatesUpdate is AaveV3Payload {
+  constructor(IEngine customEngine) AaveV3Payload(customEngine) {}
 
   function rateStrategiesUpdates()
     public

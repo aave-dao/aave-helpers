@@ -6,6 +6,7 @@
 
 | description | value before | value after |
 | --- | --- | --- |
+| isFlashloanable | true | false |
 | reserveFactor | 0 % | 15 % |
 | borrowingEnabled | false | true |
 
@@ -19,6 +20,10 @@
       "borrowingEnabled": {
         "from": false,
         "to": true
+      },
+      "isFlashloanable": {
+        "from": true,
+        "to": false
       },
       "reserveFactor": {
         "from": 0,

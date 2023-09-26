@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import '../../../src/v3-config-engine/AaveV3PayloadBase.sol';
+import '../../../src/v3-config-engine/AaveV3Payload.sol';
+import {IV3RateStrategyFactory} from '../../../src/v3-config-engine/IV3RateStrategyFactory.sol';
 import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 
 /**
@@ -9,8 +10,8 @@ import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Opti
  * https://snapshot.org/#/aave.eth/proposal/0xbda28d65ca4d64005e6019948ed52d9d62c9e73e356ab1013aa2d4829f40c735
  * @author BGD Labs (risk recommendations by Gauntlet)
  */
-contract AaveV3OptimismRatesUpdates070322 is AaveV3PayloadBase {
-  constructor(IEngine customEngine) AaveV3PayloadBase(customEngine) {}
+contract AaveV3OptimismRatesUpdates070322 is AaveV3Payload {
+  constructor(IEngine customEngine) AaveV3Payload(customEngine) {}
 
   function rateStrategiesUpdates()
     public
@@ -20,8 +21,7 @@ contract AaveV3OptimismRatesUpdates070322 is AaveV3PayloadBase {
   {
     IEngine.RateStrategyUpdate[] memory ratesUpdate = new IEngine.RateStrategyUpdate[](2);
 
-    Rates.RateStrategyParams memory usdt = LISTING_ENGINE
-      .RATE_STRATEGIES_FACTORY()
+    Rates.RateStrategyParams memory usdt = IV3RateStrategyFactory(AaveV3Optimism.RATES_FACTORY)
       .getStrategyDataOfAsset(AaveV3OptimismAssets.USDT_UNDERLYING);
     usdt.optimalUsageRatio = _bpsToRay(80_00);
     usdt.variableRateSlope2 = _bpsToRay(75_00);

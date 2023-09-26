@@ -11,16 +11,15 @@ import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
+import {AaveV3Base} from 'aave-address-book/AaveV3Base.sol';
 import {ITransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/interfaces/ITransparentProxyFactory.sol';
 import {V3RateStrategyFactory} from '../src/v3-config-engine/V3RateStrategyFactory.sol';
 
 library DeployRatesFactoryLib {
   // TODO check also by param, potentially there could be different contracts, but with exactly same params
-  function _getUniqueStrategiesOnPool(IPool pool)
-    internal
-    view
-    returns (IDefaultInterestRateStrategy[] memory)
-  {
+  function _getUniqueStrategiesOnPool(
+    IPool pool
+  ) internal view returns (IDefaultInterestRateStrategy[] memory) {
     address[] memory listedAssets = pool.getReservesList();
     IDefaultInterestRateStrategy[] memory uniqueRateStrategies = new IDefaultInterestRateStrategy[](
       listedAssets.length
@@ -140,6 +139,17 @@ library DeployRatesFactoryMetLib {
   }
 }
 
+library DeployRatesFactoryBasLib {
+  function deploy() internal returns (address, address[] memory) {
+    return
+      DeployRatesFactoryLib._createAndSetupRatesFactory(
+        AaveV3Base.POOL_ADDRESSES_PROVIDER,
+        AaveMisc.TRANSPARENT_PROXY_FACTORY_BASE,
+        AaveMisc.PROXY_ADMIN_BASE
+      );
+  }
+}
+
 contract DeployRatesFactoryEth is EthereumScript {
   function run() external broadcast {
     DeployRatesFactoryEthLib.deploy();
@@ -173,5 +183,11 @@ contract DeployRatesFactoryAva is AvalancheScript {
 contract DeployRatesFactoryMet is MetisScript {
   function run() external broadcast {
     DeployRatesFactoryMetLib.deploy();
+  }
+}
+
+contract DeployRatesFactoryBas is BaseScript {
+  function run() external broadcast {
+    DeployRatesFactoryBasLib.deploy();
   }
 }

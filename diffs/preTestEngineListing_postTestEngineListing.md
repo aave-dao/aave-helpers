@@ -14,7 +14,7 @@
 | debtCeiling | 0 $ |
 | isSiloed | false |
 | isFlashloanable | false |
-| eModeCategory | 0 |
+| eModeCategory | 1 |
 | oracle | [0x443C5116CdF663Eb387e72C688D276e702135C87](https://polygonscan.com/address/0x443C5116CdF663Eb387e72C688D276e702135C87) |
 | oracleDecimals | 8 |
 | oracleDescription | 1INCH / USD |
@@ -53,6 +53,11 @@
 | optimalStableToTotalDebtRatio | 20 % |
 | maxExcessStableToTotalDebtRatio | 80 % |
 | interestRate | ![ir](/.assets/19b2f23d55d76d891e7d30c29aa97741efed9d17.svg) |
+| eMode.label | Stablecoins |
+| eMode.ltv | 97 % |
+| eMode.liquidationThreshold | 97.5 % |
+| eMode.liquidationBonus | 1 % |
+| eMode.priceSource | 0x0000000000000000000000000000000000000000 |
 
 
 ## Raw diff
@@ -71,7 +76,7 @@
         "borrowingEnabled": true,
         "debtCeiling": 0,
         "decimals": 18,
-        "eModeCategory": 0,
+        "eModeCategory": 1,
         "interestRateStrategy": "0x03733F4E008d36f2e37F0080fF1c8DF756622E6F",
         "isActive": true,
         "isBorrowableInIsolation": false,

@@ -10,6 +10,7 @@ import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
 import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
+import {AaveV3Base} from 'aave-address-book/AaveV3Base.sol';
 
 contract DeployEth is EthereumScript {
   function run() external broadcast {
@@ -67,6 +68,16 @@ contract DeployAva is AvalancheScript {
       AaveV3Avalanche.AAVE_PROTOCOL_DATA_PROVIDER,
       IAaveV3ConfigEngine(AaveV3Avalanche.LISTING_ENGINE),
       0xCa66149425E7DC8f81276F6D80C4b486B9503D1a
+    );
+  }
+}
+
+contract DeployBas is BaseScript {
+  function run() external broadcast {
+    new CapsPlusRiskSteward(
+      AaveV3Base.AAVE_PROTOCOL_DATA_PROVIDER,
+      IAaveV3ConfigEngine(AaveV3Base.LISTING_ENGINE),
+      0xfbeB4AcB31340bA4de9C87B11dfBf7e2bc8C0bF1
     );
   }
 }

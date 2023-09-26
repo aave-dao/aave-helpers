@@ -138,7 +138,9 @@ contract ArbitrumCrossChainForwarderTest is ProtocolV3TestBase {
     // 3. mock the queuing on l2 with the data emitted on InboxMessageDelivered
     vm.selectFork(arbitrumFork);
     vm.startPrank(AddressAliasHelper.applyL1ToL2Alias(AaveGovernanceV2.SHORT_EXECUTOR));
-    ARBITRUM_BRIDGE_EXECUTOR.call(payload);
+
+    (bool success, ) = ARBITRUM_BRIDGE_EXECUTOR.call(payload);
+    assertEq(success, true);
     vm.stopPrank();
     // 4. execute the proposal
     vm.expectEmit(true, true, true, true);

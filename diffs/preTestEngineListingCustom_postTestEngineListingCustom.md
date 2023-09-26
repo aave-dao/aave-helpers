@@ -18,18 +18,18 @@
 | oracle | [0x72AFAECF99C9d9C8215fF44C77B94B99C28741e8](https://etherscan.io/address/0x72AFAECF99C9d9C8215fF44C77B94B99C28741e8) |
 | oracleDecimals | 18 |
 | oracleDescription | 1INCH / ETH |
-| oracleLatestAnswer | 0.000328918384865774 |
+| oracleLatestAnswer | 0.000216287562682828 |
 | usageAsCollateralEnabled | true |
 | ltv | 82.5 % |
 | liquidationThreshold | 86 % |
 | liquidationBonus | 5 % |
 | liquidationProtocolFee | 10 % |
 | reserveFactor | 10 % |
-| aToken | [0x7B95Ec873268a6BFC6427e7a28e396Db9D0ebc65](https://etherscan.io/address/0x7B95Ec873268a6BFC6427e7a28e396Db9D0ebc65) |
+| aToken | [0x545bD6c032eFdde65A377A6719DEF2796C8E0f2e](https://etherscan.io/address/0x545bD6c032eFdde65A377A6719DEF2796C8E0f2e) |
 | aTokenImpl | [0x7EfFD7b47Bfd17e52fB7559d3f924201b9DbfF3d](https://etherscan.io/address/0x7EfFD7b47Bfd17e52fB7559d3f924201b9DbfF3d) |
-| variableDebtToken | [0x1b7D3F4b3c032a5AE656e30eeA4e8E1Ba376068F](https://etherscan.io/address/0x1b7D3F4b3c032a5AE656e30eeA4e8E1Ba376068F) |
+| variableDebtToken | [0xd180D7fdD4092f07428eFE801E17BC03576b3192](https://etherscan.io/address/0xd180D7fdD4092f07428eFE801E17BC03576b3192) |
 | variableDebtTokenImpl | [0xaC725CB59D16C81061BDeA61041a8A5e73DA9EC6](https://etherscan.io/address/0xaC725CB59D16C81061BDeA61041a8A5e73DA9EC6) |
-| stableDebtToken | [0x90D9CD005E553111EB8C9c31Abe9706a186b6048](https://etherscan.io/address/0x90D9CD005E553111EB8C9c31Abe9706a186b6048) |
+| stableDebtToken | [0x7617d02E311CdE347A0cb45BB7DF2926BBaf5347](https://etherscan.io/address/0x7617d02E311CdE347A0cb45BB7DF2926BBaf5347) |
 | stableDebtTokenImpl | [0x15C5620dfFaC7c7366EED66C20Ad222DDbB1eD57](https://etherscan.io/address/0x15C5620dfFaC7c7366EED66C20Ad222DDbB1eD57) |
 | borrowingEnabled | true |
 | stableBorrowRateEnabled | true |
@@ -63,7 +63,7 @@
     "0x111111111117dC0aa78b770fA6A738034120C302": {
       "from": null,
       "to": {
-        "aToken": "0x7B95Ec873268a6BFC6427e7a28e396Db9D0ebc65",
+        "aToken": "0x545bD6c032eFdde65A377A6719DEF2796C8E0f2e",
         "aTokenImpl": "0x7EfFD7b47Bfd17e52fB7559d3f924201b9DbfF3d",
         "aTokenName": "Aave Ethereum 1INCH",
         "aTokenSymbol": "aEth1INCH",
@@ -86,10 +86,10 @@
         "oracle": "0x72AFAECF99C9d9C8215fF44C77B94B99C28741e8",
         "oracleDecimals": 18,
         "oracleDescription": "1INCH / ETH",
-        "oracleLatestAnswer": 328918384865774,
+        "oracleLatestAnswer": 216287562682828,
         "reserveFactor": 1000,
         "stableBorrowRateEnabled": true,
-        "stableDebtToken": "0x90D9CD005E553111EB8C9c31Abe9706a186b6048",
+        "stableDebtToken": "0x7617d02E311CdE347A0cb45BB7DF2926BBaf5347",
         "stableDebtTokenImpl": "0x15C5620dfFaC7c7366EED66C20Ad222DDbB1eD57",
         "stableDebtTokenName": "Aave Ethereum Stable Debt 1INCH",
         "stableDebtTokenSymbol": "stableDebtEth1INCH",
@@ -97,7 +97,7 @@
         "symbol": "1INCH",
         "underlying": "0x111111111117dC0aa78b770fA6A738034120C302",
         "usageAsCollateralEnabled": true,
-        "variableDebtToken": "0x1b7D3F4b3c032a5AE656e30eeA4e8E1Ba376068F",
+        "variableDebtToken": "0xd180D7fdD4092f07428eFE801E17BC03576b3192",
         "variableDebtTokenImpl": "0xaC725CB59D16C81061BDeA61041a8A5e73DA9EC6",
         "variableDebtTokenName": "Aave Ethereum Variable Debt 1INCH",
         "variableDebtTokenSymbol": "variableDebtEth1INCH"
