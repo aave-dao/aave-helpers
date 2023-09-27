@@ -56,3 +56,6 @@ download :; cast etherscan-source --chain ${chain} -d src/etherscan/${chain}_${a
 git-diff :
 	@mkdir -p diffs
 	@printf '%s\n%s\n%s\n' "\`\`\`diff" "$$(git diff --no-index --diff-algorithm=patience --ignore-space-at-eol ${before} ${after})" "\`\`\`" > diffs/${out}.md
+
+# Voting scripts
+vote :;  forge script scripts/VotingScripts.s.sol:VoteForProposal --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv 44 true

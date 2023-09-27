@@ -7,6 +7,7 @@ import {IpfsUtils} from './IpfsUtils.sol';
 import {console2} from 'forge-std/console2.sol';
 import {PayloadsControllerUtils, IGovernancePowerStrategy, IPayloadsControllerCore, IGovernanceCore} from 'aave-address-book/GovernanceV3.sol';
 import {IVotingMachineWithProofs} from 'aave-address-book/governance-v3/IVotingMachineWithProofs.sol';
+import {IVotingPortal} from 'aave-address-book/governance-v3/IVotingPortal.sol';
 import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
@@ -77,6 +78,20 @@ library GovV3Helpers {
       revert FfiFailed();
     }
     return abi.decode(f.stdout, (StorageRootResponse[]));
+  }
+
+  function vote(
+    Vm vm,
+    uint256 proposalId,
+    IVotingMachineWithProofs.VotingBalanceProof[] memory proofs,
+    bool support
+  ) internal {
+    IGovernanceCore.Proposal memory proposal = GovernanceV3Ethereum.GOVERNANCE.getProposal(
+      proposalId
+    );
+    address machine = IVotingPortal(proposal.votingPortal).VOTING_MACHINE();
+    uint256 chainId = IVotingPortal(proposal.votingPortal).VOTING_MACHINE_CHAIN_ID();
+    ChainHelpers.selectChain(vm, chainId);
   }
 
   /**
