@@ -10,6 +10,9 @@ These helpers allow you to create and execute proposals on L1 so you don't have 
 
 These helpers allow the creation of proposal for aave governance v3.
 
+The GovernanceV3Helpers also contain scripts to cast a vote directly via foundry.
+To do so just run `make vote proposalId=n support=true/false`.
+
 ## ProxyHelpers
 
 These helpers allow you to fetch the current implementation & admin for a specified proxy.
