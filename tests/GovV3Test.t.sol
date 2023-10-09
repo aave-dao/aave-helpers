@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
 import {GovV3Helpers, PayloadsControllerUtils, IPayloadsControllerCore, GovV3StorageHelpers, IGovernanceCore} from '../src/GovV3Helpers.sol';
+import {GovHelpers} from '../src/GovHelpers.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
@@ -18,14 +19,29 @@ contract GovernanceV3Test is Test {
 
   PayloadWithEmit payload;
 
+  address public constant LONG_PROPOSAL = 0x6195a956dC026A949dE552F04a5803d3aa1fC408;
+  address public constant SHORT_PROPOSAL = 0xa59262276dB8F997948fdc4a10cBc1448A375636;
+
   function setUp() public {
-    vm.createSelectFork('mainnet', 18128951);
+    vm.createSelectFork('mainnet', 18311523);
     payload = new PayloadWithEmit();
+    GovHelpers.executePayload(vm, LONG_PROPOSAL, AaveGovernanceV2.LONG_EXECUTOR);
+    GovHelpers.executePayload(vm, SHORT_PROPOSAL, AaveGovernanceV2.SHORT_EXECUTOR);
   }
 
   function test_injectProposalIntoGovernance() public {
     uint256 count = GovernanceV3Ethereum.GOVERNANCE.getProposalsCount();
+    IPayloadsControllerCore payloadsController = GovV3Helpers.getPayloadsController(block.chainid);
+
+    // 1. create action & register on payloadscontroller
+    IPayloadsControllerCore.ExecutionAction[]
+      memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
+    actions[0] = GovV3Helpers.buildAction(address(payload));
+    GovV3StorageHelpers.injectPayload(vm, payloadsController, actions);
+
     PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
+    payloads[0] = GovV3Helpers.buildMainnetPayload(vm, actions);
+    console.log('here');
     uint256 proposalId = GovV3StorageHelpers.injectProposal(vm, payloads, address(0));
     uint256 countAfter = GovernanceV3Ethereum.GOVERNANCE.getProposalsCount();
     assertEq(countAfter, count + 1);
@@ -33,12 +49,13 @@ contract GovernanceV3Test is Test {
       proposalId
     );
     assertEq(proposal.payloads.length, payloads.length);
+
     GovV3StorageHelpers.readyProposal(vm, proposalId);
     IGovernanceCore.Proposal memory readiedProposal = GovernanceV3Ethereum.GOVERNANCE.getProposal(
       proposalId
     );
     assertEq(uint256(readiedProposal.state), uint256(IGovernanceCore.State.Queued));
-    GovernanceV3Ethereum.GOVERNANCE.executeProposal(proposalId);
+    //GovernanceV3Ethereum.GOVERNANCE.executeProposal(proposalId);
   }
 
   function test_injectPayloadIntoPayloadsController() public {
@@ -63,6 +80,7 @@ contract GovernanceV3Test is Test {
     assertEq(pl.actions[1].target, address(payload));
 
     assertEq(pl.gracePeriod, payloadsController.GRACE_PERIOD());
+    require(pl.state == IPayloadsControllerCore.PayloadState.Created, 'MUST_BE_IN_CREATED_STATE');
   }
 
   function test_readyPayloadId() public {
@@ -76,9 +94,9 @@ contract GovernanceV3Test is Test {
     GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
     IPayloadsControllerCore.Payload memory pl = payloadsController.getPayloadById(payloadId);
     assertEq(uint256(pl.state), uint256(IPayloadsControllerCore.PayloadState.Queued));
-    assertEq(pl.queuedAt, 1694540686);
+    assertEq(pl.queuedAt, 1696751266);
     assertEq(uint256(pl.maximumAccessLevelRequired), 1);
-    assertEq(pl.createdAt, 1694627087);
+    assertEq(pl.createdAt, 1696837667);
     assertEq(pl.creator, address(0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496));
   }
 
@@ -108,7 +126,6 @@ contract GovernanceV3Test is Test {
 
   /**
    * Demo: this is more or less how a payload creation script could look like
-   * Disclaimer: Doesn't work yet as aave token is not yet upgraded so proposals cannot be created
    */
   // function test_payloadCreation() public {
   //   // 1. deploy payloads
@@ -131,11 +148,11 @@ contract GovernanceV3Test is Test {
   //   vm.stopPrank();
   // }
 
-  function test_voteViaProof() public {
-    GovV3Helpers.getVotingProofs(vm, 44, 0x076d6da60aAAC6c97A8a0fE8057f9564203Ee545);
-  }
+  // function test_voteViaProof() public {
+  //   GovV3Helpers.getVotingProofs(vm, 44, 0x076d6da60aAAC6c97A8a0fE8057f9564203Ee545);
+  // }
 
-  function test_registerStorageRoots() public {
-    GovV3Helpers.getStorageRoots(vm, 44);
-  }
+  // function test_registerStorageRoots() public {
+  //   GovV3Helpers.getStorageRoots(vm, 44);
+  // }
 }

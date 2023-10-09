@@ -23,6 +23,7 @@ library ChainHelpers {
 
   function selectChain(Vm vm, uint256 chainId) internal returns (uint256, uint256) {
     uint256 previousFork = vm.activeFork();
+    if (chainId == block.chainid) return (previousFork, previousFork);
     uint256 newFork;
     if (chainId == ChainIds.MAINNET) {
       newFork = vm.createFork(vm.rpcUrl('mainnet'));

@@ -15,6 +15,7 @@ import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {GovernanceV3Metis} from 'aave-address-book/GovernanceV3Metis.sol';
 import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
+import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 
 library GovV3Helpers {
@@ -83,7 +84,7 @@ library GovV3Helpers {
   function vote(
     Vm vm,
     uint256 proposalId,
-    IVotingMachineWithProofs.VotingBalanceProof[] memory proofs,
+    IVotingMachineWithProofs.VotingBalanceProof[] memory votingBalanceProofs,
     bool support
   ) internal {
     IGovernanceCore.Proposal memory proposal = GovernanceV3Ethereum.GOVERNANCE.getProposal(
@@ -92,6 +93,7 @@ library GovV3Helpers {
     address machine = IVotingPortal(proposal.votingPortal).VOTING_MACHINE();
     uint256 chainId = IVotingPortal(proposal.votingPortal).VOTING_MACHINE_CHAIN_ID();
     ChainHelpers.selectChain(vm, chainId);
+    IVotingMachineWithProofs(machine).submitVote(proposalId, support, votingBalanceProofs);
   }
 
   /**
@@ -552,6 +554,12 @@ library GovV3StorageHelpers {
       bytes32(PROPOSALS_COUNT_SLOT),
       bytes32(uint256(count + 1))
     );
+    // overwrite creator as creator porposition power is checked on execution
+    vm.store(
+      address(GovernanceV3Ethereum.GOVERNANCE),
+      bytes32(proposalBaseSlot + 1),
+      bytes32(uint256(uint160(AaveMisc.ECOSYSTEM_RESERVE)))
+    );
     // overwrite array size
     vm.store(
       address(GovernanceV3Ethereum.GOVERNANCE),
@@ -671,6 +679,16 @@ library GovV3StorageHelpers {
       168,
       176,
       bytes32(uint256(IPayloadsControllerCore.PayloadState.Created))
+    );
+
+    // overwrite expiration
+    StorageHelpers.writeBitsInStorageSlot(
+      vm,
+      address(payloadsController),
+      bytes32(payloadBaseSlot + 1),
+      80,
+      120,
+      bytes32(uint256(block.timestamp + payloadsController.EXPIRATION_DELAY()))
     );
 
     // overwrite gracePeriod
