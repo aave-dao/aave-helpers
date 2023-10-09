@@ -64,8 +64,8 @@ abstract contract BaseScript is WithChainIdValidation {
   constructor() WithChainIdValidation(ChainIds.BASE) {}
 }
 
-abstract contract BSCScript is WithChainIdValidation {
-  constructor() WithChainIdValidation(ChainIds.BSC) {}
+abstract contract BNBScript is WithChainIdValidation {
+  constructor() WithChainIdValidation(ChainIds.BNB) {}
 }
 
 abstract contract SepoliaScript is WithChainIdValidation {

@@ -20,6 +20,7 @@ fantom = "${RPC_FANTOM}"
 harmony = "${RPC_HARMONY}"
 metis = "${RPC_METIS}"
 base = "${RPC_BASE}"
+bnb = "${RPC_BNB}"
 sepolia = "${RPC_SEPOLIA}"
 
 [etherscan]
@@ -31,4 +32,5 @@ arbitrum={key="${ETHERSCAN_API_KEY_ARBITRUM}",chainId=42161}
 fantom={key="${ETHERSCAN_API_KEY_FANTOM}",chainId=250}
 base={key="${ETHERSCAN_API_KEY_BASE}",chain=8453}
 sepolia={key="${ETHERSCAN_API_KEY_MAINNET}",chainId=11155111}
+bnb={key="${ETHERSCAN_API_KEY_BNB}",chainId=56}
 # See more config options https://github.com/gakonst/foundry/tree/master/config

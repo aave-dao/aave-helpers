@@ -15,6 +15,7 @@ import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {GovernanceV3Metis} from 'aave-address-book/GovernanceV3Metis.sol';
 import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
+import {GovernanceV3BNB} from 'aave-address-book/GovernanceV3BNB.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 
@@ -36,6 +37,12 @@ library GovV3Helpers {
     return IpfsUtils.ipfsHashFile(vm, filePath, false);
   }
 
+  /**
+   * @dev fetching storage proofs via js helpers on the rpc
+   * @param vm Vm
+   * @param proposalId id of the payload
+   * @param voter address voting, to generate the proofs for
+   */
   function getVotingProofs(
     Vm vm,
     uint256 proposalId,
@@ -60,6 +67,11 @@ library GovV3Helpers {
     return abi.decode(f.stdout, (IVotingMachineWithProofs.VotingBalanceProof[]));
   }
 
+  /**
+   * @dev fetching storage root via js helpers on the rpc
+   * @param vm Vm
+   * @param proposalId id of the payload
+   */
   function getStorageRoots(
     Vm vm,
     uint256 proposalId
@@ -81,6 +93,13 @@ library GovV3Helpers {
     return abi.decode(f.stdout, (StorageRootResponse[]));
   }
 
+  /**
+   * @dev votes on a proposal via proofs
+   * @param vm Vm
+   * @param proposalId id of the payload
+   * @param votingBalanceProofs proofs
+   * @param support true if voting in support, false if voting against
+   */
   function vote(
     Vm vm,
     uint256 proposalId,
@@ -222,6 +241,11 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.MAINNET, actions);
   }
 
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param action actions array
+   */
   function buildMainnetPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction memory action
@@ -229,6 +253,11 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.MAINNET, action);
   }
 
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param actions actions array
+   */
   function buildPolygonPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
@@ -236,6 +265,11 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.POLYGON, actions);
   }
 
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param action actions array
+   */
   function buildPolygonPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction memory action
@@ -243,6 +277,11 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.POLYGON, action);
   }
 
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param actions actions array
+   */
   function buildAvalanchePayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
@@ -250,6 +289,11 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.AVALANCHE, actions);
   }
 
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param action actions array
+   */
   function buildAvalanchePayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction memory action
@@ -257,6 +301,11 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.AVALANCHE, action);
   }
 
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param actions actions array
+   */
   function buildArbitrumPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
@@ -264,6 +313,11 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.ARBITRUM, actions);
   }
 
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param action actions array
+   */
   function buildArbitrumPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction memory action
@@ -271,6 +325,11 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.ARBITRUM, action);
   }
 
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param actions actions array
+   */
   function buildOptimismPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
@@ -278,6 +337,11 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.OPTIMISM, actions);
   }
 
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param action actions array
+   */
   function buildOptimismPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction memory action
@@ -285,6 +349,11 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.OPTIMISM, action);
   }
 
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param actions actions array
+   */
   function buildMetisPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
@@ -292,6 +361,11 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.METIS, actions);
   }
 
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param action actions array
+   */
   function buildMetisPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction memory action
@@ -299,6 +373,11 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.METIS, action);
   }
 
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param actions actions array
+   */
   function buildBasePayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
@@ -306,6 +385,11 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.BASE, actions);
   }
 
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param action actions array
+   */
   function buildBasePayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction memory action
@@ -313,36 +397,62 @@ library GovV3Helpers {
     return _buildPayload(vm, ChainIds.BASE, action);
   }
 
-  function buildBSCPayload(
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param actions actions array
+   */
+  function buildBNBPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (PayloadsControllerUtils.Payload memory) {
-    return _buildPayload(vm, ChainIds.BSC, actions);
+    return _buildPayload(vm, ChainIds.BNB, actions);
   }
 
-  function buildBSCPayload(
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param action actions array
+   */
+  function buildBNBPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction memory action
   ) internal returns (PayloadsControllerUtils.Payload memory) {
-    return _buildPayload(vm, ChainIds.BSC, action);
+    return _buildPayload(vm, ChainIds.BNB, action);
   }
 
+  /**
+   * @dev creates a proposal with multiple payloads
+   * @param payloads payloads array
+   * @param ipfsHash ipfs hash
+   */
   function createProposal(
     PayloadsControllerUtils.Payload[] memory payloads,
     bytes32 ipfsHash
   ) internal returns (uint256) {
-    return createProposal(payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH, ipfsHash);
+    return createProposal(payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_POL, ipfsHash);
   }
 
+  /**
+   * @dev creates a proposal with a single payload
+   * @param payload payload
+   * @param ipfsHash ipfs hash
+   */
   function createProposal(
     PayloadsControllerUtils.Payload memory payload,
     bytes32 ipfsHash
   ) internal returns (uint256) {
     PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
     payloads[0] = payload;
-    return createProposal(payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_ETH, ipfsHash);
+    return createProposal(payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_POL, ipfsHash);
   }
 
+  /**
+   * @dev creates a proposal with a custom voting portal
+   * @param payloads payloads array
+   * @param votingPortal address of the voting portal
+   * @param ipfsHash ipfs hash
+   */
   function createProposal(
     PayloadsControllerUtils.Payload[] memory payloads,
     address votingPortal,
@@ -366,6 +476,8 @@ library GovV3Helpers {
       return GovernanceV3Metis.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.BASE) {
       return GovernanceV3Base.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.BNB) {
+      return GovernanceV3BNB.PAYLOADS_CONTROLLER;
     }
 
     revert CannotFindPayloadsController();

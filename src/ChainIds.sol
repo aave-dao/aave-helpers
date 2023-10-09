@@ -5,7 +5,7 @@ import {Vm} from 'forge-std/Vm.sol';
 library ChainIds {
   uint256 internal constant MAINNET = 1;
   uint256 internal constant OPTIMISM = 10;
-  uint256 internal constant BSC = 56;
+  uint256 internal constant BNB = 56;
   uint256 internal constant POLYGON = 137;
   uint256 internal constant FANTOM = 250;
   uint256 internal constant ZK_SYNC = 324;
@@ -29,8 +29,8 @@ library ChainHelpers {
       newFork = vm.createFork(vm.rpcUrl('mainnet'));
     } else if (chainId == ChainIds.OPTIMISM) {
       newFork = vm.createFork(vm.rpcUrl('optimism'));
-    } else if (chainId == ChainIds.BSC) {
-      newFork = vm.createFork(vm.rpcUrl('bsc'));
+    } else if (chainId == ChainIds.BNB) {
+      newFork = vm.createFork(vm.rpcUrl('bnb'));
     } else if (chainId == ChainIds.POLYGON) {
       newFork = vm.createFork(vm.rpcUrl('polygon'));
     } else if (chainId == ChainIds.FANTOM) {
