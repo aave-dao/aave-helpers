@@ -173,7 +173,7 @@ library GovV3Helpers {
   }
 
   /**
-   * Registers a payload with the provided actions on the networjḱ PayloadsController
+   * Registers a payload with the provided actions on the network PayloadsController
    * @param actions actions
    * @return uint40 payloadId
    */
