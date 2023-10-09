@@ -36,7 +36,7 @@ library ChainHelpers {
     } else if (chainId == ChainIds.FANTOM) {
       newFork = vm.createFork(vm.rpcUrl('fantom'));
     } else if (chainId == ChainIds.ZK_SYNC) {
-      newFork = vm.createFork(vm.rpcUrl('tkSync'));
+      newFork = vm.createFork(vm.rpcUrl('zkSync'));
     } else if (chainId == ChainIds.METIS) {
       newFork = vm.createFork(vm.rpcUrl('metis'));
     } else if (chainId == ChainIds.ZK_EVM) {
