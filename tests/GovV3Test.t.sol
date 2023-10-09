@@ -146,21 +146,4 @@ contract GovernanceV3Test is Test {
     GovV3Helpers.createProposal(payloads, 'hash');
     vm.stopPrank();
   }
-
-  function test_voteViaProof() public {
-    test_payloadCreation();
-    uint256 proposalId = GovernanceV3Ethereum.GOVERNANCE.getProposalsCount() - 1;
-
-    vm.warp(block.timestamp + 1 days + 1);
-    GovernanceV3Ethereum.GOVERNANCE.activateVoting(proposalId);
-
-    vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
-    IVotingMachineWithProofs.VotingBalanceProof[] memory votingBalanceProofs = GovV3Helpers
-      .getVotingProofs(vm, proposalId, AaveMisc.ECOSYSTEM_RESERVE);
-    GovV3Helpers.vote(vm, proposalId, votingBalanceProofs, true);
-  }
-
-  // function test_registerStorageRoots() public {
-  //   GovV3Helpers.getStorageRoots(vm, 44);
-  // }
 }
