@@ -47,7 +47,7 @@ library GovHelpers {
     inputs[0] = 'npx';
     inputs[1] = '--yes';
     inputs[2] = '-s';
-    inputs[3] = '@bgd-labs/aave-cli';
+    inputs[3] = '@bgd-labs/aave-cli@0.0.26';
     inputs[4] = 'ipfs';
     inputs[5] = filePath;
     inputs[6] = '-u';
