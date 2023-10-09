@@ -189,11 +189,10 @@ library GovV3Helpers {
   function createPayload(
     IPayloadsControllerCore.ExecutionAction memory action
   ) internal returns (uint40) {
-    IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
     IPayloadsControllerCore.ExecutionAction[]
       memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
     actions[0] = action;
-    return payloadsController.createPayload(actions);
+    return createPayload(actions);
   }
 
   /**
