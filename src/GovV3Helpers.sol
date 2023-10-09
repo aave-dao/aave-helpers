@@ -535,20 +535,7 @@ library GovV3Helpers {
     IPayloadsControllerCore.ExecutionAction[]
       memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
     actions[0] = action;
-    IPayloadsControllerCore payloadsController = getPayloadsController(chainId);
-    (PayloadsControllerUtils.AccessControl accessLevel, uint40 payloadId) = _findAndValidatePayload(
-      vm,
-      chainId,
-      payloadsController,
-      actions
-    );
-    return
-      PayloadsControllerUtils.Payload({
-        chain: chainId,
-        accessLevel: accessLevel,
-        payloadsController: address(payloadsController),
-        payloadId: payloadId
-      });
+    return _buildPayload(vm, chainId, actions);
   }
 
   function _findAndValidatePayload(
