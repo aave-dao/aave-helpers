@@ -238,6 +238,8 @@ contract ProtocolV3TestBase is CommonTestBase {
         configs[i].usageAsCollateralEnabled &&
         // not stable borrowable as this makes testing stable borrowing unnecessary hard to reason about
         !configs[i].stableBorrowRateEnabled &&
+        // LTV is higher than 15%
+        configs[i].ltv > 1500 &&
         // supply cap not yet reached
         ((configs[i].supplyCap * 10 ** configs[i].decimals) >
           IERC20(configs[i].aToken).totalSupply()) &&
