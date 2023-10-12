@@ -111,7 +111,7 @@ contract CommonTestBase is Test {
     inputs[0] = 'npx';
     inputs[1] = '--yes';
     inputs[2] = '-s';
-    inputs[3] = '@bgd-labs/aave-cli';
+    inputs[3] = '@bgd-labs/aave-cli@0.0.26';
     inputs[4] = 'diff-snapshots';
     inputs[5] = beforePath;
     inputs[6] = afterPath;
