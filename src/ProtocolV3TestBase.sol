@@ -66,6 +66,27 @@ contract ProtocolV3TestBase is CommonTestBase {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
   using SafeERC20 for IERC20;
 
+  function defaultTest(
+    string memory reportName,
+    IPool pool,
+    address payload
+  ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
+    string memory beforeString = string(abi.encodePacked(reportName, '_before'));
+    ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
+
+    GovV3Helpers.executePayload(vm, payload);
+
+    string memory afterString = string(abi.encodePacked(reportName, '_after'));
+    ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
+
+    diffReports(reportBefore, reportAfter);
+
+    configChangePlausibilityTest(configBefore, configAfter);
+
+    e2eTest(pool);
+    return (configBefore, configAfter);
+  }
+
   function configChangePlausibilityTest(
     ReserveConfig[] memory configBefore,
     ReserveConfig[] memory configAfter

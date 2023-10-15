@@ -6,6 +6,7 @@ import {ProtocolV3LegacyTestBase, ProtocolV3TestBase, ReserveConfig} from '../sr
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
+import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 
 contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
   function setUp() public {
@@ -84,5 +85,18 @@ contract ProtocolV3TestE2ETestSnapshot is ProtocolV3TestBase {
 
   function test_snapshot() public {
     createConfigurationSnapshot('snapshot', AaveV3Optimism.POOL, true, false, false, false);
+  }
+}
+
+contract ProtocolV3TestDefaultTest is ProtocolV3TestBase {
+  PayloadWithEmit payload;
+
+  function setUp() public {
+    vm.createSelectFork('optimism', 105213914);
+    payload = new PayloadWithEmit();
+  }
+
+  function test_default() public {
+    defaultTest('default', AaveV3Optimism.POOL, address(payload));
   }
 }
