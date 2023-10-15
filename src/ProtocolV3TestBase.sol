@@ -4,6 +4,7 @@ pragma solidity >=0.7.5 <0.9.0;
 import 'forge-std/Test.sol';
 import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
@@ -11,14 +12,7 @@ import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
-
-interface IERC20Detailed is IERC20 {
-  function name() external view returns (string memory);
-
-  function symbol() external view returns (string memory);
-
-  function decimals() external view returns (uint8);
-}
+import {GovV3Helpers} from './GovV3Helpers.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -71,6 +65,33 @@ struct InterestStrategyValues {
 contract ProtocolV3TestBase is CommonTestBase {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
   using SafeERC20 for IERC20;
+
+  function configChangePlausibilityTest(
+    ReserveConfig[] memory configBefore,
+    ReserveConfig[] memory configAfter
+  ) public {
+    uint256 configsBeforeLength = configBefore.length;
+    for (uint256 i = 0; i < configAfter.length; i++) {
+      // assets are ususally not permanently unlisted, so the expectation is there will only be addition
+      // if config existed before
+      if (i < configsBeforeLength) {
+        // borrow increase should only happen on assets with borrowing enabled
+        if (configBefore[i].borrowCap < configAfter[i].borrowCap) {
+          require(configAfter[i].borrowingEnabled, 'PL_BORROW_CAP_BORROW_DISABLED');
+        }
+      } else {
+        // at least newly listed assets should never have a supply cap exceeding total supply
+        uint256 totalSupply = IERC20(configAfter[i].underlying).totalSupply();
+        require(
+          configAfter[i].supplyCap / 1e2 <=
+            totalSupply / IERC20Metadata(configAfter[i].underlying).decimals(),
+          'PL_SUPPLY_CAP_GT_TOTAL_SUPPLY'
+        );
+      }
+      // borrow cap should never exceed supply cap
+      require(configAfter[i].borrowCap <= configAfter[i].supplyCap, 'PL_SUPPLY_LT_BORROW');
+    }
+  }
 
   /**
    * @dev Generates a markdown compatible snapshot of the whole pool configuration into `/reports`.
@@ -466,8 +487,8 @@ contract ProtocolV3TestBase is CommonTestBase {
         'aTokenImpl',
         ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, config.aToken)
       );
-      vm.serializeString(key, 'aTokenSymbol', IERC20Detailed(config.aToken).symbol());
-      vm.serializeString(key, 'aTokenName', IERC20Detailed(config.aToken).name());
+      vm.serializeString(key, 'aTokenSymbol', IERC20Metadata(config.aToken).symbol());
+      vm.serializeString(key, 'aTokenName', IERC20Metadata(config.aToken).name());
       vm.serializeAddress(
         key,
         'stableDebtTokenImpl',
@@ -479,9 +500,9 @@ contract ProtocolV3TestBase is CommonTestBase {
       vm.serializeString(
         key,
         'stableDebtTokenSymbol',
-        IERC20Detailed(config.stableDebtToken).symbol()
+        IERC20Metadata(config.stableDebtToken).symbol()
       );
-      vm.serializeString(key, 'stableDebtTokenName', IERC20Detailed(config.stableDebtToken).name());
+      vm.serializeString(key, 'stableDebtTokenName', IERC20Metadata(config.stableDebtToken).name());
       vm.serializeAddress(
         key,
         'variableDebtTokenImpl',
@@ -493,12 +514,12 @@ contract ProtocolV3TestBase is CommonTestBase {
       vm.serializeString(
         key,
         'variableDebtTokenSymbol',
-        IERC20Detailed(config.variableDebtToken).symbol()
+        IERC20Metadata(config.variableDebtToken).symbol()
       );
       vm.serializeString(
         key,
         'variableDebtTokenName',
-        IERC20Detailed(config.variableDebtToken).name()
+        IERC20Metadata(config.variableDebtToken).name()
       );
       vm.serializeAddress(key, 'oracle', address(assetOracle));
       if (address(assetOracle) != address(0)) {
