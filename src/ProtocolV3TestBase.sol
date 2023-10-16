@@ -230,6 +230,13 @@ contract ProtocolV3TestBase is CommonTestBase {
       vm.revertTo(snapshot);
       // test variable borrowing
       if (testAssetConfig.borrowingEnabled) {
+        if (
+          (testAssetConfig.borrowCap * 10 ** testAssetConfig.decimals) <
+          IERC20(testAssetConfig.variableDebtToken).totalSupply() + testAssetAmount
+        ) {
+          console.log('Skip Borrowing: %s, borrow cap fully utilized', testAssetConfig.symbol);
+          return;
+        }
         _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
         vm.revertTo(snapshot);
         // test stable borrowing
