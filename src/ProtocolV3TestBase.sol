@@ -79,7 +79,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     string memory afterString = string(abi.encodePacked(reportName, '_after'));
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
 
-    diffReports(reportBefore, reportAfter);
+    diffReports(beforeString, afterString);
 
     configChangePlausibilityTest(configBefore, configAfter);
 
@@ -110,7 +110,13 @@ contract ProtocolV3TestBase is CommonTestBase {
         );
       }
       // borrow cap should never exceed supply cap
-      require(configAfter[i].borrowCap <= configAfter[i].supplyCap, 'PL_SUPPLY_LT_BORROW');
+      if (
+        configAfter[i].borrowCap != 0 &&
+        configAfter[i].underlying != AaveV3EthereumAssets.GHO_UNDERLYING // GHO is the exlcusion from the rule
+      ) {
+        console.log(configAfter[i].underlying);
+        require(configAfter[i].borrowCap <= configAfter[i].supplyCap, 'PL_SUPPLY_LT_BORROW');
+      }
     }
   }
 

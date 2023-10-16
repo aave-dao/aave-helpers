@@ -87,16 +87,3 @@ contract ProtocolV3TestE2ETestSnapshot is ProtocolV3TestBase {
     createConfigurationSnapshot('snapshot', AaveV3Optimism.POOL, true, false, false, false);
   }
 }
-
-contract ProtocolV3TestDefaultTest is ProtocolV3TestBase {
-  PayloadWithEmit payload;
-
-  function setUp() public {
-    vm.createSelectFork('optimism', 105213914);
-    payload = new PayloadWithEmit();
-  }
-
-  function test_default() public {
-    defaultTest('default', AaveV3Optimism.POOL, address(payload));
-  }
-}

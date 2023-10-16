@@ -4,7 +4,9 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {IVotingMachineWithProofs, GovV3Helpers, PayloadsControllerUtils, IPayloadsControllerCore, GovV3StorageHelpers, IGovernanceCore} from '../src/GovV3Helpers.sol';
 import {GovHelpers} from '../src/GovHelpers.sol';
+import {ProtocolV3TestBase} from '../src/ProtocolV3TestBase.sol';
 import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 
@@ -14,7 +16,7 @@ interface Mock {
   function guardian() external view returns (address);
 }
 
-contract GovernanceV3Test is Test {
+contract GovernanceV3Test is ProtocolV3TestBase {
   event TestEvent();
 
   PayloadWithEmit payload;
@@ -145,5 +147,9 @@ contract GovernanceV3Test is Test {
     vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
     GovV3Helpers.createProposal(payloads, 'hash');
     vm.stopPrank();
+  }
+
+  function test_helpers() public {
+    defaultTest('default', AaveV3Ethereum.POOL, address(payload));
   }
 }
