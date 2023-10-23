@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import '../../src/v2-config-engine/AaveV2PayloadBase.sol';
+import '../../src/v2-config-engine/AaveV2Payload.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 
 /**
@@ -9,8 +9,8 @@ import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
  * IMPORTANT Parameters are pseudo-random, DON'T USE THIS ANYHOW IN PRODUCTION
  * @author BGD Labs
  */
-contract AaveV2EthereumRatesUpdate is AaveV2PayloadBase {
-  constructor(IEngine customEngine) AaveV2PayloadBase(customEngine) {}
+contract AaveV2EthereumRatesUpdate is AaveV2Payload {
+  constructor(IEngine customEngine) AaveV2Payload(customEngine) {}
 
   function rateStrategiesUpdates()
     public

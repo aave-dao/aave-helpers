@@ -16,7 +16,7 @@ import {EngineFlags} from '../v3-config-engine/EngineFlags.sol';
  *    Updates of interest rate strategies.
  * @author BGD Labs
  */
-abstract contract AaveV2PayloadBase {
+abstract contract AaveV2Payload {
   using Address for address;
 
   IEngine public immutable LISTING_ENGINE;
