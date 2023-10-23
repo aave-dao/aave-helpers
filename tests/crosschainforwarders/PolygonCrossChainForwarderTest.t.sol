@@ -2,7 +2,8 @@
 pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
-import {AaveV3Polygon, AaveMisc} from 'aave-address-book/AaveAddressBook.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
+import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveGovernanceV2, IExecutorWithTimelock} from 'aave-address-book/AaveGovernanceV2.sol';
 import {IStateReceiver} from 'governance-crosschain-bridges/contracts/dependencies/polygon/fxportal/FxChild.sol';
 import {GovHelpers} from '../../src/GovHelpers.sol';
@@ -44,7 +45,7 @@ contract PolygonCrossChainForwarderTest is ProtocolV3TestBase {
   function testProposalE2E() public {
     // 1. create l1 proposal
     vm.selectFork(mainnetFork);
-    vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
+    vm.startPrank(MiscEthereum.ECOSYSTEM_RESERVE);
     GovHelpers.Payload[] memory payloads = new GovHelpers.Payload[](1);
     payloads[0] = GovHelpers.Payload({
       value: 0,

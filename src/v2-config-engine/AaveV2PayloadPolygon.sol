@@ -9,6 +9,6 @@ import './AaveV2PayloadBase.sol';
  * @author BGD Labs
  */
 // TODO: Add rates factory address after deploying
-abstract contract AaveV2PayloadPolygon is AaveV2PayloadBase(IEngine(AaveV2Polygon.LISTING_ENGINE)) {
+abstract contract AaveV2PayloadPolygon is AaveV2PayloadBase(IEngine(AaveV2Polygon.CONFIG_ENGINE)) {
 
 }

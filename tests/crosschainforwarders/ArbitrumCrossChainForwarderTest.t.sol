@@ -2,7 +2,8 @@
 pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
-import {AaveV3Arbitrum, AaveMisc} from 'aave-address-book/AaveAddressBook.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
+import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveGovernanceV2, IExecutorWithTimelock} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AddressAliasHelper} from 'governance-crosschain-bridges/contracts/dependencies/arbitrum/AddressAliasHelper.sol';
 import {IInbox} from 'governance-crosschain-bridges/contracts/dependencies/arbitrum/interfaces/IInbox.sol';
@@ -67,7 +68,7 @@ contract ArbitrumCrossChainForwarderTest is ProtocolV3TestBase {
     deal(address(AaveGovernanceV2.SHORT_EXECUTOR), 0.001 ether);
 
     // 1. create l1 proposal
-    vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
+    vm.startPrank(MiscEthereum.ECOSYSTEM_RESERVE);
     GovHelpers.Payload[] memory payloads = new GovHelpers.Payload[](1);
     payloads[0] = GovHelpers.Payload({
       target: address(forwarder),

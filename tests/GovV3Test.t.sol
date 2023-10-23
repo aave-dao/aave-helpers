@@ -5,7 +5,7 @@ import 'forge-std/Test.sol';
 import {IVotingMachineWithProofs, GovV3Helpers, PayloadsControllerUtils, IPayloadsControllerCore, GovV3StorageHelpers, IGovernanceCore} from '../src/GovV3Helpers.sol';
 import {GovHelpers} from '../src/GovHelpers.sol';
 import {ProtocolV3TestBase} from '../src/ProtocolV3TestBase.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
@@ -143,8 +143,8 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     // 3. create the actual proposal
     PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
     payloads[0] = GovV3Helpers.buildMainnetPayload(vm, actions);
-    deal(AaveMisc.ECOSYSTEM_RESERVE, 0.5e18);
-    vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
+    deal(MiscEthereum.ECOSYSTEM_RESERVE, 0.5e18);
+    vm.startPrank(MiscEthereum.ECOSYSTEM_RESERVE);
     GovV3Helpers.createProposal(payloads, 'hash');
     vm.stopPrank();
   }

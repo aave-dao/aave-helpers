@@ -8,7 +8,7 @@ import './AaveV3Payload.sol';
  * @dev Base smart contract for an Aave v3.0.2 (compatible with 3.0.0) listing on v3 Base.
  * @author BGD Labs
  */
-abstract contract AaveV3PayloadBase is AaveV3Payload(IEngine(AaveV3Base.LISTING_ENGINE)) {
+abstract contract AaveV3PayloadBase is AaveV3Payload(IEngine(AaveV3Base.CONFIG_ENGINE)) {
   function getPoolContext() public pure override returns (IEngine.PoolContext memory) {
     return IEngine.PoolContext({networkName: 'Base', networkAbbreviation: 'Bas'});
   }

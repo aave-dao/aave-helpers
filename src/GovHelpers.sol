@@ -10,7 +10,7 @@ import {IPoolAddressesProvider} from 'aave-address-book/AaveV3.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveV3Harmony} from 'aave-address-book/AaveV3Harmony.sol';
 import {AaveV3Fantom} from 'aave-address-book/AaveV3Fantom.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {ChainIds} from './ChainIds.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
@@ -211,8 +211,8 @@ library GovHelpers {
     Payload[] memory payloads,
     address executor
   ) internal returns (uint256) {
-    vm.deal(AaveMisc.ECOSYSTEM_RESERVE, 1 ether);
-    vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
+    vm.deal(MiscEthereum.ECOSYSTEM_RESERVE, 1 ether);
+    vm.startPrank(MiscEthereum.ECOSYSTEM_RESERVE);
     uint256 proposalId = _createProposal(executor, payloads, bytes32('test'), false);
     vm.stopPrank();
     return proposalId;

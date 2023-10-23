@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
-import {AaveMisc} from 'aave-address-book/AaveAddressBook.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {IL2CrossDomainMessenger} from 'governance-crosschain-bridges/contracts/dependencies/optimism/interfaces/IL2CrossDomainMessenger.sol';
 import {GovHelpers} from '../../src/GovHelpers.sol';
@@ -38,7 +38,7 @@ contract MetisCrossChainForwarderTest is ProtocolV3TestBase {
   function testProposalE2E() public {
     // 1. create l1 proposal
     vm.selectFork(mainnetFork);
-    vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
+    vm.startPrank(MiscEthereum.ECOSYSTEM_RESERVE);
     GovHelpers.Payload[] memory payloads = new GovHelpers.Payload[](1);
     payloads[0] = GovHelpers.Payload({
       target: address(forwarder),
