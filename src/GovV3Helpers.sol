@@ -472,6 +472,28 @@ library GovV3Helpers {
     return createProposal(payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_POL, ipfsHash);
   }
 
+  // temporarily patched create proposal for governance v2.5
+  function createProposal2_5(
+    PayloadsControllerUtils.Payload[] memory payloads,
+    bytes32 ipfsHash
+  ) internal returns (uint256) {
+    require(block.chainid == ChainIds.MAINNET, 'MAINNET_ONLY');
+    require(payloads.length != 0, 'MINIMUM_ONE_PAYLOAD');
+    require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
+
+    GovHelpers.Payload[] memory gov2Payloads = new GovHelpers.Payload[](payloads.length);
+    for (uint256 i = 0; i < payloads.length; i++) {
+      gov2Payloads[i] = GovHelpers.Payload({
+        target: address(GovernanceV3Ethereum.GOVERNANCE),
+        value: 0,
+        signature: 'forwardPayloadForExecution(PayloadsControllerUtils.Payload memory payload)',
+        callData: abi.encode(payloads[i]),
+        withDelegatecall: false
+      });
+    }
+    return GovHelpers.createProposal(gov2Payloads, ipfsHash, true);
+  }
+
   /**
    * @dev creates a proposal with a single payload
    * @param payload payload
@@ -532,29 +554,17 @@ library GovV3Helpers {
     require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
     require(votingPortal != address(0), 'INVALID_VOTING_PORTAL');
 
-    // Temporarily patched for governance v2.5
-    GovHelpers.Payload[] memory gov2Payloads = new GovHelpers.Payload[](payloads.length);
-    for (uint256 i = 0; i < payloads.length; i++) {
-      gov2Payloads[i] = GovHelpers.Payload({
-        target: address(GovernanceV3Ethereum.GOVERNANCE),
-        value: 0,
-        signature: 'forwardPayloadForExecution(PayloadsControllerUtils.Payload memory payload)',
-        callData: abi.encode(payloads[i]),
-        withDelegatecall: false
-      });
-    }
-    return GovHelpers.createProposal(gov2Payloads, ipfsHash, true);
-    // uint256 fee = GovernanceV3Ethereum.GOVERNANCE.getCancellationFee();
-    // console2.logBytes(
-    //   abi.encodeWithSelector(
-    //     IGovernanceCore.createProposal.selector,
-    //     payloads,
-    //     votingPortal,
-    //     ipfsHash
-    //   )
-    // );
-    // return
-    //   GovernanceV3Ethereum.GOVERNANCE.createProposal{value: fee}(payloads, votingPortal, ipfsHash);
+    uint256 fee = GovernanceV3Ethereum.GOVERNANCE.getCancellationFee();
+    console2.logBytes(
+      abi.encodeWithSelector(
+        IGovernanceCore.createProposal.selector,
+        payloads,
+        votingPortal,
+        ipfsHash
+      )
+    );
+    return
+      GovernanceV3Ethereum.GOVERNANCE.createProposal{value: fee}(payloads, votingPortal, ipfsHash);
   }
 
   function _buildPayload(
