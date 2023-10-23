@@ -24,7 +24,7 @@ contract CommonTestBase is Test {
 
   address public constant EOA = 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045;
 
-  function executePayload(Vm vm, address payload) {
+  function executePayload(Vm vm, address payload) internal {
     GovV3Helpers.executePayload(vm, payload);
   }
 

@@ -95,7 +95,7 @@ contract ProtocolV3TestBase is CommonTestBase {
   function configChangePlausibilityTest(
     ReserveConfig[] memory configBefore,
     ReserveConfig[] memory configAfter
-  ) public {
+  ) public view {
     uint256 configsBeforeLength = configBefore.length;
     for (uint256 i = 0; i < configAfter.length; i++) {
       // assets are ususally not permanently unlisted, so the expectation is there will only be addition
