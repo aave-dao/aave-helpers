@@ -4,7 +4,14 @@ pragma solidity ^0.8.0;
 import '../src/ScriptUtils.sol';
 import {IPoolAddressesProvider, IPool, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV3.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
+import {MiscPolygon} from 'aave-address-book/MiscPolygon.sol';
+import {MiscOptimism} from 'aave-address-book/MiscOptimism.sol';
+import {MiscArbitrum} from 'aave-address-book/MiscArbitrum.sol';
+import {MiscAvalanche} from 'aave-address-book/MiscAvalanche.sol';
+import {MiscBase} from 'aave-address-book/MiscBase.sol';
+import {MiscMetis} from 'aave-address-book/MiscMetis.sol';
+import {MiscGnosis} from 'aave-address-book/MiscGnosis.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
@@ -12,6 +19,7 @@ import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
 import {AaveV3Base} from 'aave-address-book/AaveV3Base.sol';
+import {AaveV3Gnosis} from 'aave-address-book/AaveV3Gnosis.sol';
 import {ITransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/interfaces/ITransparentProxyFactory.sol';
 import {V3RateStrategyFactory} from '../src/v3-config-engine/V3RateStrategyFactory.sol';
 
@@ -78,8 +86,8 @@ library DeployRatesFactoryEthLib {
     return
       DeployRatesFactoryLib._createAndSetupRatesFactory(
         AaveV3Ethereum.POOL_ADDRESSES_PROVIDER,
-        AaveMisc.TRANSPARENT_PROXY_FACTORY_ETHEREUM,
-        AaveMisc.PROXY_ADMIN_ETHEREUM
+        MiscEthereum.TRANSPARENT_PROXY_FACTORY,
+        MiscEthereum.PROXY_ADMIN
       );
   }
 }
@@ -89,8 +97,8 @@ library DeployRatesFactoryOptLib {
     return
       DeployRatesFactoryLib._createAndSetupRatesFactory(
         AaveV3Optimism.POOL_ADDRESSES_PROVIDER,
-        AaveMisc.TRANSPARENT_PROXY_FACTORY_OPTIMISM,
-        AaveMisc.PROXY_ADMIN_OPTIMISM
+        MiscOptimism.TRANSPARENT_PROXY_FACTORY,
+        MiscOptimism.PROXY_ADMIN
       );
   }
 }
@@ -100,8 +108,8 @@ library DeployRatesFactoryArbLib {
     return
       DeployRatesFactoryLib._createAndSetupRatesFactory(
         AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER,
-        AaveMisc.TRANSPARENT_PROXY_FACTORY_ARBITRUM,
-        AaveMisc.PROXY_ADMIN_ARBITRUM
+        MiscArbitrum.TRANSPARENT_PROXY_FACTORY,
+        MiscArbitrum.PROXY_ADMIN
       );
   }
 }
@@ -111,8 +119,8 @@ library DeployRatesFactoryPolLib {
     return
       DeployRatesFactoryLib._createAndSetupRatesFactory(
         AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
-        AaveMisc.TRANSPARENT_PROXY_FACTORY_POLYGON,
-        AaveMisc.PROXY_ADMIN_POLYGON
+        MiscPolygon.TRANSPARENT_PROXY_FACTORY,
+        MiscPolygon.PROXY_ADMIN
       );
   }
 }
@@ -122,8 +130,8 @@ library DeployRatesFactoryAvaLib {
     return
       DeployRatesFactoryLib._createAndSetupRatesFactory(
         AaveV3Avalanche.POOL_ADDRESSES_PROVIDER,
-        AaveMisc.TRANSPARENT_PROXY_FACTORY_AVALANCHE,
-        AaveMisc.PROXY_ADMIN_AVALANCHE
+        MiscAvalanche.TRANSPARENT_PROXY_FACTORY,
+        MiscAvalanche.PROXY_ADMIN
       );
   }
 }
@@ -133,8 +141,8 @@ library DeployRatesFactoryMetLib {
     return
       DeployRatesFactoryLib._createAndSetupRatesFactory(
         AaveV3Metis.POOL_ADDRESSES_PROVIDER,
-        AaveMisc.TRANSPARENT_PROXY_FACTORY_METIS,
-        AaveMisc.PROXY_ADMIN_METIS
+        MiscMetis.TRANSPARENT_PROXY_FACTORY,
+        MiscMetis.PROXY_ADMIN
       );
   }
 }
@@ -144,8 +152,19 @@ library DeployRatesFactoryBasLib {
     return
       DeployRatesFactoryLib._createAndSetupRatesFactory(
         AaveV3Base.POOL_ADDRESSES_PROVIDER,
-        AaveMisc.TRANSPARENT_PROXY_FACTORY_BASE,
-        AaveMisc.PROXY_ADMIN_BASE
+        MiscBase.TRANSPARENT_PROXY_FACTORY,
+        MiscBase.PROXY_ADMIN
+      );
+  }
+}
+
+library DeployRatesFactoryGnoLib {
+  function deploy() internal returns (address, address[] memory) {
+    return
+      DeployRatesFactoryLib._createAndSetupRatesFactory(
+        AaveV3Gnosis.POOL_ADDRESSES_PROVIDER,
+        MiscGnosis.TRANSPARENT_PROXY_FACTORY,
+        MiscGnosis.PROXY_ADMIN
       );
   }
 }
@@ -189,5 +208,11 @@ contract DeployRatesFactoryMet is MetisScript {
 contract DeployRatesFactoryBas is BaseScript {
   function run() external broadcast {
     DeployRatesFactoryBasLib.deploy();
+  }
+}
+
+contract DeployRatesFactoryGno is GnosisScript {
+  function run() external broadcast {
+    DeployRatesFactoryGnoLib.deploy();
   }
 }
