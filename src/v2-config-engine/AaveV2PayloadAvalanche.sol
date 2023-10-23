@@ -10,7 +10,7 @@ import './AaveV2PayloadBase.sol';
  */
 // TODO: Add rates factory address after deploying
 abstract contract AaveV2PayloadAvalanche is
-  AaveV2PayloadBase(IEngine(AaveV2Avalanche.LISTING_ENGINE))
+  AaveV2PayloadBase(IEngine(AaveV2Avalanche.CONFIG_ENGINE))
 {
 
 }
