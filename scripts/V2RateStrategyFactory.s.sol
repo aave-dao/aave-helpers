@@ -3,7 +3,9 @@ pragma solidity ^0.8.0;
 
 import {ILendingPoolAddressesProvider, IDefaultInterestRateStrategy, ILendingPool} from 'aave-address-book/AaveV2.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
+import {MiscPolygon} from 'aave-address-book/MiscPolygon.sol';
+import {MiscAvalanche} from 'aave-address-book/MiscAvalanche.sol';
 import {ITransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/interfaces/ITransparentProxyFactory.sol';
 import {V2RateStrategyFactory} from '../src/v2-config-engine/V2RateStrategyFactory.sol';
 import '../src/ScriptUtils.sol';
@@ -79,8 +81,8 @@ library DeployV2RatesFactoryEthLib {
     return
       DeployV2RatesFactoryLib._createAndSetupRatesFactory(
         AaveV2Ethereum.POOL_ADDRESSES_PROVIDER,
-        AaveMisc.TRANSPARENT_PROXY_FACTORY_ETHEREUM,
-        AaveMisc.PROXY_ADMIN_ETHEREUM
+        MiscEthereum.TRANSPARENT_PROXY_FACTORY,
+        MiscEthereum.PROXY_ADMIN
       );
   }
 }
@@ -90,8 +92,8 @@ library DeployV2RatesFactoryEthAMMLib {
     return
       DeployV2RatesFactoryLib._createAndSetupRatesFactory(
         AaveV2EthereumAMM.POOL_ADDRESSES_PROVIDER,
-        AaveMisc.TRANSPARENT_PROXY_FACTORY_ETHEREUM,
-        AaveMisc.PROXY_ADMIN_ETHEREUM
+        MiscEthereum.TRANSPARENT_PROXY_FACTORY,
+        MiscEthereum.PROXY_ADMIN
       );
   }
 }
@@ -101,8 +103,8 @@ library DeployV2RatesFactoryPolLib {
     return
       DeployV2RatesFactoryLib._createAndSetupRatesFactory(
         AaveV2Polygon.POOL_ADDRESSES_PROVIDER,
-        AaveMisc.TRANSPARENT_PROXY_FACTORY_POLYGON,
-        AaveMisc.PROXY_ADMIN_POLYGON
+        MiscPolygon.TRANSPARENT_PROXY_FACTORY,
+        MiscPolygon.PROXY_ADMIN
       );
   }
 }
@@ -112,8 +114,8 @@ library DeployV2RatesFactoryAvaLib {
     return
       DeployV2RatesFactoryLib._createAndSetupRatesFactory(
         AaveV2Avalanche.POOL_ADDRESSES_PROVIDER,
-        AaveMisc.TRANSPARENT_PROXY_FACTORY_AVALANCHE,
-        AaveMisc.PROXY_ADMIN_AVALANCHE
+        MiscAvalanche.TRANSPARENT_PROXY_FACTORY,
+        MiscAvalanche.PROXY_ADMIN
       );
   }
 }

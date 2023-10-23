@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
 import {GovHelpers} from '../src/GovHelpers.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 
@@ -17,7 +17,7 @@ contract GovernanceTest is Test {
     payloads[0] = GovHelpers.buildMainnet(address(1));
     payloads[1] = GovHelpers.buildPolygon(address(2));
 
-    vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
+    vm.startPrank(MiscEthereum.ECOSYSTEM_RESERVE);
     GovHelpers.createProposal(payloads, bytes32('ipfs'));
     vm.stopPrank();
   }
@@ -27,7 +27,7 @@ contract GovernanceTest is Test {
     payloads[0] = GovHelpers.buildMainnet(address(1));
     payloads[1] = GovHelpers.buildPolygon(address(2));
 
-    vm.startPrank(AaveMisc.ECOSYSTEM_RESERVE);
+    vm.startPrank(MiscEthereum.ECOSYSTEM_RESERVE);
     GovHelpers.createProposal(payloads, GovHelpers.ipfsHashFile(vm, 'tests/mocks/proposal.md'));
     vm.stopPrank();
   }

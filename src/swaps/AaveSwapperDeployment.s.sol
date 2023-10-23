@@ -3,7 +3,7 @@
 pragma solidity ^0.8.0;
 
 import {Script} from 'forge-std/Script.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {TransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/TransparentProxyFactory.sol';
 
 import {AaveSwapper} from './AaveSwapper.sol';
@@ -13,9 +13,9 @@ contract DeplyAaveSwapper is Script {
     vm.startBroadcast();
 
     address aaveSwapper = address(new AaveSwapper());
-    TransparentProxyFactory(AaveMisc.TRANSPARENT_PROXY_FACTORY_ETHEREUM).create(
+    TransparentProxyFactory(MiscEthereum.TRANSPARENT_PROXY_FACTORY).create(
       aaveSwapper,
-      AaveMisc.PROXY_ADMIN_ETHEREUM,
+      MiscEthereum.PROXY_ADMIN,
       abi.encodeWithSelector(AaveSwapper.initialize.selector)
     );
 

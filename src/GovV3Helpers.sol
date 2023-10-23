@@ -16,7 +16,7 @@ import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {GovernanceV3Metis} from 'aave-address-book/GovernanceV3Metis.sol';
 import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 import {GovernanceV3BNB} from 'aave-address-book/GovernanceV3BNB.sol';
-import {AaveMisc} from 'aave-address-book/AaveMisc.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 
 library GovV3Helpers {
@@ -656,7 +656,7 @@ library GovV3StorageHelpers {
     vm.store(
       address(GovernanceV3Ethereum.GOVERNANCE),
       bytes32(proposalBaseSlot + 1),
-      bytes32(uint256(uint160(AaveMisc.ECOSYSTEM_RESERVE)))
+      bytes32(uint256(uint160(MiscEthereum.ECOSYSTEM_RESERVE)))
     );
     // overwrite array size
     vm.store(
