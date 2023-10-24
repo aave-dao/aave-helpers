@@ -11,11 +11,9 @@ import {V2RateStrategyFactory} from '../src/v2-config-engine/V2RateStrategyFacto
 import '../src/ScriptUtils.sol';
 
 library DeployV2RatesFactoryLib {
-  function _getUniqueStrategiesOnPool(ILendingPool pool)
-    internal
-    view
-    returns (IDefaultInterestRateStrategy[] memory)
-  {
+  function _getUniqueStrategiesOnPool(
+    ILendingPool pool
+  ) internal view returns (IDefaultInterestRateStrategy[] memory) {
     address[] memory listedAssets = pool.getReservesList();
     IDefaultInterestRateStrategy[] memory uniqueRateStrategies = new IDefaultInterestRateStrategy[](
       listedAssets.length
@@ -70,9 +68,8 @@ library DeployV2RatesFactoryLib {
   // To make sure strategies initialised on the factory respect the standard code
   // We do so by checking if the strategy to initialise matches the standard deployed rates address codehash
   function _isStandardStrategy(address strategy) internal view returns (bool) {
-    return (
-      strategy.codehash == 0xd7aa7ce390578e74a5e48d4f530f22cbd75db8437fd6a1ae0a983e550483d972 // Current standard codehash deployed from factory
-    );
+    return (strategy.codehash ==
+      0xd7aa7ce390578e74a5e48d4f530f22cbd75db8437fd6a1ae0a983e550483d972); // Current standard codehash deployed from factory
   }
 }
 

@@ -11,6 +11,7 @@ import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {ChainIds} from './ChainIds.sol';
+import {GovV3Helpers} from './GovV3Helpers.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -48,6 +49,30 @@ struct InterestStrategyValues {
 
 contract ProtocolV2TestBase is CommonTestBase {
   using SafeERC20 for IERC20;
+
+  /**
+   * @dev runs the default test suite that should run on any proposal touching the aave protocol which includes:
+   * - diffing the config
+   * - running an e2e testsuite over all assets
+   */
+  function defaultTest(
+    string memory reportName,
+    ILendingPool pool,
+    address payload
+  ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
+    string memory beforeString = string(abi.encodePacked(reportName, '_before'));
+    ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
+
+    GovV3Helpers.executePayload(vm, payload);
+
+    string memory afterString = string(abi.encodePacked(reportName, '_after'));
+    ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
+
+    diffReports(beforeString, afterString);
+
+    e2eTest(pool);
+    return (configBefore, configAfter);
+  }
 
   /**
    * @dev Generates a markdown compatible snapshot of the whole pool configuration into `/reports`.

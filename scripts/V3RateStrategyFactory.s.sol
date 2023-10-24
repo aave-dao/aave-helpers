@@ -6,12 +6,12 @@ import {IPoolAddressesProvider, IPool, IDefaultInterestRateStrategy} from 'aave-
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {MiscPolygon} from 'aave-address-book/MiscPolygon.sol';
-import {MiscOptimism} from 'aave-address-book/MiscOptimism.sol';
-import {MiscArbitrum} from 'aave-address-book/MiscArbitrum.sol';
 import {MiscAvalanche} from 'aave-address-book/MiscAvalanche.sol';
-import {MiscBase} from 'aave-address-book/MiscBase.sol';
 import {MiscMetis} from 'aave-address-book/MiscMetis.sol';
+import {MiscBase} from 'aave-address-book/MiscBase.sol';
 import {MiscGnosis} from 'aave-address-book/MiscGnosis.sol';
+import {MiscArbitrum} from 'aave-address-book/MiscArbitrum.sol';
+import {MiscOptimism} from 'aave-address-book/MiscOptimism.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';

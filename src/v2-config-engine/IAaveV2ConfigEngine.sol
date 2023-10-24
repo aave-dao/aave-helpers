@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {ILendingPoolConfigurator} from 'aave-address-book/AaveV2.sol';
 import {IV2RateStrategyFactory} from './IV2RateStrategyFactory.sol';
 
-/// @dev Examples here assume the usage of the `AaveV2PayloadBase` base contracts
+/// @dev Examples here assume the usage of the `AaveV2Payload` base contracts
 /// contained in this same repository
 interface IAaveV2ConfigEngine {
   /**
@@ -49,5 +49,4 @@ interface IAaveV2ConfigEngine {
   function RATE_STRATEGIES_FACTORY() external view returns (IV2RateStrategyFactory);
 
   function POOL_CONFIGURATOR() external view returns (ILendingPoolConfigurator);
-
 }

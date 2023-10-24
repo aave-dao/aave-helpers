@@ -66,6 +66,12 @@ contract ProtocolV3TestBase is CommonTestBase {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
   using SafeERC20 for IERC20;
 
+  /**
+   * @dev runs the default test suite that should run on any proposal touching the aave protocol which includes:
+   * - diffing the config
+   * - checking if the changes are plausible (no conflicting config changes etc)
+   * - running an e2e testsuite over all assets
+   */
   function defaultTest(
     string memory reportName,
     IPool pool,
