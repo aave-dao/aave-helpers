@@ -18,7 +18,7 @@ library IpfsUtils {
       inputs[6] = '-u';
     }
     Vm.FfiResult memory f = vm.tryFfi(inputs);
-    if (f.exit_code != 0) {
+    if (f.exitCode != 0) {
       console2.logString(string(f.stderr));
       revert FfiFailed();
     }

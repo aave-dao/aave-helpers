@@ -100,7 +100,7 @@ library GovV3Helpers {
     inputs[8] = '--voter';
     inputs[9] = vm.toString(voter);
     Vm.FfiResult memory f = vm.tryFfi(inputs);
-    if (f.exit_code != 0) {
+    if (f.exitCode != 0) {
       console2.logString(string(f.stderr));
       revert FfiFailed();
     }
@@ -126,7 +126,7 @@ library GovV3Helpers {
     inputs[6] = '--proposalId';
     inputs[7] = vm.toString(proposalId);
     Vm.FfiResult memory f = vm.tryFfi(inputs);
-    if (f.exit_code != 0) {
+    if (f.exitCode != 0) {
       console2.logString(string(f.stderr));
       revert FfiFailed();
     }
