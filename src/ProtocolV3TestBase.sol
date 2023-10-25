@@ -12,7 +12,6 @@ import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
-import {GovV3Helpers} from './GovV3Helpers.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -80,7 +79,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     string memory beforeString = string(abi.encodePacked(reportName, '_before'));
     ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
 
-    GovV3Helpers.executePayload(vm, payload);
+    executePayload(vm, payload);
 
     string memory afterString = string(abi.encodePacked(reportName, '_after'));
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
@@ -96,7 +95,7 @@ contract ProtocolV3TestBase is CommonTestBase {
   function configChangePlausibilityTest(
     ReserveConfig[] memory configBefore,
     ReserveConfig[] memory configAfter
-  ) public {
+  ) public view {
     uint256 configsBeforeLength = configBefore.length;
     for (uint256 i = 0; i < configAfter.length; i++) {
       // assets are ususally not permanently unlisted, so the expectation is there will only be addition

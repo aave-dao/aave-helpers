@@ -18,6 +18,46 @@ import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 import {GovernanceV3BNB} from 'aave-address-book/GovernanceV3BNB.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
+import {ProxyHelpers} from './ProxyHelpers.sol';
+import {GovHelpers, IAaveGovernanceV2} from './GovHelpers.sol';
+
+interface IGovernance_V2_5 {
+  /**
+   * @notice emitted when gas limit gets updated
+   * @param gasLimit the new gas limit
+   */
+  event GasLimitUpdated(uint256 indexed gasLimit);
+
+  /**
+   * @notice method to get the CrossChainController contract address of the currently deployed address
+   * @return address of CrossChainController contract
+   */
+  function CROSS_CHAIN_CONTROLLER() external view returns (address);
+
+  /**
+   * @notice method to get the name of the contract
+   * @return name string
+   */
+  function NAME() external view returns (string memory);
+
+  /**
+   * @notice method to get the gas limit used on destination chain to execute bridged message
+   * @return gas limit
+   * @dev this gas limit is assuming that the messages to forward are only payload execution messages
+   */
+  function GAS_LIMIT() external view returns (uint256);
+
+  /**
+   * @notice method to send a payload to execution chain
+   * @param payload object with the information needed for execution
+   */
+  function forwardPayloadForExecution(PayloadsControllerUtils.Payload memory payload) external;
+
+  /**
+   * @notice method to initialize governance v2.5
+   */
+  function initialize() external;
+}
 
 library GovV3Helpers {
   error CanNotFindPayload();
@@ -60,7 +100,7 @@ library GovV3Helpers {
     inputs[8] = '--voter';
     inputs[9] = vm.toString(voter);
     Vm.FfiResult memory f = vm.tryFfi(inputs);
-    if (f.exit_code != 0) {
+    if (f.exitCode != 0) {
       console2.logString(string(f.stderr));
       revert FfiFailed();
     }
@@ -86,7 +126,7 @@ library GovV3Helpers {
     inputs[6] = '--proposalId';
     inputs[7] = vm.toString(proposalId);
     Vm.FfiResult memory f = vm.tryFfi(inputs);
-    if (f.exit_code != 0) {
+    if (f.exitCode != 0) {
       console2.logString(string(f.stderr));
       revert FfiFailed();
     }
@@ -432,6 +472,28 @@ library GovV3Helpers {
     return createProposal(payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_POL, ipfsHash);
   }
 
+  // temporarily patched create proposal for governance v2.5
+  function createProposal2_5(
+    PayloadsControllerUtils.Payload[] memory payloads,
+    bytes32 ipfsHash
+  ) internal returns (uint256) {
+    require(block.chainid == ChainIds.MAINNET, 'MAINNET_ONLY');
+    require(payloads.length != 0, 'MINIMUM_ONE_PAYLOAD');
+    require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
+
+    GovHelpers.Payload[] memory gov2Payloads = new GovHelpers.Payload[](payloads.length);
+    for (uint256 i = 0; i < payloads.length; i++) {
+      gov2Payloads[i] = GovHelpers.Payload({
+        target: address(GovernanceV3Ethereum.GOVERNANCE),
+        value: 0,
+        signature: 'forwardPayloadForExecution(PayloadsControllerUtils.Payload memory payload)',
+        callData: abi.encode(payloads[i]),
+        withDelegatecall: false
+      });
+    }
+    return GovHelpers.createProposal(gov2Payloads, ipfsHash, true);
+  }
+
   /**
    * @dev creates a proposal with a single payload
    * @param payload payload
@@ -493,7 +555,6 @@ library GovV3Helpers {
     require(votingPortal != address(0), 'INVALID_VOTING_PORTAL');
 
     uint256 fee = GovernanceV3Ethereum.GOVERNANCE.getCancellationFee();
-
     console2.logBytes(
       abi.encodeWithSelector(
         IGovernanceCore.createProposal.selector,

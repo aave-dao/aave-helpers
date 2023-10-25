@@ -11,7 +11,6 @@ import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {ChainIds} from './ChainIds.sol';
-import {GovV3Helpers} from './GovV3Helpers.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -63,7 +62,7 @@ contract ProtocolV2TestBase is CommonTestBase {
     string memory beforeString = string(abi.encodePacked(reportName, '_before'));
     ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
 
-    GovV3Helpers.executePayload(vm, payload);
+    executePayload(vm, payload);
 
     string memory afterString = string(abi.encodePacked(reportName, '_after'));
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);

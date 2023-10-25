@@ -9,6 +9,7 @@ import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {ChainIds} from './ChainIds.sol';
+import {GovV3Helpers} from './GovV3Helpers.sol';
 
 struct ReserveTokens {
   address aToken;
@@ -22,6 +23,10 @@ contract CommonTestBase is Test {
   address public constant ETH_MOCK_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
   address public constant EOA = 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045;
+
+  function executePayload(Vm vm, address payload) internal {
+    GovV3Helpers.executePayload(vm, payload);
+  }
 
   /**
    * @notice deal doesn't support amounts stored in a script right now.
