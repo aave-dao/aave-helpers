@@ -42,6 +42,9 @@ deploy-steward-arb :; forge script scripts/RiskStewards.s.sol:DeployArb --rpc-ur
 deploy-steward-ava :; forge script scripts/RiskStewards.s.sol:DeployAva --rpc-url avalanche --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-steward-met :; forge script scripts/RiskStewards.s.sol:DeployMet --rpc-url metis --broadcast --ledger --legacy --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-steward-bas :; forge script scripts/RiskStewards.s.sol:DeployBas --rpc-url base --broadcast --ledger --legacy --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
+deploy-steward-gno :; forge script scripts/RiskStewards.s.sol:DeployGno --rpc-url gnosis --broadcast --legacy --ledger --legacy --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
+
+deploy-freezing-steward :; deploy-steward-gno :; forge script scripts/FreezingStewards.s.sol:DeployGno --rpc-url gnosis --broadcast --legacy --ledger --legacy --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 
 deploy-rates-factory-v2-eth :; forge script scripts/V2RateStrategyFactory.s.sol:DeployV2RatesFactoryEth --mnemonics random --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
 deploy-rates-factory-v2-eth-amm :; forge script scripts/V2RateStrategyFactory.s.sol:DeployV2RatesFactoryEthAMM --mnemonics random --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv
