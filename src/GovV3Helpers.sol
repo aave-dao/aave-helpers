@@ -563,6 +563,8 @@ library GovV3Helpers {
       return GovernanceV3Base.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.BNB) {
       return GovernanceV3BNB.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.GNOSIS) {
+      return GovernanceV3Gnosis.PAYLOADS_CONTROLLER;
     }
 
     revert CannotFindPayloadsController();
