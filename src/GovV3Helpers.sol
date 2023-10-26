@@ -441,6 +441,30 @@ library GovV3Helpers {
    * @param vm Vm
    * @param actions actions array
    */
+  function buildGnosisPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.GNOSIS, actions);
+  }
+
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param action actions array
+   */
+  function buildGnosisPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.GNOSIS, action);
+  }
+
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param actions actions array
+   */
   function buildBNBPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
