@@ -83,6 +83,15 @@ contract CommonTestBase is Test {
         return true;
       }
     }
+    if (block.chainid == ChainIds.GNOSIS) {
+      // TODO: import EURs address from address-book once address book is updated
+      // EURs
+      if (asset == 0xcB444e90D8198415266c6a2724b7900fb12FC56E) {
+        vm.startPrank(0xBA12222222228d8Ba445958a75a0704d566BF2C8);
+        IERC20(asset).transfer(user, amount);
+        return true;
+      }
+    }
     return false;
   }
 
