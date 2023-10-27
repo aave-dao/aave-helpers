@@ -1,4 +1,4 @@
-# Streategic Assets Manager Information
+# Strategic Assets Manager Information
 
 ## Main Idea
 
