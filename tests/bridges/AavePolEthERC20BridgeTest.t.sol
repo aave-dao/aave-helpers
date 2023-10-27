@@ -8,7 +8,7 @@ import {AaveV2Polygon, AaveV2PolygonAssets} from 'aave-address-book/AaveV2Polygo
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 
-import {AavePolEthERC20Bridge} from './AavePolEthERC20Bridge.sol';
+import {AavePolEthERC20Bridge} from '../../src/bridges/AavePolEthERC20Bridge.sol';
 
 /**
  * @dev Tests for AavePolEthERC20Bridge
