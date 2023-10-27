@@ -7,8 +7,8 @@ import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 
-import {BaseSwapPayload} from './BaseSwapPayload.sol';
-import {DepositV2SwapPayload} from './DepositV2SwapPayload.sol';
+import {BaseSwapPayload} from '../../src/swaps/BaseSwapPayload.sol';
+import {DepositV2SwapPayload} from '../../src/swaps/DepositV2SwapPayload.sol';
 
 contract MyPayload is DepositV2SwapPayload {
   function execute() external {}

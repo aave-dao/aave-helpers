@@ -8,7 +8,7 @@ import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethe
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 
-import {AaveSwapper} from './AaveSwapper.sol';
+import {AaveSwapper} from '../../src/swaps/AaveSwapper.sol';
 
 contract AaveSwapperTest is Test {
   event DepositedIntoV2(address indexed token, uint256 amount);
