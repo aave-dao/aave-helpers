@@ -9,14 +9,14 @@ import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Opti
 import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
-import {IAaveV3ConfigEngine} from '../src/v3-config-engine/IAaveV3ConfigEngine.sol';
-import {AaveV3PolygonRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3PolygonRatesUpdates070322.sol';
-import {AaveV3AvalancheRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3AvalancheRatesUpdates070322.sol';
-import {AaveV3OptimismRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3OptimismRatesUpdates070322.sol';
-import {AaveV3ArbitrumRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3ArbitrumRatesUpdates070322.sol';
-import {DeployEnginePolLib, DeployEngineEthLib, DeployEngineAvaLib, DeployEngineOptLib, DeployEngineArbLib} from '../scripts/AaveV3ConfigEngine.s.sol';
-import {GovHelpers} from '../src/GovHelpers.sol';
-import '../src/ProtocolV3TestBase.sol';
+import {IAaveV3ConfigEngine} from '../../src/v3-config-engine/IAaveV3ConfigEngine.sol';
+import {AaveV3PolygonRatesUpdates070322} from '../mocks/gauntlet-updates/AaveV3PolygonRatesUpdates070322.sol';
+import {AaveV3AvalancheRatesUpdates070322} from '../mocks/gauntlet-updates/AaveV3AvalancheRatesUpdates070322.sol';
+import {AaveV3OptimismRatesUpdates070322} from '../mocks/gauntlet-updates/AaveV3OptimismRatesUpdates070322.sol';
+import {AaveV3ArbitrumRatesUpdates070322} from '../mocks/gauntlet-updates/AaveV3ArbitrumRatesUpdates070322.sol';
+import {DeployEnginePolLib, DeployEngineEthLib, DeployEngineAvaLib, DeployEngineOptLib, DeployEngineArbLib} from '../../scripts/AaveV3ConfigEngine.s.sol';
+import {GovHelpers} from '../../src/GovHelpers.sol';
+import '../../src/ProtocolV3TestBase.sol';
 
 contract AaveV3PolygonConfigEngineRatesTest is ProtocolV3TestBase {
   using stdStorage for StdStorage;

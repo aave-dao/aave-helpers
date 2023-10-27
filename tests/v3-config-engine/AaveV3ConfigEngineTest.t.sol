@@ -1,32 +1,32 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {IAaveV3ConfigEngine} from '../src/v3-config-engine/IAaveV3ConfigEngine.sol';
-import {AaveV3PolygonMockListing} from './mocks/AaveV3PolygonMockListing.sol';
-import {AaveV3EthereumMockCustomListing} from './mocks/AaveV3EthereumMockCustomListing.sol';
-import {AaveV3EthereumMockCapUpdate} from './mocks/AaveV3EthereumMockCapUpdate.sol';
-import {AaveV3AvalancheCollateralUpdate} from './mocks/AaveV3AvalancheCollateralUpdate.sol';
-import {AaveV3AvalancheCollateralUpdateNoChange} from './mocks/AaveV3AvalancheCollateralUpdateNoChange.sol';
-import {AaveV3AvalancheCollateralUpdateWrongBonus, AaveV3AvalancheCollateralUpdateCorrectBonus} from './mocks/AaveV3AvalancheCollateralUpdateEdgeBonus.sol';
-import {AaveV3PolygonBorrowUpdate} from './mocks/AaveV3PolygonBorrowUpdate.sol';
-import {AaveV3PolygonPriceFeedUpdate} from './mocks/AaveV3PolygonPriceFeedUpdate.sol';
-import {AaveV3PolygonEModeCategoryUpdate, AaveV3AvalancheEModeCategoryUpdateEdgeBonus} from './mocks/AaveV3PolygonEModeCategoryUpdate.sol';
-import {AaveV3AvalancheEModeCategoryUpdateNoChange} from './mocks/AaveV3AvalancheEModeCategoryUpdateNoChange.sol';
-import {AaveV3EthereumAssetEModeUpdate} from './mocks/AaveV3EthereumAssetEModeUpdate.sol';
-import {AaveV3OptimismMockRatesUpdate} from './mocks/AaveV3OptimismMockRatesUpdate.sol';
-import {DeployRatesFactoryPolLib, DeployRatesFactoryEthLib, DeployRatesFactoryAvaLib, DeployRatesFactoryArbLib, DeployRatesFactoryOptLib} from '../scripts/V3RateStrategyFactory.s.sol';
-import {DeployEnginePolLib, DeployEngineEthLib, DeployEngineAvaLib, DeployEngineOptLib, DeployEngineArbLib} from '../scripts/AaveV3ConfigEngine.s.sol';
+import {IAaveV3ConfigEngine} from '../../src/v3-config-engine/IAaveV3ConfigEngine.sol';
+import {AaveV3PolygonMockListing} from '../mocks/AaveV3PolygonMockListing.sol';
+import {AaveV3EthereumMockCustomListing} from '../mocks/AaveV3EthereumMockCustomListing.sol';
+import {AaveV3EthereumMockCapUpdate} from '../mocks/AaveV3EthereumMockCapUpdate.sol';
+import {AaveV3AvalancheCollateralUpdate} from '../mocks/AaveV3AvalancheCollateralUpdate.sol';
+import {AaveV3AvalancheCollateralUpdateNoChange} from '../mocks/AaveV3AvalancheCollateralUpdateNoChange.sol';
+import {AaveV3AvalancheCollateralUpdateWrongBonus, AaveV3AvalancheCollateralUpdateCorrectBonus} from '../mocks/AaveV3AvalancheCollateralUpdateEdgeBonus.sol';
+import {AaveV3PolygonBorrowUpdate} from '../mocks/AaveV3PolygonBorrowUpdate.sol';
+import {AaveV3PolygonPriceFeedUpdate} from '../mocks/AaveV3PolygonPriceFeedUpdate.sol';
+import {AaveV3PolygonEModeCategoryUpdate, AaveV3AvalancheEModeCategoryUpdateEdgeBonus} from '../mocks/AaveV3PolygonEModeCategoryUpdate.sol';
+import {AaveV3AvalancheEModeCategoryUpdateNoChange} from '../mocks/AaveV3AvalancheEModeCategoryUpdateNoChange.sol';
+import {AaveV3EthereumAssetEModeUpdate} from '../mocks/AaveV3EthereumAssetEModeUpdate.sol';
+import {AaveV3OptimismMockRatesUpdate} from '../mocks/AaveV3OptimismMockRatesUpdate.sol';
+import {DeployRatesFactoryPolLib, DeployRatesFactoryEthLib, DeployRatesFactoryAvaLib, DeployRatesFactoryArbLib, DeployRatesFactoryOptLib} from '../../scripts/V3RateStrategyFactory.s.sol';
+import {DeployEnginePolLib, DeployEngineEthLib, DeployEngineAvaLib, DeployEngineOptLib, DeployEngineArbLib} from '../../scripts/AaveV3ConfigEngine.s.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {IDefaultInterestRateStrategy} from 'aave-address-book/AaveV3.sol';
-import {AaveV3PolygonRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3PolygonRatesUpdates070322.sol';
-import {AaveV3AvalancheRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3AvalancheRatesUpdates070322.sol';
-import {AaveV3OptimismRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3OptimismRatesUpdates070322.sol';
-import {AaveV3ArbitrumRatesUpdates070322} from './mocks/gauntlet-updates/AaveV3ArbitrumRatesUpdates070322.sol';
-import '../src/ProtocolV3TestBase.sol';
+import {AaveV3PolygonRatesUpdates070322} from '../mocks/gauntlet-updates/AaveV3PolygonRatesUpdates070322.sol';
+import {AaveV3AvalancheRatesUpdates070322} from '../mocks/gauntlet-updates/AaveV3AvalancheRatesUpdates070322.sol';
+import {AaveV3OptimismRatesUpdates070322} from '../mocks/gauntlet-updates/AaveV3OptimismRatesUpdates070322.sol';
+import {AaveV3ArbitrumRatesUpdates070322} from '../mocks/gauntlet-updates/AaveV3ArbitrumRatesUpdates070322.sol';
+import '../../src/ProtocolV3TestBase.sol';
 
 contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
   using stdStorage for StdStorage;

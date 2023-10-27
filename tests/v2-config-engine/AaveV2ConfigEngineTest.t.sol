@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {AaveV2EthereumRatesUpdate} from './mocks/AaveV2EthereumRatesUpdate.sol';
-import {IAaveV2ConfigEngine} from '../src/v2-config-engine/IAaveV2ConfigEngine.sol';
-import {DeployV2EngineEthLib} from '../scripts/AaveV2ConfigEngine.s.sol';
-import {DeployV2RatesFactoryEthLib} from '../scripts/V2RateStrategyFactory.s.sol';
+import {AaveV2EthereumRatesUpdate} from '../mocks/AaveV2EthereumRatesUpdate.sol';
+import {IAaveV2ConfigEngine} from '../../src/v2-config-engine/IAaveV2ConfigEngine.sol';
+import {DeployV2EngineEthLib} from '../../scripts/AaveV2ConfigEngine.s.sol';
+import {DeployV2RatesFactoryEthLib} from '../../scripts/V2RateStrategyFactory.s.sol';
 import {AaveV2Ethereum} from 'aave-address-book/AaveAddressBook.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
-import {IV2RateStrategyFactory} from '../src/v2-config-engine/IV2RateStrategyFactory.sol';
-import {GovHelpers} from '../src/GovHelpers.sol';
-import '../src/ProtocolV2TestBase.sol';
+import {IV2RateStrategyFactory} from '../../src/v2-config-engine/IV2RateStrategyFactory.sol';
+import {GovHelpers} from '../../src/GovHelpers.sol';
+import '../../src/ProtocolV2TestBase.sol';
 
 contract AaveV2ConfigEngineTest is ProtocolV2TestBase {
   using stdStorage for StdStorage;

@@ -4,8 +4,8 @@ pragma solidity ^0.8.0;
 import {AaveV3Ethereum} from 'aave-address-book/AaveAddressBook.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {IDefaultInterestRateStrategy} from 'aave-address-book/AaveV3.sol';
-import {V3RateStrategyFactory, IV3RateStrategyFactory} from '../src/v3-config-engine/V3RateStrategyFactory.sol';
-import '../src/ProtocolV3TestBase.sol';
+import {V3RateStrategyFactory, IV3RateStrategyFactory} from '../../src/v3-config-engine/V3RateStrategyFactory.sol';
+import '../../src/ProtocolV3TestBase.sol';
 
 contract V3RateStrategyFactoryTest is ProtocolV3TestBase {
   using stdStorage for StdStorage;
