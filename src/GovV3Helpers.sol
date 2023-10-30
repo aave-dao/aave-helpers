@@ -511,7 +511,7 @@ library GovV3Helpers {
       gov2Payloads[i] = GovHelpers.Payload({
         target: address(GovernanceV3Ethereum.GOVERNANCE),
         value: 0,
-        signature: 'forwardPayloadForExecution(PayloadsControllerUtils.Payload memory payload)',
+        signature: 'forwardPayloadForExecution((uint256,uint8,address,uint40))',
         callData: abi.encode(payloads[i]),
         withDelegatecall: false
       });
