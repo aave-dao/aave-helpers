@@ -21,12 +21,9 @@ contract GovernanceV2_5Test is ProtocolV3TestBase {
 
   PayloadWithEmit payload;
 
-  address public constant SHORT_PROPOSAL = 0xE40E84457F4b5075f1EB32352d81ecF1dE77fee6;
-
   function setUp() public {
-    vm.createSelectFork('mainnet', 18415523);
+    vm.createSelectFork('mainnet', 18470099);
     payload = new PayloadWithEmit();
-    GovHelpers.executePayload(vm, SHORT_PROPOSAL, AaveGovernanceV2.SHORT_EXECUTOR);
   }
 
   /**
@@ -48,8 +45,24 @@ contract GovernanceV2_5Test is ProtocolV3TestBase {
     PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
     payloads[0] = GovV3Helpers.buildMainnetPayload(vm, actions);
     vm.startPrank(MiscEthereum.ECOSYSTEM_RESERVE);
-    GovV3Helpers.createProposal2_5(payloads, 'hash');
+    uint256 proposalId = GovV3Helpers.createProposal2_5(payloads, 'hash');
     vm.stopPrank();
+
+    // 4. execute the proposal
+    GovHelpers.passVoteAndExecute(vm, proposalId);
+
+    // 5. expect queueing on payloads controller
+    IPayloadsControllerCore.Payload memory payloadsControllerPayload = GovernanceV3Ethereum
+      .PAYLOADS_CONTROLLER
+      .getPayloadById(0);
+    require(
+      payloadsControllerPayload.state == IPayloadsControllerCore.PayloadState.Queued,
+      'SHOULD_BE_QUEUED'
+    );
+    vm.warp(block.timestamp + payloadsControllerPayload.delay + 1);
+    vm.expectEmit(true, true, true, true);
+    emit TestEvent();
+    GovernanceV3Ethereum.PAYLOADS_CONTROLLER.executePayload(0);
   }
 
   function test_helpers() public {
