@@ -27,33 +27,33 @@ library ChainHelpers {
     if (chainId == block.chainid) return (previousFork, previousFork);
     uint256 newFork;
     if (chainId == ChainIds.MAINNET) {
-      newFork = vm.createFork(vm.rpcUrl('mainnet'));
+      newFork = vm.createSelectFork(vm.rpcUrl('mainnet'));
     } else if (chainId == ChainIds.OPTIMISM) {
-      newFork = vm.createFork(vm.rpcUrl('optimism'));
+      newFork = vm.createSelectFork(vm.rpcUrl('optimism'));
     } else if (chainId == ChainIds.BNB) {
-      newFork = vm.createFork(vm.rpcUrl('bnb'));
+      newFork = vm.createSelectFork(vm.rpcUrl('bnb'));
     } else if (chainId == ChainIds.POLYGON) {
-      newFork = vm.createFork(vm.rpcUrl('polygon'));
+      newFork = vm.createSelectFork(vm.rpcUrl('polygon'));
     } else if (chainId == ChainIds.FANTOM) {
-      newFork = vm.createFork(vm.rpcUrl('fantom'));
+      newFork = vm.createSelectFork(vm.rpcUrl('fantom'));
     } else if (chainId == ChainIds.ZK_SYNC) {
-      newFork = vm.createFork(vm.rpcUrl('zkSync'));
+      newFork = vm.createSelectFork(vm.rpcUrl('zkSync'));
     } else if (chainId == ChainIds.METIS) {
-      newFork = vm.createFork(vm.rpcUrl('metis'));
+      newFork = vm.createSelectFork(vm.rpcUrl('metis'));
     } else if (chainId == ChainIds.ZK_EVM) {
-      newFork = vm.createFork(vm.rpcUrl('zkEvm'));
+      newFork = vm.createSelectFork(vm.rpcUrl('zkEvm'));
     } else if (chainId == ChainIds.BASE) {
-      newFork = vm.createFork(vm.rpcUrl('base'));
+      newFork = vm.createSelectFork(vm.rpcUrl('base'));
     } else if (chainId == ChainIds.GNOSIS) {
-      newFork = vm.createFork(vm.rpcUrl('gnosis'));
+      newFork = vm.createSelectFork(vm.rpcUrl('gnosis'));
     } else if (chainId == ChainIds.ARBITRUM) {
-      newFork = vm.createFork(vm.rpcUrl('arbitrum'));
+      newFork = vm.createSelectFork(vm.rpcUrl('arbitrum'));
     } else if (chainId == ChainIds.AVALANCHE) {
-      newFork = vm.createFork(vm.rpcUrl('avalanche'));
+      newFork = vm.createSelectFork(vm.rpcUrl('avalanche'));
     } else if (chainId == ChainIds.SEPOLIA) {
-      newFork = vm.createFork(vm.rpcUrl('sepolia'));
+      newFork = vm.createSelectFork(vm.rpcUrl('sepolia'));
     } else if (chainId == ChainIds.HARMONY) {
-      newFork = vm.createFork(vm.rpcUrl('harmony'));
+      newFork = vm.createSelectFork(vm.rpcUrl('harmony'));
     } else {
       revert UnknownChainId();
     }

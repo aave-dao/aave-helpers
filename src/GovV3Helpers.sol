@@ -643,7 +643,7 @@ library GovV3Helpers {
     );
     require(payload.expirationTime >= block.timestamp, 'EXPIRATION_MUST_BE_IN_THE_FUTURE');
     if (prevFork != currentFork) {
-      vm.selectFork(prevFork);
+      ChainHelpers.selectChain(vm, ChainIds.MAINNET);
     }
     return (payload.maximumAccessLevelRequired, payloadId);
   }
