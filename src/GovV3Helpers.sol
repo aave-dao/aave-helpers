@@ -632,7 +632,7 @@ library GovV3Helpers {
     IPayloadsControllerCore payloadsController,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) private returns (PayloadsControllerUtils.AccessControl, uint40) {
-    (uint256 prevFork, ) = ChainHelpers.selectChain(vm, chainId);
+    (uint256 prevFork, uint256 currentFork) = ChainHelpers.selectChain(vm, chainId);
     (uint40 payloadId, IPayloadsControllerCore.Payload memory payload) = _findPayloadId(
       payloadsController,
       actions
@@ -642,7 +642,9 @@ library GovV3Helpers {
       'MUST_BE_IN_CREATED_STATE'
     );
     require(payload.expirationTime >= block.timestamp, 'EXPIRATION_MUST_BE_IN_THE_FUTURE');
-    vm.selectFork(prevFork);
+    if (prevFork != currentFork) {
+      vm.selectFork(prevFork);
+    }
     return (payload.maximumAccessLevelRequired, payloadId);
   }
 
