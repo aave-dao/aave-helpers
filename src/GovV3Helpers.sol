@@ -93,7 +93,7 @@ library GovV3Helpers {
     inputs[0] = 'npx';
     inputs[1] = '--yes';
     inputs[2] = '-s';
-    inputs[3] = '@bgd-labs/aave-cli@0.0.24-4c3312572ba1eb196152981db889a8c0831aff75.0';
+    inputs[3] = '@bgd-labs/aave-cli@0.0.27-0a01f2a07efe0ec4c875cf479004d20350235f64.0';
     inputs[4] = 'governance';
     inputs[5] = 'getVotingProofs';
     inputs[6] = '--proposalId';
@@ -121,7 +121,7 @@ library GovV3Helpers {
     inputs[0] = 'npx';
     inputs[1] = '--yes';
     inputs[2] = '-s';
-    inputs[3] = '@bgd-labs/aave-cli@0.0.24-4c3312572ba1eb196152981db889a8c0831aff75.0';
+    inputs[3] = '@bgd-labs/aave-cli@0.0.27-0a01f2a07efe0ec4c875cf479004d20350235f64.0';
     inputs[4] = 'governance';
     inputs[5] = 'getStorageRoots';
     inputs[6] = '--proposalId';
