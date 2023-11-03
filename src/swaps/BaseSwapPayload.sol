@@ -8,6 +8,10 @@ import {AaveV2Ethereum} from 'aave-address-book/AaveV2Ethereum.sol';
 
 import {ISwapPayload} from './interfaces/ISwapPayload.sol';
 
+/**
+ * @title BaseSwapPayload
+ * @author Llama
+ */
 abstract contract BaseSwapPayload is ISwapPayload {
   using SafeERC20 for IERC20;
 

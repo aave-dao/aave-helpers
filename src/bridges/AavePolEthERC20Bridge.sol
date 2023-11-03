@@ -24,6 +24,11 @@ interface IERC20Polygon {
   function withdraw(uint256 amount) external;
 }
 
+/**
+ * @title AavePolEthERC20Bridge
+ * @author Llama
+ * @notice Helper contract to bridge assets from polygon to ethereum
+ */
 contract AavePolEthERC20Bridge is Ownable, Rescuable, IAavePolEthERC20Bridge {
   using SafeERC20 for IERC20;
 

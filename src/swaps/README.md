@@ -1,6 +1,6 @@
 # Aave <> CoW Swap: AaveSwapper
 
-The AaveSwapper is a smart contract tool deveoped in order to more easily allow the Aave DAO to swap its tokens.
+The AaveSwapper is a smart contract tool developed in order to more easily allow the Aave DAO to swap its tokens.
 Up until now, the DAO relied on custom one-use contracts in order to accomplish the swap of one token for another.
 Some examples include the BAL <> AAVE swap from 2022, the acquisition of CRV or the acquisition of B-80BAL-20WETH.
 All the instances listed above required significant time to develop, test, and review, all while reinventing the

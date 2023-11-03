@@ -13,6 +13,11 @@ import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {IPriceChecker} from './interfaces/IExpectedOutCalculator.sol';
 import {IMilkman} from './interfaces/IMilkman.sol';
 
+/**
+ * @title AaveSwapper
+ * @author Llama
+ * @notice Helper contract to swap assets using milkman
+ */
 contract AaveSwapper is Initializable, OwnableWithGuardian, Rescuable {
   using SafeERC20 for IERC20;
 
