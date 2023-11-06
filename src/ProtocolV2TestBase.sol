@@ -181,6 +181,15 @@ contract ProtocolV2TestBase is CommonTestBase {
   ) internal {
     uint256 snapshot = vm.snapshot();
     this._borrow(testAssetConfig, pool, borrower, amount, stable);
+    // switching back and forth between rate modes should work
+    if (testAssetConfig.stableBorrowRateEnabled) {
+      vm.startPrank(borrower);
+      pool.swapBorrowRateMode(testAssetConfig.underlying, stable ? 1 : 2);
+      pool.swapBorrowRateMode(testAssetConfig.underlying, stable ? 2 : 1);
+    } else {
+      vm.expectRevert();
+      pool.swapBorrowRateMode(testAssetConfig.underlying, stable ? 1 : 2);
+    }
     _repay(testAssetConfig, pool, borrower, amount, stable);
     vm.revertTo(snapshot);
   }
