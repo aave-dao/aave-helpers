@@ -23,8 +23,8 @@ contract AaveV3EthereumMockCustomListing is AaveV3Payload {
 
     listingsCustom[0] = IEngine.ListingWithCustomImpl(
       IEngine.Listing({
-        asset: 0x111111111117dC0aa78b770fA6A738034120C302,
-        assetSymbol: '1INCH',
+        asset: 0xcAfE001067cDEF266AfB7Eb5A286dCFD277f3dE5,
+        assetSymbol: 'PSP',
         priceFeed: 0x72AFAECF99C9d9C8215fF44C77B94B99C28741e8,
         rateStrategyParams: IV3RateStrategyFactory(AaveV3Ethereum.RATES_FACTORY)
           .getStrategyDataOfAsset(AaveV3EthereumAssets.AAVE_UNDERLYING), // Quite common case, of setting the same rate strategy as an already listed asset

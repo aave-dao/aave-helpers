@@ -9,11 +9,11 @@
         "to": 10150
       },
       "liquidationThreshold": {
-        "from": 9750,
+        "from": 9500,
         "to": 9760
       },
       "ltv": {
-        "from": 9700,
+        "from": 9300,
         "to": 9740
       }
     }

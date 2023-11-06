@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | oracle | [0x72484B12719E23115761D5DA1646945632979bB6](https://polygonscan.com/address/0x72484B12719E23115761D5DA1646945632979bB6) | [0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7](https://polygonscan.com/address/0xfE4A8cc5b5B2366C1B58Bea3858e81843581b2F7) |
 | oracleDescription | AAVE / USD | USDC / USD |
-| oracleLatestAnswer | 62.7644276 | 0.9999226 |
+| oracleLatestAnswer | 96.3115 | 1.00001165 |
 
 
 ## Raw diff
@@ -26,8 +26,8 @@
         "to": "USDC / USD"
       },
       "oracleLatestAnswer": {
-        "from": 6276442760,
-        "to": 99992260
+        "from": 9631150000,
+        "to": 100001165
       }
     }
   }

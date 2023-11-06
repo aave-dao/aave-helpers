@@ -2,15 +2,15 @@
 
 ### Reserves added
 
-#### 1INCH ([0x111111111117dC0aa78b770fA6A738034120C302](https://etherscan.io/address/0x111111111117dC0aa78b770fA6A738034120C302))
+#### PSP ([0xcAfE001067cDEF266AfB7Eb5A286dCFD277f3dE5](https://etherscan.io/address/0xcAfE001067cDEF266AfB7Eb5A286dCFD277f3dE5))
 
 | description | value |
 | --- | --- |
 | decimals | 18 |
 | isActive | true |
 | isFrozen | false |
-| supplyCap | 85,000 1INCH |
-| borrowCap | 60,000 1INCH |
+| supplyCap | 85,000 PSP |
+| borrowCap | 60,000 PSP |
 | debtCeiling | 0 $ |
 | isSiloed | false |
 | isFlashloanable | false |
@@ -18,30 +18,30 @@
 | oracle | [0x72AFAECF99C9d9C8215fF44C77B94B99C28741e8](https://etherscan.io/address/0x72AFAECF99C9d9C8215fF44C77B94B99C28741e8) |
 | oracleDecimals | 18 |
 | oracleDescription | 1INCH / ETH |
-| oracleLatestAnswer | 0.000216287562682828 |
+| oracleLatestAnswer | 0.000186571062207223 |
 | usageAsCollateralEnabled | true |
 | ltv | 82.5 % |
 | liquidationThreshold | 86 % |
 | liquidationBonus | 5 % |
 | liquidationProtocolFee | 10 % |
 | reserveFactor | 10 % |
-| aToken | [0x545bD6c032eFdde65A377A6719DEF2796C8E0f2e](https://etherscan.io/address/0x545bD6c032eFdde65A377A6719DEF2796C8E0f2e) |
+| aToken | [0x82F9c5ad306BBa1AD0De49bB5FA6F01bf61085ef](https://etherscan.io/address/0x82F9c5ad306BBa1AD0De49bB5FA6F01bf61085ef) |
 | aTokenImpl | [0x7EfFD7b47Bfd17e52fB7559d3f924201b9DbfF3d](https://etherscan.io/address/0x7EfFD7b47Bfd17e52fB7559d3f924201b9DbfF3d) |
-| variableDebtToken | [0xd180D7fdD4092f07428eFE801E17BC03576b3192](https://etherscan.io/address/0xd180D7fdD4092f07428eFE801E17BC03576b3192) |
+| variableDebtToken | [0x68e9f0aD4e6f8F5DB70F6923d4d6d5b225B83b16](https://etherscan.io/address/0x68e9f0aD4e6f8F5DB70F6923d4d6d5b225B83b16) |
 | variableDebtTokenImpl | [0xaC725CB59D16C81061BDeA61041a8A5e73DA9EC6](https://etherscan.io/address/0xaC725CB59D16C81061BDeA61041a8A5e73DA9EC6) |
-| stableDebtToken | [0x7617d02E311CdE347A0cb45BB7DF2926BBaf5347](https://etherscan.io/address/0x7617d02E311CdE347A0cb45BB7DF2926BBaf5347) |
+| stableDebtToken | [0x61dFd349140C239d3B61fEe203Efc811b518a317](https://etherscan.io/address/0x61dFd349140C239d3B61fEe203Efc811b518a317) |
 | stableDebtTokenImpl | [0x15C5620dfFaC7c7366EED66C20Ad222DDbB1eD57](https://etherscan.io/address/0x15C5620dfFaC7c7366EED66C20Ad222DDbB1eD57) |
 | borrowingEnabled | true |
 | stableBorrowRateEnabled | true |
 | isBorrowableInIsolation | false |
 | interestRateStrategy | [0x24701A6368Ff6D2874d6b8cDadd461552B8A5283](https://etherscan.io/address/0x24701A6368Ff6D2874d6b8cDadd461552B8A5283) |
-| aTokenName | Aave Ethereum 1INCH |
-| aTokenSymbol | aEth1INCH |
+| aTokenName | Aave Ethereum PSP |
+| aTokenSymbol | aEthPSP |
 | isPaused | false |
-| stableDebtTokenName | Aave Ethereum Stable Debt 1INCH |
-| stableDebtTokenSymbol | stableDebtEth1INCH |
-| variableDebtTokenName | Aave Ethereum Variable Debt 1INCH |
-| variableDebtTokenSymbol | variableDebtEth1INCH |
+| stableDebtTokenName | Aave Ethereum Stable Debt PSP |
+| stableDebtTokenSymbol | stableDebtEthPSP |
+| variableDebtTokenName | Aave Ethereum Variable Debt PSP |
+| variableDebtTokenSymbol | variableDebtEthPSP |
 | optimalUsageRatio | 45 % |
 | maxExcessUsageRatio | 55 % |
 | baseVariableBorrowRate | 0 % |
@@ -60,13 +60,13 @@
 ```json
 {
   "reserves": {
-    "0x111111111117dC0aa78b770fA6A738034120C302": {
+    "0xcAfE001067cDEF266AfB7Eb5A286dCFD277f3dE5": {
       "from": null,
       "to": {
-        "aToken": "0x545bD6c032eFdde65A377A6719DEF2796C8E0f2e",
+        "aToken": "0x82F9c5ad306BBa1AD0De49bB5FA6F01bf61085ef",
         "aTokenImpl": "0x7EfFD7b47Bfd17e52fB7559d3f924201b9DbfF3d",
-        "aTokenName": "Aave Ethereum 1INCH",
-        "aTokenSymbol": "aEth1INCH",
+        "aTokenName": "Aave Ethereum PSP",
+        "aTokenSymbol": "aEthPSP",
         "borrowCap": 60000,
         "borrowingEnabled": true,
         "debtCeiling": 0,
@@ -86,21 +86,21 @@
         "oracle": "0x72AFAECF99C9d9C8215fF44C77B94B99C28741e8",
         "oracleDecimals": 18,
         "oracleDescription": "1INCH / ETH",
-        "oracleLatestAnswer": 216287562682828,
+        "oracleLatestAnswer": 186571062207223,
         "reserveFactor": 1000,
         "stableBorrowRateEnabled": true,
-        "stableDebtToken": "0x7617d02E311CdE347A0cb45BB7DF2926BBaf5347",
+        "stableDebtToken": "0x61dFd349140C239d3B61fEe203Efc811b518a317",
         "stableDebtTokenImpl": "0x15C5620dfFaC7c7366EED66C20Ad222DDbB1eD57",
-        "stableDebtTokenName": "Aave Ethereum Stable Debt 1INCH",
-        "stableDebtTokenSymbol": "stableDebtEth1INCH",
+        "stableDebtTokenName": "Aave Ethereum Stable Debt PSP",
+        "stableDebtTokenSymbol": "stableDebtEthPSP",
         "supplyCap": 85000,
-        "symbol": "1INCH",
-        "underlying": "0x111111111117dC0aa78b770fA6A738034120C302",
+        "symbol": "PSP",
+        "underlying": "0xcAfE001067cDEF266AfB7Eb5A286dCFD277f3dE5",
         "usageAsCollateralEnabled": true,
-        "variableDebtToken": "0xd180D7fdD4092f07428eFE801E17BC03576b3192",
+        "variableDebtToken": "0x68e9f0aD4e6f8F5DB70F6923d4d6d5b225B83b16",
         "variableDebtTokenImpl": "0xaC725CB59D16C81061BDeA61041a8A5e73DA9EC6",
-        "variableDebtTokenName": "Aave Ethereum Variable Debt 1INCH",
-        "variableDebtTokenSymbol": "variableDebtEth1INCH"
+        "variableDebtTokenName": "Aave Ethereum Variable Debt PSP",
+        "variableDebtTokenSymbol": "variableDebtEthPSP"
       }
     }
   }

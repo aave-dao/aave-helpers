@@ -38,11 +38,11 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
   uint256 arbitrumFork;
 
   function setUp() public {
-    mainnetFork = vm.createSelectFork(vm.rpcUrl('mainnet'), 17326583);
-    optimismFork = vm.createSelectFork(vm.rpcUrl('optimism'), 100960572);
-    polygonFork = vm.createSelectFork(vm.rpcUrl('polygon'), 42811924);
-    avalancheFork = vm.createSelectFork(vm.rpcUrl('avalanche'), 30323695);
-    arbitrumFork = vm.createSelectFork(vm.rpcUrl('arbitrum'), 92866839);
+    mainnetFork = vm.createSelectFork(vm.rpcUrl('mainnet'), 18515746);
+    optimismFork = vm.createSelectFork(vm.rpcUrl('optimism'), 111854461);
+    polygonFork = vm.createSelectFork(vm.rpcUrl('polygon'), 49628607);
+    avalancheFork = vm.createSelectFork(vm.rpcUrl('avalanche'), 37426577);
+    arbitrumFork = vm.createSelectFork(vm.rpcUrl('arbitrum'), 147823152);
   }
 
   event CollateralConfigurationChanged(
@@ -171,8 +171,8 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
     diffReports('preTestEngineListingCustom', 'postTestEngineListingCustom');
 
     ReserveConfig memory expectedAssetConfig = ReserveConfig({
-      symbol: '1INCH',
-      underlying: 0x111111111117dC0aa78b770fA6A738034120C302,
+      symbol: 'PSP',
+      underlying: 0xcAfE001067cDEF266AfB7Eb5A286dCFD277f3dE5,
       aToken: address(0), // Mock, as they don't get validated, because of the "dynamic" deployment on proposal execution
       variableDebtToken: address(0), // Mock, as they don't get validated, because of the "dynamic" deployment on proposal execution
       stableDebtToken: address(0), // Mock, as they don't get validated, because of the "dynamic" deployment on proposal execution
@@ -205,7 +205,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
 
     _validateReserveTokensImpls(
       AaveV3Ethereum.POOL_ADDRESSES_PROVIDER,
-      _findReserveConfigBySymbol(allConfigsAfter, '1INCH'),
+      _findReserveConfigBySymbol(allConfigsAfter, 'PSP'),
       ReserveTokens({
         aToken: AaveV3Ethereum.DEFAULT_A_TOKEN_IMPL_REV_1,
         stableDebtToken: AaveV3Ethereum.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
@@ -215,7 +215,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
 
     _validateAssetSourceOnOracle(
       AaveV3Ethereum.POOL_ADDRESSES_PROVIDER,
-      0x111111111117dC0aa78b770fA6A738034120C302,
+      0xcAfE001067cDEF266AfB7Eb5A286dCFD277f3dE5,
       0x72AFAECF99C9d9C8215fF44C77B94B99C28741e8
     );
 
