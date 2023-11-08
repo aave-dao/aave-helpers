@@ -45,7 +45,7 @@ contract GovernanceV2_5Test is ProtocolV3TestBase {
     PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
     payloads[0] = GovV3Helpers.buildMainnetPayload(vm, actions);
     vm.startPrank(MiscEthereum.ECOSYSTEM_RESERVE);
-    uint256 proposalId = GovV3Helpers.createProposal2_5(payloads, 'hash');
+    uint256 proposalId = GovV3Helpers.createProposal2_5(vm, payloads, 'hash');
     vm.stopPrank();
 
     // 4. execute the proposal

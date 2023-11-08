@@ -478,27 +478,30 @@ library GovV3Helpers {
    * @param vm Vm
    * @param action actions array
    */
-  function buildBNBPayload(
-    Vm vm,
-    IPayloadsControllerCore.ExecutionAction memory action
-  ) internal returns (PayloadsControllerUtils.Payload memory) {
+  function buildBNBPayload(Vm vm, IPayloadsControllerCore.ExecutionAction memory action)
+    internal
+    returns (PayloadsControllerUtils.Payload memory)
+  {
     return _buildPayload(vm, ChainIds.BNB, action);
   }
 
   /**
    * @dev creates a proposal with multiple payloads
+   * @param vm Vm
    * @param payloads payloads array
    * @param ipfsHash ipfs hash
    */
   function createProposal(
+    Vm vm,
     PayloadsControllerUtils.Payload[] memory payloads,
     bytes32 ipfsHash
   ) internal returns (uint256) {
-    return createProposal(payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_POL, ipfsHash);
+    return createProposal(vm, payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_POL, ipfsHash);
   }
 
   // temporarily patched create proposal for governance v2.5
   function createProposal2_5(
+    Vm vm,
     PayloadsControllerUtils.Payload[] memory payloads,
     bytes32 ipfsHash
   ) internal returns (uint256) {
@@ -506,6 +509,7 @@ library GovV3Helpers {
     require(payloads.length != 0, 'MINIMUM_ONE_PAYLOAD');
     require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
 
+    generateProposalPreviewLink(vm, payloads, ipfsHash, address(0));
     GovHelpers.Payload[] memory gov2Payloads = new GovHelpers.Payload[](payloads.length);
     for (uint256 i = 0; i < payloads.length; i++) {
       gov2Payloads[i] = GovHelpers.Payload({
@@ -521,30 +525,34 @@ library GovV3Helpers {
 
   /**
    * @dev creates a proposal with a single payload
+   * @param vm Vm
    * @param payload payload
    * @param ipfsHash ipfs hash
    */
   function createProposal(
+    Vm vm,
     PayloadsControllerUtils.Payload memory payload,
     bytes32 ipfsHash
   ) internal returns (uint256) {
     PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](1);
     payloads[0] = payload;
-    return createProposal(payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_POL, ipfsHash);
+    return createProposal(vm, payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_POL, ipfsHash);
   }
 
   /**
    * @dev creates a proposal with a custom voting portal
+   * @param vm Vm
    * @param payloads payloads array
    * @param votingPortal address of the voting portal
    * @param ipfsHash ipfs hash
    */
   function createProposal(
+    Vm vm,
     PayloadsControllerUtils.Payload[] memory payloads,
     address votingPortal,
     bytes32 ipfsHash
   ) internal returns (uint256) {
-    return _createProposal(payloads, ipfsHash, votingPortal);
+    return _createProposal(vm, payloads, ipfsHash, votingPortal);
   }
 
   function getPayloadsController(uint256 chainId) internal pure returns (IPayloadsControllerCore) {
@@ -571,7 +579,41 @@ library GovV3Helpers {
     revert CannotFindPayloadsController();
   }
 
+  function generateProposalPreviewLink(
+    Vm vm,
+    PayloadsControllerUtils.Payload[] memory payloads,
+    bytes32 ipfsHash,
+    address votingPortal
+  ) public pure {
+    string memory payloadsStr;
+    for (uint256 i = 0; i < payloads.length; i++) {
+      string memory payloadBase = string.concat('&payload[', vm.toString(i), '].');
+      string memory payload = string.concat(
+        payloadBase,
+        'chain=',
+        vm.toString(payloads[i].chain),
+        payloadBase,
+        'accessLevel=',
+        vm.toString(uint8(payloads[i].accessLevel)),
+        payloadBase,
+        'payloadsController=',
+        vm.toString(payloads[i].payloadsController),
+        payloadBase,
+        'payloadId=',
+        vm.toString(payloads[i].payloadId)
+      );
+      payloadsStr = string.concat(payloadsStr, payload);
+    }
+    console2.log(
+      'https://example.com/proposal-preview?ipfsHash=%s&votingPortal=%s%s',
+      vm.toString(ipfsHash),
+      votingPortal,
+      payloadsStr
+    );
+  }
+
   function _createProposal(
+    Vm vm,
     PayloadsControllerUtils.Payload[] memory payloads,
     bytes32 ipfsHash,
     address votingPortal
@@ -581,6 +623,7 @@ library GovV3Helpers {
     require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
     require(votingPortal != address(0), 'INVALID_VOTING_PORTAL');
 
+    generateProposalPreviewLink(vm, payloads, ipfsHash, votingPortal);
     uint256 fee = GovernanceV3Ethereum.GOVERNANCE.getCancellationFee();
     console2.logBytes(
       abi.encodeWithSelector(

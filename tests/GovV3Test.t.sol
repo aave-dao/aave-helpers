@@ -145,7 +145,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     payloads[0] = GovV3Helpers.buildMainnetPayload(vm, actions);
     deal(MiscEthereum.ECOSYSTEM_RESERVE, 0.5e18);
     vm.startPrank(MiscEthereum.ECOSYSTEM_RESERVE);
-    GovV3Helpers.createProposal(payloads, 'hash');
+    GovV3Helpers.createProposal(vm, payloads, 'hash');
     vm.stopPrank();
   }
 
