@@ -590,7 +590,7 @@ library GovV3Helpers {
       string memory payloadBase = string.concat('&payload[', vm.toString(i), '].');
       string memory payload = string.concat(
         payloadBase,
-        'chain=',
+        'chainId=',
         vm.toString(payloads[i].chain),
         payloadBase,
         'accessLevel=',
