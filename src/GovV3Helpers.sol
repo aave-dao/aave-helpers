@@ -89,17 +89,15 @@ library GovV3Helpers {
     uint256 proposalId,
     address voter
   ) internal returns (IVotingMachineWithProofs.VotingBalanceProof[] memory) {
-    string[] memory inputs = new string[](10);
+    string[] memory inputs = new string[](8);
     inputs[0] = 'npx';
-    inputs[1] = '--yes';
-    inputs[2] = '-s';
-    inputs[3] = '@bgd-labs/aave-cli@0.0.27-0a01f2a07efe0ec4c875cf479004d20350235f64.0';
-    inputs[4] = 'governance';
-    inputs[5] = 'getVotingProofs';
-    inputs[6] = '--proposalId';
-    inputs[7] = vm.toString(proposalId);
-    inputs[8] = '--voter';
-    inputs[9] = vm.toString(voter);
+    inputs[1] = '@bgd-labs/aave-cli@0.1.0';
+    inputs[2] = 'governance';
+    inputs[3] = 'getVotingProofs';
+    inputs[4] = '--proposalId';
+    inputs[5] = vm.toString(proposalId);
+    inputs[6] = '--voter';
+    inputs[7] = vm.toString(voter);
     Vm.FfiResult memory f = vm.tryFfi(inputs);
     if (f.exitCode != 0) {
       console2.logString(string(f.stderr));
@@ -117,15 +115,13 @@ library GovV3Helpers {
     Vm vm,
     uint256 proposalId
   ) internal returns (StorageRootResponse[] memory) {
-    string[] memory inputs = new string[](8);
+    string[] memory inputs = new string[](6);
     inputs[0] = 'npx';
-    inputs[1] = '--yes';
-    inputs[2] = '-s';
-    inputs[3] = '@bgd-labs/aave-cli@0.0.27-0a01f2a07efe0ec4c875cf479004d20350235f64.0';
-    inputs[4] = 'governance';
-    inputs[5] = 'getStorageRoots';
-    inputs[6] = '--proposalId';
-    inputs[7] = vm.toString(proposalId);
+    inputs[1] = '@bgd-labs/aave-cli@0.1.0';
+    inputs[2] = 'governance';
+    inputs[3] = 'getStorageRoots';
+    inputs[4] = '--proposalId';
+    inputs[5] = vm.toString(proposalId);
     Vm.FfiResult memory f = vm.tryFfi(inputs);
     if (f.exitCode != 0) {
       console2.logString(string(f.stderr));

@@ -7,15 +7,13 @@ library IpfsUtils {
   error FfiFailed();
 
   function ipfsHashFile(Vm vm, string memory filePath, bool upload) internal returns (bytes32) {
-    string[] memory inputs = new string[](7);
+    string[] memory inputs = new string[](5);
     inputs[0] = 'npx';
-    inputs[1] = '--yes';
-    inputs[2] = '-s';
-    inputs[3] = '@bgd-labs/aave-cli@0.0.27-0a01f2a07efe0ec4c875cf479004d20350235f64.0';
-    inputs[4] = 'ipfs';
-    inputs[5] = filePath;
+    inputs[1] = '@bgd-labs/aave-cli@0.1.0';
+    inputs[2] = 'ipfs';
+    inputs[3] = filePath;
     if (upload) {
-      inputs[6] = '-u';
+      inputs[4] = '-u';
     }
     Vm.FfiResult memory f = vm.tryFfi(inputs);
     if (f.exitCode != 0) {
