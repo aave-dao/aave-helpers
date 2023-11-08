@@ -379,6 +379,12 @@ contract ProtocolV2TestBase is CommonTestBase {
       'poolConfiguratorImpl',
       ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, address(configurator))
     );
+    address lendingPoolCollateralManager = addressesProvider.getLendingPoolCollateralManager();
+    vm.serializeAddress(
+      poolConfigKey,
+      'lendingPoolCollateralManager',
+      address(lendingPoolCollateralManager)
+    );
 
     // PoolDaraProvider
     IAaveProtocolDataProvider pdp = IAaveProtocolDataProvider(

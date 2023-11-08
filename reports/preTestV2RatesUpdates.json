@@ -1,6 +1,7 @@
 {
   "chainId": 1,
   "poolConfig": {
+    "lendingPoolCollateralManager": "0xbd4765210d4167CE2A5b87280D9E8Ee316D5EC7C",
     "oracle": "0xA50ba011c48153De246E5192C8f9258A2ba79Ca9",
     "pool": "0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9",
     "poolAddressesProvider": "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5",
