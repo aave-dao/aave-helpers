@@ -76,6 +76,15 @@ contract ProtocolV3TestBase is CommonTestBase {
     IPool pool,
     address payload
   ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
+    return defaultTest(reportName, pool, payload, true);
+  }
+
+  function defaultTest(
+    string memory reportName,
+    IPool pool,
+    address payload,
+    bool runE2E
+  ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
     string memory beforeString = string(abi.encodePacked(reportName, '_before'));
     ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
 
@@ -88,7 +97,7 @@ contract ProtocolV3TestBase is CommonTestBase {
 
     configChangePlausibilityTest(configBefore, configAfter);
 
-    e2eTest(pool);
+    if (runE2E) e2eTest(pool);
     return (configBefore, configAfter);
   }
 

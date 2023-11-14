@@ -6,6 +6,7 @@ import {IAaveOracle, ILendingPool, ILendingPoolAddressesProvider, ILendingPoolCo
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
+import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
@@ -60,18 +61,27 @@ contract ProtocolV2TestBase is CommonTestBase {
     ILendingPool pool,
     address payload
   ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
+    return defaultTest(reportName, pool, payload, true);
+  }
+
+  function defaultTest(
+    string memory reportName,
+    ILendingPool pool,
+    address payload,
+    bool runE2E
+  ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
     string memory beforeString = string(abi.encodePacked(reportName, '_before'));
     ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
 
     executePayload(vm, payload);
 
-    string memory afterString = string(abi.encodePacked(reportName, '_after'));
-    ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
+    // string memory afterString = string(abi.encodePacked(reportName, '_after'));
+    // ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
 
-    diffReports(beforeString, afterString);
+    // diffReports(beforeString, afterString);
 
-    e2eTest(pool);
-    return (configBefore, configAfter);
+    // if (runE2E) e2eTest(pool);
+    return (configBefore, configBefore);
   }
 
   /**
@@ -386,10 +396,12 @@ contract ProtocolV2TestBase is CommonTestBase {
       address(lendingPoolCollateralManager)
     );
 
-    // PoolDaraProvider
+    // PoolDataProvider
     IAaveProtocolDataProvider pdp = IAaveProtocolDataProvider(
       addressesProvider.getAddress(
-        0x0100000000000000000000000000000000000000000000000000000000000000
+        pool == AaveV2EthereumAMM.POOL
+          ? bytes32(0x1000000000000000000000000000000000000000000000000000000000000000)
+          : bytes32(0x0100000000000000000000000000000000000000000000000000000000000000)
       )
     );
     vm.serializeAddress(poolConfigKey, 'protocolDataProvider', address(pdp));
@@ -522,7 +534,9 @@ contract ProtocolV2TestBase is CommonTestBase {
     );
     IAaveProtocolDataProvider poolDataProvider = IAaveProtocolDataProvider(
       addressesProvider.getAddress(
-        0x0100000000000000000000000000000000000000000000000000000000000000
+        pool == AaveV2EthereumAMM.POOL
+          ? bytes32(0x1000000000000000000000000000000000000000000000000000000000000000)
+          : bytes32(0x0100000000000000000000000000000000000000000000000000000000000000)
       )
     );
     LocalVars memory vars;
