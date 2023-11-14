@@ -75,13 +75,13 @@ contract ProtocolV2TestBase is CommonTestBase {
 
     executePayload(vm, payload);
 
-    // string memory afterString = string(abi.encodePacked(reportName, '_after'));
-    // ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
+    string memory afterString = string(abi.encodePacked(reportName, '_after'));
+    ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
 
-    // diffReports(beforeString, afterString);
+    diffReports(beforeString, afterString);
 
-    // if (runE2E) e2eTest(pool);
-    return (configBefore, configBefore);
+    if (runE2E) e2eTest(pool);
+    return (configBefore, configAfter);
   }
 
   /**
