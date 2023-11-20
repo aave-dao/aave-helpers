@@ -79,7 +79,7 @@ library DeployEngineOptLib {
         new Engine(
           AaveV3Optimism.DEFAULT_A_TOKEN_IMPL_REV_2,
           AaveV3Optimism.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
-          AaveV3Optimism.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
+          AaveV3Optimism.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_3,
           engineConstants,
           engineLibraries
         )
@@ -112,7 +112,7 @@ library DeployEngineArbLib {
         new Engine(
           AaveV3Arbitrum.DEFAULT_A_TOKEN_IMPL_REV_2,
           AaveV3Arbitrum.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
-          AaveV3Arbitrum.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
+          AaveV3Arbitrum.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_3,
           engineConstants,
           engineLibraries
         )
@@ -145,7 +145,7 @@ library DeployEnginePolLib {
         new Engine(
           AaveV3Polygon.DEFAULT_A_TOKEN_IMPL_REV_2,
           AaveV3Polygon.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
-          AaveV3Polygon.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
+          AaveV3Polygon.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_3,
           engineConstants,
           engineLibraries
         )
@@ -178,7 +178,7 @@ library DeployEngineAvaLib {
         new Engine(
           AaveV3Avalanche.DEFAULT_A_TOKEN_IMPL_REV_2,
           AaveV3Avalanche.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2,
-          AaveV3Avalanche.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
+          AaveV3Avalanche.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_3,
           engineConstants,
           engineLibraries
         )

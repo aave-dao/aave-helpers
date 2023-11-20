@@ -40,7 +40,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
   function setUp() public {
     mainnetFork = vm.createSelectFork(vm.rpcUrl('mainnet'), 18515746);
     optimismFork = vm.createSelectFork(vm.rpcUrl('optimism'), 111854461);
-    polygonFork = vm.createSelectFork(vm.rpcUrl('polygon'), 49628607);
+    polygonFork = vm.createSelectFork(vm.rpcUrl('polygon'), 50170881);
     avalancheFork = vm.createSelectFork(vm.rpcUrl('avalanche'), 37426577);
     arbitrumFork = vm.createSelectFork(vm.rpcUrl('arbitrum'), 147823152);
   }
@@ -123,7 +123,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
       _findReserveConfigBySymbol(allConfigsAfter, '1INCH'),
       ReserveTokens({
         aToken: AaveV3Polygon.DEFAULT_A_TOKEN_IMPL_REV_2,
-        stableDebtToken: AaveV3Polygon.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
+        stableDebtToken: AaveV3Polygon.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_3,
         variableDebtToken: AaveV3Polygon.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2
       })
     );
@@ -137,10 +137,10 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
     // impl should be same as e.g. AAVE
     _validateReserveTokensImpls(
       AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
-      _findReserveConfigBySymbol(allConfigsAfter, 'AAVE'),
+      _findReserveConfigBySymbol(allConfigsAfter, 'CRV'),
       ReserveTokens({
         aToken: AaveV3Polygon.DEFAULT_A_TOKEN_IMPL_REV_2,
-        stableDebtToken: AaveV3Polygon.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_2,
+        stableDebtToken: AaveV3Polygon.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_3,
         variableDebtToken: AaveV3Polygon.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_2
       })
     );
