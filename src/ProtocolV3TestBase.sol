@@ -317,6 +317,8 @@ contract ProtocolV3TestBase is CommonTestBase {
         configs[i].usageAsCollateralEnabled &&
         // not stable borrowable as this makes testing stable borrowing unnecessary hard to reason about
         !configs[i].stableBorrowRateEnabled &&
+        // not isolated asset as we can only borrow stablecoins against it
+        configs[i].debtCeiling == 0 &&
         // supply cap not yet reached
         ((configs[i].supplyCap * 10 ** configs[i].decimals) >
           IERC20(configs[i].aToken).totalSupply()) &&
