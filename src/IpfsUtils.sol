@@ -21,15 +21,6 @@ library IpfsUtils {
       revert FfiFailed();
     }
     require(f.stdout.length != 0, 'CALCULATED_HASH_IS_ZERO');
-    console2.logString('Info: This preview will only work when the file has been uploaded to ipfs');
-    console2.logString(
-      string(
-        abi.encodePacked(
-          'Preview: https://app.aave.com/governance/ipfs-preview/?ipfsHash=',
-          vm.toString(f.stdout)
-        )
-      )
-    );
     return bytes32(f.stdout);
   }
 }
