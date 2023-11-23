@@ -603,7 +603,7 @@ library GovV3Helpers {
       payloadsStr = string.concat(payloadsStr, payload);
     }
     console2.log(
-      'https://aave-governance-v3-interface-git-feat-create-ui-bgd-labs.vercel.app/createByParams?ipfsHash=%s&votingPortal=%s%s',
+      'https://aave-governance-v3-interface.vercel.app/createByParams?ipfsHash=%s&votingPortal=%s%s',
       vm.toString(ipfsHash),
       votingPortal,
       payloadsStr
