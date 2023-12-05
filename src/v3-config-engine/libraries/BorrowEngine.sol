@@ -60,7 +60,7 @@ library BorrowEngine {
       // The reserve factor should always be > 0
       require(
         (updates[i].reserveFactor > 0 && updates[i].reserveFactor <= 100_00) ||
-          updates[i].reserveFactor != EngineFlags.KEEP_CURRENT,
+          updates[i].reserveFactor == EngineFlags.KEEP_CURRENT,
         'INVALID_RESERVE_FACTOR'
       );
 
