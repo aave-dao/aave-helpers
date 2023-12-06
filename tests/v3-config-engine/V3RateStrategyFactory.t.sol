@@ -12,7 +12,7 @@ contract V3RateStrategyFactoryTest is ProtocolV3TestBase {
   V3RateStrategyFactory rateStrategyFactory;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 17370731);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 18726128);
     rateStrategyFactory = new V3RateStrategyFactory(AaveV3Ethereum.POOL_ADDRESSES_PROVIDER);
   }
 
