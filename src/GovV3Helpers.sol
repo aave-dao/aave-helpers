@@ -22,6 +22,7 @@ import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {GovHelpers, IAaveGovernanceV2} from './GovHelpers.sol';
+import {Create2Utils} from './ScriptUtils.sol';
 
 interface IGovernance_V2_5 {
   /**
@@ -151,6 +152,32 @@ library GovV3Helpers {
     uint256 chainId = IVotingPortal(proposal.votingPortal).VOTING_MACHINE_CHAIN_ID();
     ChainHelpers.selectChain(vm, chainId);
     IVotingMachineWithProofs(machine).submitVote(proposalId, support, votingBalanceProofs);
+  }
+
+  /**
+   * Helper function to abstract away the consistent salt from the users
+   */
+  function deployDeterministic(bytes memory bytecode) internal pure returns (address) {
+    Create2Utils.create2Deploy('v1', bytecode);
+  }
+
+  /**
+   * @dev builds a action to be registered on a payloadsController
+   * - assumes accesscontrol level 1
+   * - assumes delegateCall true
+   * - assumes standard `execute()` signature on the payload contract
+   * - assumes eth value 0
+   * - assumes no calldata being necessary
+   * @param bytecode bytecode of the payload to be executed
+   */
+  function buildAction(
+    bytes memory bytecode
+  ) internal pure returns (IPayloadsControllerCore.ExecutionAction memory) {
+    address payloadAddress = Create2Utils.computeCreate2Address(
+      'v1',
+      keccak256(abi.encodePacked(bytecode))
+    );
+    return buildAction(payloadAddress);
   }
 
   /**
