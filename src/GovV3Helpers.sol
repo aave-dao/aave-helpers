@@ -158,7 +158,7 @@ library GovV3Helpers {
    * Helper function to abstract away the consistent salt from the users
    */
   function deployDeterministic(bytes memory bytecode) internal returns (address) {
-    Create2Utils.create2Deploy('v1', bytecode);
+    return Create2Utils.create2Deploy('v1', bytecode);
   }
 
   /**
