@@ -231,7 +231,7 @@ contract ProtocolV3TestBase is CommonTestBase {
           testAssetConfig.supplyCap > 0
             ? testAssetConfig.supplyCap * 10 ** testAssetConfig.decimals
             : type(uint256).max
-        ) < IERC20(testAssetConfig.aToken).totalSupply() + testAssetAmount
+        ) <= IERC20(testAssetConfig.aToken).totalSupply() + testAssetAmount
       ) {
         console.log('Skip: %s, supply cap fully utilized', testAssetConfig.symbol);
         return;
@@ -251,8 +251,11 @@ contract ProtocolV3TestBase is CommonTestBase {
       // test variable borrowing
       if (testAssetConfig.borrowingEnabled) {
         if (
-          (testAssetConfig.borrowCap * 10 ** testAssetConfig.decimals) <
-          IERC20(testAssetConfig.variableDebtToken).totalSupply() + testAssetAmount
+          (
+            testAssetConfig.borrowCap > 0
+              ? testAssetConfig.borrowCap * 10 ** testAssetConfig.decimals
+              : type(uint256).max
+          ) <= IERC20(testAssetConfig.variableDebtToken).totalSupply() + testAssetAmount
         ) {
           console.log('Skip Borrowing: %s, borrow cap fully utilized', testAssetConfig.symbol);
           return;
