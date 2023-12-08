@@ -112,7 +112,9 @@ contract ProtocolV3TestBase is CommonTestBase {
       if (i < configsBeforeLength) {
         // borrow increase should only happen on assets with borrowing enabled
         // unless it is setting a borrow cap for the first time
-        if (configBefore[i].borrowCap < configAfter[i].borrowCap && configBefore[i].borrowCap != 0) {
+        if (
+          configBefore[i].borrowCap < configAfter[i].borrowCap && configBefore[i].borrowCap != 0
+        ) {
           require(configAfter[i].borrowingEnabled, 'PL_BORROW_CAP_BORROW_DISABLED');
         }
       } else {
@@ -225,8 +227,11 @@ contract ProtocolV3TestBase is CommonTestBase {
       }
     } else {
       if (
-        (testAssetConfig.supplyCap * 10 ** testAssetConfig.decimals) <
-        IERC20(testAssetConfig.aToken).totalSupply() + testAssetAmount
+        (
+          testAssetConfig.supplyCap > 0
+            ? testAssetConfig.supplyCap * 10 ** testAssetConfig.decimals
+            : type(uint256).max
+        ) < IERC20(testAssetConfig.aToken).totalSupply() + testAssetAmount
       ) {
         console.log('Skip: %s, supply cap fully utilized', testAssetConfig.symbol);
         return;
@@ -320,10 +325,17 @@ contract ProtocolV3TestBase is CommonTestBase {
         // not isolated asset as we can only borrow stablecoins against it
         configs[i].debtCeiling == 0 &&
         // supply cap not yet reached
-        ((configs[i].supplyCap * 10 ** configs[i].decimals) >
-          IERC20(configs[i].aToken).totalSupply()) &&
-        (// supply cap margin big enough
-        (configs[i].supplyCap * 10 ** configs[i].decimals) -
+        ((
+          configs[i].supplyCap > 0
+            ? configs[i].supplyCap * 10 ** configs[i].decimals
+            : type(uint256).max
+        ) > IERC20(configs[i].aToken).totalSupply()) &&
+        // supply cap margin big enough
+        ((
+          configs[i].supplyCap > 0
+            ? configs[i].supplyCap * 10 ** configs[i].decimals
+            : type(uint256).max
+        ) -
           IERC20(configs[i].aToken).totalSupply() >
           _getTokenAmountByDollarValue(pool, configs[i], minSupplyCapDollarMargin))
       ) return configs[i];
