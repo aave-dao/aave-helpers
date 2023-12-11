@@ -180,7 +180,7 @@ contract ProtocolV3TestBase is CommonTestBase {
    */
   function e2eTest(IPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    ReserveConfig memory collateralConfig = _getGoodCollateral(pool, configs);
+    ReserveConfig memory collateralConfig = _getGoodCollateral(configs);
     uint256 snapshot = vm.snapshot();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
@@ -304,7 +304,6 @@ contract ProtocolV3TestBase is CommonTestBase {
    * @dev returns a "good" collateral in the list that cannot be borrowed in stable mode
    */
   function _getGoodCollateral(
-    IPool pool,
     ReserveConfig[] memory configs
   ) private pure returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
