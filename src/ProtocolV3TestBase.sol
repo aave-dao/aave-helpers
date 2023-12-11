@@ -306,7 +306,7 @@ contract ProtocolV3TestBase is CommonTestBase {
   function _getGoodCollateral(
     IPool pool,
     ReserveConfig[] memory configs
-  ) private view returns (ReserveConfig memory config) {
+  ) private pure returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
       if (
         // not frozen etc
