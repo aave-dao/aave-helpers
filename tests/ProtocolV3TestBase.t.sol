@@ -70,7 +70,7 @@ contract ProtocolV3TestE2ETestAll is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestAllMainnet is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('mainnet', 17990597);
+    vm.createSelectFork('mainnet', 18763779);
   }
 
   function test_e2e() public {

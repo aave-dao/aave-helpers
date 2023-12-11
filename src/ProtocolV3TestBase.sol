@@ -112,7 +112,9 @@ contract ProtocolV3TestBase is CommonTestBase {
       if (i < configsBeforeLength) {
         // borrow increase should only happen on assets with borrowing enabled
         // unless it is setting a borrow cap for the first time
-        if (configBefore[i].borrowCap < configAfter[i].borrowCap && configBefore[i].borrowCap != 0) {
+        if (
+          configBefore[i].borrowCap < configAfter[i].borrowCap && configBefore[i].borrowCap != 0
+        ) {
           require(configAfter[i].borrowingEnabled, 'PL_BORROW_CAP_BORROW_DISABLED');
         }
       } else {
@@ -178,7 +180,7 @@ contract ProtocolV3TestBase is CommonTestBase {
    */
   function e2eTest(IPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    ReserveConfig memory collateralConfig = _getGoodCollateral(pool, configs, 1000);
+    ReserveConfig memory collateralConfig = _getGoodCollateral(pool, configs);
     uint256 snapshot = vm.snapshot();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
@@ -203,15 +205,24 @@ contract ProtocolV3TestBase is CommonTestBase {
     address collateralSupplier = vm.addr(3);
     address testAssetSupplier = vm.addr(4);
     require(collateralConfig.usageAsCollateralEnabled, 'COLLATERAL_CONFIG_MUST_BE_COLLATERAL');
-    uint256 testAssetAmount = _getTokenAmountByDollarValue(pool, testAssetConfig, 100);
+    uint256 collateralAssetAmount = _getTokenAmountByDollarValue(pool, collateralConfig, 100000);
+    uint256 testAssetAmount = _getTokenAmountByDollarValue(pool, testAssetConfig, 1000);
+
+    // remove caps as they should not prevent testing
+    IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
+    IPoolConfigurator poolConfigurator = IPoolConfigurator(addressesProvider.getPoolConfigurator());
+    vm.startPrank(addressesProvider.getACLAdmin());
+    if (collateralConfig.supplyCap != 0)
+      poolConfigurator.setSupplyCap(testAssetConfig.underlying, 0);
+    if (testAssetConfig.supplyCap != 0)
+      poolConfigurator.setSupplyCap(testAssetConfig.underlying, 0);
+    if (testAssetConfig.borrowCap != 0)
+      poolConfigurator.setBorrowCap(testAssetConfig.underlying, 0);
+    vm.stopPrank();
+
     // GHO is a special case as it cannot be supplied
     if (testAssetConfig.underlying == AaveV3EthereumAssets.GHO_UNDERLYING) {
-      _deposit(
-        collateralConfig,
-        pool,
-        collateralSupplier,
-        _getTokenAmountByDollarValue(pool, collateralConfig, 10000)
-      );
+      _deposit(collateralConfig, pool, collateralSupplier, collateralAssetAmount);
       uint256 snapshot = vm.snapshot();
       // test variable borrowing
       if (testAssetConfig.borrowingEnabled) {
@@ -224,19 +235,7 @@ contract ProtocolV3TestBase is CommonTestBase {
         }
       }
     } else {
-      if (
-        (testAssetConfig.supplyCap * 10 ** testAssetConfig.decimals) <
-        IERC20(testAssetConfig.aToken).totalSupply() + testAssetAmount
-      ) {
-        console.log('Skip: %s, supply cap fully utilized', testAssetConfig.symbol);
-        return;
-      }
-      _deposit(
-        collateralConfig,
-        pool,
-        collateralSupplier,
-        _getTokenAmountByDollarValue(pool, collateralConfig, 10000)
-      );
+      _deposit(collateralConfig, pool, collateralSupplier, collateralAssetAmount);
       _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
       uint256 snapshot = vm.snapshot();
       // test withdrawal
@@ -306,8 +305,7 @@ contract ProtocolV3TestBase is CommonTestBase {
    */
   function _getGoodCollateral(
     IPool pool,
-    ReserveConfig[] memory configs,
-    uint256 minSupplyCapDollarMargin
+    ReserveConfig[] memory configs
   ) private view returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
       if (
@@ -318,14 +316,7 @@ contract ProtocolV3TestBase is CommonTestBase {
         // not stable borrowable as this makes testing stable borrowing unnecessary hard to reason about
         !configs[i].stableBorrowRateEnabled &&
         // not isolated asset as we can only borrow stablecoins against it
-        configs[i].debtCeiling == 0 &&
-        // supply cap not yet reached
-        ((configs[i].supplyCap * 10 ** configs[i].decimals) >
-          IERC20(configs[i].aToken).totalSupply()) &&
-        (// supply cap margin big enough
-        (configs[i].supplyCap * 10 ** configs[i].decimals) -
-          IERC20(configs[i].aToken).totalSupply() >
-          _getTokenAmountByDollarValue(pool, configs[i], minSupplyCapDollarMargin))
+        configs[i].debtCeiling == 0
       ) return configs[i];
     }
     revert('ERROR: No usable collateral found');
