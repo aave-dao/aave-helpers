@@ -165,7 +165,7 @@ library GovV3Helpers {
    * Predicts the payload based on a constant salt
    */
   function predictDeterministicAddress(bytes memory bytecode) internal pure returns (address) {
-    return Create2Utils.computeCreate2Address('v1', keccak256(abi.encodePacked(bytecode)));
+    return Create2Utils.computeCreate2Address('v1', bytecode);
   }
 
   /**

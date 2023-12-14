@@ -112,6 +112,13 @@ library Create2Utils {
       );
   }
 
+  function computeCreate2Address(
+    bytes32 salt,
+    bytes memory bytecode
+  ) internal pure returns (address) {
+    return computeCreate2Address(salt, keccak256(abi.encodePacked(bytecode)));
+  }
+
   function addressFromLast20Bytes(bytes32 bytesValue) internal pure returns (address) {
     return address(uint160(uint256(bytesValue)));
   }
