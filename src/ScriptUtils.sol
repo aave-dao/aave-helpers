@@ -84,7 +84,7 @@ library Create2Utils {
     if (isContractDeployed(CREATE2_FACTORY) == false) {
       revert('MISSING_CREATE2_FACTORY');
     }
-    address computed = computeCreate2Address(salt, keccak256(abi.encodePacked(bytecode)));
+    address computed = computeCreate2Address(salt, bytecode);
 
     if (isContractDeployed(computed)) {
       return computed;
