@@ -155,7 +155,7 @@ library GovV3Helpers {
   }
 
   /**
-   * Deployes a contract with a constant salt
+   * Deploys a contract with a constant salt
    */
   function deployDeterministic(bytes memory bytecode) internal returns (address) {
     return Create2Utils.create2Deploy('v1', bytecode);
