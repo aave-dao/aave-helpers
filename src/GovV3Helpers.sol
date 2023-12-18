@@ -93,7 +93,7 @@ library GovV3Helpers {
   ) internal returns (IVotingMachineWithProofs.VotingBalanceProof[] memory) {
     string[] memory inputs = new string[](8);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@0.1.0';
+    inputs[1] = '@bgd-labs/aave-cli@0.2.1';
     inputs[2] = 'governance';
     inputs[3] = 'getVotingProofs';
     inputs[4] = '--proposalId';
@@ -119,7 +119,7 @@ library GovV3Helpers {
   ) internal returns (StorageRootResponse[] memory) {
     string[] memory inputs = new string[](6);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@0.1.0';
+    inputs[1] = '@bgd-labs/aave-cli@0.2.1';
     inputs[2] = 'governance';
     inputs[3] = 'getStorageRoots';
     inputs[4] = '--proposalId';
@@ -526,6 +526,16 @@ library GovV3Helpers {
     bytes32 ipfsHash
   ) internal returns (uint256) {
     return createProposal(vm, payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_POL, ipfsHash);
+  }
+
+  /**
+   * @dev Executes an already created proposal on governance v3 by manipulating stororage so it#s executable in the current block.
+   * @param vm Vm
+   * @param proposalId id of the proposal to execute
+   */
+  function executeProposal(Vm vm, uint256 proposalId) internal {
+    GovV3StorageHelpers.readyProposal(vm, proposalId);
+    GovernanceV3Ethereum.GOVERNANCE.executeProposal(proposalId);
   }
 
   function build2_5Payload(
