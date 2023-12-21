@@ -68,6 +68,20 @@ contract ProtocolV3TestE2ETestAll is ProtocolV3TestBase {
   }
 }
 
+contract ProtocolV3TestE2ETestAvalancheAll is ProtocolV3TestBase {
+  function setUp() public {
+    vm.createSelectFork('avalanche', 38700698);
+  }
+
+  function test_e2e() public {
+    e2eTest(AaveV3Optimism.POOL);
+  }
+
+  function test_deal() public {
+    deal(0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E, address(this), 1000);
+  }
+}
+
 contract ProtocolV3TestE2ETestAllMainnet is ProtocolV3TestBase {
   function setUp() public {
     vm.createSelectFork('mainnet', 18763779);

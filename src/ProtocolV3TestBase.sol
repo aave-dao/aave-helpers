@@ -198,9 +198,10 @@ contract ProtocolV3TestBase is CommonTestBase {
     ReserveConfig memory testAssetConfig
   ) public {
     console.log(
-      'E2E: Collateral %s, TestAsset %s',
+      'E2E: Collateral %s, TestAsset %s(%s)',
       collateralConfig.symbol,
-      testAssetConfig.symbol
+      testAssetConfig.symbol,
+      testAssetConfig.underlying
     );
     address collateralSupplier = vm.addr(3);
     address testAssetSupplier = vm.addr(4);
