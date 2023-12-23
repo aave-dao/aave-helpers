@@ -97,7 +97,7 @@ contract CommonTestBase is Test {
         return true;
       }
       if (asset == AaveV3OptimismAssets.USDCn_UNDERLYING) {
-        vm.startPrank(0xf491d040110384dbcf7f241ffe2a546513fd873d);
+        vm.startPrank(0xf491d040110384DBcf7F241fFE2A546513fD873d);
         IERC20(asset).transfer(user, amount);
         return true;
       }
@@ -119,15 +119,15 @@ contract CommonTestBase is Test {
       }
     }
     if (block.chainid == ChainIds.AVALANCHE) {
-      if (asset == AaveV3AvalancheAssets.USDCn_UNDERLYING) {
+      if (asset == AaveV3AvalancheAssets.USDC_UNDERLYING) {
         vm.startPrank(0x9f8c163cBA728e99993ABe7495F06c0A3c8Ac8b9);
         IERC20(asset).transfer(user, amount);
         return true;
       }
     }
     if (block.chainid == ChainIds.BASE) {
-      if (asset == AaveV3BaseAssets.USDCn_UNDERLYING) {
-        vm.startPrank(0x20fe51a9229eef2cf8ad9e89d91cab9312cf3b7a);
+      if (asset == AaveV3BaseAssets.USDC_UNDERLYING) {
+        vm.startPrank(0x20FE51A9229EEf2cF8Ad9E89d91CAb9312cF3b7A);
         IERC20(asset).transfer(user, amount);
         return true;
       }
