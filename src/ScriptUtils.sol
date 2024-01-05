@@ -72,6 +72,14 @@ abstract contract GnosisScript is WithChainIdValidation {
   constructor() WithChainIdValidation(ChainIds.GNOSIS) {}
 }
 
+abstract contract ScrollScript is WithChainIdValidation {
+  constructor() WithChainIdValidation(ChainIds.SCROLL) {}
+}
+
+abstract contract ZkEVMScript is WithChainIdValidation {
+  constructor() WithChainIdValidation(ChainIds.ZK_EVM) {}
+}
+
 abstract contract SepoliaScript is WithChainIdValidation {
   constructor() WithChainIdValidation(ChainIds.SEPOLIA) {}
 }
