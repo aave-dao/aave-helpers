@@ -18,6 +18,7 @@ library ChainIds {
   uint256 internal constant SCROLL = 534352;
   uint256 internal constant SEPOLIA = 11155111;
   uint256 internal constant HARMONY = 1666600000;
+  uint256 internal constant SCROLL = 534352;
 }
 
 library ChainHelpers {
@@ -57,6 +58,8 @@ library ChainHelpers {
       newFork = vm.createSelectFork(vm.rpcUrl('sepolia'));
     } else if (chainId == ChainIds.HARMONY) {
       newFork = vm.createSelectFork(vm.rpcUrl('harmony'));
+    } else if (chainId == ChainIds.SCROLL) {
+      newFork = vm.createSelectFork(vm.rpcUrl('scroll'));
     } else {
       revert UnknownChainId();
     }
