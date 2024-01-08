@@ -5,7 +5,7 @@ import '../src/ScriptUtils.sol';
 import {AaveV3ConfigEngine as Engine} from '../src/v3-config-engine/AaveV3ConfigEngine.sol';
 import {IAaveV3ConfigEngine as IEngine} from '../src/v3-config-engine/IAaveV3ConfigEngine.sol';
 import {IV3RateStrategyFactory} from '../src/v3-config-engine/IV3RateStrategyFactory.sol';
-import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
+import {AaveV3Ethereum, IPool, IPoolConfigurator, IAaveOracle} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV3BNB} from 'aave-address-book/AaveV3BNB.sol';
 import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
@@ -14,6 +14,7 @@ import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
 import {AaveV3Gnosis} from 'aave-address-book/AaveV3Gnosis.sol';
 import {AaveV3Base} from 'aave-address-book/AaveV3Base.sol';
+import {AaveV3Scroll} from 'aave-address-book/AaveV3Scroll.sol';
 import {CapsEngine} from '../src/v3-config-engine/libraries/CapsEngine.sol';
 import {BorrowEngine} from '../src/v3-config-engine/libraries/BorrowEngine.sol';
 import {CollateralEngine} from '../src/v3-config-engine/libraries/CollateralEngine.sol';
@@ -319,6 +320,39 @@ library DeployEngineBnbLib {
   }
 }
 
+library DeployEngineScrollLib {
+  function deploy() internal returns (address) {
+    IEngine.EngineLibraries memory engineLibraries = IEngine.EngineLibraries({
+      listingEngine: Create2Utils.create2Deploy('v1', type(ListingEngine).creationCode),
+      eModeEngine: Create2Utils.create2Deploy('v1', type(EModeEngine).creationCode),
+      borrowEngine: Create2Utils.create2Deploy('v1', type(BorrowEngine).creationCode),
+      collateralEngine: Create2Utils.create2Deploy('v1', type(CollateralEngine).creationCode),
+      priceFeedEngine: Create2Utils.create2Deploy('v1', type(PriceFeedEngine).creationCode),
+      rateEngine: Create2Utils.create2Deploy('v1', type(RateEngine).creationCode),
+      capsEngine: Create2Utils.create2Deploy('v1', type(CapsEngine).creationCode)
+    });
+    IEngine.EngineConstants memory engineConstants = IEngine.EngineConstants({
+      pool: AaveV3Scroll.POOL,
+      poolConfigurator: AaveV3Scroll.POOL_CONFIGURATOR,
+      ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Scroll.RATES_FACTORY),
+      oracle: AaveV3Scroll.ORACLE,
+      rewardsController: AaveV3Scroll.DEFAULT_INCENTIVES_CONTROLLER,
+      collector: address(AaveV3Scroll.COLLECTOR)
+    });
+
+    return
+      address(
+        new Engine(
+          AaveV3Scroll.DEFAULT_A_TOKEN_IMPL_REV_1,
+          AaveV3Scroll.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
+          AaveV3Scroll.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
+          engineConstants,
+          engineLibraries
+        )
+      );
+  }
+}
+
 contract DeployEngineEth is EthereumScript {
   function run() external broadcast {
     DeployEngineEthLib.deploy();
@@ -370,5 +404,11 @@ contract DeployEngineGno is GnosisScript {
 contract DeployEngineBnb is BNBScript {
   function run() external broadcast {
     DeployEngineBnbLib.deploy();
+  }
+}
+
+contract DeployEngineScroll is ScrollScript {
+  function run() external broadcast {
+    DeployEngineScrollLib.deploy();
   }
 }

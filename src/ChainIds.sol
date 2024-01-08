@@ -15,6 +15,7 @@ library ChainIds {
   uint256 internal constant ARBITRUM = 42161;
   uint256 internal constant AVALANCHE = 43114;
   uint256 internal constant GNOSIS = 100;
+  uint256 internal constant SCROLL = 534352;
   uint256 internal constant SEPOLIA = 11155111;
   uint256 internal constant HARMONY = 1666600000;
 }
@@ -46,6 +47,8 @@ library ChainHelpers {
       newFork = vm.createSelectFork(vm.rpcUrl('base'));
     } else if (chainId == ChainIds.GNOSIS) {
       newFork = vm.createSelectFork(vm.rpcUrl('gnosis'));
+    }  else if (chainId == ChainIds.SCROLL) {
+      newFork = vm.createSelectFork(vm.rpcUrl('scroll'));
     } else if (chainId == ChainIds.ARBITRUM) {
       newFork = vm.createSelectFork(vm.rpcUrl('arbitrum'));
     } else if (chainId == ChainIds.AVALANCHE) {
