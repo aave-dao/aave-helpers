@@ -8,6 +8,11 @@ import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
+import {AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
+import {AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
+import {AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
+import {AaveV3GnosisAssets} from 'aave-address-book/AaveV3Gnosis.sol';
+import {AaveV3BaseAssets} from 'aave-address-book/AaveV3Base.sol';
 import {ChainIds} from './ChainIds.sol';
 import {GovV3Helpers} from './GovV3Helpers.sol';
 
@@ -80,6 +85,11 @@ contract CommonTestBase is Test {
         IERC20(asset).transfer(user, amount);
         return true;
       }
+      if (asset == AaveV3EthereumAssets.USDC_UNDERLYING) {
+        vm.startPrank(0xcEe284F754E854890e311e3280b767F80797180d);
+        IERC20(asset).transfer(user, amount);
+        return true;
+      }
     }
     if (block.chainid == ChainIds.OPTIMISM) {
       // sUSD
@@ -88,12 +98,43 @@ contract CommonTestBase is Test {
         IERC20(asset).transfer(user, amount);
         return true;
       }
+      if (asset == AaveV3OptimismAssets.USDCn_UNDERLYING) {
+        vm.startPrank(0xf491d040110384DBcf7F241fFE2A546513fD873d);
+        IERC20(asset).transfer(user, amount);
+        return true;
+      }
     }
     if (block.chainid == ChainIds.GNOSIS) {
-      // TODO: import EURs address from address-book once address book is updated
-      // EURs
-      if (asset == 0xcB444e90D8198415266c6a2724b7900fb12FC56E) {
+      if (asset == AaveV3GnosisAssets.EURe_UNDERLYING) {
         vm.startPrank(0xBA12222222228d8Ba445958a75a0704d566BF2C8);
+        IERC20(asset).transfer(user, amount);
+        return true;
+      }
+    }
+    if (block.chainid == ChainIds.POLYGON) {
+      if (asset == AaveV3PolygonAssets.USDCn_UNDERLYING) {
+        vm.startPrank(0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245);
+        IERC20(asset).transfer(user, amount);
+        return true;
+      }
+    }
+    if (block.chainid == ChainIds.ARBITRUM) {
+      if (asset == AaveV3ArbitrumAssets.USDCn_UNDERLYING) {
+        vm.startPrank(0x47c031236e19d024b42f8AE6780E44A573170703);
+        IERC20(asset).transfer(user, amount);
+        return true;
+      }
+    }
+    if (block.chainid == ChainIds.AVALANCHE) {
+      if (asset == AaveV3AvalancheAssets.USDC_UNDERLYING) {
+        vm.startPrank(0x9f8c163cBA728e99993ABe7495F06c0A3c8Ac8b9);
+        IERC20(asset).transfer(user, amount);
+        return true;
+      }
+    }
+    if (block.chainid == ChainIds.BASE) {
+      if (asset == AaveV3BaseAssets.USDC_UNDERLYING) {
+        vm.startPrank(0x20FE51A9229EEf2cF8Ad9E89d91CAb9312cF3b7A);
         IERC20(asset).transfer(user, amount);
         return true;
       }
@@ -129,7 +170,7 @@ contract CommonTestBase is Test {
 
     string[] memory inputs = new string[](7);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@0.1.0';
+    inputs[1] = '@bgd-labs/aave-cli@0.2.1';
     inputs[2] = 'diff-snapshots';
     inputs[3] = beforePath;
     inputs[4] = afterPath;

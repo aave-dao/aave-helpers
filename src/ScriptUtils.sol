@@ -88,7 +88,7 @@ library Create2Utils {
     if (isContractDeployed(CREATE2_FACTORY) == false) {
       revert('MISSING_CREATE2_FACTORY');
     }
-    address computed = computeCreate2Address(salt, keccak256(abi.encodePacked(bytecode)));
+    address computed = computeCreate2Address(salt, bytecode);
 
     if (isContractDeployed(computed)) {
       return computed;
@@ -114,6 +114,13 @@ library Create2Utils {
       addressFromLast20Bytes(
         keccak256(abi.encodePacked(bytes1(0xff), CREATE2_FACTORY, salt, initcodeHash))
       );
+  }
+
+  function computeCreate2Address(
+    bytes32 salt,
+    bytes memory bytecode
+  ) internal pure returns (address) {
+    return computeCreate2Address(salt, keccak256(abi.encodePacked(bytecode)));
   }
 
   function addressFromLast20Bytes(bytes32 bytesValue) internal pure returns (address) {

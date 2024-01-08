@@ -213,7 +213,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     IPoolConfigurator poolConfigurator = IPoolConfigurator(addressesProvider.getPoolConfigurator());
     vm.startPrank(addressesProvider.getACLAdmin());
     if (collateralConfig.supplyCap != 0)
-      poolConfigurator.setSupplyCap(testAssetConfig.underlying, 0);
+      poolConfigurator.setSupplyCap(collateralConfig.underlying, 0);
     if (testAssetConfig.supplyCap != 0)
       poolConfigurator.setSupplyCap(testAssetConfig.underlying, 0);
     if (testAssetConfig.borrowCap != 0)

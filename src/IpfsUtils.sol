@@ -9,7 +9,7 @@ library IpfsUtils {
   function ipfsHashFile(Vm vm, string memory filePath, bool upload) internal returns (bytes32) {
     string[] memory inputs = new string[](5);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@0.1.0';
+    inputs[1] = '@bgd-labs/aave-cli@0.2.1';
     inputs[2] = 'ipfs';
     inputs[3] = filePath;
     if (upload) {

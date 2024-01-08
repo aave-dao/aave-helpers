@@ -93,7 +93,7 @@ library GovV3Helpers {
   ) internal returns (IVotingMachineWithProofs.VotingBalanceProof[] memory) {
     string[] memory inputs = new string[](8);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@0.1.0';
+    inputs[1] = '@bgd-labs/aave-cli@0.2.1';
     inputs[2] = 'governance';
     inputs[3] = 'getVotingProofs';
     inputs[4] = '--proposalId';
@@ -119,7 +119,7 @@ library GovV3Helpers {
   ) internal returns (StorageRootResponse[] memory) {
     string[] memory inputs = new string[](6);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@0.1.0';
+    inputs[1] = '@bgd-labs/aave-cli@0.2.1';
     inputs[2] = 'governance';
     inputs[3] = 'getStorageRoots';
     inputs[4] = '--proposalId';
@@ -155,10 +155,17 @@ library GovV3Helpers {
   }
 
   /**
-   * Helper function to abstract away the consistent salt from the users
+   * Deploys a contract with a constant salt
    */
   function deployDeterministic(bytes memory bytecode) internal returns (address) {
     return Create2Utils.create2Deploy('v1', bytecode);
+  }
+
+  /**
+   * Predicts the payload based on a constant salt
+   */
+  function predictDeterministicAddress(bytes memory bytecode) internal pure returns (address) {
+    return Create2Utils.computeCreate2Address('v1', bytecode);
   }
 
   /**
@@ -173,10 +180,7 @@ library GovV3Helpers {
   function buildAction(
     bytes memory bytecode
   ) internal pure returns (IPayloadsControllerCore.ExecutionAction memory) {
-    address payloadAddress = Create2Utils.computeCreate2Address(
-      'v1',
-      keccak256(abi.encodePacked(bytecode))
-    );
+    address payloadAddress = predictDeterministicAddress(bytecode);
     return buildAction(payloadAddress);
   }
 
@@ -524,6 +528,29 @@ library GovV3Helpers {
     return createProposal(vm, payloads, GovernanceV3Ethereum.VOTING_PORTAL_ETH_POL, ipfsHash);
   }
 
+  /**
+   * @dev Executes an already created proposal on governance v3 by manipulating stororage so it#s executable in the current block.
+   * @param vm Vm
+   * @param proposalId id of the proposal to execute
+   */
+  function executeProposal(Vm vm, uint256 proposalId) internal {
+    GovV3StorageHelpers.readyProposal(vm, proposalId);
+    GovernanceV3Ethereum.GOVERNANCE.executeProposal(proposalId);
+  }
+
+  function build2_5Payload(
+    PayloadsControllerUtils.Payload memory payload
+  ) internal returns (GovHelpers.Payload memory) {
+    return
+      GovHelpers.Payload({
+        target: address(GovernanceV3Ethereum.GOVERNANCE),
+        value: 0,
+        signature: 'forwardPayloadForExecution((uint256,uint8,address,uint40))',
+        callData: abi.encode(payload),
+        withDelegatecall: false
+      });
+  }
+
   // temporarily patched create proposal for governance v2.5
   function createProposal2_5(
     Vm vm,
@@ -537,13 +564,7 @@ library GovV3Helpers {
     generateProposalPreviewLink(vm, payloads, ipfsHash, address(0));
     GovHelpers.Payload[] memory gov2Payloads = new GovHelpers.Payload[](payloads.length);
     for (uint256 i = 0; i < payloads.length; i++) {
-      gov2Payloads[i] = GovHelpers.Payload({
-        target: address(GovernanceV3Ethereum.GOVERNANCE),
-        value: 0,
-        signature: 'forwardPayloadForExecution((uint256,uint8,address,uint40))',
-        callData: abi.encode(payloads[i]),
-        withDelegatecall: false
-      });
+      gov2Payloads[i] = build2_5Payload(payloads[i]);
     }
     return GovHelpers.createProposal(gov2Payloads, ipfsHash, true);
   }
