@@ -13,6 +13,7 @@ import {MiscGnosis} from 'aave-address-book/MiscGnosis.sol';
 import {MiscBNB} from 'aave-address-book/MiscBNB.sol';
 import {MiscArbitrum} from 'aave-address-book/MiscArbitrum.sol';
 import {MiscOptimism} from 'aave-address-book/MiscOptimism.sol';
+import {MiscPolygonZkEvm} from 'aave-address-book/MiscPolygonZkEvm.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
@@ -22,6 +23,7 @@ import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
 import {AaveV3Base} from 'aave-address-book/AaveV3Base.sol';
 import {AaveV3Gnosis} from 'aave-address-book/AaveV3Gnosis.sol';
 import {AaveV3BNB} from 'aave-address-book/AaveV3BNB.sol';
+import {AaveV3PolygonZkEvm} from 'aave-address-book/AaveV3PolygonZkEvm.sol';
 import {ITransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/interfaces/ITransparentProxyFactory.sol';
 import {V3RateStrategyFactory} from '../src/v3-config-engine/V3RateStrategyFactory.sol';
 
@@ -182,6 +184,17 @@ library DeployRatesFactoryBnbLib {
   }
 }
 
+library DeployRatesFactoryZkEvmLib {
+  function deploy() internal returns (address, address[] memory) {
+    return
+      DeployRatesFactoryLib._createAndSetupRatesFactory(
+        AaveV3PolygonZkEvm.POOL_ADDRESSES_PROVIDER,
+        MiscPolygonZkEvm.TRANSPARENT_PROXY_FACTORY,
+        MiscPolygonZkEvm.PROXY_ADMIN
+      );
+  }
+}
+
 contract DeployRatesFactoryEth is EthereumScript {
   function run() external broadcast {
     DeployRatesFactoryEthLib.deploy();
@@ -233,5 +246,11 @@ contract DeployRatesFactoryGno is GnosisScript {
 contract DeployRatesFactoryBnb is BNBScript {
   function run() external broadcast {
     DeployRatesFactoryBnbLib.deploy();
+  }
+}
+
+contract DeployRatesFactoryZkEvm is PolygonZkEvmScript {
+  function run() external broadcast {
+    DeployRatesFactoryZkEvmLib.deploy();
   }
 }

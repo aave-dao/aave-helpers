@@ -7,6 +7,7 @@ import {IAaveV3ConfigEngine as IEngine} from '../src/v3-config-engine/IAaveV3Con
 import {IV3RateStrategyFactory} from '../src/v3-config-engine/IV3RateStrategyFactory.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV3BNB} from 'aave-address-book/AaveV3BNB.sol';
+import {AaveV3PolygonZkEvm} from 'aave-address-book/AaveV3PolygonZkEvm.sol';
 import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
@@ -319,6 +320,39 @@ library DeployEngineBnbLib {
   }
 }
 
+library DeployEngineZkEvmLib {
+  function deploy() internal returns (address) {
+    IEngine.EngineLibraries memory engineLibraries = IEngine.EngineLibraries({
+      listingEngine: Create2Utils.create2Deploy('v1', type(ListingEngine).creationCode),
+      eModeEngine: Create2Utils.create2Deploy('v1', type(EModeEngine).creationCode),
+      borrowEngine: Create2Utils.create2Deploy('v1', type(BorrowEngine).creationCode),
+      collateralEngine: Create2Utils.create2Deploy('v1', type(CollateralEngine).creationCode),
+      priceFeedEngine: Create2Utils.create2Deploy('v1', type(PriceFeedEngine).creationCode),
+      rateEngine: Create2Utils.create2Deploy('v1', type(RateEngine).creationCode),
+      capsEngine: Create2Utils.create2Deploy('v1', type(CapsEngine).creationCode)
+    });
+    IEngine.EngineConstants memory engineConstants = IEngine.EngineConstants({
+      pool: AaveV3PolygonZkEvm.POOL,
+      poolConfigurator: AaveV3PolygonZkEvm.POOL_CONFIGURATOR,
+      ratesStrategyFactory: IV3RateStrategyFactory(AaveV3PolygonZkEvm.RATES_FACTORY),
+      oracle: AaveV3PolygonZkEvm.ORACLE,
+      rewardsController: AaveV3PolygonZkEvm.DEFAULT_INCENTIVES_CONTROLLER,
+      collector: address(AaveV3PolygonZkEvm.COLLECTOR)
+    });
+
+    return
+      address(
+        new Engine(
+          AaveV3PolygonZkEvm.DEFAULT_A_TOKEN_IMPL_REV_1,
+          AaveV3PolygonZkEvm.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
+          AaveV3PolygonZkEvm.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
+          engineConstants,
+          engineLibraries
+        )
+      );
+  }
+}
+
 contract DeployEngineEth is EthereumScript {
   function run() external broadcast {
     DeployEngineEthLib.deploy();
@@ -370,5 +404,11 @@ contract DeployEngineGno is GnosisScript {
 contract DeployEngineBnb is BNBScript {
   function run() external broadcast {
     DeployEngineBnbLib.deploy();
+  }
+}
+
+contract DeployEngineZkEvm is PolygonZkEvmScript {
+  function run() external broadcast {
+    DeployEngineZkEvmLib.deploy();
   }
 }

@@ -23,6 +23,7 @@ base = "${RPC_BASE}"
 bnb = "${RPC_BNB}"
 sepolia = "${RPC_SEPOLIA}"
 gnosis="${RPC_GNOSIS}"
+zkevm = "${RPC_ZKEVM}"
 
 [etherscan]
 mainnet={key="${ETHERSCAN_API_KEY_MAINNET}",chainId=1}
@@ -35,4 +36,5 @@ base={key="${ETHERSCAN_API_KEY_BASE}",chain=8453}
 bnb={key="${ETHERSCAN_API_KEY_BNB}",chainId=56,url='https://api.bscscan.com/api'}
 sepolia={key="${ETHERSCAN_API_KEY_MAINNET}",chainId=11155111}
 gnosis={key="${ETHERSCAN_API_KEY_GNOSIS}",chainId=100, url='https://api.gnosisscan.io/api'}
+zkevm={key="${ETHERSCAN_API_KEY_ZKEVM}",chainId=1101}
 # See more config options https://github.com/gakonst/foundry/tree/master/config

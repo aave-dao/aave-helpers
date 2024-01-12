@@ -13,6 +13,7 @@ import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Base} from 'aave-address-book/AaveV3Base.sol';
 import {AaveV3Gnosis} from 'aave-address-book/AaveV3Gnosis.sol';
 import {AaveV3BNB} from 'aave-address-book/AaveV3BNB.sol';
+import {AaveV3PolygonZkEvm} from 'aave-address-book/AaveV3PolygonZkEvm.sol';
 
 contract DeployEth is EthereumScript {
   function run() external broadcast {
@@ -100,6 +101,16 @@ contract DeployBNB is BNBScript {
       AaveV3BNB.AAVE_PROTOCOL_DATA_PROVIDER,
       IAaveV3ConfigEngine(AaveV3BNB.CONFIG_ENGINE),
       0x126dc589cc75f17385dD95516F3F1788d862E7bc
+    );
+  }
+}
+
+contract DeployZkEvm is PolygonZkEvmScript {
+  function run() external broadcast {
+    new CapsPlusRiskSteward(
+      AaveV3PolygonZkEvm.AAVE_PROTOCOL_DATA_PROVIDER,
+      IAaveV3ConfigEngine(AaveV3PolygonZkEvm.CONFIG_ENGINE),
+      0xC165b4ae0dfB650E0123d4A70D260029Cb6e2C0f
     );
   }
 }
