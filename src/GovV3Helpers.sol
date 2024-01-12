@@ -63,7 +63,7 @@ interface IGovernance_V2_5 {
 }
 
 library GovV3Helpers {
-  error CanNotFindPayload();
+  error CannotFindPayload();
   error CannotFindPayloadsController();
   error ExecutorNotFound();
   error LongBytesNotSupportedYet();
@@ -750,7 +750,7 @@ library GovV3Helpers {
         return (payloadId - 1, payload);
       }
     }
-    revert CanNotFindPayload();
+    revert CannotFindPayload();
   }
 
   function _actionsAreEqual(

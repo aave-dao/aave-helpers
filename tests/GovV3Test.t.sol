@@ -18,6 +18,7 @@ interface Mock {
 
 contract GovernanceV3Test is ProtocolV3TestBase {
   event TestEvent();
+  error CannotFindPayload();
 
   PayloadWithEmit payload;
 
@@ -153,12 +154,13 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     defaultTest('default', AaveV3Ethereum.POOL, address(payload));
   }
 
-  function test_findPayload() public {
+  function testFail_findPayload() public {
     IPayloadsControllerCore.ExecutionAction[]
       memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
     actions[0] = GovV3Helpers.buildAction(address(42));
 
-    // should revert as payload 42 does not exist
+    // should revert as payload 0x42 does not exist
+    vm.expectRevert(CannotFindPayload.selector);
     GovV3Helpers.buildMainnetPayload(vm, actions);
   }
 }
