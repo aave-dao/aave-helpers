@@ -76,7 +76,7 @@ abstract contract ScrollScript is WithChainIdValidation {
   constructor() WithChainIdValidation(ChainIds.SCROLL) {}
 }
 
-abstract contract ZkEVMScript is WithChainIdValidation {
+abstract contract PolygonZkEvmScript is WithChainIdValidation {
   constructor() WithChainIdValidation(ChainIds.ZK_EVM) {}
 }
 
