@@ -742,10 +742,12 @@ library GovV3Helpers {
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) private view returns (uint40, IPayloadsControllerCore.Payload memory) {
     uint40 count = payloadsController.getPayloadsCount();
-    for (uint40 payloadId = count - 1; payloadId >= 0; payloadId--) {
-      IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(payloadId);
+    for (uint40 payloadId = count; payloadId > 0; payloadId--) {
+      IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(
+        payloadId - 1
+      );
       if (_actionsAreEqual(actions, payload.actions)) {
-        return (payloadId, payload);
+        return (payloadId - 1, payload);
       }
     }
     revert CanNotFindPayload();
