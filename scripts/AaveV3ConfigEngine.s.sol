@@ -338,21 +338,12 @@ library DeployEngineScrollLib {
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Scroll.RATES_FACTORY),
       oracle: AaveV3Scroll.ORACLE,
       rewardsController: AaveV3Scroll.DEFAULT_INCENTIVES_CONTROLLER,
-      collector: address(AaveV3Scroll.COLLECTOR),
-      pool: AaveV3Scroll.POOL,
-      poolConfigurator: AaveV3Scroll.POOL_CONFIGURATOR,
-      ratesStrategyFactory: IV3RateStrategyFactory(AaveV3Scroll.RATES_FACTORY),
-      oracle: AaveV3Scroll.ORACLE,
-      rewardsController: AaveV3Scroll.DEFAULT_INCENTIVES_CONTROLLER,
       collector: address(AaveV3Scroll.COLLECTOR)
     });
 
     return
       address(
         new Engine(
-          AaveV3Scroll.DEFAULT_A_TOKEN_IMPL_REV_1,
-          AaveV3Scroll.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
-          AaveV3Scroll.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3Scroll.DEFAULT_A_TOKEN_IMPL_REV_1,
           AaveV3Scroll.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3Scroll.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
@@ -381,21 +372,12 @@ library DeployEngineZkEvmLib {
       ratesStrategyFactory: IV3RateStrategyFactory(AaveV3PolygonZkEvm.RATES_FACTORY),
       oracle: AaveV3PolygonZkEvm.ORACLE,
       rewardsController: AaveV3PolygonZkEvm.DEFAULT_INCENTIVES_CONTROLLER,
-      collector: address(AaveV3PolygonZkEvm.COLLECTOR),
-      pool: AaveV3PolygonZkEvm.POOL,
-      poolConfigurator: AaveV3PolygonZkEvm.POOL_CONFIGURATOR,
-      ratesStrategyFactory: IV3RateStrategyFactory(AaveV3PolygonZkEvm.RATES_FACTORY),
-      oracle: AaveV3PolygonZkEvm.ORACLE,
-      rewardsController: AaveV3PolygonZkEvm.DEFAULT_INCENTIVES_CONTROLLER,
       collector: address(AaveV3PolygonZkEvm.COLLECTOR)
     });
 
     return
       address(
         new Engine(
-          AaveV3Scroll.DEFAULT_A_TOKEN_IMPL_REV_1,
-          AaveV3Scroll.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
-          AaveV3Scroll.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3PolygonZkEvm.DEFAULT_A_TOKEN_IMPL_REV_1,
           AaveV3PolygonZkEvm.DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1,
           AaveV3PolygonZkEvm.DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1,
