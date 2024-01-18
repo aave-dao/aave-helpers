@@ -15,7 +15,14 @@ import {IFxStateSender} from 'governance-crosschain-bridges/contracts/dependenci
  */
 contract CrosschainForwarderPolygon {
   address public constant FX_ROOT_ADDRESS = 0xfe5e5D361b2ad62c541bAb87C45a0B9B018389a2;
-  address public constant POLYGON_BRIDGE_EXECUTOR = 0xdc9A35B16DB4e126cFeDC41322b3a36454B1F772;
+  address public immutable POLYGON_BRIDGE_EXECUTOR;
+
+  /**
+   * @param bridgeExecutor The executor
+   */
+  constructor(address bridgeExecutor) {
+    POLYGON_BRIDGE_EXECUTOR = bridgeExecutor;
+  }
 
   /**
    * @dev this function will be executed once the proposal passes the mainnet vote.

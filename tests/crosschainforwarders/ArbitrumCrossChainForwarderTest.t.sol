@@ -36,7 +36,7 @@ contract ArbitrumCrossChainForwarderTest is ProtocolV3TestBase {
 
   function setUp() public {
     mainnetFork = vm.createSelectFork(vm.rpcUrl('mainnet'), 16128510);
-    forwarder = new CrosschainForwarderArbitrum();
+    forwarder = new CrosschainForwarderArbitrum(ARBITRUM_BRIDGE_EXECUTOR);
     arbitrumFork = vm.createSelectFork(vm.rpcUrl('arbitrum'), 76261612);
     payloadWithEmit = new PayloadWithEmit();
   }
@@ -49,10 +49,10 @@ contract ArbitrumCrossChainForwarderTest is ProtocolV3TestBase {
   function testHasSufficientGas() public {
     vm.selectFork(mainnetFork);
     assertEq(AaveGovernanceV2.SHORT_EXECUTOR.balance, 0);
-    (bool hasEnoughGasBefore, ) = forwarder.hasSufficientGasForExecution(580);
+    (bool hasEnoughGasBefore, ) = forwarder.hasSufficientGasForExecution(AaveGovernanceV2.SHORT_EXECUTOR, 580);
     assertEq(hasEnoughGasBefore, false);
     deal(address(AaveGovernanceV2.SHORT_EXECUTOR), 0.001 ether);
-    (bool hasEnoughGasAfter, ) = forwarder.hasSufficientGasForExecution(580);
+    (bool hasEnoughGasAfter, ) = forwarder.hasSufficientGasForExecution(AaveGovernanceV2.SHORT_EXECUTOR, 580);
     assertEq(hasEnoughGasAfter, true);
   }
 

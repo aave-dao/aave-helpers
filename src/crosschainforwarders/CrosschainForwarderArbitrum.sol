@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
-import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {IInbox} from 'governance-crosschain-bridges/contracts/dependencies/arbitrum/interfaces/IInbox.sol';
 import {IL2BridgeExecutor} from 'governance-crosschain-bridges/contracts/interfaces/IL2BridgeExecutor.sol';
 
@@ -11,8 +9,7 @@ import {IL2BridgeExecutor} from 'governance-crosschain-bridges/contracts/interfa
  * @author BGD Labs
  * @notice You can **only** use this executor when the arbitrum payload has a `execute()` signature without parameters
  * @notice You can **only** use this executor when the arbitrum payload is expected to be executed via `DELEGATECALL`
- * @notice This contract assumes to be called via AAVE Governance V2
- * @notice This contract will assume the SHORT_EXECUTOR will be topped up with enough funds to fund the short executor
+ * @notice This contract will assume the caller will be topped up with enough funds to fund the message relay
  * @dev This executor is a generic wrapper to be used with Arbitrum Inbox (https://developer.offchainlabs.com/arbos/l1-to-l2-messaging)
  * It encodes a parameterless `execute()` with delegate calls and a specified target.
  * This encoded abi is then send to the Inbox to be synced executed on the arbitrum network.
@@ -20,7 +17,7 @@ import {IL2BridgeExecutor} from 'governance-crosschain-bridges/contracts/interfa
  */
 contract CrosschainForwarderArbitrum {
   IInbox public constant INBOX = IInbox(0x4Dbd4fc535Ac27206064B68FfCf827b0A60BAB3f);
-  address public constant ARBITRUM_BRIDGE_EXECUTOR = AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR;
+  address public immutable ARBITRUM_BRIDGE_EXECUTOR;
   address public constant ARBITRUM_GUARDIAN = 0xbbd9f90699c1FA0D7A65870D241DD1f1217c96Eb;
 
   // amount of gwei to overpay on basefee for fast submission
@@ -38,6 +35,13 @@ contract CrosschainForwarderArbitrum {
   uint256 public constant L2_MAX_FEE_PER_GAS = 1 gwei;
 
   /**
+   * @param bridgeExecutor The L2 executor
+   */
+  constructor(address bridgeExecutor) {
+    ARBITRUM_BRIDGE_EXECUTOR = bridgeExecutor;
+  }
+
+  /**
    * @dev returns the amount of gas needed for submitting the ticket
    * @param bytesLength the payload bytes length (usually 580)
    * @return uint256 maxSubmissionFee needed on L2 with BASE_FEE_MARGIN
@@ -51,16 +55,17 @@ contract CrosschainForwarderArbitrum {
   }
 
   /**
-   * @dev checks if the short executor is topped up with enough eth for proposal execution
+   * @dev checks if the executor is topped up with enough eth for proposal execution
    * with current basefee
+   * @param executor the address to check for sufficient gas
    * @param bytesLength the payload bytes length (usually 580)
-   * @return bool indicating if the SHORT_EXECUTOR has sufficient funds
+   * @return bool indicating if the caller has sufficient funds
    * @return uint256 the gas required for ticket creation and redemption
    */
-  function hasSufficientGasForExecution(uint256 bytesLength) public view returns (bool, uint256) {
+  function hasSufficientGasForExecution(address executor, uint256 bytesLength) public view returns (bool, uint256) {
     (uint256 maxSubmission, uint256 maxRedemption) = getRequiredGas(bytesLength);
     uint256 requiredGas = maxSubmission + maxRedemption;
-    return (AaveGovernanceV2.SHORT_EXECUTOR.balance >= requiredGas, requiredGas);
+    return (executor.balance >= requiredGas, requiredGas);
   }
 
   /**

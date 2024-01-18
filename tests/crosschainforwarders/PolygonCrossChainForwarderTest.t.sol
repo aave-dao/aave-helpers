@@ -32,7 +32,7 @@ contract PolygonCrossChainForwarderTest is ProtocolV3TestBase {
 
   function setUp() public {
     mainnetFork = vm.createSelectFork(vm.rpcUrl('mainnet'), 15275388);
-    forwarder = new CrosschainForwarderPolygon();
+    forwarder = new CrosschainForwarderPolygon(POLYGON_BRIDGE_EXECUTOR);
     polygonFork = vm.createSelectFork(vm.rpcUrl('polygon'), 31507646);
     payloadWithEmit = new PayloadWithEmit();
   }

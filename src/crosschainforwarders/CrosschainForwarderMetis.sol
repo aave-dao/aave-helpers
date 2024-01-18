@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {ICrossDomainMessenger} from 'governance-crosschain-bridges/contracts/dependencies/optimism/interfaces/ICrossDomainMessenger.sol';
 import {IL2BridgeExecutor} from 'governance-crosschain-bridges/contracts/interfaces/IL2BridgeExecutor.sol';
 
@@ -16,23 +15,29 @@ import {IL2BridgeExecutor} from 'governance-crosschain-bridges/contracts/interfa
 contract CrosschainForwarderMetis {
   /**
    * @dev The L1 Cross Domain Messenger contract sends messages from L1 to L2, and relays messages
-   * from L2 onto L1. In this contract it's used by the governance SHORT_EXECUTOR to send the encoded L2 queuing over the bridge.
+   * from L2 onto L1. In this contract it's used to send the encoded L2 queuing over the bridge.
    */
   address public constant L1_CROSS_DOMAIN_MESSENGER_ADDRESS =
     0x081D1101855bD523bA69A9794e0217F0DB6323ff;
 
   /**
    * @dev The metis bridge executor is a L2 governance execution contract.
-   * This contract allows queuing of proposals by allow listed addresses (in this case the L1 short executor).
-   * https://andromeda-explorer.metis.io/address/0x8EC77963068474a45016938Deb95E603Ca82a029
+   * This contract allows queuing of proposals by allow listed addresses.
    */
-  address public constant METIS_BRIDGE_EXECUTOR = AaveGovernanceV2.METIS_BRIDGE_EXECUTOR;
+  address public immutable METIS_BRIDGE_EXECUTOR;
 
   /**
    * @dev The gas limit of the queue transaction by the L2CrossDomainMessenger on L2.
    * The limit seems reasonable considering the queue transaction, as all gas limits are prepaid.
    */
   uint32 public constant MAX_GAS_LIMIT = 5_000_000;
+
+  /**
+   * @param bridgeExecutor The L2 executor
+   */
+  constructor(address bridgeExecutor) {
+    METIS_BRIDGE_EXECUTOR = bridgeExecutor;
+  }
 
   /**
    * @dev this function will be executed once the proposal passes the mainnet vote.

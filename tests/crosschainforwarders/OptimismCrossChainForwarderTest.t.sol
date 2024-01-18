@@ -32,7 +32,7 @@ contract OptimismCrossChainForwarderTest is ProtocolV3TestBase {
 
   function setUp() public {
     mainnetFork = vm.createSelectFork(vm.rpcUrl('mainnet'), 15783218);
-    forwarder = new CrosschainForwarderOptimism();
+    forwarder = new CrosschainForwarderOptimism(OPTIMISM_BRIDGE_EXECUTOR);
     optimismFork = vm.createSelectFork(vm.rpcUrl('optimism'), 30264427);
     payloadWithEmit = new PayloadWithEmit();
   }

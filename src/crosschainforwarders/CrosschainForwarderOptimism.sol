@@ -21,17 +21,16 @@ interface ICanonicalTransactionChain {
 contract CrosschainForwarderOptimism {
   /**
    * @dev The L1 Cross Domain Messenger contract sends messages from L1 to L2, and relays messages
-   * from L2 onto L1. In this contract it's used by the governance SHORT_EXECUTOR to send the encoded L2 queuing over the bridge.
+   * from L2 onto L1. In this contract it's used to send the encoded L2 queuing over the bridge.
    */
   address public constant L1_CROSS_DOMAIN_MESSENGER_ADDRESS =
     0x25ace71c97B33Cc4729CF772ae268934F7ab5fA1;
 
   /**
    * @dev The optimism bridge executor is a L2 governance execution contract.
-   * This contract allows queuing of proposals by allow listed addresses (in this case the L1 short executor).
-   * https://optimistic.etherscan.io/address/0x7d9103572bE58FfE99dc390E8246f02dcAe6f611
+   * This contract allows queuing of proposals by allow listed addresses.
    */
-  address public constant OPTIMISM_BRIDGE_EXECUTOR = 0x7d9103572bE58FfE99dc390E8246f02dcAe6f611;
+  address public immutable OPTIMISM_BRIDGE_EXECUTOR;
 
   /**
    * @dev The CTC contract is an append only log of transactions which must be applied to the rollup state.
@@ -40,6 +39,13 @@ contract CrosschainForwarderOptimism {
    */
   ICanonicalTransactionChain public constant CANONICAL_TRANSACTION_CHAIN =
     ICanonicalTransactionChain(0x5E4e65926BA27467555EB562121fac00D24E9dD2);
+
+  /**
+   * @param bridgeExecutor The L2 executor
+   */
+  constructor(address bridgeExecutor) {
+    OPTIMISM_BRIDGE_EXECUTOR = bridgeExecutor;
+  }
 
   /**
    * @dev this function will be executed once the proposal passes the mainnet vote.

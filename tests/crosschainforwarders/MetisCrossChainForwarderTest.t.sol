@@ -30,7 +30,7 @@ contract MetisCrossChainForwarderTest is ProtocolV3TestBase {
 
   function setUp() public {
     mainnetFork = vm.createSelectFork(vm.rpcUrl('mainnet'), 17093477);
-    forwarder = new CrosschainForwarderMetis();
+    forwarder = new CrosschainForwarderMetis(METIS_BRIDGE_EXECUTOR);
     metisFork = vm.createSelectFork(vm.rpcUrl('metis'), 5428548);
     payloadWithEmit = new PayloadWithEmit();
   }
