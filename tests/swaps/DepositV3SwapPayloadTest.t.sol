@@ -6,6 +6,7 @@ import {Test} from 'forge-std/Test.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {CommonTestBase} from '../../src/CommonTestBase.sol';
 
 import {BaseSwapPayload} from '../../src/swaps/BaseSwapPayload.sol';
 import {DepositV3SwapPayload} from '../../src/swaps/DepositV3SwapPayload.sol';
@@ -18,7 +19,7 @@ contract MyPayload is DepositV3SwapPayload {
   }
 }
 
-contract DepositV3SwapPayloadTest is Test {
+contract DepositV3SwapPayloadTest is CommonTestBase {
   event DepositedIntoV3(address indexed token, uint256 amount);
 
   DepositV3SwapPayload public payload;
@@ -34,7 +35,7 @@ contract DepositV3SwapPayloadTest is Test {
   function test_successful() public {
     uint256 amount = 1_000e18;
 
-    deal(AaveV3EthereumAssets.AAVE_UNDERLYING, address(payload), amount);
+    deal2(AaveV3EthereumAssets.AAVE_UNDERLYING, address(payload), amount);
 
     uint256 balanceCollectorBefore = IERC20(AaveV3EthereumAssets.AAVE_A_TOKEN).balanceOf(
       address(AaveV3Ethereum.COLLECTOR)

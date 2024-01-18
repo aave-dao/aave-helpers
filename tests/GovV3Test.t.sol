@@ -91,9 +91,9 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
     IPayloadsControllerCore.Payload memory pl = payloadsController.getPayloadById(payloadId);
     assertEq(uint256(pl.state), uint256(IPayloadsControllerCore.PayloadState.Queued));
-    assertEq(pl.queuedAt, 1697983463);
+    assertEq(pl.queuedAt, 1705004722);
     assertEq(uint256(pl.maximumAccessLevelRequired), 1);
-    assertEq(pl.createdAt, 1698069864);
+    assertEq(pl.createdAt, block.timestamp);
     assertEq(pl.creator, address(0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496));
   }
 

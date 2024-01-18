@@ -12,7 +12,7 @@ contract V3RateStrategyFactoryTest is ProtocolV3TestBase {
   V3RateStrategyFactory rateStrategyFactory;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 18726128);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 19036639);
     rateStrategyFactory = new V3RateStrategyFactory(AaveV3Ethereum.POOL_ADDRESSES_PROVIDER);
   }
 
@@ -61,7 +61,7 @@ contract V3RateStrategyFactoryTest is ProtocolV3TestBase {
     );
   }
 
-  function testMultipleCreateStrategies() public {
+  function test_multipleCreateStrategies() public {
     IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
       AaveV3EthereumAssets.USDT_INTEREST_RATE_STRATEGY
     );

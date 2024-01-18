@@ -16,10 +16,10 @@
 
 | description | value before | value after |
 | --- | --- | --- |
-| interestRateStrategy | [0x6D6D3b7FC50999bf20dE5CC8e0F63AFD18B95f0e](https://explorer.optimism.io/address/0x6D6D3b7FC50999bf20dE5CC8e0F63AFD18B95f0e) | [0xD61ca03Eac0352090f45bE50403F7B17d20E11F2](https://explorer.optimism.io/address/0xD61ca03Eac0352090f45bE50403F7B17d20E11F2) |
+| interestRateStrategy | [0xd5CA18a70189309664e34FB8150799ff13722308](https://explorer.optimism.io/address/0xd5CA18a70189309664e34FB8150799ff13722308) | [0x424883C7dD9Bd129BC346A65E8455CDe9fC0c43C](https://explorer.optimism.io/address/0x424883C7dD9Bd129BC346A65E8455CDe9fC0c43C) |
 | optimalUsageRatio | 90 % | 80 % |
 | maxExcessUsageRatio | 10 % | 20 % |
-| interestRate | ![before](/.assets/ebd346a83b729edecf1938b8cdd0528700c8b9fd.svg) | ![after](/.assets/9ed0ac5bda0d6aea5b627325dd757aab5a706122.svg) |
+| interestRate | ![before](/.assets/5f02ea67e5ba53eee2797379ac1cd619db8b194e.svg) | ![after](/.assets/ae5f4984ec6d1aad35594fe55bd4718cc49196da.svg) |
 
 ## Raw diff
 
@@ -34,8 +34,8 @@
     },
     "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58": {
       "interestRateStrategy": {
-        "from": "0x6D6D3b7FC50999bf20dE5CC8e0F63AFD18B95f0e",
-        "to": "0xD61ca03Eac0352090f45bE50403F7B17d20E11F2"
+        "from": "0xd5CA18a70189309664e34FB8150799ff13722308",
+        "to": "0x424883C7dD9Bd129BC346A65E8455CDe9fC0c43C"
       }
     }
   },
