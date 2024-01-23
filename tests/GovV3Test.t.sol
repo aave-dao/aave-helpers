@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
 import {IVotingMachineWithProofs, GovV3Helpers, PayloadsControllerUtils, IPayloadsControllerCore, GovV3StorageHelpers, IGovernanceCore} from '../src/GovV3Helpers.sol';
-import {GovHelpers} from '../src/GovHelpers.sol';
 import {ProtocolV3TestBase} from '../src/ProtocolV3TestBase.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
