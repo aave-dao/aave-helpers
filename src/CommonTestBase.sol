@@ -3,6 +3,7 @@ pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/StdJson.sol';
 import 'forge-std/Test.sol';
+import {VmSafe} from 'forge-std/Vm.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
@@ -149,10 +150,11 @@ contract CommonTestBase is Test {
    * @param amount to deal
    */
   function deal2(address asset, address user, uint256 amount) internal {
-    (, address oldSender, ) = vm.readCallers();
+    (VmSafe.CallerMode mode, address oldSender, ) = vm.readCallers();
     bool patched = _patchedDeal(asset, user, amount);
     if (patched) {
-      vm.startPrank(oldSender);
+      if (mode == VmSafe.CallerMode.None) vm.stopPrank();
+      else vm.startPrank(oldSender);
     } else {
       deal(asset, user, amount);
     }
