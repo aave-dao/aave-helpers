@@ -46,48 +46,48 @@ contract CommonTestBase is Test {
     if (block.chainid == ChainIds.MAINNET) {
       // FXS
       if (asset == 0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0) {
-        vm.startPrank(0xF977814e90dA44bFA03b6295A0616a897441aceC);
+        vm.prank(0xF977814e90dA44bFA03b6295A0616a897441aceC);
         IERC20(asset).transfer(user, amount);
         return true;
       }
       // GUSD
       if (asset == AaveV2EthereumAssets.GUSD_UNDERLYING) {
-        vm.startPrank(0x22FFDA6813f4F34C520bf36E5Ea01167bC9DF159);
+        vm.prank(0x22FFDA6813f4F34C520bf36E5Ea01167bC9DF159);
         IERC20(asset).transfer(user, amount);
         return true;
       }
       // SNX
       if (asset == AaveV2EthereumAssets.SNX_UNDERLYING) {
-        vm.startPrank(0xAc86855865CbF31c8f9FBB68C749AD5Bd72802e3);
+        vm.prank(0xAc86855865CbF31c8f9FBB68C749AD5Bd72802e3);
         IERC20(asset).transfer(user, amount);
         return true;
       }
       // sUSD
       if (asset == AaveV2EthereumAssets.sUSD_UNDERLYING) {
-        vm.startPrank(0x99F4176EE457afedFfCB1839c7aB7A030a5e4A92);
+        vm.prank(0x99F4176EE457afedFfCB1839c7aB7A030a5e4A92);
         IERC20(asset).transfer(user, amount);
         return true;
       }
       // stETH
       if (asset == AaveV2EthereumAssets.stETH_UNDERLYING) {
-        vm.startPrank(0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0);
+        vm.prank(0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0);
         IERC20(asset).transfer(user, amount);
         return true;
       }
       // LDO
       if (asset == AaveV3EthereumAssets.LDO_UNDERLYING) {
-        vm.startPrank(0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c);
+        vm.prank(0x3e40D73EB977Dc6a537aF587D48316feE66E9C8c);
         IERC20(asset).transfer(user, amount);
         return true;
       }
       // AAVE
       if (asset == AaveV3EthereumAssets.AAVE_UNDERLYING) {
-        vm.startPrank(MiscEthereum.ECOSYSTEM_RESERVE);
+        vm.prank(MiscEthereum.ECOSYSTEM_RESERVE);
         IERC20(asset).transfer(user, amount);
         return true;
       }
       if (asset == AaveV3EthereumAssets.USDC_UNDERLYING) {
-        vm.startPrank(0xcEe284F754E854890e311e3280b767F80797180d);
+        vm.prank(0xcEe284F754E854890e311e3280b767F80797180d);
         IERC20(asset).transfer(user, amount);
         return true;
       }
@@ -95,47 +95,47 @@ contract CommonTestBase is Test {
     if (block.chainid == ChainIds.OPTIMISM) {
       // sUSD
       if (asset == AaveV3OptimismAssets.sUSD_UNDERLYING) {
-        vm.startPrank(AaveV3OptimismAssets.sUSD_A_TOKEN);
+        vm.prank(AaveV3OptimismAssets.sUSD_A_TOKEN);
         IERC20(asset).transfer(user, amount);
         return true;
       }
       if (asset == AaveV3OptimismAssets.USDCn_UNDERLYING) {
-        vm.startPrank(0xf491d040110384DBcf7F241fFE2A546513fD873d);
+        vm.prank(0xf491d040110384DBcf7F241fFE2A546513fD873d);
         IERC20(asset).transfer(user, amount);
         return true;
       }
     }
     if (block.chainid == ChainIds.GNOSIS) {
       if (asset == AaveV3GnosisAssets.EURe_UNDERLYING) {
-        vm.startPrank(0xBA12222222228d8Ba445958a75a0704d566BF2C8);
+        vm.prank(0xBA12222222228d8Ba445958a75a0704d566BF2C8);
         IERC20(asset).transfer(user, amount);
         return true;
       }
     }
     if (block.chainid == ChainIds.POLYGON) {
       if (asset == AaveV3PolygonAssets.USDCn_UNDERLYING) {
-        vm.startPrank(0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245);
+        vm.prank(0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245);
         IERC20(asset).transfer(user, amount);
         return true;
       }
     }
     if (block.chainid == ChainIds.ARBITRUM) {
       if (asset == AaveV3ArbitrumAssets.USDCn_UNDERLYING) {
-        vm.startPrank(0x47c031236e19d024b42f8AE6780E44A573170703);
+        vm.prank(0x47c031236e19d024b42f8AE6780E44A573170703);
         IERC20(asset).transfer(user, amount);
         return true;
       }
     }
     if (block.chainid == ChainIds.AVALANCHE) {
       if (asset == AaveV3AvalancheAssets.USDC_UNDERLYING) {
-        vm.startPrank(0x9f8c163cBA728e99993ABe7495F06c0A3c8Ac8b9);
+        vm.prank(0x9f8c163cBA728e99993ABe7495F06c0A3c8Ac8b9);
         IERC20(asset).transfer(user, amount);
         return true;
       }
     }
     if (block.chainid == ChainIds.BASE) {
       if (asset == AaveV3BaseAssets.USDC_UNDERLYING) {
-        vm.startPrank(0x20FE51A9229EEf2cF8Ad9E89d91CAb9312cF3b7A);
+        vm.prank(0x20FE51A9229EEf2cF8Ad9E89d91CAb9312cF3b7A);
         IERC20(asset).transfer(user, amount);
         return true;
       }
@@ -151,13 +151,12 @@ contract CommonTestBase is Test {
    */
   function deal2(address asset, address user, uint256 amount) internal {
     (VmSafe.CallerMode mode, address oldSender, ) = vm.readCallers();
+    if (mode != VmSafe.CallerMode.None) vm.stopPrank();
     bool patched = _patchedDeal(asset, user, amount);
-    if (patched) {
-      if (mode == VmSafe.CallerMode.None) vm.stopPrank();
-      else vm.startPrank(oldSender);
-    } else {
+    if (!patched) {
       deal(asset, user, amount);
     }
+    if (mode != VmSafe.CallerMode.None) vm.startPrank(oldSender);
   }
 
   /**
