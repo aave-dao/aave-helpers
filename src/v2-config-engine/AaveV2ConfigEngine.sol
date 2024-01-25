@@ -11,7 +11,6 @@ import './IAaveV2ConfigEngine.sol';
  * @author BGD Labs
  */
 contract AaveV2ConfigEngine is IAaveV2ConfigEngine {
-
   struct AssetsConfig {
     address[] ids;
     IV2RateStrategyFactory.RateStrategyParams[] rates;
@@ -20,10 +19,7 @@ contract AaveV2ConfigEngine is IAaveV2ConfigEngine {
   ILendingPoolConfigurator public immutable POOL_CONFIGURATOR;
   IV2RateStrategyFactory public immutable RATE_STRATEGIES_FACTORY;
 
-  constructor(
-    ILendingPoolConfigurator configurator,
-    IV2RateStrategyFactory rateStrategiesFactory
-  ) {
+  constructor(ILendingPoolConfigurator configurator, IV2RateStrategyFactory rateStrategiesFactory) {
     require(address(configurator) != address(0), 'ONLY_NONZERO_CONFIGURATOR');
     require(address(rateStrategiesFactory) != address(0), 'ONLY_NONZERO_RATES_FACTORY');
 
@@ -79,7 +75,6 @@ contract AaveV2ConfigEngine is IAaveV2ConfigEngine {
         if (strategiesParams[i].stableRateSlope2 == EngineFlags.KEEP_CURRENT) {
           strategiesParams[i].stableRateSlope2 = currentStrategyData.stableRateSlope2;
         }
-
       }
     }
 
@@ -90,11 +85,9 @@ contract AaveV2ConfigEngine is IAaveV2ConfigEngine {
     }
   }
 
-  function _repackRatesUpdate(RateStrategyUpdate[] memory updates)
-    internal
-    pure
-    returns (AssetsConfig memory)
-  {
+  function _repackRatesUpdate(
+    RateStrategyUpdate[] memory updates
+  ) internal pure returns (AssetsConfig memory) {
     address[] memory ids = new address[](updates.length);
     IV2RateStrategyFactory.RateStrategyParams[]
       memory rates = new IV2RateStrategyFactory.RateStrategyParams[](updates.length);
@@ -104,11 +97,6 @@ contract AaveV2ConfigEngine is IAaveV2ConfigEngine {
       rates[i] = updates[i].params;
     }
 
-    return
-      AssetsConfig({
-        ids: ids,
-        rates: rates
-      });
+    return AssetsConfig({ids: ids, rates: rates});
   }
-
 }

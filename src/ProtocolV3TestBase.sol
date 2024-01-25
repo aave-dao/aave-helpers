@@ -4,20 +4,14 @@ pragma solidity >=0.7.5 <0.9.0;
 import 'forge-std/Test.sol';
 import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
-
-interface IERC20Detailed is IERC20 {
-  function name() external view returns (string memory);
-
-  function symbol() external view returns (string memory);
-
-  function decimals() external view returns (uint8);
-}
+import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -64,9 +58,84 @@ struct InterestStrategyValues {
   uint256 variableRateSlope2;
 }
 
+/**
+ * only applicable to harmony at this point
+ */
 contract ProtocolV3TestBase is CommonTestBase {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
   using SafeERC20 for IERC20;
+
+  /**
+   * @dev runs the default test suite that should run on any proposal touching the aave protocol which includes:
+   * - diffing the config
+   * - checking if the changes are plausible (no conflicting config changes etc)
+   * - running an e2e testsuite over all assets
+   */
+  function defaultTest(
+    string memory reportName,
+    IPool pool,
+    address payload
+  ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
+    return defaultTest(reportName, pool, payload, true);
+  }
+
+  function defaultTest(
+    string memory reportName,
+    IPool pool,
+    address payload,
+    bool runE2E
+  ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
+    string memory beforeString = string(abi.encodePacked(reportName, '_before'));
+    ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
+
+    executePayload(vm, payload);
+
+    string memory afterString = string(abi.encodePacked(reportName, '_after'));
+    ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
+
+    diffReports(beforeString, afterString);
+
+    configChangePlausibilityTest(configBefore, configAfter);
+
+    if (runE2E) e2eTest(pool);
+    return (configBefore, configAfter);
+  }
+
+  function configChangePlausibilityTest(
+    ReserveConfig[] memory configBefore,
+    ReserveConfig[] memory configAfter
+  ) public view {
+    uint256 configsBeforeLength = configBefore.length;
+    for (uint256 i = 0; i < configAfter.length; i++) {
+      // assets are ususally not permanently unlisted, so the expectation is there will only be addition
+      // if config existed before
+      if (i < configsBeforeLength) {
+        // borrow increase should only happen on assets with borrowing enabled
+        // unless it is setting a borrow cap for the first time
+        if (
+          configBefore[i].borrowCap < configAfter[i].borrowCap && configBefore[i].borrowCap != 0
+        ) {
+          require(configAfter[i].borrowingEnabled, 'PL_BORROW_CAP_BORROW_DISABLED');
+        }
+      } else {
+        // at least newly listed assets should never have a supply cap exceeding total supply
+        uint256 totalSupply = IERC20(configAfter[i].underlying).totalSupply();
+        require(
+          configAfter[i].supplyCap / 1e2 <=
+            totalSupply / IERC20Metadata(configAfter[i].underlying).decimals(),
+          'PL_SUPPLY_CAP_GT_TOTAL_SUPPLY'
+        );
+      }
+      // borrow cap should never exceed supply cap
+      if (
+        configAfter[i].borrowCap != 0 &&
+        configAfter[i].underlying != AaveV3EthereumAssets.GHO_UNDERLYING // GHO is the exlcusion from the rule
+      ) {
+        console.log(configAfter[i].underlying);
+        require(configAfter[i].borrowCap <= configAfter[i].supplyCap, 'PL_SUPPLY_LT_BORROW');
+      }
+    }
+  }
 
   /**
    * @dev Generates a markdown compatible snapshot of the whole pool configuration into `/reports`.
@@ -111,13 +180,14 @@ contract ProtocolV3TestBase is CommonTestBase {
    */
   function e2eTest(IPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    ReserveConfig memory collateralConfig = _getFirstCollateral(configs);
+    ReserveConfig memory collateralConfig = _getGoodCollateral(configs);
+    uint256 snapshot = vm.snapshot();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
-        // there's a foundry bug causing issues when this is outside the loop
-        uint256 snapshot = vm.snapshot();
         e2eTestAsset(pool, collateralConfig, configs[i]);
         vm.revertTo(snapshot);
+      } else {
+        console.log('E2E: TestAsset %s SKIPPED', configs[i].symbol);
       }
     }
   }
@@ -135,29 +205,59 @@ contract ProtocolV3TestBase is CommonTestBase {
     address collateralSupplier = vm.addr(3);
     address testAssetSupplier = vm.addr(4);
     require(collateralConfig.usageAsCollateralEnabled, 'COLLATERAL_CONFIG_MUST_BE_COLLATERAL');
-    uint256 testAssetAmount = _getTokenAmountByDollarValue(pool, testAssetConfig, 100);
-    if (
-      (testAssetConfig.supplyCap * 10 ** testAssetConfig.decimals) <
-      IERC20(testAssetConfig.aToken).totalSupply() + testAssetAmount
-    ) {
-      console.log('Skip: %s, supply cap fully utilized', testAssetConfig.symbol);
-      return;
-    }
-    _deposit(collateralConfig, pool, collateralSupplier, 10_000 * 10 ** collateralConfig.decimals);
-    _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
-    uint256 snapshot = vm.snapshot();
-    // test withdrawal
-    _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
-    _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
-    vm.revertTo(snapshot);
-    // test variable borrowing
-    if (testAssetConfig.borrowingEnabled) {
-      _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
-      vm.revertTo(snapshot);
-      // test stable borrowing
-      if (testAssetConfig.stableBorrowRateEnabled) {
-        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
+    uint256 collateralAssetAmount = _getTokenAmountByDollarValue(pool, collateralConfig, 100000);
+    uint256 testAssetAmount = _getTokenAmountByDollarValue(pool, testAssetConfig, 1000);
+
+    // remove caps as they should not prevent testing
+    IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
+    IPoolConfigurator poolConfigurator = IPoolConfigurator(addressesProvider.getPoolConfigurator());
+    vm.startPrank(addressesProvider.getACLAdmin());
+    if (collateralConfig.supplyCap != 0)
+      poolConfigurator.setSupplyCap(collateralConfig.underlying, 0);
+    if (testAssetConfig.supplyCap != 0)
+      poolConfigurator.setSupplyCap(testAssetConfig.underlying, 0);
+    if (testAssetConfig.borrowCap != 0)
+      poolConfigurator.setBorrowCap(testAssetConfig.underlying, 0);
+    vm.stopPrank();
+
+    // GHO is a special case as it cannot be supplied
+    if (testAssetConfig.underlying == AaveV3EthereumAssets.GHO_UNDERLYING) {
+      _deposit(collateralConfig, pool, collateralSupplier, collateralAssetAmount);
+      uint256 snapshot = vm.snapshot();
+      // test variable borrowing
+      if (testAssetConfig.borrowingEnabled) {
+        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
         vm.revertTo(snapshot);
+        // test stable borrowing
+        if (testAssetConfig.stableBorrowRateEnabled) {
+          _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
+          vm.revertTo(snapshot);
+        }
+      }
+    } else {
+      _deposit(collateralConfig, pool, collateralSupplier, collateralAssetAmount);
+      _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
+      uint256 snapshot = vm.snapshot();
+      // test withdrawal
+      _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
+      _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
+      vm.revertTo(snapshot);
+      // test variable borrowing
+      if (testAssetConfig.borrowingEnabled) {
+        if (
+          (testAssetConfig.borrowCap * 10 ** testAssetConfig.decimals) <
+          IERC20(testAssetConfig.variableDebtToken).totalSupply() + testAssetAmount
+        ) {
+          console.log('Skip Borrowing: %s, borrow cap fully utilized', testAssetConfig.symbol);
+          return;
+        }
+        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
+        vm.revertTo(snapshot);
+        // test stable borrowing
+        if (testAssetConfig.stableBorrowRateEnabled) {
+          _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
+          vm.revertTo(snapshot);
+        }
       }
     }
   }
@@ -188,20 +288,37 @@ contract ProtocolV3TestBase is CommonTestBase {
     bool stable
   ) internal {
     this._borrow(testAssetConfig, pool, borrower, amount, stable);
+    // switching back and forth between rate modes should work
+    if (testAssetConfig.stableBorrowRateEnabled) {
+      vm.startPrank(borrower);
+      pool.swapBorrowRateMode(testAssetConfig.underlying, stable ? 1 : 2);
+      pool.swapBorrowRateMode(testAssetConfig.underlying, stable ? 2 : 1);
+    } else {
+      vm.expectRevert();
+      pool.swapBorrowRateMode(testAssetConfig.underlying, stable ? 1 : 2);
+    }
     _repay(testAssetConfig, pool, borrower, amount, stable);
   }
 
   /**
-   * @dev returns the first collateral in the list that cannot be borrowed in stable mode
+   * @dev returns a "good" collateral in the list that cannot be borrowed in stable mode
    */
-  function _getFirstCollateral(
+  function _getGoodCollateral(
     ReserveConfig[] memory configs
   ) private pure returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
-      if (configs[i].usageAsCollateralEnabled && !configs[i].stableBorrowRateEnabled)
-        return configs[i];
+      if (
+        // not frozen etc
+        _includeInE2e(configs[i]) &&
+        // usable as collateral
+        configs[i].usageAsCollateralEnabled &&
+        // not stable borrowable as this makes testing stable borrowing unnecessary hard to reason about
+        !configs[i].stableBorrowRateEnabled &&
+        // not isolated asset as we can only borrow stablecoins against it
+        configs[i].debtCeiling == 0
+      ) return configs[i];
     }
-    revert('ERROR: No collateral found');
+    revert('ERROR: No usable collateral found');
   }
 
   function _deposit(
@@ -216,7 +333,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     vm.startPrank(user);
     uint256 aTokenBefore = IERC20(config.aToken).balanceOf(user);
     deal2(config.underlying, user, amount);
-    IERC20(config.underlying).safeApprove(address(pool), amount);
+    IERC20(config.underlying).forceApprove(address(pool), amount);
     console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
     pool.deposit(config.underlying, amount, user, 0);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
@@ -272,11 +389,15 @@ contract ProtocolV3TestBase is CommonTestBase {
     address debtToken = stable ? config.stableDebtToken : config.variableDebtToken;
     uint256 debtBefore = IERC20(debtToken).balanceOf(user);
     deal2(config.underlying, user, amount);
-    IERC20(config.underlying).safeApprove(address(pool), amount);
+    IERC20(config.underlying).forceApprove(address(pool), amount);
     console.log('REPAY: %s, Amount: %s', config.symbol, amount);
     pool.repay(config.underlying, amount, stable ? 1 : 2, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
-    require(debtAfter == ((debtBefore > amount) ? debtBefore - amount : 0), '_repay() : ERROR');
+    if (amount >= debtBefore) {
+      assertEq(debtAfter, 0, '_repay() : ERROR MUST_BE_ZERO');
+    } else {
+      assertApproxEqAbs(debtAfter, debtBefore - amount, 1, '_repay() : ERROR MAX_ONE_OFF');
+    }
     vm.stopPrank();
   }
 
@@ -416,8 +537,8 @@ contract ProtocolV3TestBase is CommonTestBase {
         'aTokenImpl',
         ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, config.aToken)
       );
-      vm.serializeString(key, 'aTokenSymbol', IERC20Detailed(config.aToken).symbol());
-      vm.serializeString(key, 'aTokenName', IERC20Detailed(config.aToken).name());
+      vm.serializeString(key, 'aTokenSymbol', IERC20Metadata(config.aToken).symbol());
+      vm.serializeString(key, 'aTokenName', IERC20Metadata(config.aToken).name());
       vm.serializeAddress(
         key,
         'stableDebtTokenImpl',
@@ -429,9 +550,9 @@ contract ProtocolV3TestBase is CommonTestBase {
       vm.serializeString(
         key,
         'stableDebtTokenSymbol',
-        IERC20Detailed(config.stableDebtToken).symbol()
+        IERC20Metadata(config.stableDebtToken).symbol()
       );
-      vm.serializeString(key, 'stableDebtTokenName', IERC20Detailed(config.stableDebtToken).name());
+      vm.serializeString(key, 'stableDebtTokenName', IERC20Metadata(config.stableDebtToken).name());
       vm.serializeAddress(
         key,
         'variableDebtTokenImpl',
@@ -443,12 +564,12 @@ contract ProtocolV3TestBase is CommonTestBase {
       vm.serializeString(
         key,
         'variableDebtTokenSymbol',
-        IERC20Detailed(config.variableDebtToken).symbol()
+        IERC20Metadata(config.variableDebtToken).symbol()
       );
       vm.serializeString(
         key,
         'variableDebtTokenName',
-        IERC20Detailed(config.variableDebtToken).name()
+        IERC20Metadata(config.variableDebtToken).name()
       );
       vm.serializeAddress(key, 'oracle', address(assetOracle));
       if (address(assetOracle) != address(0)) {
@@ -588,7 +709,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     localConfig.liquidationProtocolFee = configuration.getLiquidationProtocolFee();
     localConfig.isBorrowableInIsolation = configuration.getBorrowableInIsolation();
 
-    localConfig.isFlashloanable = false;
+    localConfig.isFlashloanable = configuration.getFlashLoanEnabled();
 
     return localConfig;
   }
@@ -689,82 +810,82 @@ contract ProtocolV3TestBase is CommonTestBase {
     ReserveConfig memory config = _findReserveConfig(allConfigs, expectedConfig.underlying);
     require(
       keccak256(bytes(config.symbol)) == keccak256(bytes(expectedConfig.symbol)),
-      '_validateConfigsInAave() : INVALID_SYMBOL'
+      '_validateReserveConfig() : INVALID_SYMBOL'
     );
     require(
       config.underlying == expectedConfig.underlying,
-      '_validateConfigsInAave() : INVALID_UNDERLYING'
+      '_validateReserveConfig() : INVALID_UNDERLYING'
     );
-    require(config.decimals == expectedConfig.decimals, '_validateConfigsInAave: INVALID_DECIMALS');
-    require(config.ltv == expectedConfig.ltv, '_validateConfigsInAave: INVALID_LTV');
+    require(config.decimals == expectedConfig.decimals, '_validateReserveConfig: INVALID_DECIMALS');
+    require(config.ltv == expectedConfig.ltv, '_validateReserveConfig: INVALID_LTV');
     require(
       config.liquidationThreshold == expectedConfig.liquidationThreshold,
-      '_validateConfigsInAave: INVALID_LIQ_THRESHOLD'
+      '_validateReserveConfig: INVALID_LIQ_THRESHOLD'
     );
     require(
       config.liquidationBonus == expectedConfig.liquidationBonus,
-      '_validateConfigsInAave: INVALID_LIQ_BONUS'
+      '_validateReserveConfig: INVALID_LIQ_BONUS'
     );
     require(
       config.liquidationProtocolFee == expectedConfig.liquidationProtocolFee,
-      '_validateConfigsInAave: INVALID_LIQUIDATION_PROTOCOL_FEE'
+      '_validateReserveConfig: INVALID_LIQUIDATION_PROTOCOL_FEE'
     );
     require(
       config.reserveFactor == expectedConfig.reserveFactor,
-      '_validateConfigsInAave: INVALID_RESERVE_FACTOR'
+      '_validateReserveConfig: INVALID_RESERVE_FACTOR'
     );
 
     require(
       config.usageAsCollateralEnabled == expectedConfig.usageAsCollateralEnabled,
-      '_validateConfigsInAave: INVALID_USAGE_AS_COLLATERAL'
+      '_validateReserveConfig: INVALID_USAGE_AS_COLLATERAL'
     );
     require(
       config.borrowingEnabled == expectedConfig.borrowingEnabled,
-      '_validateConfigsInAave: INVALID_BORROWING_ENABLED'
+      '_validateReserveConfig: INVALID_BORROWING_ENABLED'
     );
     require(
       config.stableBorrowRateEnabled == expectedConfig.stableBorrowRateEnabled,
-      '_validateConfigsInAave: INVALID_STABLE_BORROW_ENABLED'
+      '_validateReserveConfig: INVALID_STABLE_BORROW_ENABLED'
     );
     require(
       config.isActive == expectedConfig.isActive,
-      '_validateConfigsInAave: INVALID_IS_ACTIVE'
+      '_validateReserveConfig: INVALID_IS_ACTIVE'
     );
     require(
       config.isFrozen == expectedConfig.isFrozen,
-      '_validateConfigsInAave: INVALID_IS_FROZEN'
+      '_validateReserveConfig: INVALID_IS_FROZEN'
     );
     require(
       config.isSiloed == expectedConfig.isSiloed,
-      '_validateConfigsInAave: INVALID_IS_SILOED'
+      '_validateReserveConfig: INVALID_IS_SILOED'
     );
     require(
       config.isBorrowableInIsolation == expectedConfig.isBorrowableInIsolation,
-      '_validateConfigsInAave: INVALID_IS_BORROWABLE_IN_ISOLATION'
+      '_validateReserveConfig: INVALID_IS_BORROWABLE_IN_ISOLATION'
     );
     require(
       config.isFlashloanable == expectedConfig.isFlashloanable,
-      '_validateConfigsInAave: INVALID_IS_FLASHLOANABLE'
+      '_validateReserveConfig: INVALID_IS_FLASHLOANABLE'
     );
     require(
       config.supplyCap == expectedConfig.supplyCap,
-      '_validateConfigsInAave: INVALID_SUPPLY_CAP'
+      '_validateReserveConfig: INVALID_SUPPLY_CAP'
     );
     require(
       config.borrowCap == expectedConfig.borrowCap,
-      '_validateConfigsInAave: INVALID_BORROW_CAP'
+      '_validateReserveConfig: INVALID_BORROW_CAP'
     );
     require(
       config.debtCeiling == expectedConfig.debtCeiling,
-      '_validateConfigsInAave: INVALID_DEBT_CEILING'
+      '_validateReserveConfig: INVALID_DEBT_CEILING'
     );
     require(
       config.eModeCategory == expectedConfig.eModeCategory,
-      '_validateConfigsInAave: INVALID_EMODE_CATEGORY'
+      '_validateReserveConfig: INVALID_EMODE_CATEGORY'
     );
     require(
       config.interestRateStrategy == expectedConfig.interestRateStrategy,
-      '_validateConfigsInAave: INVALID_INTEREST_RATE_STRATEGY'
+      '_validateReserveConfig: INVALID_INTEREST_RATE_STRATEGY'
     );
   }
 
@@ -989,7 +1110,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     require(
       IInitializableAdminUpgradeabilityProxy(config.aToken).implementation() ==
         expectedImpls.aToken,
-      '_validateReserveTokensImpls() : INVALID_ATOKEN_IMPL'
+      '_validateReserveTokensImpls() : INVALID_VARIABLE_DEBT_IMPL'
     );
     require(
       IInitializableAdminUpgradeabilityProxy(config.variableDebtToken).implementation() ==
@@ -999,7 +1120,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     require(
       IInitializableAdminUpgradeabilityProxy(config.stableDebtToken).implementation() ==
         expectedImpls.stableDebtToken,
-      '_validateReserveTokensImpls() : INVALID_ATOKEN_IMPL'
+      '_validateReserveTokensImpls() : INVALID_STABLE_DEBT_IMPL'
     );
     vm.stopPrank();
   }
@@ -1043,9 +1164,43 @@ contract ProtocolV3TestBase is CommonTestBase {
       revert('_getAssetOnEmodeCategory(): LESS_ASSETS_IN_CATEGORY_THAN_EXPECTED');
     }
   }
+
+  function _validateEmodeCategory(
+    IPoolAddressesProvider addressesProvider,
+    uint256 category,
+    DataTypes.EModeCategory memory expectedCategoryData
+  ) internal view {
+    address poolAddress = addressesProvider.getPool();
+    DataTypes.EModeCategory memory currentCategoryData = IPool(poolAddress).getEModeCategoryData(
+      uint8(category)
+    );
+    require(
+      keccak256(bytes(currentCategoryData.label)) == keccak256(bytes(expectedCategoryData.label)),
+      '_validateEmodeCategory(): INVALID_LABEL'
+    );
+    require(
+      currentCategoryData.ltv == expectedCategoryData.ltv,
+      '_validateEmodeCategory(): INVALID_LTV'
+    );
+    require(
+      currentCategoryData.liquidationThreshold == expectedCategoryData.liquidationThreshold,
+      '_validateEmodeCategory(): INVALID_LT'
+    );
+    require(
+      currentCategoryData.liquidationBonus == expectedCategoryData.liquidationBonus,
+      '_validateEmodeCategory(): INVALID_LB'
+    );
+    require(
+      currentCategoryData.priceSource == expectedCategoryData.priceSource,
+      '_validateEmodeCategory(): INVALID_PRICE_SOURCE'
+    );
+  }
 }
 
-contract ProtocolV3_0_1TestBase is ProtocolV3TestBase {
+/**
+ * only applicable to v3 harmony at this point
+ */
+contract ProtocolV3LegacyTestBase is ProtocolV3TestBase {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
 
   function _getStructReserveConfig(
@@ -1083,7 +1238,7 @@ contract ProtocolV3_0_1TestBase is ProtocolV3TestBase {
     localConfig.liquidationProtocolFee = configuration.getLiquidationProtocolFee();
     localConfig.isBorrowableInIsolation = configuration.getBorrowableInIsolation();
 
-    localConfig.isFlashloanable = configuration.getFlashLoanEnabled();
+    localConfig.isFlashloanable = false;
 
     return localConfig;
   }

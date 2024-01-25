@@ -2,32 +2,24 @@
 
 ### Reserve altered
 
-#### WETH ([0x4200000000000000000000000000000000000006](https://optimistic.etherscan.io/address/0x4200000000000000000000000000000000000006))
+#### WETH ([0x4200000000000000000000000000000000000006](https://explorer.optimism.io/address/0x4200000000000000000000000000000000000006))
 
 | description | value before | value after |
 | --- | --- | --- |
-| reserveFactor | 10 % | 15 % |
-| interestRateStrategy | [0xeE1BAc9355EaAfCD1B68d272d640d870bC9b4b5C](https://optimistic.etherscan.io/address/0xeE1BAc9355EaAfCD1B68d272d640d870bC9b4b5C) | [0xc76EF342898f1AE7E6C4632627Df683FAD8563DD](https://optimistic.etherscan.io/address/0xc76EF342898f1AE7E6C4632627Df683FAD8563DD) |
-| optimalUsageRatio | 45 % | 80 % |
-| maxExcessUsageRatio | 55 % | 20 % |
+| interestRateStrategy | [0x5f58C25D17C09c9e1892F45DE6dA45ed973A5326](https://explorer.optimism.io/address/0x5f58C25D17C09c9e1892F45DE6dA45ed973A5326) | [0xc76EF342898f1AE7E6C4632627Df683FAD8563DD](https://explorer.optimism.io/address/0xc76EF342898f1AE7E6C4632627Df683FAD8563DD) |
 | baseVariableBorrowRate | 0 % | 1 % |
-| variableRateSlope1 | 7 % | 3.8 % |
-| variableRateSlope2 | 300 % | 80 % |
-| baseStableBorrowRate | 9 % | 6.8 % |
-| stableRateSlope1 | 0 % | 4 % |
-| stableRateSlope2 | 0 % | 80 % |
-| interestRate | ![before](/.assets/19b2f23d55d76d891e7d30c29aa97741efed9d17.svg) | ![after](/.assets/25b7cbb97d2012b141455f46ee9b3f7e0e40a4b0.svg) |
+| variableRateSlope1 | 3.3 % | 3.8 % |
+| baseStableBorrowRate | 6.3 % | 6.8 % |
+| interestRate | ![before](/.assets/715cbb89cad22db0c20f074df5ed4b41cd5a2327.svg) | ![after](/.assets/25b7cbb97d2012b141455f46ee9b3f7e0e40a4b0.svg) |
 
-#### USDT ([0x94b008aA00579c1307B0EF2c499aD98a8ce58e58](https://optimistic.etherscan.io/address/0x94b008aA00579c1307B0EF2c499aD98a8ce58e58))
+#### USDT ([0x94b008aA00579c1307B0EF2c499aD98a8ce58e58](https://explorer.optimism.io/address/0x94b008aA00579c1307B0EF2c499aD98a8ce58e58))
 
 | description | value before | value after |
 | --- | --- | --- |
-| interestRateStrategy | [0x41B66b4b6b4c9dab039d96528D1b88f7BAF8C5A4](https://optimistic.etherscan.io/address/0x41B66b4b6b4c9dab039d96528D1b88f7BAF8C5A4) | [0xA9F3C3caE095527061e6d270DBE163693e6fda9D](https://optimistic.etherscan.io/address/0xA9F3C3caE095527061e6d270DBE163693e6fda9D) |
+| interestRateStrategy | [0xd5CA18a70189309664e34FB8150799ff13722308](https://explorer.optimism.io/address/0xd5CA18a70189309664e34FB8150799ff13722308) | [0x424883C7dD9Bd129BC346A65E8455CDe9fC0c43C](https://explorer.optimism.io/address/0x424883C7dD9Bd129BC346A65E8455CDe9fC0c43C) |
 | optimalUsageRatio | 90 % | 80 % |
 | maxExcessUsageRatio | 10 % | 20 % |
-| variableRateSlope2 | 60 % | 75 % |
-| stableRateSlope2 | 60 % | 75 % |
-| interestRate | ![before](/.assets/ea60696e57315a00b0941d7fe1bd186df779165e.svg) | ![after](/.assets/8d9de32bf30b1c9dcf71f07a13b228c69a71a4ce.svg) |
+| interestRate | ![before](/.assets/5f02ea67e5ba53eee2797379ac1cd619db8b194e.svg) | ![after](/.assets/ae5f4984ec6d1aad35594fe55bd4718cc49196da.svg) |
 
 ## Raw diff
 
@@ -36,18 +28,14 @@
   "reserves": {
     "0x4200000000000000000000000000000000000006": {
       "interestRateStrategy": {
-        "from": "0xeE1BAc9355EaAfCD1B68d272d640d870bC9b4b5C",
+        "from": "0x5f58C25D17C09c9e1892F45DE6dA45ed973A5326",
         "to": "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD"
-      },
-      "reserveFactor": {
-        "from": 1000,
-        "to": 1500
       }
     },
     "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58": {
       "interestRateStrategy": {
-        "from": "0x41B66b4b6b4c9dab039d96528D1b88f7BAF8C5A4",
-        "to": "0xA9F3C3caE095527061e6d270DBE163693e6fda9D"
+        "from": "0xd5CA18a70189309664e34FB8150799ff13722308",
+        "to": "0x424883C7dD9Bd129BC346A65E8455CDe9fC0c43C"
       }
     }
   },

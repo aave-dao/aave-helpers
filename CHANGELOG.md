@@ -2,6 +2,51 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/bgd-labs/aave-helpers/compare/v2.2.0...v2.3.0) (2023-06-29)
+
+
+### Features
+
+* add forwarders ([#72](https://github.com/bgd-labs/aave-helpers/issues/72)) ([49e85e7](https://github.com/bgd-labs/aave-helpers/commit/49e85e78a5a7290271e820dd5c5581384c55402a))
+* add oracle info ([#84](https://github.com/bgd-labs/aave-helpers/issues/84)) ([c273eec](https://github.com/bgd-labs/aave-helpers/commit/c273eec190a72ae956102a5f2e1dae892704817c))
+* add risk steward ([#83](https://github.com/bgd-labs/aave-helpers/issues/83)) ([1d973c4](https://github.com/bgd-labs/aave-helpers/commit/1d973c4f11f9938c8f97c805716a59de9e94474f))
+* add sentinel to snapshot ([#91](https://github.com/bgd-labs/aave-helpers/issues/91)) ([c339e88](https://github.com/bgd-labs/aave-helpers/commit/c339e889982651779b2e94dc94a5b1c9ac5563ba))
+* added _logStrategyPreviewUrlParams() to ProtocolV3TestBase and ProtocolV2TestBase ([#65](https://github.com/bgd-labs/aave-helpers/issues/65)) ([2c62d04](https://github.com/bgd-labs/aave-helpers/commit/2c62d04bb701c3791f9abe354bef66a23ad09a41))
+* finalize steward scripts ([#95](https://github.com/bgd-labs/aave-helpers/issues/95)) ([7be8b44](https://github.com/bgd-labs/aave-helpers/commit/7be8b441c667e2dc7a784b45f8a733cd8382687f))
+* finalize v2 addresses ([#103](https://github.com/bgd-labs/aave-helpers/issues/103)) ([1371a7c](https://github.com/bgd-labs/aave-helpers/commit/1371a7cca3777d4f3906a21c45477acc024d453b))
+* flatten structure ([#75](https://github.com/bgd-labs/aave-helpers/issues/75)) ([8e37485](https://github.com/bgd-labs/aave-helpers/commit/8e37485ff4a4d76e2783a97a2841bab4d0440836))
+* forwarder contract for metis ([#86](https://github.com/bgd-labs/aave-helpers/issues/86)) ([8b407ff](https://github.com/bgd-labs/aave-helpers/commit/8b407ff9554ab5e42b5da37dd5ec15cd13eb2244))
+* improve e2e testsuite ([#107](https://github.com/bgd-labs/aave-helpers/issues/107)) ([691f48c](https://github.com/bgd-labs/aave-helpers/commit/691f48cad066c5ea3fe924b906d48c557fe80e53))
+* improve v3 tests ([#104](https://github.com/bgd-labs/aave-helpers/issues/104)) ([7aebb79](https://github.com/bgd-labs/aave-helpers/commit/7aebb798c214bce19e777069b140fef94eaecb30))
+* include name/samybol of asv ([#106](https://github.com/bgd-labs/aave-helpers/issues/106)) ([4c81999](https://github.com/bgd-labs/aave-helpers/commit/4c819998905a1103ea50e4924d56632a6c77f0ac))
+* initialize as empty objects ([#87](https://github.com/bgd-labs/aave-helpers/issues/87)) ([89b8e02](https://github.com/bgd-labs/aave-helpers/commit/89b8e02b29897ba765a546e706fb9c2f74c801d7))
+* ipfs tools ([#90](https://github.com/bgd-labs/aave-helpers/issues/90)) ([8504b3e](https://github.com/bgd-labs/aave-helpers/commit/8504b3ebbeed210f98563b77202ba4b2a1c3ef37))
+* new governance tools ([#99](https://github.com/bgd-labs/aave-helpers/issues/99)) ([cec1bff](https://github.com/bgd-labs/aave-helpers/commit/cec1bff3ec6b80be7757bc40dfdbb886a9d8a99c))
+* patch deal (reverting caller) ([#110](https://github.com/bgd-labs/aave-helpers/issues/110)) ([32254d7](https://github.com/bgd-labs/aave-helpers/commit/32254d7305cf4c021620aba3537bbdb015c591cd))
+* patch v2 e2e suite ([#92](https://github.com/bgd-labs/aave-helpers/issues/92)) ([d9f4e2d](https://github.com/bgd-labs/aave-helpers/commit/d9f4e2db82863c7e579f8af5904769f0d5894dec))
+* rates base payload and factory for v2 ([#68](https://github.com/bgd-labs/aave-helpers/issues/68)) ([ccadc3c](https://github.com/bgd-labs/aave-helpers/commit/ccadc3caead3dde0835a75f0fe148b903a3692a0))
+* serialize chainId on v2 as well ([#80](https://github.com/bgd-labs/aave-helpers/issues/80)) ([136abd4](https://github.com/bgd-labs/aave-helpers/commit/136abd46bb8ee55bc6f0cf505a3886ac541aeff0))
+* show ipfs preview ([#100](https://github.com/bgd-labs/aave-helpers/issues/100)) ([4c4d223](https://github.com/bgd-labs/aave-helpers/commit/4c4d223940af14b107a1bc14defabfa5c511fea2))
+* snapshot symbol & name ([#105](https://github.com/bgd-labs/aave-helpers/issues/105)) ([5d303fe](https://github.com/bgd-labs/aave-helpers/commit/5d303fe0f0c424d8919953269ddf3851f91dccc4))
+* update deps ([#79](https://github.com/bgd-labs/aave-helpers/issues/79)) ([0a48f24](https://github.com/bgd-labs/aave-helpers/commit/0a48f2427814777666c05252aaadad208f52f47a))
+* update libraries ([#96](https://github.com/bgd-labs/aave-helpers/issues/96)) ([3b01622](https://github.com/bgd-labs/aave-helpers/commit/3b016220a02bb0fe3a7589e666bb6ea7ffdc3cde))
+* update-gov-scripts ([#116](https://github.com/bgd-labs/aave-helpers/issues/116)) ([9160727](https://github.com/bgd-labs/aave-helpers/commit/916072715cd641e4fd337ca084836efd259dcdc3))
+* upgrade ci ([#109](https://github.com/bgd-labs/aave-helpers/issues/109)) ([d476f42](https://github.com/bgd-labs/aave-helpers/commit/d476f421589e246b5870889a7d0bf75e4b6c3950))
+* use lib to read flags instead of doing calls ([#108](https://github.com/bgd-labs/aave-helpers/issues/108)) ([60dd764](https://github.com/bgd-labs/aave-helpers/commit/60dd764f9914ad08230601a8c07b42a30d433d3c))
+
+
+### Bug Fixes
+
+* 0.8 compat ([#69](https://github.com/bgd-labs/aave-helpers/issues/69)) ([78b55aa](https://github.com/bgd-labs/aave-helpers/commit/78b55aadb671b03cde196673d3524399a21bbf33))
+* add missing scripts ([#82](https://github.com/bgd-labs/aave-helpers/issues/82)) ([afe2a9f](https://github.com/bgd-labs/aave-helpers/commit/afe2a9fd060a5a6ff9871f448548e5009e1de6ea))
+* bump aave-address-book ([3da36e6](https://github.com/bgd-labs/aave-helpers/commit/3da36e6fdfd6543bb1c6f7b7b2fcc0506015a97c))
+* diff-snapshot**s** typo ([#101](https://github.com/bgd-labs/aave-helpers/issues/101)) ([b239952](https://github.com/bgd-labs/aave-helpers/commit/b2399522b7f41477358e61c48eec0dbb2ffbd29f))
+* error string not reflecting actual error ([#112](https://github.com/bgd-labs/aave-helpers/issues/112)) ([2ebb620](https://github.com/bgd-labs/aave-helpers/commit/2ebb62097723c2bcb95b4a01c2eff336dae50a6f))
+* ethereum e2e ([#98](https://github.com/bgd-labs/aave-helpers/issues/98)) ([cfd9133](https://github.com/bgd-labs/aave-helpers/commit/cfd91334e58b36fdeb0296d3cb8e40a85ed3d954))
+* fix linting ([1d24015](https://github.com/bgd-labs/aave-helpers/commit/1d2401543d737dd9aa621b5a8730afa55714fe03))
+* resolve slight inconsistency on oracle.DECIMALS ([#89](https://github.com/bgd-labs/aave-helpers/issues/89)) ([0ccea16](https://github.com/bgd-labs/aave-helpers/commit/0ccea1639301700c59db40586cf36f96d08b7457))
+* write config to json ([#71](https://github.com/bgd-labs/aave-helpers/issues/71)) ([0a77460](https://github.com/bgd-labs/aave-helpers/commit/0a774604ebf4019a9dc44768e2085a1ea053d6db))
+
 ## [2.2.0](https://github.com/bgd-labs/aave-helpers/compare/v2.1.0...v2.2.0) (2023-02-22)
 
 

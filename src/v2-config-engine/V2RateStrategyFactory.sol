@@ -100,7 +100,9 @@ contract V2RateStrategyFactory is Initializable, IV2RateStrategyFactory {
     RateStrategyParams memory params;
 
     IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
-      ILendingPool(ADDRESSES_PROVIDER.getLendingPool()).getReserveData(asset).interestRateStrategyAddress
+      ILendingPool(ADDRESSES_PROVIDER.getLendingPool())
+        .getReserveData(asset)
+        .interestRateStrategyAddress
     );
 
     if (address(strategy) != address(0)) {
@@ -111,11 +113,9 @@ contract V2RateStrategyFactory is Initializable, IV2RateStrategyFactory {
   }
 
   ///@inheritdoc IV2RateStrategyFactory
-  function getStrategyData(IDefaultInterestRateStrategy strategy)
-    public
-    view
-    returns (RateStrategyParams memory)
-  {
+  function getStrategyData(
+    IDefaultInterestRateStrategy strategy
+  ) public view returns (RateStrategyParams memory) {
     return
       RateStrategyParams({
         optimalUtilizationRate: strategy.OPTIMAL_UTILIZATION_RATE(),
