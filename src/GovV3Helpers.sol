@@ -95,7 +95,7 @@ library GovV3Helpers {
   ) internal returns (IVotingMachineWithProofs.VotingBalanceProof[] memory) {
     string[] memory inputs = new string[](8);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@0.5.0';
+    inputs[1] = '@bgd-labs/aave-cli@0.6.4';
     inputs[2] = 'governance';
     inputs[3] = 'getVotingProofs';
     inputs[4] = '--proposalId';
@@ -121,7 +121,7 @@ library GovV3Helpers {
   ) internal returns (StorageRootResponse[] memory) {
     string[] memory inputs = new string[](6);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@0.5.0';
+    inputs[1] = '@bgd-labs/aave-cli@0.6.4';
     inputs[2] = 'governance';
     inputs[3] = 'getStorageRoots';
     inputs[4] = '--proposalId';
