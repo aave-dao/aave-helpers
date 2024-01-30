@@ -273,21 +273,7 @@ library GovHelpers {
    * @param payloadAddress address of payload to execute
    */
   function executePayload(Vm vm, address payloadAddress, address executor) internal {
-    if (
-      block.chainid == ChainIds.MAINNET &&
-      (executor == AaveGovernanceV2.SHORT_EXECUTOR || executor == AaveGovernanceV2.LONG_EXECUTOR)
-    ) {
-      Payload[] memory proposals = new Payload[](1);
-      proposals[0] = Payload({
-        target: payloadAddress,
-        signature: 'execute()',
-        callData: '',
-        withDelegatecall: true,
-        value: 0
-      });
-      uint256 proposalId = _queueProposalToL1ExecutorStorage(vm, executor, proposals);
-      AaveGovernanceV2.GOV.execute(proposalId);
-    } else if (_isKnownL2Executor(executor)) {
+    if (_isKnownL2Executor(executor)) {
       Payload[] memory proposals = new Payload[](1);
       proposals[0] = Payload({
         target: payloadAddress,
