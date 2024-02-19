@@ -23,7 +23,6 @@ import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
-import {GovHelpers, IAaveGovernanceV2} from './GovHelpers.sol';
 import {Create2Utils} from './ScriptUtils.sol';
 
 interface IGovernance_V2_5 {
@@ -586,37 +585,6 @@ library GovV3Helpers {
   function executeProposal(Vm vm, uint256 proposalId) internal {
     GovV3StorageHelpers.readyProposal(vm, proposalId);
     GovernanceV3Ethereum.GOVERNANCE.executeProposal(proposalId);
-  }
-
-  function build2_5Payload(
-    PayloadsControllerUtils.Payload memory payload
-  ) internal returns (GovHelpers.Payload memory) {
-    return
-      GovHelpers.Payload({
-        target: address(GovernanceV3Ethereum.GOVERNANCE),
-        value: 0,
-        signature: 'forwardPayloadForExecution((uint256,uint8,address,uint40))',
-        callData: abi.encode(payload),
-        withDelegatecall: false
-      });
-  }
-
-  // temporarily patched create proposal for governance v2.5
-  function createProposal2_5(
-    Vm vm,
-    PayloadsControllerUtils.Payload[] memory payloads,
-    bytes32 ipfsHash
-  ) internal returns (uint256) {
-    require(block.chainid == ChainIds.MAINNET, 'MAINNET_ONLY');
-    require(payloads.length != 0, 'MINIMUM_ONE_PAYLOAD');
-    require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
-
-    generateProposalPreviewLink(vm, payloads, ipfsHash, address(0));
-    GovHelpers.Payload[] memory gov2Payloads = new GovHelpers.Payload[](payloads.length);
-    for (uint256 i = 0; i < payloads.length; i++) {
-      gov2Payloads[i] = build2_5Payload(payloads[i]);
-    }
-    return GovHelpers.createProposal(gov2Payloads, ipfsHash, true);
   }
 
   /**

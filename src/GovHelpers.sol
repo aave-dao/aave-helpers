@@ -3,9 +3,8 @@ pragma solidity >=0.7.5 <0.9.0;
 pragma abicoder v2;
 
 import {Vm} from 'forge-std/Vm.sol';
-import {console2} from 'forge-std/console2.sol';
-import {IpfsUtils} from './IpfsUtils.sol';
-import {AaveGovernanceV2, IAaveGovernanceV2, IExecutorWithTimelock} from 'aave-address-book/AaveGovernanceV2.sol';
+import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
+import {IExecutorWithTimelock} from 'aave-address-book/common/IExecutorWithTimelock.sol';
 import {IPoolAddressesProvider} from 'aave-address-book/AaveV3.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveV3Harmony} from 'aave-address-book/AaveV3Harmony.sol';
@@ -23,14 +22,6 @@ interface CommonExecutor {
   function execute(uint256 actionsSetId) external payable;
 }
 
-interface IProposalValidator {
-  /**
-   * @dev Get voting duration constant value
-   * @return the voting duration value in seconds
-   **/
-  function VOTING_DURATION() external view returns (uint256);
-}
-
 library GovHelpers {
   error ExecutorNotFound();
   error LongBytesNotSupportedYet();
@@ -41,10 +32,6 @@ library GovHelpers {
     string signature;
     bytes callData;
     bool withDelegatecall;
-  }
-
-  function ipfsHashFile(Vm vm, string memory filePath) internal returns (bytes32) {
-    return IpfsUtils.ipfsHashFile(vm, filePath, false);
   }
 
   function buildMainnet(address payloadAddress) internal pure returns (Payload memory) {
@@ -121,128 +108,6 @@ library GovHelpers {
         callData: abi.encode(payloadAddress),
         withDelegatecall: true
       });
-  }
-
-  function createProposal(Payload[] memory payloads, bytes32 ipfsHash) internal returns (uint256) {
-    return _createProposal(AaveGovernanceV2.SHORT_EXECUTOR, payloads, ipfsHash, false);
-  }
-
-  function createProposal(
-    Payload[] memory payloads,
-    bytes32 ipfsHash,
-    bool emitLog
-  ) internal returns (uint256) {
-    return _createProposal(AaveGovernanceV2.SHORT_EXECUTOR, payloads, ipfsHash, emitLog);
-  }
-
-  function createProposal(
-    Payload[] memory payloads,
-    bytes32 ipfsHash,
-    address executor
-  ) internal returns (uint256) {
-    return _createProposal(executor, payloads, ipfsHash, false);
-  }
-
-  function createProposal(
-    Payload[] memory payloads,
-    bytes32 ipfsHash,
-    bool emitLog,
-    address executor
-  ) internal returns (uint256) {
-    return _createProposal(executor, payloads, ipfsHash, emitLog);
-  }
-
-  function _createProposal(
-    address executor,
-    Payload[] memory payloads,
-    bytes32 ipfsHash,
-    bool emitLog
-  ) private returns (uint256) {
-    require(block.chainid == ChainIds.MAINNET, 'MAINNET_ONLY');
-    require(payloads.length != 0, 'MINIMUM_ONE_PAYLOAD');
-    require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
-
-    address[] memory targets = new address[](payloads.length);
-    uint256[] memory values = new uint256[](payloads.length);
-    string[] memory signatures = new string[](payloads.length);
-    bytes[] memory calldatas = new bytes[](payloads.length);
-    bool[] memory withDelegatecalls = new bool[](payloads.length);
-    for (uint256 i = 0; i < payloads.length; i++) {
-      require(payloads[i].target != address(0), 'NON_ZERO_TARGET');
-      targets[i] = payloads[i].target;
-      signatures[i] = payloads[i].signature;
-      calldatas[i] = payloads[i].callData;
-      values[i] = payloads[i].value;
-      withDelegatecalls[i] = payloads[i].withDelegatecall;
-    }
-
-    if (emitLog) {
-      console2.logBytes(
-        abi.encodeWithSelector(
-          AaveGovernanceV2.GOV.create.selector,
-          IExecutorWithTimelock(executor),
-          targets,
-          values,
-          signatures,
-          calldatas,
-          withDelegatecalls,
-          ipfsHash
-        )
-      );
-    }
-
-    return
-      AaveGovernanceV2.GOV.create(
-        IExecutorWithTimelock(executor),
-        targets,
-        values,
-        signatures,
-        calldatas,
-        withDelegatecalls,
-        ipfsHash
-      );
-  }
-
-  /**
-   * @dev Impersonate the ecosystem reserve and creates the proposal.
-   */
-  function createTestProposal(
-    Vm vm,
-    Payload[] memory payloads,
-    address executor
-  ) internal returns (uint256) {
-    vm.deal(MiscEthereum.ECOSYSTEM_RESERVE, 1 ether);
-    vm.startPrank(MiscEthereum.ECOSYSTEM_RESERVE);
-    uint256 proposalId = _createProposal(executor, payloads, bytes32('test'), false);
-    vm.stopPrank();
-    return proposalId;
-  }
-
-  function passVoteAndExecute(Vm vm, uint256 proposalId) internal {
-    passVoteAndQueue(vm, proposalId);
-    uint256 executionTime = AaveGovernanceV2.GOV.getProposalById(proposalId).executionTime;
-    vm.warp(executionTime + 1);
-    AaveGovernanceV2.GOV.execute(proposalId);
-  }
-
-  function passVoteAndQueue(Vm vm, uint256 proposalId) internal {
-    passVote(vm, proposalId);
-    AaveGovernanceV2.GOV.queue(proposalId);
-  }
-
-  /**
-   * Alter storage slots so the proposal passes
-   */
-  function passVote(Vm vm, uint256 proposalId) internal {
-    uint256 power = 5000000 ether;
-    vm.roll(block.number + 1);
-    vm.store(
-      address(AaveGovernanceV2.GOV),
-      bytes32(uint256(keccak256(abi.encode(proposalId, 0x4))) + 11),
-      bytes32(power)
-    );
-    uint256 endBlock = AaveGovernanceV2.GOV.getProposalById(proposalId).endBlock;
-    vm.roll(endBlock + 1);
   }
 
   /**
@@ -367,169 +232,6 @@ library GovHelpers {
     }
     // executiontime
     vm.store(l2Executor, bytes32(proposalBaseSlot + 5), bytes32(block.timestamp));
-    return proposalCount;
-  }
-
-  /**
-   * @notice Creates a proposal via storage overwrites
-   * @param vm vm
-   * @param params proposal
-   */
-  function _queueProposalToL1ExecutorStorage(
-    Vm vm,
-    address l1Executor,
-    Payload[] memory params
-  ) internal returns (uint256) {
-    //  struct Proposal {
-    //   uint256 id; // 0
-    //   address creator; // 1
-    //   IExecutorWithTimelock executor; // 2
-    //   address[] targets; // 3
-    //   uint256[] values; // 4
-    //   string[] signatures; // 5
-    //   bytes[] calldatas; // 6
-    //   bool[] withDelegatecalls; // 7
-    //   uint256 startBlock; // 8
-    //   uint256 endBlock; // 9
-    //   uint256 executionTime; // 10
-    //   uint256 forVotes; // 11
-    //   uint256 againstVotes; // 12
-    //   bool executed; // 13 0-8
-    //   bool canceled; // 13 9-16
-    //   address strategy; // 13 16-176
-    //   bytes32 ipfsHash; // 14
-    //   mapping(address => Vote) votes; // 15
-    // }
-    // count is stored in slot 5
-    uint256 proposalCount = uint256(vm.load(address(AaveGovernanceV2.GOV), bytes32(uint256(3))));
-    // bump counter by 1
-    vm.store(address(AaveGovernanceV2.GOV), bytes32(uint256(3)), bytes32(proposalCount + 1));
-
-    // set storage array sizes
-    // proposals
-    uint256 proposalBaseSlot = StorageHelpers.getStorageSlotUintMapping(4, proposalCount);
-    // id
-    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot), bytes32(proposalCount));
-    // creator
-    vm.store(
-      address(AaveGovernanceV2.GOV),
-      bytes32(proposalBaseSlot + 1),
-      bytes32(uint256(uint160(msg.sender)))
-    );
-    // executor
-    vm.store(
-      address(AaveGovernanceV2.GOV),
-      bytes32(proposalBaseSlot + 2),
-      bytes32(uint256(uint160(l1Executor)))
-    );
-    // targets
-    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 3), bytes32(params.length));
-    // values
-    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 4), bytes32(params.length));
-    // signatures
-    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 5), bytes32(params.length));
-    // calldatas
-    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 6), bytes32(params.length));
-    // withDelegateCalls
-    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 7), bytes32(params.length));
-    // block math
-    uint256 dalay = AaveGovernanceV2.GOV.getVotingDelay(); // (blocks) delay in voting blocks before voting can happen
-    uint256 duration = IProposalValidator(l1Executor).VOTING_DURATION(); // (blocks) duration of the voting
-    uint256 executionTime = block.timestamp;
-    // @dev the block timings are not accurate, but enough to satisfy execution
-    // startBlock
-    vm.store(
-      address(AaveGovernanceV2.GOV),
-      bytes32(proposalBaseSlot + 8),
-      bytes32(block.number - (dalay + duration))
-    );
-    // endBlock
-    vm.store(
-      address(AaveGovernanceV2.GOV),
-      bytes32(proposalBaseSlot + 9),
-      bytes32(block.number - 1)
-    );
-    // executionTime
-    vm.store(address(AaveGovernanceV2.GOV), bytes32(proposalBaseSlot + 10), bytes32(executionTime));
-    // forVotes
-    vm.store(
-      address(AaveGovernanceV2.GOV),
-      bytes32(proposalBaseSlot + 11),
-      bytes32(uint256(15_000_000 ether)) // TODO: calculate needed amount
-    );
-    // strategy
-    vm.store(
-      address(AaveGovernanceV2.GOV),
-      bytes32(proposalBaseSlot + 13),
-      bytes32(uint256(uint160(AaveGovernanceV2.GOV.getGovernanceStrategy())) << 16)
-    );
-    // store actual values
-    for (uint256 i = 0; i < params.length; i++) {
-      bytes32 queueHash = keccak256(
-        abi.encode(
-          params[i].target,
-          0,
-          params[i].signature,
-          params[i].callData,
-          executionTime,
-          true
-        )
-      );
-      // queue hash on executor
-      vm.store(
-        l1Executor,
-        bytes32(
-          StorageHelpers.getStorageSlotBytes32Mapping(
-            // the mapping slot is 3 on short and 7 on long
-            l1Executor == AaveGovernanceV2.SHORT_EXECUTOR ? 3 : 7,
-            queueHash
-          )
-        ),
-        bytes32(uint256(1))
-      );
-      // targets
-      vm.store(
-        address(AaveGovernanceV2.GOV),
-        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 3, i, 1)),
-        bytes32(uint256(uint160(params[i].target)))
-      );
-      // values
-      vm.store(
-        address(AaveGovernanceV2.GOV),
-        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 4, i, 1)),
-        bytes32(0)
-      );
-      // signatures
-      if (bytes(params[i].signature).length > 31) revert LongBytesNotSupportedYet();
-      vm.store(
-        address(AaveGovernanceV2.GOV),
-        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 5, i, 1)),
-        bytes32(
-          bytes.concat(
-            bytes31(bytes(params[i].signature)),
-            bytes1(uint8(bytes(params[i].signature).length * 2))
-          )
-        )
-      );
-      // calldatas
-      if (params[i].callData.length > 31) revert LongBytesNotSupportedYet();
-      vm.store(
-        address(AaveGovernanceV2.GOV),
-        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 6, i, 1)),
-        bytes32(
-          bytes.concat(
-            bytes31(bytes(params[i].callData)),
-            bytes1(uint8(bytes(params[i].callData).length * 2))
-          )
-        )
-      );
-      // withDelegateCalls
-      vm.store(
-        address(AaveGovernanceV2.GOV),
-        bytes32(StorageHelpers.arrLocation(proposalBaseSlot + 7, i, 1)),
-        bytes32(uint256(1))
-      );
-    }
     return proposalCount;
   }
 

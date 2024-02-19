@@ -7,6 +7,3 @@
 [submodule "lib/aave-address-book"]
 	path = lib/aave-address-book
 	url = https://github.com/bgd-labs/aave-address-book
-[submodule "lib/governance-crosschain-bridges"]
-	path = lib/governance-crosschain-bridges
-	url = https://github.com/aave/governance-crosschain-bridges
