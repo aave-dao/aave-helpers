@@ -246,7 +246,7 @@ library GovHelpers {
       return true;
     if (executor == AaveGovernanceV2.BASE_BRIDGE_EXECUTOR && block.chainid == ChainIds.BASE)
       return true;
-    // not a l2, but following same interface & stroage
+    // not a l2, but following same interface & storage
     if (executor == AaveGovernanceV2.ARC_TIMELOCK && block.chainid == ChainIds.MAINNET) return true;
     return false;
   }

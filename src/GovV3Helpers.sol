@@ -213,7 +213,7 @@ library GovV3Helpers {
    * @param payloadAddress address of the payload to be executed
    * @param accessLevel accessLevel required by the payload
    * @param value eth value to be sent to the payload
-   * @param withDelegateCall determines if payload thould be executed via delgatecall
+   * @param withDelegateCall determines if payload should be executed via delgatecall
    * @param signature signature to be executed on the payload
    * @param callData calldata for the signature
    */
@@ -283,7 +283,7 @@ library GovV3Helpers {
 
   /**
    * @dev executes a payloadAddress via payloadsController by injecting it into storage and executing it afterwards.
-   * Injecting into storage is a convinience method to reduce the txs executed from 2 to 1, this allows awaiting emitted events on the payloadsController.
+   * Injecting into storage is a convenience method to reduce the txs executed from 2 to 1, this allows awaiting emitted events on the payloadsController.
    * @notice This method is for test purposes only.
    * @param vm Vm
    * @param payloadAddress address of the payload to execute
@@ -578,7 +578,7 @@ library GovV3Helpers {
   }
 
   /**
-   * @dev Executes an already created proposal on governance v3 by manipulating stororage so it#s executable in the current block.
+   * @dev Executes an already created proposal on governance v3 by manipulating storage so it#s executable in the current block.
    * @param vm Vm
    * @param proposalId id of the proposal to execute
    */
@@ -779,7 +779,7 @@ library GovV3Helpers {
     IPayloadsControllerCore.ExecutionAction[] memory actionsA,
     IPayloadsControllerCore.ExecutionAction[] memory actionsB
   ) private pure returns (bool) {
-    // must be equal size for equlity
+    // must be equal size for equality
     if (actionsA.length != actionsB.length) return false;
     for (uint256 actionId = 0; actionId < actionsA.length; actionId++) {
       if (actionsA[actionId].target != actionsB[actionId].target) return false;
@@ -855,7 +855,7 @@ library GovV3StorageHelpers {
       bytes32(PROPOSALS_COUNT_SLOT),
       bytes32(uint256(count + 1))
     );
-    // overwrite creator as creator porposition power is checked on execution
+    // overwrite creator as creator proposition power is checked on execution
     vm.store(
       address(GovernanceV3Ethereum.GOVERNANCE),
       bytes32(proposalBaseSlot + 1),

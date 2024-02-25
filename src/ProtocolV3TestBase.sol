@@ -107,7 +107,7 @@ contract ProtocolV3TestBase is CommonTestBase {
   ) public view {
     uint256 configsBeforeLength = configBefore.length;
     for (uint256 i = 0; i < configAfter.length; i++) {
-      // assets are ususally not permanently unlisted, so the expectation is there will only be addition
+      // assets are usually not permanently unlisted, so the expectation is there will only be addition
       // if config existed before
       if (i < configsBeforeLength) {
         // borrow increase should only happen on assets with borrowing enabled
@@ -129,7 +129,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       // borrow cap should never exceed supply cap
       if (
         configAfter[i].borrowCap != 0 &&
-        configAfter[i].underlying != AaveV3EthereumAssets.GHO_UNDERLYING // GHO is the exlcusion from the rule
+        configAfter[i].underlying != AaveV3EthereumAssets.GHO_UNDERLYING // GHO is the exclusion from the rule
       ) {
         console.log(configAfter[i].underlying);
         require(configAfter[i].borrowCap <= configAfter[i].supplyCap, 'PL_SUPPLY_LT_BORROW');
@@ -140,7 +140,7 @@ contract ProtocolV3TestBase is CommonTestBase {
   /**
    * @dev Generates a markdown compatible snapshot of the whole pool configuration into `/reports`.
    * @param reportName filename suffix for the generated reports.
-   * @param pool the pool to be snapshotted
+   * @param pool the pool to be snapshot
    * @return ReserveConfig[] list of configs
    */
   function createConfigurationSnapshot(
