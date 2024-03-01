@@ -3,6 +3,7 @@ pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
 import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
+import {IDefaultInterestRateStrategyV2} from 'src/dependencies/IDefaultInterestRateStrategyV2.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
@@ -440,48 +441,73 @@ contract ProtocolV3TestBase is CommonTestBase {
     for (uint256 i = 0; i < configs.length; i++) {
       if (!_isInAddressArray(usedStrategies, configs[i].interestRateStrategy)) {
         usedStrategies[i] = configs[i].interestRateStrategy;
-        IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
+        IDefaultInterestRateStrategyV2 strategyV2 = IDefaultInterestRateStrategyV2(
           configs[i].interestRateStrategy
         );
-        string memory key = vm.toString(address(strategy));
-        vm.serializeString(
-          key,
-          'baseStableBorrowRate',
-          vm.toString(strategy.getBaseStableBorrowRate())
+        IDefaultInterestRateStrategy strategyV1 = IDefaultInterestRateStrategy(
+          configs[i].interestRateStrategy
         );
-        vm.serializeString(key, 'stableRateSlope1', vm.toString(strategy.getStableRateSlope1()));
-        vm.serializeString(key, 'stableRateSlope2', vm.toString(strategy.getStableRateSlope2()));
-        vm.serializeString(
-          key,
-          'baseVariableBorrowRate',
-          vm.toString(strategy.getBaseVariableBorrowRate())
-        );
-        vm.serializeString(
-          key,
-          'variableRateSlope1',
-          vm.toString(strategy.getVariableRateSlope1())
-        );
-        vm.serializeString(
-          key,
-          'variableRateSlope2',
-          vm.toString(strategy.getVariableRateSlope2())
-        );
-        vm.serializeString(
-          key,
-          'optimalStableToTotalDebtRatio',
-          vm.toString(strategy.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO())
-        );
-        vm.serializeString(
-          key,
-          'maxExcessStableToTotalDebtRatio',
-          vm.toString(strategy.MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO())
-        );
-        vm.serializeString(key, 'optimalUsageRatio', vm.toString(strategy.OPTIMAL_USAGE_RATIO()));
-        string memory object = vm.serializeString(
-          key,
-          'maxExcessUsageRatio',
-          vm.toString(strategy.MAX_EXCESS_USAGE_RATIO())
-        );
+        string memory key = vm.toString(address(strategyV1));
+        string memory object;
+        try strategyV1.getVariableRateSlope1() {
+          vm.serializeString(
+            key,
+            'baseStableBorrowRate',
+            vm.toString(strategyV1.getBaseStableBorrowRate())
+          );
+          vm.serializeString(key, 'stableRateSlope1', vm.toString(strategyV1.getStableRateSlope1()));
+          vm.serializeString(key, 'stableRateSlope2', vm.toString(strategyV1.getStableRateSlope2()));
+          vm.serializeString(
+            key,
+            'baseVariableBorrowRate',
+            vm.toString(strategyV1.getBaseVariableBorrowRate())
+          );
+          vm.serializeString(
+            key,
+            'variableRateSlope1',
+            vm.toString(strategyV1.getVariableRateSlope1())
+          );
+          vm.serializeString(
+            key,
+            'variableRateSlope2',
+            vm.toString(strategyV1.getVariableRateSlope2())
+          );
+          vm.serializeString(
+            key,
+            'optimalStableToTotalDebtRatio',
+            vm.toString(strategyV1.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO())
+          );
+          vm.serializeString(
+            key,
+            'maxExcessStableToTotalDebtRatio',
+            vm.toString(strategyV1.MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO())
+          );
+          vm.serializeString(key, 'optimalUsageRatio', vm.toString(strategyV1.OPTIMAL_USAGE_RATIO()));
+          object = vm.serializeString(
+            key,
+            'maxExcessUsageRatio',
+            vm.toString(strategyV1.MAX_EXCESS_USAGE_RATIO())
+          );
+        } catch {
+          address asset = configs[i].underlying;
+          vm.serializeString(
+            key,
+            'baseVariableBorrowRate',
+            vm.toString(strategyV2.getBaseVariableBorrowRate(asset))
+          );
+          vm.serializeString(
+            key,
+            'variableRateSlope1',
+            vm.toString(strategyV2.getVariableRateSlope1(asset))
+          );
+          vm.serializeString(
+            key,
+            'variableRateSlope2',
+            vm.toString(strategyV2.getVariableRateSlope2(asset))
+          );
+          vm.serializeString(key, 'maxVariableBorrowRate', vm.toString(strategyV2.getMaxVariableBorrowRate(asset)));
+          object = vm.serializeString(key, 'optimalUsageRatio', vm.toString(strategyV2.getOptimalUsageRatio(asset)));
+        }
         content = vm.serializeString(strategiesKey, key, object);
       }
     }
