@@ -968,6 +968,33 @@ contract ProtocolV3TestBase is CommonTestBase {
     );
   }
 
+  function _validateInterestRateData(
+    address asset,
+    address interestRateStrategyAddress,
+    IDefaultInterestRateStrategyV2.InterestRateData memory interestRateData
+  ) internal view {
+    IDefaultInterestRateStrategyV2 strategy = IDefaultInterestRateStrategyV2(
+      interestRateStrategyAddress
+    );
+
+    require(
+      strategy.getOptimalUsageRatio(asset) == interestRateData.optimalUsageRatio,
+      '_validateInterestRateData() : INVALID_OPTIMAL_RATIO'
+    );
+    require(
+      strategy.getBaseVariableBorrowRate(asset) == interestRateData.baseVariableBorrowRate,
+      '_validateInterestRateData() : INVALID_BASE_VARIABLE_BORROW'
+    );
+    require(
+      strategy.getVariableRateSlope1(asset) == interestRateData.variableRateSlope1,
+      '_validateInterestRateData() : INVALID_VARIABLE_SLOPE_1'
+    );
+    require(
+      strategy.getVariableRateSlope2(asset) == interestRateData.variableRateSlope2,
+      '_validateInterestRateData() : INVALID_VARIABLE_SLOPE_2'
+    );
+  }
+
   function _noReservesConfigsChangesApartNewListings(
     ReserveConfig[] memory allConfigsBefore,
     ReserveConfig[] memory allConfigsAfter
