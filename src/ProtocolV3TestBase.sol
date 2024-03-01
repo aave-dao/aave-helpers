@@ -971,7 +971,7 @@ contract ProtocolV3TestBase is CommonTestBase {
   function _validateInterestRateData(
     address asset,
     address interestRateStrategyAddress,
-    IDefaultInterestRateStrategyV2.InterestRateData memory interestRateData
+    IDefaultInterestRateStrategyV2.InterestRateDataRay memory interestRateData
   ) internal view {
     IDefaultInterestRateStrategyV2 strategy = IDefaultInterestRateStrategyV2(
       interestRateStrategyAddress
