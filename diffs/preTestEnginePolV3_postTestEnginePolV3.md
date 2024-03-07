@@ -9,7 +9,7 @@
 | interestRateStrategy | [0xf6733B9842883BFE0e0a940eA2F572676af31bde](https://polygonscan.com/address/0xf6733B9842883BFE0e0a940eA2F572676af31bde) | [0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F](https://polygonscan.com/address/0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F) |
 | variableRateSlope1 | 3.3 % | 3.8 % |
 | baseStableBorrowRate | 6.3 % | 6.8 % |
-| interestRate | ![before](/.assets/0503ddc95c9ff90b6308f1ba4175b90d670e81ed.svg) | ![after](/.assets/25b7cbb97d2012b141455f46ee9b3f7e0e40a4b0.svg) |
+| interestRate | ![before](/.assets/bc821e780dbf0cd88aa89ae21f339014e1053ceb.svg) | ![after](/.assets/e7c3905f5d41473b5148fbd1df41bdc06ae104fb.svg) |
 
 ## Raw diff
 
@@ -24,19 +24,18 @@
     }
   },
   "strategies": {
-    "0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F": {
-      "from": null,
-      "to": {
-        "baseStableBorrowRate": "68000000000000000000000000",
-        "baseVariableBorrowRate": "10000000000000000000000000",
-        "maxExcessStableToTotalDebtRatio": "800000000000000000000000000",
-        "maxExcessUsageRatio": "200000000000000000000000000",
-        "optimalStableToTotalDebtRatio": "200000000000000000000000000",
-        "optimalUsageRatio": "800000000000000000000000000",
-        "stableRateSlope1": "40000000000000000000000000",
-        "stableRateSlope2": "800000000000000000000000000",
-        "variableRateSlope1": "38000000000000000000000000",
-        "variableRateSlope2": "800000000000000000000000000"
+    "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619": {
+      "address": {
+        "from": "0xf6733B9842883BFE0e0a940eA2F572676af31bde",
+        "to": "0x27eFE5db315b71753b2a38ED3d5dd7E9362ba93F"
+      },
+      "baseStableBorrowRate": {
+        "from": "63000000000000000000000000",
+        "to": "68000000000000000000000000"
+      },
+      "variableRateSlope1": {
+        "from": "33000000000000000000000000",
+        "to": "38000000000000000000000000"
       }
     }
   }

@@ -330,36 +330,35 @@ contract ProtocolV2TestBase is CommonTestBase {
     // keys for json stringification
     string memory strategiesKey = 'stategies';
     string memory content = '{}';
+    vm.serializeJson(strategiesKey, '{}');
 
-    address[] memory usedStrategies = new address[](configs.length);
     for (uint256 i = 0; i < configs.length; i++) {
-      if (!_isInAddressArray(usedStrategies, configs[i].interestRateStrategy)) {
-        usedStrategies[i] = configs[i].interestRateStrategy;
-        IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
-          configs[i].interestRateStrategy
-        );
-        string memory key = vm.toString(address(strategy));
-        vm.serializeString(key, 'stableRateSlope1', vm.toString(strategy.stableRateSlope1()));
-        vm.serializeString(key, 'stableRateSlope2', vm.toString(strategy.stableRateSlope2()));
-        vm.serializeString(
-          key,
-          'baseVariableBorrowRate',
-          vm.toString(strategy.baseVariableBorrowRate())
-        );
-        vm.serializeString(key, 'variableRateSlope1', vm.toString(strategy.variableRateSlope1()));
-        vm.serializeString(key, 'variableRateSlope2', vm.toString(strategy.variableRateSlope2()));
-        vm.serializeString(
-          key,
-          'optimalUsageRatio',
-          vm.toString(strategy.OPTIMAL_UTILIZATION_RATE())
-        );
-        string memory object = vm.serializeString(
-          key,
-          'maxExcessUsageRatio',
-          vm.toString(strategy.EXCESS_UTILIZATION_RATE())
-        );
-        content = vm.serializeString(strategiesKey, key, object);
-      }
+      IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
+        configs[i].interestRateStrategy
+      );
+      string memory key = vm.toString(configs[i].underlying);
+      vm.serializeJson(key, '{}');
+      vm.serializeString(key, 'address', vm.toString(address(strategy)));
+      vm.serializeString(key, 'stableRateSlope1', vm.toString(strategy.stableRateSlope1()));
+      vm.serializeString(key, 'stableRateSlope2', vm.toString(strategy.stableRateSlope2()));
+      vm.serializeString(
+        key,
+        'baseVariableBorrowRate',
+        vm.toString(strategy.baseVariableBorrowRate())
+      );
+      vm.serializeString(key, 'variableRateSlope1', vm.toString(strategy.variableRateSlope1()));
+      vm.serializeString(key, 'variableRateSlope2', vm.toString(strategy.variableRateSlope2()));
+      vm.serializeString(
+        key,
+        'optimalUsageRatio',
+        vm.toString(strategy.OPTIMAL_UTILIZATION_RATE())
+      );
+      string memory object = vm.serializeString(
+        key,
+        'maxExcessUsageRatio',
+        vm.toString(strategy.EXCESS_UTILIZATION_RATE())
+      );
+      content = vm.serializeString(strategiesKey, key, object);
     }
     string memory output = vm.serializeString('root', 'strategies', content);
     vm.writeJson(output, path);
@@ -427,6 +426,7 @@ contract ProtocolV2TestBase is CommonTestBase {
     // keys for json stringification
     string memory reservesKey = 'reserves';
     string memory content = '{}';
+    vm.serializeJson(reservesKey, '{}');
 
     ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(
       pool.getAddressesProvider()
@@ -440,6 +440,7 @@ contract ProtocolV2TestBase is CommonTestBase {
       );
 
       string memory key = vm.toString(config.underlying);
+      vm.serializeJson(key, '{}');
       vm.serializeString(key, 'symbol', config.symbol);
       vm.serializeString(
         key,

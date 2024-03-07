@@ -509,31 +509,8 @@
     }
   },
   "strategies": {
-    "0x271f5f8325051f22caDa18FfedD4a805584a232A": {
-      "baseStableBorrowRate": 68000000000000000000000000,
-      "baseVariableBorrowRate": 10000000000000000000000000,
-      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
-      "maxExcessUsageRatio": 200000000000000000000000000,
-      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
-      "optimalUsageRatio": 800000000000000000000000000,
-      "stableRateSlope1": 40000000000000000000000000,
-      "stableRateSlope2": 800000000000000000000000000,
-      "variableRateSlope1": 38000000000000000000000000,
-      "variableRateSlope2": 800000000000000000000000000
-    },
-    "0x354E84ec43aCD91e1C0135c3e691960E881DB4b7": {
-      "baseStableBorrowRate": 60000000000000000000000000,
-      "baseVariableBorrowRate": 0,
-      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
-      "maxExcessUsageRatio": 550000000000000000000000000,
-      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
-      "optimalUsageRatio": 450000000000000000000000000,
-      "stableRateSlope1": 0,
-      "stableRateSlope2": 0,
-      "variableRateSlope1": 40000000000000000000000000,
-      "variableRateSlope2": 3000000000000000000000000000
-    },
-    "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6": {
+    "0x152b9d0FdC40C096757F570A51E494bd4b943E50": {
+      "address": "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6",
       "baseStableBorrowRate": 90000000000000000000000000,
       "baseVariableBorrowRate": 0,
       "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
@@ -545,19 +522,99 @@
       "variableRateSlope1": 70000000000000000000000000,
       "variableRateSlope2": 3000000000000000000000000000
     },
-    "0xD624AFA34614B4fe7FEe7e1751a2E5E04fb47398": {
-      "baseStableBorrowRate": 45000000000000000000000000,
+    "0x2b2C81e08f1Af8835a78Bb2A90AE924ACE0eA4bE": {
+      "address": "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6",
+      "baseStableBorrowRate": 90000000000000000000000000,
       "baseVariableBorrowRate": 0,
       "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
-      "maxExcessUsageRatio": 100000000000000000000000000,
+      "maxExcessUsageRatio": 550000000000000000000000000,
       "optimalStableToTotalDebtRatio": 200000000000000000000000000,
-      "optimalUsageRatio": 900000000000000000000000000,
-      "stableRateSlope1": 5000000000000000000000000,
-      "stableRateSlope2": 600000000000000000000000000,
-      "variableRateSlope1": 35000000000000000000000000,
-      "variableRateSlope2": 600000000000000000000000000
+      "optimalUsageRatio": 450000000000000000000000000,
+      "stableRateSlope1": 0,
+      "stableRateSlope2": 0,
+      "variableRateSlope1": 70000000000000000000000000,
+      "variableRateSlope2": 3000000000000000000000000000
     },
-    "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD": {
+    "0x49D5c2BdFfac6CE2BFdB6640F4F80f226bc10bAB": {
+      "address": "0x271f5f8325051f22caDa18FfedD4a805584a232A",
+      "baseStableBorrowRate": 68000000000000000000000000,
+      "baseVariableBorrowRate": 10000000000000000000000000,
+      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
+      "maxExcessUsageRatio": 200000000000000000000000000,
+      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
+      "optimalUsageRatio": 800000000000000000000000000,
+      "stableRateSlope1": 40000000000000000000000000,
+      "stableRateSlope2": 800000000000000000000000000,
+      "variableRateSlope1": 38000000000000000000000000,
+      "variableRateSlope2": 800000000000000000000000000
+    },
+    "0x50b7545627a5162F82A992c33b87aDc75187B218": {
+      "address": "0x354E84ec43aCD91e1C0135c3e691960E881DB4b7",
+      "baseStableBorrowRate": 60000000000000000000000000,
+      "baseVariableBorrowRate": 0,
+      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
+      "maxExcessUsageRatio": 550000000000000000000000000,
+      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
+      "optimalUsageRatio": 450000000000000000000000000,
+      "stableRateSlope1": 0,
+      "stableRateSlope2": 0,
+      "variableRateSlope1": 40000000000000000000000000,
+      "variableRateSlope2": 3000000000000000000000000000
+    },
+    "0x5947BB275c521040051D82396192181b413227A3": {
+      "address": "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6",
+      "baseStableBorrowRate": 90000000000000000000000000,
+      "baseVariableBorrowRate": 0,
+      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
+      "maxExcessUsageRatio": 550000000000000000000000000,
+      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
+      "optimalUsageRatio": 450000000000000000000000000,
+      "stableRateSlope1": 0,
+      "stableRateSlope2": 0,
+      "variableRateSlope1": 70000000000000000000000000,
+      "variableRateSlope2": 3000000000000000000000000000
+    },
+    "0x5c49b268c9841AFF1Cc3B0a418ff5c3442eE3F3b": {
+      "address": "0xfab05a6aF585da2F96e21452F91E812452996BD3",
+      "baseStableBorrowRate": 50000000000000000000000000,
+      "baseVariableBorrowRate": 0,
+      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
+      "maxExcessUsageRatio": 200000000000000000000000000,
+      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
+      "optimalUsageRatio": 800000000000000000000000000,
+      "stableRateSlope1": 5000000000000000000000000,
+      "stableRateSlope2": 750000000000000000000000000,
+      "variableRateSlope1": 40000000000000000000000000,
+      "variableRateSlope2": 750000000000000000000000000
+    },
+    "0x63a72806098Bd3D9520cC43356dD78afe5D386D9": {
+      "address": "0x79a906e8c998d2fb5C5D66d23c4c5416Fe0168D6",
+      "baseStableBorrowRate": 90000000000000000000000000,
+      "baseVariableBorrowRate": 0,
+      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
+      "maxExcessUsageRatio": 550000000000000000000000000,
+      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
+      "optimalUsageRatio": 450000000000000000000000000,
+      "stableRateSlope1": 0,
+      "stableRateSlope2": 0,
+      "variableRateSlope1": 70000000000000000000000000,
+      "variableRateSlope2": 3000000000000000000000000000
+    },
+    "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7": {
+      "address": "0xfab05a6aF585da2F96e21452F91E812452996BD3",
+      "baseStableBorrowRate": 50000000000000000000000000,
+      "baseVariableBorrowRate": 0,
+      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
+      "maxExcessUsageRatio": 200000000000000000000000000,
+      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
+      "optimalUsageRatio": 800000000000000000000000000,
+      "stableRateSlope1": 5000000000000000000000000,
+      "stableRateSlope2": 750000000000000000000000000,
+      "variableRateSlope1": 40000000000000000000000000,
+      "variableRateSlope2": 750000000000000000000000000
+    },
+    "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7": {
+      "address": "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD",
       "baseStableBorrowRate": 87200000000000000000000000,
       "baseVariableBorrowRate": 10000000000000000000000000,
       "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
@@ -569,7 +626,34 @@
       "variableRateSlope1": 47200000000000000000000000,
       "variableRateSlope2": 1442800000000000000000000000
     },
-    "0xfab05a6aF585da2F96e21452F91E812452996BD3": {
+    "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E": {
+      "address": "0xD624AFA34614B4fe7FEe7e1751a2E5E04fb47398",
+      "baseStableBorrowRate": 45000000000000000000000000,
+      "baseVariableBorrowRate": 0,
+      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
+      "maxExcessUsageRatio": 100000000000000000000000000,
+      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
+      "optimalUsageRatio": 900000000000000000000000000,
+      "stableRateSlope1": 5000000000000000000000000,
+      "stableRateSlope2": 600000000000000000000000000,
+      "variableRateSlope1": 35000000000000000000000000,
+      "variableRateSlope2": 600000000000000000000000000
+    },
+    "0xD24C2Ad096400B6FBcd2ad8B24E7acBc21A1da64": {
+      "address": "0xfab05a6aF585da2F96e21452F91E812452996BD3",
+      "baseStableBorrowRate": 50000000000000000000000000,
+      "baseVariableBorrowRate": 0,
+      "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
+      "maxExcessUsageRatio": 200000000000000000000000000,
+      "optimalStableToTotalDebtRatio": 200000000000000000000000000,
+      "optimalUsageRatio": 800000000000000000000000000,
+      "stableRateSlope1": 5000000000000000000000000,
+      "stableRateSlope2": 750000000000000000000000000,
+      "variableRateSlope1": 40000000000000000000000000,
+      "variableRateSlope2": 750000000000000000000000000
+    },
+    "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70": {
+      "address": "0xfab05a6aF585da2F96e21452F91E812452996BD3",
       "baseStableBorrowRate": 50000000000000000000000000,
       "baseVariableBorrowRate": 0,
       "maxExcessStableToTotalDebtRatio": 800000000000000000000000000,
