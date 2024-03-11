@@ -199,6 +199,14 @@ library GovV3Helpers {
     return buildAction(payloadAddress);
   }
 
+  function buildAction(
+    bytes memory bytecode,
+    bytes memory arguments
+  ) internal pure returns (IPayloadsControllerCore.ExecutionAction memory) {
+    address payloadAddress = predictDeterministicAddress(bytecode, arguments);
+    return buildAction(payloadAddress);
+  }
+
   /**
    * @dev builds a action to be registered on a payloadsController
    * - assumes accesscontrol level 1
