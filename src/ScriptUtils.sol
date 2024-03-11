@@ -88,6 +88,28 @@ library Create2Utils {
   // https://github.com/safe-global/safe-singleton-factory
   address public constant CREATE2_FACTORY = 0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7;
 
+  function create2Deploy(
+    bytes32 salt,
+    bytes memory bytecode,
+    bytes memory arguments
+  ) internal returns (address) {
+    if (isContractDeployed(CREATE2_FACTORY) == false) {
+      revert('MISSING_CREATE2_FACTORY');
+    }
+    address computed = computeCreate2Address(salt, bytecode, arguments);
+
+    if (isContractDeployed(computed)) {
+      return computed;
+    } else {
+      bytes memory creationBytecode = abi.encodePacked(salt, abi.encodePacked(bytecode, arguments));
+      bytes memory returnData;
+      (, returnData) = CREATE2_FACTORY.call(creationBytecode);
+      address deployedAt = address(uint160(bytes20(returnData)));
+      require(deployedAt == computed, 'failure at create2 address derivation');
+      return deployedAt;
+    }
+  }
+
   function create2Deploy(bytes32 salt, bytes memory bytecode) internal returns (address) {
     if (isContractDeployed(CREATE2_FACTORY) == false) {
       revert('MISSING_CREATE2_FACTORY');
@@ -125,6 +147,14 @@ library Create2Utils {
     bytes memory bytecode
   ) internal pure returns (address) {
     return computeCreate2Address(salt, keccak256(abi.encodePacked(bytecode)));
+  }
+
+  function computeCreate2Address(
+    bytes32 salt,
+    bytes memory bytecode,
+    bytes memory arguments
+  ) internal pure returns (address) {
+    return computeCreate2Address(salt, keccak256(abi.encodePacked(bytecode, arguments)));
   }
 
   function addressFromLast20Bytes(bytes32 bytesValue) internal pure returns (address) {

@@ -162,11 +162,25 @@ library GovV3Helpers {
     return Create2Utils.create2Deploy('v1', bytecode);
   }
 
+  function deployDeterministic(
+    bytes memory bytecode,
+    bytes memory arguments
+  ) internal returns (address) {
+    return Create2Utils.create2Deploy('v1', bytecode, arguments);
+  }
+
   /**
    * Predicts the payload based on a constant salt
    */
   function predictDeterministicAddress(bytes memory bytecode) internal pure returns (address) {
     return Create2Utils.computeCreate2Address('v1', bytecode);
+  }
+
+  function predictDeterministicAddress(
+    bytes memory bytecode,
+    bytes memory arguments
+  ) internal pure returns (address) {
+    return Create2Utils.computeCreate2Address('v1', bytecode, arguments);
   }
 
   /**
