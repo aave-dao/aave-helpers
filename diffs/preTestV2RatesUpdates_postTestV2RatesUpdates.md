@@ -7,11 +7,11 @@
 | description | value before | value after |
 | --- | --- | --- |
 | interestRateStrategy | [0x8Cae0596bC1eD42dc3F04c4506cfe442b3E74e27](https://etherscan.io/address/0x8Cae0596bC1eD42dc3F04c4506cfe442b3E74e27) | [0xc76EF342898f1AE7E6C4632627Df683FAD8563DD](https://etherscan.io/address/0xc76EF342898f1AE7E6C4632627Df683FAD8563DD) |
-| optimalUsageRatio | 90 % | 69 % |
-| maxExcessUsageRatio | 10 % | 31 % |
 | variableRateSlope1 | 4 % | 42 % |
 | stableRateSlope1 | 2 % | 69 % |
-| interestRate | ![before](/.assets/1ee1814a06c37c32f0efd02a4fda97a8278b0714.svg) | ![after](/.assets/ad67c5576b64e24c557a73a5bc9c67be904f53bb.svg) |
+| optimalUsageRatio | 90 % | 69 % |
+| maxExcessUsageRatio | 10 % | 31 % |
+| interestRate | ![before](/.assets/5e79e9a56ca8a6038bc1021944bea8eab572d775.svg) | ![after](/.assets/6146163fc3328000e8abf4d8dff2529a55aa4a0e.svg) |
 
 ## Raw diff
 
@@ -26,16 +26,26 @@
     }
   },
   "strategies": {
-    "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD": {
-      "from": null,
-      "to": {
-        "baseVariableBorrowRate": 0,
-        "maxExcessUsageRatio": "310000000000000000000000000",
-        "optimalUsageRatio": "690000000000000000000000000",
-        "stableRateSlope1": "690000000000000000000000000",
-        "stableRateSlope2": "600000000000000000000000000",
-        "variableRateSlope1": "420000000000000000000000000",
-        "variableRateSlope2": "600000000000000000000000000"
+    "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48": {
+      "address": {
+        "from": "0x8Cae0596bC1eD42dc3F04c4506cfe442b3E74e27",
+        "to": "0xc76EF342898f1AE7E6C4632627Df683FAD8563DD"
+      },
+      "maxExcessUsageRatio": {
+        "from": "100000000000000000000000000",
+        "to": "310000000000000000000000000"
+      },
+      "optimalUsageRatio": {
+        "from": "900000000000000000000000000",
+        "to": "690000000000000000000000000"
+      },
+      "stableRateSlope1": {
+        "from": "20000000000000000000000000",
+        "to": "690000000000000000000000000"
+      },
+      "variableRateSlope1": {
+        "from": "40000000000000000000000000",
+        "to": "420000000000000000000000000"
       }
     }
   }

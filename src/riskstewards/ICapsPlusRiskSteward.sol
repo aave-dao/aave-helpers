@@ -13,7 +13,7 @@ import {IAaveV3ConfigEngine} from '../v3-config-engine/IAaveV3ConfigEngine.sol';
  */
 interface ICapsPlusRiskSteward {
   /**
-   * @notice Stuct storing the last update of a specific cap
+   * @notice Struct storing the last update of a specific cap
    */
   struct Debounce {
     uint40 supplyCapLastUpdated;
@@ -41,7 +41,7 @@ interface ICapsPlusRiskSteward {
   function RISK_COUNCIL() external view returns (address);
 
   /**
-   * @notice Allows increasing borrow and supply caps accross multiple assets
+   * @notice Allows increasing borrow and supply caps across multiple assets
    * @dev A cap increase is only possible ever 5 days per asset
    * @dev A cap increase is only allowed to increase the cap by 50%
    * @param capUpdates caps to be updated

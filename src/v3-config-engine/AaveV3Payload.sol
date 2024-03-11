@@ -34,10 +34,10 @@ abstract contract AaveV3Payload {
     CONFIG_ENGINE = engine;
   }
 
-  /// @dev to be overriden on the child if any extra logic is needed pre-listing
+  /// @dev to be overridden on the child if any extra logic is needed pre-listing
   function _preExecute() internal virtual {}
 
-  /// @dev to be overriden on the child if any extra logic is needed post-listing
+  /// @dev to be overridden on the child if any extra logic is needed post-listing
   function _postExecute() internal virtual {}
 
   function execute() external {

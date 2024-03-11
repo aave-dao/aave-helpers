@@ -253,7 +253,7 @@ interface IAaveV3ConfigEngine {
 
   /**
    * @notice Performs full listings of assets, in the Aave pool configured in this engine instance
-   * @dev This function allows more customization, especifically enables to set custom implementations
+   * @dev This function allows more customization, specifically enables to set custom implementations
    *   for a/v/s tokens.
    *   IMPORTANT. Use it only if understanding the internals of the Aave v3 protocol
    * @param context `PoolContext` struct, effectively meta-data for naming of a/v/s tokens.

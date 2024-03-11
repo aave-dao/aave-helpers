@@ -23,7 +23,6 @@ import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
-import {GovHelpers, IAaveGovernanceV2} from './GovHelpers.sol';
 import {Create2Utils} from './ScriptUtils.sol';
 
 interface IGovernance_V2_5 {
@@ -95,7 +94,7 @@ library GovV3Helpers {
   ) internal returns (IVotingMachineWithProofs.VotingBalanceProof[] memory) {
     string[] memory inputs = new string[](8);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@0.6.4';
+    inputs[1] = '@bgd-labs/aave-cli@^0.8.0';
     inputs[2] = 'governance';
     inputs[3] = 'getVotingProofs';
     inputs[4] = '--proposalId';
@@ -121,7 +120,7 @@ library GovV3Helpers {
   ) internal returns (StorageRootResponse[] memory) {
     string[] memory inputs = new string[](6);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@0.6.4';
+    inputs[1] = '@bgd-labs/aave-cli@^0.8.0';
     inputs[2] = 'governance';
     inputs[3] = 'getStorageRoots';
     inputs[4] = '--proposalId';
@@ -163,11 +162,25 @@ library GovV3Helpers {
     return Create2Utils.create2Deploy('v1', bytecode);
   }
 
+  function deployDeterministic(
+    bytes memory bytecode,
+    bytes memory arguments
+  ) internal returns (address) {
+    return Create2Utils.create2Deploy('v1', bytecode, arguments);
+  }
+
   /**
    * Predicts the payload based on a constant salt
    */
   function predictDeterministicAddress(bytes memory bytecode) internal pure returns (address) {
     return Create2Utils.computeCreate2Address('v1', bytecode);
+  }
+
+  function predictDeterministicAddress(
+    bytes memory bytecode,
+    bytes memory arguments
+  ) internal pure returns (address) {
+    return Create2Utils.computeCreate2Address('v1', bytecode, arguments);
   }
 
   /**
@@ -183,6 +196,14 @@ library GovV3Helpers {
     bytes memory bytecode
   ) internal pure returns (IPayloadsControllerCore.ExecutionAction memory) {
     address payloadAddress = predictDeterministicAddress(bytecode);
+    return buildAction(payloadAddress);
+  }
+
+  function buildAction(
+    bytes memory bytecode,
+    bytes memory arguments
+  ) internal pure returns (IPayloadsControllerCore.ExecutionAction memory) {
+    address payloadAddress = predictDeterministicAddress(bytecode, arguments);
     return buildAction(payloadAddress);
   }
 
@@ -214,7 +235,7 @@ library GovV3Helpers {
    * @param payloadAddress address of the payload to be executed
    * @param accessLevel accessLevel required by the payload
    * @param value eth value to be sent to the payload
-   * @param withDelegateCall determines if payload thould be executed via delgatecall
+   * @param withDelegateCall determines if payload should be executed via delgatecall
    * @param signature signature to be executed on the payload
    * @param callData calldata for the signature
    */
@@ -284,7 +305,7 @@ library GovV3Helpers {
 
   /**
    * @dev executes a payloadAddress via payloadsController by injecting it into storage and executing it afterwards.
-   * Injecting into storage is a convinience method to reduce the txs executed from 2 to 1, this allows awaiting emitted events on the payloadsController.
+   * Injecting into storage is a convenience method to reduce the txs executed from 2 to 1, this allows awaiting emitted events on the payloadsController.
    * @notice This method is for test purposes only.
    * @param vm Vm
    * @param payloadAddress address of the payload to execute
@@ -579,44 +600,13 @@ library GovV3Helpers {
   }
 
   /**
-   * @dev Executes an already created proposal on governance v3 by manipulating stororage so it#s executable in the current block.
+   * @dev Executes an already created proposal on governance v3 by manipulating storage so it#s executable in the current block.
    * @param vm Vm
    * @param proposalId id of the proposal to execute
    */
   function executeProposal(Vm vm, uint256 proposalId) internal {
     GovV3StorageHelpers.readyProposal(vm, proposalId);
     GovernanceV3Ethereum.GOVERNANCE.executeProposal(proposalId);
-  }
-
-  function build2_5Payload(
-    PayloadsControllerUtils.Payload memory payload
-  ) internal returns (GovHelpers.Payload memory) {
-    return
-      GovHelpers.Payload({
-        target: address(GovernanceV3Ethereum.GOVERNANCE),
-        value: 0,
-        signature: 'forwardPayloadForExecution((uint256,uint8,address,uint40))',
-        callData: abi.encode(payload),
-        withDelegatecall: false
-      });
-  }
-
-  // temporarily patched create proposal for governance v2.5
-  function createProposal2_5(
-    Vm vm,
-    PayloadsControllerUtils.Payload[] memory payloads,
-    bytes32 ipfsHash
-  ) internal returns (uint256) {
-    require(block.chainid == ChainIds.MAINNET, 'MAINNET_ONLY');
-    require(payloads.length != 0, 'MINIMUM_ONE_PAYLOAD');
-    require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
-
-    generateProposalPreviewLink(vm, payloads, ipfsHash, address(0));
-    GovHelpers.Payload[] memory gov2Payloads = new GovHelpers.Payload[](payloads.length);
-    for (uint256 i = 0; i < payloads.length; i++) {
-      gov2Payloads[i] = build2_5Payload(payloads[i]);
-    }
-    return GovHelpers.createProposal(gov2Payloads, ipfsHash, true);
   }
 
   /**
@@ -811,7 +801,7 @@ library GovV3Helpers {
     IPayloadsControllerCore.ExecutionAction[] memory actionsA,
     IPayloadsControllerCore.ExecutionAction[] memory actionsB
   ) private pure returns (bool) {
-    // must be equal size for equlity
+    // must be equal size for equality
     if (actionsA.length != actionsB.length) return false;
     for (uint256 actionId = 0; actionId < actionsA.length; actionId++) {
       if (actionsA[actionId].target != actionsB[actionId].target) return false;
@@ -887,7 +877,7 @@ library GovV3StorageHelpers {
       bytes32(PROPOSALS_COUNT_SLOT),
       bytes32(uint256(count + 1))
     );
-    // overwrite creator as creator porposition power is checked on execution
+    // overwrite creator as creator proposition power is checked on execution
     vm.store(
       address(GovernanceV3Ethereum.GOVERNANCE),
       bytes32(proposalBaseSlot + 1),

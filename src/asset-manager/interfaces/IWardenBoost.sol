@@ -30,7 +30,7 @@ interface IWardenBoost {
   function offers(uint256 boostId) external returns (BoostOffer memory);
 
   /// @notice Registers a new user wanting to sell its delegation
-  /// @dev Regsiters a new user, creates a BoostOffer with the given parameters
+  /// @dev Registers a new user, creates a BoostOffer with the given parameters
   /// @param pricePerVote Price of 1 vote per second (in wei)
   /// @param maxDuration Maximum duration (in weeks) that a Boost can last when taken from this Offer
   /// @param expiryTime Timestamp when this Offer is not longer valid
