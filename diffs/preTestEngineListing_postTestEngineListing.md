@@ -40,10 +40,10 @@
 | currentLiquidityRate | 0 |
 | currentVariableBorrowRate | 0 |
 | isPaused | false |
-| liquidityIndex | 0 |
+| liquidityIndex | 1000000000000000000000000000 |
 | stableDebtTokenName | Aave Polygon Stable Debt 1INCH |
 | stableDebtTokenSymbol | stableDebtPol1INCH |
-| variableBorrowIndex | 0 |
+| variableBorrowIndex | 1000000000000000000000000000 |
 | variableDebtTokenName | Aave Polygon Variable Debt 1INCH |
 | variableDebtTokenSymbol | variableDebtPol1INCH |
 | optimalUsageRatio | 45 % |
@@ -93,7 +93,7 @@
         "liquidationBonus": 10500,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 8600,
-        "liquidityIndex": 0,
+        "liquidityIndex": "1000000000000000000000000000",
         "ltv": 8250,
         "oracle": "0x443C5116CdF663Eb387e72C688D276e702135C87",
         "oracleDecimals": 8,
@@ -109,7 +109,7 @@
         "symbol": "1INCH",
         "underlying": "0x9c2C5fd7b07E95EE044DDeba0E97a665F142394f",
         "usageAsCollateralEnabled": true,
-        "variableBorrowIndex": 0,
+        "variableBorrowIndex": "1000000000000000000000000000",
         "variableDebtToken": "0xE701126012EC0290822eEA17B794454d1AF8b030",
         "variableDebtTokenImpl": "0x79b5e91037AE441dE0d9e6fd3Fd85b96B83d4E93",
         "variableDebtTokenName": "Aave Polygon Variable Debt 1INCH",

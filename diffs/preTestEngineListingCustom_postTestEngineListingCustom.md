@@ -40,10 +40,10 @@
 | currentLiquidityRate | 0 |
 | currentVariableBorrowRate | 0 |
 | isPaused | false |
-| liquidityIndex | 0 |
+| liquidityIndex | 1000000000000000000000000000 |
 | stableDebtTokenName | Aave Ethereum Stable Debt PSP |
 | stableDebtTokenSymbol | stableDebtEthPSP |
-| variableBorrowIndex | 0 |
+| variableBorrowIndex | 1000000000000000000000000000 |
 | variableDebtTokenName | Aave Ethereum Variable Debt PSP |
 | variableDebtTokenSymbol | variableDebtEthPSP |
 | optimalUsageRatio | 45 % |
@@ -88,7 +88,7 @@
         "liquidationBonus": 10500,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 8600,
-        "liquidityIndex": 0,
+        "liquidityIndex": "1000000000000000000000000000",
         "ltv": 8250,
         "oracle": "0x72AFAECF99C9d9C8215fF44C77B94B99C28741e8",
         "oracleDecimals": 18,
@@ -104,7 +104,7 @@
         "symbol": "PSP",
         "underlying": "0xcAfE001067cDEF266AfB7Eb5A286dCFD277f3dE5",
         "usageAsCollateralEnabled": true,
-        "variableBorrowIndex": 0,
+        "variableBorrowIndex": "1000000000000000000000000000",
         "variableDebtToken": "0x68e9f0aD4e6f8F5DB70F6923d4d6d5b225B83b16",
         "variableDebtTokenImpl": "0xaC725CB59D16C81061BDeA61041a8A5e73DA9EC6",
         "variableDebtTokenName": "Aave Ethereum Variable Debt PSP",
