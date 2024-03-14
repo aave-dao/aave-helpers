@@ -119,9 +119,9 @@ contract ProtocolV3TestE2ETestAllMainnet is ProtocolV3TestBase {
   }
 }
 
-contract ProtocolV3TestE2ETestSnapshot is ProtocolV3TestBase {
+contract ProtocolV3TestOptimismSnapshot is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('optimism', 105213914);
+    vm.createSelectFork('optimism', 117408311);
   }
 
   function test_snapshot() public {
