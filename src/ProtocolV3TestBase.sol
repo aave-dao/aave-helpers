@@ -541,6 +541,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       ExtendedAggregatorV2V3Interface assetOracle = ExtendedAggregatorV2V3Interface(
         oracle.getSourceOfAsset(config.underlying)
       );
+      DataTypes.ReserveData memory reserveData = pool.getReserveData(config.aToken);
 
       string memory key = vm.toString(config.underlying);
       vm.serializeJson(key, '{}');
@@ -555,6 +556,10 @@ contract ProtocolV3TestBase is CommonTestBase {
       vm.serializeUint(key, 'supplyCap', config.supplyCap);
       vm.serializeUint(key, 'debtCeiling', config.debtCeiling);
       vm.serializeUint(key, 'eModeCategory', config.eModeCategory);
+      vm.serializeUint(key, 'liquidityIndex', reserveData.liquidityIndex);
+      vm.serializeUint(key, 'currentLiquidityRate', reserveData.currentLiquidityRate);
+      vm.serializeUint(key, 'variableBorrowIndex', reserveData.variableBorrowIndex);
+      vm.serializeUint(key, 'currentVariableBorrowRate', reserveData.currentVariableBorrowRate);
       vm.serializeBool(key, 'usageAsCollateralEnabled', config.usageAsCollateralEnabled);
       vm.serializeBool(key, 'borrowingEnabled', config.borrowingEnabled);
       vm.serializeBool(key, 'stableBorrowRateEnabled', config.stableBorrowRateEnabled);
