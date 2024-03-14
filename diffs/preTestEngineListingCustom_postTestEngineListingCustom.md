@@ -35,15 +35,15 @@
 | stableBorrowRateEnabled | true |
 | isBorrowableInIsolation | false |
 | interestRateStrategy | [0x24701A6368Ff6D2874d6b8cDadd461552B8A5283](https://etherscan.io/address/0x24701A6368Ff6D2874d6b8cDadd461552B8A5283) |
+| liquidityIndex | 1 |
+| variableBorrowIndex | 1 |
 | aTokenName | Aave Ethereum PSP |
 | aTokenSymbol | aEthPSP |
-| currentLiquidityRate | 0 |
-| currentVariableBorrowRate | 0 |
+| currentLiquidityRate | 0 % |
+| currentVariableBorrowRate | 0 % |
 | isPaused | false |
-| liquidityIndex | 1000000000000000000000000000 |
 | stableDebtTokenName | Aave Ethereum Stable Debt PSP |
 | stableDebtTokenSymbol | stableDebtEthPSP |
-| variableBorrowIndex | 1000000000000000000000000000 |
 | variableDebtTokenName | Aave Ethereum Variable Debt PSP |
 | variableDebtTokenSymbol | variableDebtEthPSP |
 | optimalUsageRatio | 45 % |

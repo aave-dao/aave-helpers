@@ -2,7 +2,7 @@
 
 ### Reserves altered
 
-#### AAVE.e ([0x63a72806098Bd3D9520cC43356dD78afe5D386D9](https://snowtrace.io/address/0x63a72806098Bd3D9520cC43356dD78afe5D386D9))
+#### AAVE.e ([0x63a72806098Bd3D9520cC43356dD78afe5D386D9](https://snowscan.xyz/address/0x63a72806098Bd3D9520cC43356dD78afe5D386D9))
 
 | description | value before | value after |
 | --- | --- | --- |

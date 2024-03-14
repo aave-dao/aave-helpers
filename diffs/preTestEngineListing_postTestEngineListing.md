@@ -35,15 +35,15 @@
 | stableBorrowRateEnabled | false |
 | isBorrowableInIsolation | false |
 | interestRateStrategy | [0x03733F4E008d36f2e37F0080fF1c8DF756622E6F](https://polygonscan.com/address/0x03733F4E008d36f2e37F0080fF1c8DF756622E6F) |
+| liquidityIndex | 1 |
+| variableBorrowIndex | 1 |
 | aTokenName | Aave Polygon 1INCH |
 | aTokenSymbol | aPol1INCH |
-| currentLiquidityRate | 0 |
-| currentVariableBorrowRate | 0 |
+| currentLiquidityRate | 0 % |
+| currentVariableBorrowRate | 0 % |
 | isPaused | false |
-| liquidityIndex | 1000000000000000000000000000 |
 | stableDebtTokenName | Aave Polygon Stable Debt 1INCH |
 | stableDebtTokenSymbol | stableDebtPol1INCH |
-| variableBorrowIndex | 1000000000000000000000000000 |
 | variableDebtTokenName | Aave Polygon Variable Debt 1INCH |
 | variableDebtTokenSymbol | variableDebtPol1INCH |
 | optimalUsageRatio | 45 % |
