@@ -3,16 +3,16 @@ pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
 import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
-import {IDefaultInterestRateStrategyV2} from 'src/dependencies/IDefaultInterestRateStrategyV2.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
+import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
-import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
-import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
+import {IDefaultInterestRateStrategyV2} from './dependencies/IDefaultInterestRateStrategyV2.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -541,6 +541,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       ExtendedAggregatorV2V3Interface assetOracle = ExtendedAggregatorV2V3Interface(
         oracle.getSourceOfAsset(config.underlying)
       );
+      DataTypes.ReserveData memory reserveData = pool.getReserveData(config.underlying);
 
       string memory key = vm.toString(config.underlying);
       vm.serializeJson(key, '{}');
@@ -555,6 +556,10 @@ contract ProtocolV3TestBase is CommonTestBase {
       vm.serializeUint(key, 'supplyCap', config.supplyCap);
       vm.serializeUint(key, 'debtCeiling', config.debtCeiling);
       vm.serializeUint(key, 'eModeCategory', config.eModeCategory);
+      vm.serializeUint(key, 'liquidityIndex', reserveData.liquidityIndex);
+      vm.serializeUint(key, 'currentLiquidityRate', reserveData.currentLiquidityRate);
+      vm.serializeUint(key, 'variableBorrowIndex', reserveData.variableBorrowIndex);
+      vm.serializeUint(key, 'currentVariableBorrowRate', reserveData.currentVariableBorrowRate);
       vm.serializeBool(key, 'usageAsCollateralEnabled', config.usageAsCollateralEnabled);
       vm.serializeBool(key, 'borrowingEnabled', config.borrowingEnabled);
       vm.serializeBool(key, 'stableBorrowRateEnabled', config.stableBorrowRateEnabled);

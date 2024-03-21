@@ -58,7 +58,7 @@ contract CommonTestBase is Test {
       }
       // SNX
       if (asset == AaveV2EthereumAssets.SNX_UNDERLYING) {
-        vm.prank(0xAc86855865CbF31c8f9FBB68C749AD5Bd72802e3);
+        vm.prank(0x0D0452f487D1EDc869d1488ae984590ca2900D2F);
         IERC20(asset).transfer(user, amount);
         return true;
       }
@@ -171,7 +171,7 @@ contract CommonTestBase is Test {
 
     string[] memory inputs = new string[](7);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@^0.8.0';
+    inputs[1] = '@bgd-labs/aave-cli@^0.9.1';
     inputs[2] = 'diff-snapshots';
     inputs[3] = beforePath;
     inputs[4] = afterPath;
