@@ -322,7 +322,7 @@ library DeployEngineBnbLib {
 }
 
 library DeployEngineScrollLib {
-    function deploy() internal returns (address) {
+  function deploy() internal returns (address) {
     IEngine.EngineLibraries memory engineLibraries = IEngine.EngineLibraries({
       listingEngine: Create2Utils.create2Deploy('v1', type(ListingEngine).creationCode),
       eModeEngine: Create2Utils.create2Deploy('v1', type(EModeEngine).creationCode),
@@ -353,7 +353,6 @@ library DeployEngineScrollLib {
       );
   }
 }
-
 
 library DeployEngineZkEvmLib {
   function deploy() internal returns (address) {

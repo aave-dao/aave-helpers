@@ -866,7 +866,7 @@ library GovV3StorageHelpers {
   function injectProposal(
     Vm vm,
     PayloadsControllerUtils.Payload[] memory payloads,
-    address votingPortal
+    address // supposed to be votingPortal, kept to not introduce breaking change, but mute compilation warning
   ) internal returns (uint256) {
     uint256 count = GovernanceV3Ethereum.GOVERNANCE.getProposalsCount();
     uint256 proposalBaseSlot = StorageHelpers.getStorageSlotUintMapping(PROPOSALS_SLOT, count);

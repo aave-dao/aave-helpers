@@ -5,7 +5,7 @@ import 'forge-std/Test.sol';
 import {GovV3Helpers, PayloadsControllerUtils} from '../src/GovV3Helpers.sol';
 
 contract PreviewLink is Test {
-  function testPreviewLink() public {
+  function testPreviewLink() public pure {
     PayloadsControllerUtils.Payload[] memory payloads = new PayloadsControllerUtils.Payload[](2);
     payloads[0].payloadId = 1;
     payloads[0].accessLevel = PayloadsControllerUtils.AccessControl.Level_1;

@@ -47,7 +47,7 @@ library ChainHelpers {
       newFork = vm.createSelectFork(vm.rpcUrl('base'));
     } else if (chainId == ChainIds.GNOSIS) {
       newFork = vm.createSelectFork(vm.rpcUrl('gnosis'));
-    }  else if (chainId == ChainIds.SCROLL) {
+    } else if (chainId == ChainIds.SCROLL) {
       newFork = vm.createSelectFork(vm.rpcUrl('scroll'));
     } else if (chainId == ChainIds.ARBITRUM) {
       newFork = vm.createSelectFork(vm.rpcUrl('arbitrum'));

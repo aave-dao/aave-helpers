@@ -10,7 +10,7 @@ contract CommonTestBaseTest is CommonTestBase {
     vm.createSelectFork('mainnet', 18572478);
   }
 
-  function call() external returns (address) {
+  function call() external view returns (address) {
     return msg.sender;
   }
 

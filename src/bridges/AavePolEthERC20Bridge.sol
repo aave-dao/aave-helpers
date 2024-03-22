@@ -100,7 +100,7 @@ contract AavePolEthERC20Bridge is Ownable, Rescuable, IAavePolEthERC20Bridge {
   receive() external payable {
     if (block.chainid != ChainIds.MAINNET) revert InvalidChain();
 
-    (bool success, ) = address(AaveV3Ethereum.COLLECTOR).call{value: address(this).balance}("");
+    (bool success, ) = address(AaveV3Ethereum.COLLECTOR).call{value: address(this).balance}('');
     if (!success) {
       emit FailedToSendETH();
     }
