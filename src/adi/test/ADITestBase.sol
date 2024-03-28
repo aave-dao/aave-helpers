@@ -210,12 +210,12 @@ contract ADITestBase is Test {
       return chainIds;
     } else if (chainId == ChainIds.POLYGON) {
       uint256[] memory chainIds = new uint256[](1);
-      chainIds[1] = ChainIds.MAINNET;
+      chainIds[0] = ChainIds.MAINNET;
 
       return chainIds;
     } else if (chainId == ChainIds.AVALANCHE) {
       uint256[] memory chainIds = new uint256[](1);
-      chainIds[1] = ChainIds.MAINNET;
+      chainIds[0] = ChainIds.MAINNET;
 
       return chainIds;
     } else {

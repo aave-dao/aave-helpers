@@ -40,7 +40,7 @@ contract AaveV3PolygonRatesUpdates070322 is AaveV3Payload {
     mai.stableRateSlope2 = _bpsToRay(75_00);
 
     Rates.RateStrategyParams memory ageur = IV3RateStrategyFactory(AaveV3Polygon.RATES_FACTORY)
-      .getStrategyDataOfAsset(AaveV3PolygonAssets.agEUR_UNDERLYING);
+      .getStrategyDataOfAsset(AaveV3PolygonAssets.EURA_UNDERLYING);
     ageur.optimalUsageRatio = _bpsToRay(80_00);
     ageur.variableRateSlope2 = _bpsToRay(75_00);
     ageur.stableRateSlope2 = _bpsToRay(75_00);
@@ -58,7 +58,7 @@ contract AaveV3PolygonRatesUpdates070322 is AaveV3Payload {
       params: mai
     });
     ratesUpdate[3] = IEngine.RateStrategyUpdate({
-      asset: AaveV3PolygonAssets.agEUR_UNDERLYING,
+      asset: AaveV3PolygonAssets.EURA_UNDERLYING,
       params: ageur
     });
     ratesUpdate[4] = IEngine.RateStrategyUpdate({
