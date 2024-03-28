@@ -10,7 +10,7 @@ import {ICrossChainReceiver} from 'aave-address-book/common/ICrossChainControlle
 abstract contract BaseReceiverAdaptersUpdate {
   function getReceiverBridgeAdaptersToRemove()
     public
-    pure
+    view
     virtual
     returns (ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[] memory)
   {
@@ -20,7 +20,7 @@ abstract contract BaseReceiverAdaptersUpdate {
 
   function getReceiverBridgeAdaptersToAllow()
     public
-    pure
+    view
     virtual
     returns (ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[] memory)
   {

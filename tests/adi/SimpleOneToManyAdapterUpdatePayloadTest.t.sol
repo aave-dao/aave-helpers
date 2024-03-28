@@ -5,6 +5,7 @@ import '../../src/aDI/SimpleOneToManyAdapterUpdate.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {ChainIds} from '../../src/ChainIds.sol';
 import 'forge-std/Test.sol';
+import '../../src/adi/test/ADITestBase.sol';
 
 contract SimpleOneToManyAdapterUpdatePayload is
   SimpleOneToManyAdapterUpdate(
@@ -37,6 +38,20 @@ contract SimpleOneToManyAdapterUpdatePayload is
 }
 
 // provably here we should just define the blockNumber and network. And use base test that in theory could generate diffs
-contract SimpleOneToManyAdapterUpdatePayloadTest is Test {
+contract SimpleOneToManyAdapterUpdatePayloadTest is ADITestBase {
+  SimpleOneToManyAdapterUpdatePayload public payload;
 
+  function setUp() public {
+    vm.createSelectFork(vm.rpcUrl('polygon'), 54954005);
+    payload = new SimpleOneToManyAdapterUpdatePayload();
+  }
+
+  function test_defaultTest() public {
+    defaultTest(
+      'test_adi_diffs',
+      GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER,
+      address(payload),
+      true
+    );
+  }
 }

@@ -10,7 +10,7 @@ import {ICrossChainForwarder} from 'aave-address-book/common/ICrossChainControll
 abstract contract BaseForwarderAdaptersUpdate {
   function getForwarderBridgeAdaptersToRemove()
     public
-    pure
+    view
     virtual
     returns (ICrossChainForwarder.BridgeAdapterToDisable[] memory)
   {
@@ -19,7 +19,7 @@ abstract contract BaseForwarderAdaptersUpdate {
 
   function getForwarderBridgeAdaptersToEnable()
     public
-    pure
+    view
     virtual
     returns (ICrossChainForwarder.ForwarderBridgeAdapterConfigInput[] memory)
   {
