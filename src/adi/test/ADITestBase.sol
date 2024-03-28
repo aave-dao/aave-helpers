@@ -108,10 +108,44 @@ contract ADITestBase is Test {
     vm.serializeUint('root', 'chainId', block.chainid);
     CCCConfig memory config = _getCCCConfig(crossChainController);
     if (receiverConfigs) _writeReceiverConfigs(path, config);
-    //    if (receiverAdapterConfigs) _writeStrategyConfigs(path, configs);
+    if (receiverAdapterConfigs) _writeReceiverAdapters(path, config);
     //    if (forwarderAdapterConfigs) _writeEModeConfigs(path, configs, pool);
 
     return config;
+  }
+
+  function _writeReceiverAdapters(string memory path, CCCConfig memory config) internal {
+    // keys for json stringification
+    string memory receiverAdaptersKey = 'receiverAdapters';
+    string memory content = '{}';
+    vm.serializeJson(receiverAdaptersKey, '{}');
+    ReceiverAdaptersByChain[] memory receiverConfig = config.receiverAdaptersConfig;
+
+    for (uint256 i = 0; i < receiverConfig.length; i++) {
+      uint256 chainId = receiverConfig[i].chainId;
+      string memory key = vm.toString(chainId);
+      vm.serializeJson(key, '{}');
+      string memory object;
+
+      for (uint256 j = 0; j < receiverConfig[i].receiverAdapters.length; j++) {
+        if (j == receiverConfig[i].receiverAdapters.length - 1) {
+          object = vm.serializeString(
+            key,
+            string.concat('receiver_', vm.toString(j)),
+            vm.toString(receiverConfig[i].receiverAdapters[j])
+          );
+        } else {
+          vm.serializeString(
+            key,
+            string.concat('receiver_', vm.toString(j)),
+            vm.toString(receiverConfig[i].receiverAdapters[j])
+          );
+        }
+      }
+      content = vm.serializeString(receiverAdaptersKey, key, object);
+    }
+    string memory output = vm.serializeString('root', 'receiverAdaptersByChain', content);
+    vm.writeJson(output, path);
   }
 
   function _writeReceiverConfigs(string memory path, CCCConfig memory configs) internal {
