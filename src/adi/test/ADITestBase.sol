@@ -6,6 +6,7 @@ import 'forge-std/Test.sol';
 import {ICrossChainReceiver, ICrossChainForwarder} from 'aave-address-book/common/ICrossChainController.sol';
 import {ChainIds} from '../../ChainIds.sol';
 import {GovV3Helpers} from '../../GovV3Helpers.sol';
+import {IBaseAdaptersUpdate} from '../interfaces/IBaseAdaptersUpdate.sol';
 
 contract ADITestBase is Test {
   using stdJson for string;
@@ -48,8 +49,8 @@ contract ADITestBase is Test {
 
     string[] memory inputs = new string[](7);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@^0.9.3';
-    inputs[2] = 'diff-snapshots';
+    inputs[1] = '@bgd-labs/aave-cli@0.9.4';
+    inputs[2] = 'adi-diff-snapshots';
     inputs[3] = beforePath;
     inputs[4] = afterPath;
     inputs[5] = '-o';
@@ -73,10 +74,54 @@ contract ADITestBase is Test {
 
     diffReports(beforeString, afterString);
 
-    //    configChangePlausibilityTest(configBefore, configAfter);
-    //
-    //    if (runE2E) e2eTest(pool);
+    if (runE2E) e2eTest(payload);
+
     return (configBefore, configAfter);
+  }
+
+  function e2eTest(address payload) public {
+    // test receivers
+    ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[]
+      memory receiversToAllow = IBaseAdaptersUpdate(payload).getReceiverBridgeAdaptersToAllow();
+    if (receiversToAllow.length != 0) {
+      testCorrectReceiverAdaptersConfiguration(receiversToAllow);
+      // TODO: test that receiver adapters are correctly configured?? trusted remote
+    }
+    //    ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[]
+    //      memory receiversToRemove = IBaseAdaptersUpdate(payload).getReceiverBridgeAdaptersToRemove();
+    //    if (receiversToRemove.length != 0) {
+    //      testOnlyRemovedSpecifiedReceiverAdapters();
+    //    }
+  }
+
+  function testCorrectReceiverAdaptersConfiguration(
+    ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[] memory receiversToAllow
+  ) internal {
+    for (uint256 i = 0; i < receiversToAllow.length; i++) {
+      for (uint256 j = 0; j < receiversToAllow[i].chainIds.length; j++) {
+        assertEq(
+          ICrossChainReceiver(CROSS_CHAIN_CONTROLLER).isReceiverBridgeAdapterAllowed(
+            receiversToAllow[i].bridgeAdapter,
+            receiversToAllow[i].chainIds[j]
+          ),
+          false
+        );
+      }
+    }
+
+    executePayload(vm, payloadAddress);
+
+    for (uint256 i = 0; i < receiversToAllow.length; i++) {
+      for (uint256 j = 0; j < receiversToAllow[i].chainIds.length; j++) {
+        assertEq(
+          ICrossChainReceiver(CROSS_CHAIN_CONTROLLER).isReceiverBridgeAdapterAllowed(
+            receiversToAllow[i].bridgeAdapter,
+            receiversToAllow[i].chainIds[j]
+          ),
+          true
+        );
+      }
+    }
   }
 
   /**

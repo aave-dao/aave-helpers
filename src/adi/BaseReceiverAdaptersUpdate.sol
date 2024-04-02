@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {ICrossChainReceiver} from 'aave-address-book/common/ICrossChainController.sol';
+import {IBaseReceiverAdaptersUpdate, ICrossChainReceiver} from './interfaces/IBaseReceiverAdaptersUpdate.sol';
 
 /**
  * @title Base payload aDI and bridge adapters update
  * @author BGD Labs @bgdlabs
  */
-abstract contract BaseReceiverAdaptersUpdate {
+abstract contract BaseReceiverAdaptersUpdate is IBaseReceiverAdaptersUpdate {
   function getReceiverBridgeAdaptersToRemove()
     public
     view
