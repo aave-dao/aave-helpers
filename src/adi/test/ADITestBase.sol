@@ -109,9 +109,54 @@ contract ADITestBase is Test {
     CCCConfig memory config = _getCCCConfig(crossChainController);
     if (receiverConfigs) _writeReceiverConfigs(path, config);
     if (receiverAdapterConfigs) _writeReceiverAdapters(path, config);
-    //    if (forwarderAdapterConfigs) _writeEModeConfigs(path, configs, pool);
+    if (forwarderAdapterConfigs) _writeForwarderAdatpers(path, config);
 
     return config;
+  }
+
+  function _writeForwarderAdatpers(string memory path, CCCConfig memory config) internal {
+    // keys for json stringification
+    string memory forwarderAdaptersKey = 'forwarderAdapters';
+    string memory content = '{}';
+    vm.serializeJson(forwarderAdaptersKey, '{}');
+    ForwarderAdaptersByChain[] memory forwarderConfig = config.forwarderAdaptersConfig;
+
+    for (uint256 i = 0; i < forwarderConfig.length; i++) {
+      uint256 chainId = forwarderConfig[i].chainId;
+      string memory key = vm.toString(chainId);
+      vm.serializeJson(key, '{}');
+      string memory object;
+
+      ICrossChainForwarder.ChainIdBridgeConfig[] memory forwarders = forwarderConfig[i].forwarders;
+      for (uint256 j = 0; j < forwarders.length; j++) {
+        if (j == forwarders.length - 1) {
+          vm.serializeString(
+            key,
+            string.concat('origin_', vm.toString(j)),
+            vm.toString(forwarders[j].currentChainBridgeAdapter)
+          );
+          object = vm.serializeString(
+            key,
+            string.concat('destination_', vm.toString(j)),
+            vm.toString(forwarders[j].destinationBridgeAdapter)
+          );
+        } else {
+          vm.serializeString(
+            key,
+            string.concat('origin_', vm.toString(j)),
+            vm.toString(forwarders[j].currentChainBridgeAdapter)
+          );
+          vm.serializeString(
+            key,
+            string.concat('destination_', vm.toString(j)),
+            vm.toString(forwarders[j].destinationBridgeAdapter)
+          );
+        }
+      }
+      content = vm.serializeString(forwarderAdaptersKey, key, object);
+    }
+    string memory output = vm.serializeString('root', 'forwarderAdaptersByChain', content);
+    vm.writeJson(output, path);
   }
 
   function _writeReceiverAdapters(string memory path, CCCConfig memory config) internal {
