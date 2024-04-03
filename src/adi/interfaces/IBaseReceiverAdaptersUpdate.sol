@@ -11,12 +11,10 @@ interface IBaseReceiverAdaptersUpdate {
   function getReceiverBridgeAdaptersToRemove()
     external
     view
-    virtual
     returns (ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[] memory);
 
   function getReceiverBridgeAdaptersToAllow()
     external
     view
-    virtual
     returns (ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[] memory);
 }

@@ -28,7 +28,14 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
     NEW_ADAPTER = constructorInput.newAdapter;
   }
 
-  function getDestinationAdapters() public pure virtual returns (DestinationAdaptersInput[] memory);
+  function getDestinationAdapters()
+    public
+    pure
+    virtual
+    returns (DestinationAdaptersInput[] memory)
+  {
+    return new DestinationAdaptersInput[](0);
+  }
 
   function getChainsToReceive() public pure virtual returns (uint256[] memory);
 

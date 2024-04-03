@@ -11,12 +11,10 @@ interface IBaseForwarderAdaptersUpdate {
   function getForwarderBridgeAdaptersToRemove()
     external
     view
-    virtual
     returns (ICrossChainForwarder.BridgeAdapterToDisable[] memory);
 
   function getForwarderBridgeAdaptersToEnable()
     external
     view
-    virtual
     returns (ICrossChainForwarder.ForwarderBridgeAdapterConfigInput[] memory);
 }
