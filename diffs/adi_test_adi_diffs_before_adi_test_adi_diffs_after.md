@@ -4,21 +4,25 @@
 {
   "forwarderAdaptersByChain": {
     "1": {
-      "destination_3": {
-        "from": "0xb13712De579E1f9943502FFCf72eab6ec348cF79",
-        "to": "0x1562F1b2487F892BBA8Ef325aF054Fd157510a71"
+      "0xDA4B6024aA06f7565BBcAaD9B8bE24C3c229AAb5": {
+        "from": "0x2a323be63e08E08536Fc3b5d8C6f24825e68895e",
+        "to": null
       },
-      "origin_3": {
-        "from": "0xb13712De579E1f9943502FFCf72eab6ec348cF79",
-        "to": "0x853649f897383f89d8441346Cf26a9ed02720B02"
+      "0x7FAE7765abB4c8f778d57337bB720d0BC53057e3": {
+        "from": null,
+        "to": "0x8410d9BD353b420ebA8C48ff1B0518426C280FCC"
       }
     }
   },
   "receiverAdaptersByChain": {
     "1": {
-      "receiver_3": {
-        "from": "0xb13712De579E1f9943502FFCf72eab6ec348cF79",
-        "to": "0x853649f897383f89d8441346Cf26a9ed02720B02"
+      "0xDA4B6024aA06f7565BBcAaD9B8bE24C3c229AAb5": {
+        "from": true,
+        "to": null
+      },
+      "0x7FAE7765abB4c8f778d57337bB720d0BC53057e3": {
+        "from": null,
+        "to": true
       }
     }
   }

@@ -59,7 +59,7 @@ contract SimpleOneToManyAdapterUpdatePayloadTest is ADITestBase {
   SimpleOneToManyAdapterUpdatePayload public payload;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 54946269);
+    vm.createSelectFork(vm.rpcUrl('polygon'), 55428042);
     payload = new SimpleOneToManyAdapterUpdatePayload();
   }
 

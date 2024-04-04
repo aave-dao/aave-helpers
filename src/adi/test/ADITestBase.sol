@@ -423,25 +423,15 @@ contract ADITestBase is Test {
       ICrossChainForwarder.ChainIdBridgeConfig[] memory forwarders = forwarderConfig[i].forwarders;
       for (uint256 j = 0; j < forwarders.length; j++) {
         if (j == forwarders.length - 1) {
-          vm.serializeString(
-            key,
-            string.concat('origin_', vm.toString(j)),
-            vm.toString(forwarders[j].currentChainBridgeAdapter)
-          );
           object = vm.serializeString(
             key,
-            string.concat('destination_', vm.toString(j)),
+            vm.toString(forwarders[j].currentChainBridgeAdapter),
             vm.toString(forwarders[j].destinationBridgeAdapter)
           );
         } else {
           vm.serializeString(
             key,
-            string.concat('origin_', vm.toString(j)),
-            vm.toString(forwarders[j].currentChainBridgeAdapter)
-          );
-          vm.serializeString(
-            key,
-            string.concat('destination_', vm.toString(j)),
+            vm.toString(forwarders[j].currentChainBridgeAdapter),
             vm.toString(forwarders[j].destinationBridgeAdapter)
           );
         }
@@ -469,14 +459,14 @@ contract ADITestBase is Test {
         if (j == receiverConfig[i].receiverAdapters.length - 1) {
           object = vm.serializeString(
             key,
-            string.concat('receiver_', vm.toString(j)),
-            vm.toString(receiverConfig[i].receiverAdapters[j])
+            vm.toString(receiverConfig[i].receiverAdapters[j]),
+            vm.toString(true)
           );
         } else {
           vm.serializeString(
             key,
-            string.concat('receiver_', vm.toString(j)),
-            vm.toString(receiverConfig[i].receiverAdapters[j])
+            vm.toString(receiverConfig[i].receiverAdapters[j]),
+            vm.toString(true)
           );
         }
       }
