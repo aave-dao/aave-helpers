@@ -94,7 +94,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     executePayload(vm, payload);
 
     uint256 gasUsed = startGas - gasleft();
-    assertTrue(gasUsed < block.gaslimit, 'BLOCK_GAS_LIMIT_EXCEEDED');
+    assertLt(gasUsed, block.gaslimit, 'BLOCK_GAS_LIMIT_EXCEEDED');
 
     string memory afterString = string(abi.encodePacked(reportName, '_after'));
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
