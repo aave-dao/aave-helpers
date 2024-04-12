@@ -21,31 +21,8 @@ abstract contract BaseAdaptersUpdate is
   }
 
   function execute() public override {
-    // remove old Receiver bridge adapter
-    ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[]
-      memory receiversToRemove = getReceiverBridgeAdaptersToRemove();
-    if (receiversToRemove.length != 0) {
-      ICrossChainReceiver(CROSS_CHAIN_CONTROLLER).disallowReceiverBridgeAdapters(receiversToRemove);
-    }
+    executeReceiversUpdate(CROSS_CHAIN_CONTROLLER);
 
-    // remove forwarding adapters
-    ICrossChainForwarder.BridgeAdapterToDisable[]
-      memory forwardersToRemove = getForwarderBridgeAdaptersToRemove();
-    if (forwardersToRemove.length != 0) {
-      ICrossChainForwarder(CROSS_CHAIN_CONTROLLER).disableBridgeAdapters(forwardersToRemove);
-    }
-
-    ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[]
-      memory receiversToAllow = getReceiverBridgeAdaptersToAllow();
-    if (receiversToAllow.length != 0) {
-      // add receiver adapters
-      ICrossChainReceiver(CROSS_CHAIN_CONTROLLER).allowReceiverBridgeAdapters(receiversToAllow);
-    }
-    ICrossChainForwarder.ForwarderBridgeAdapterConfigInput[]
-      memory forwardersToEnable = getForwarderBridgeAdaptersToEnable();
-    if (forwardersToEnable.length != 0) {
-      // add forwarding adapters
-      ICrossChainForwarder(CROSS_CHAIN_CONTROLLER).enableBridgeAdapters(forwardersToEnable);
-    }
+    executeForwardersUpdate(CROSS_CHAIN_CONTROLLER);
   }
 }

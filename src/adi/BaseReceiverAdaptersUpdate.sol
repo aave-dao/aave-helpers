@@ -26,4 +26,20 @@ abstract contract BaseReceiverAdaptersUpdate is IBaseReceiverAdaptersUpdate {
   {
     return new ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[](0);
   }
+
+  function executeReceiversUpdate(address crossChainController) public virtual {
+    // remove old Receiver bridge adapter
+    ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[]
+      memory receiversToRemove = getReceiverBridgeAdaptersToRemove();
+    if (receiversToRemove.length != 0) {
+      ICrossChainReceiver(crossChainController).disallowReceiverBridgeAdapters(receiversToRemove);
+    }
+
+    // add receiver adapters
+    ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[]
+      memory receiversToAllow = getReceiverBridgeAdaptersToAllow();
+    if (receiversToAllow.length != 0) {
+      ICrossChainReceiver(crossChainController).allowReceiverBridgeAdapters(receiversToAllow);
+    }
+  }
 }
