@@ -18,18 +18,18 @@
 | oracle | [0x443C5116CdF663Eb387e72C688D276e702135C87](https://polygonscan.com/address/0x443C5116CdF663Eb387e72C688D276e702135C87) |
 | oracleDecimals | 8 |
 | oracleDescription | 1INCH / USD |
-| oracleLatestAnswer | 0.36313594 |
+| oracleLatestAnswer | 0.54658874 |
 | usageAsCollateralEnabled | true |
 | ltv | 82.5 % |
 | liquidationThreshold | 86 % |
 | liquidationBonus | 5 % |
 | liquidationProtocolFee | 10 % |
 | reserveFactor | 10 % |
-| aToken | [0xA4D94019934D8333Ef880ABFFbF2FDd611C762BD](https://polygonscan.com/address/0xA4D94019934D8333Ef880ABFFbF2FDd611C762BD) |
+| aToken | [0xF107d93D67A487B5586AEB8B840755c36fB77b72](https://polygonscan.com/address/0xF107d93D67A487B5586AEB8B840755c36fB77b72) |
 | aTokenImpl | [0xCf85FF1c37c594a10195F7A9Ab85CBb0a03f69dE](https://polygonscan.com/address/0xCf85FF1c37c594a10195F7A9Ab85CBb0a03f69dE) |
-| variableDebtToken | [0xE701126012EC0290822eEA17B794454d1AF8b030](https://polygonscan.com/address/0xE701126012EC0290822eEA17B794454d1AF8b030) |
+| variableDebtToken | [0xb2122f310A5cB1d7f46d0FDb2fC5d36392Aaac96](https://polygonscan.com/address/0xb2122f310A5cB1d7f46d0FDb2fC5d36392Aaac96) |
 | variableDebtTokenImpl | [0x79b5e91037AE441dE0d9e6fd3Fd85b96B83d4E93](https://polygonscan.com/address/0x79b5e91037AE441dE0d9e6fd3Fd85b96B83d4E93) |
-| stableDebtToken | [0xc889e9f8370D14A428a9857205d99BFdB400b757](https://polygonscan.com/address/0xc889e9f8370D14A428a9857205d99BFdB400b757) |
+| stableDebtToken | [0x106Daa74Bd93f436D455953966ba6b70EBdCbFdb](https://polygonscan.com/address/0x106Daa74Bd93f436D455953966ba6b70EBdCbFdb) |
 | stableDebtTokenImpl | [0xF4294973B7E6F6C411dD8A388592E7c7D32F2486](https://polygonscan.com/address/0xF4294973B7E6F6C411dD8A388592E7c7D32F2486) |
 | borrowingEnabled | true |
 | stableBorrowRateEnabled | false |
@@ -72,7 +72,7 @@
     "0x9c2C5fd7b07E95EE044DDeba0E97a665F142394f": {
       "from": null,
       "to": {
-        "aToken": "0xA4D94019934D8333Ef880ABFFbF2FDd611C762BD",
+        "aToken": "0xF107d93D67A487B5586AEB8B840755c36fB77b72",
         "aTokenImpl": "0xCf85FF1c37c594a10195F7A9Ab85CBb0a03f69dE",
         "aTokenName": "Aave Polygon 1INCH",
         "aTokenSymbol": "aPol1INCH",
@@ -98,10 +98,10 @@
         "oracle": "0x443C5116CdF663Eb387e72C688D276e702135C87",
         "oracleDecimals": 8,
         "oracleDescription": "1INCH / USD",
-        "oracleLatestAnswer": 36313594,
+        "oracleLatestAnswer": 54658874,
         "reserveFactor": 1000,
         "stableBorrowRateEnabled": false,
-        "stableDebtToken": "0xc889e9f8370D14A428a9857205d99BFdB400b757",
+        "stableDebtToken": "0x106Daa74Bd93f436D455953966ba6b70EBdCbFdb",
         "stableDebtTokenImpl": "0xF4294973B7E6F6C411dD8A388592E7c7D32F2486",
         "stableDebtTokenName": "Aave Polygon Stable Debt 1INCH",
         "stableDebtTokenSymbol": "stableDebtPol1INCH",
@@ -110,7 +110,7 @@
         "underlying": "0x9c2C5fd7b07E95EE044DDeba0E97a665F142394f",
         "usageAsCollateralEnabled": true,
         "variableBorrowIndex": "1000000000000000000000000000",
-        "variableDebtToken": "0xE701126012EC0290822eEA17B794454d1AF8b030",
+        "variableDebtToken": "0xb2122f310A5cB1d7f46d0FDb2fC5d36392Aaac96",
         "variableDebtTokenImpl": "0x79b5e91037AE441dE0d9e6fd3Fd85b96B83d4E93",
         "variableDebtTokenName": "Aave Polygon Variable Debt 1INCH",
         "variableDebtTokenSymbol": "variableDebtPol1INCH"
