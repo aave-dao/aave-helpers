@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import '../../src/aDI/SimpleOneToManyAdapterUpdate.sol';
+import {SimpleOneToManyAdapterUpdate} from '../../src/aDI/SimpleOneToManyAdapterUpdate.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {ChainIds} from '../../src/ChainIds.sol';
