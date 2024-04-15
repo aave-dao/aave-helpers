@@ -29,8 +29,13 @@ abstract contract SimpleReceiverAdapterUpdate is BaseAdaptersUpdate {
     NEW_ADAPTER = constructorInput.newAdapter;
   }
 
+  /**
+   * @notice method to get the chains that a new adapter will receive messages from
+   * @return an array of chain ids
+   */
   function getChainsToReceive() public pure virtual returns (uint256[] memory);
 
+  /// @inheritdoc IBaseReceiverAdaptersUpdate
   function getReceiverBridgeAdaptersToRemove()
     public
     view
@@ -56,6 +61,7 @@ abstract contract SimpleReceiverAdapterUpdate is BaseAdaptersUpdate {
     }
   }
 
+  /// @inheritdoc IBaseReceiverAdaptersUpdate
   function getReceiverBridgeAdaptersToAllow()
     public
     view

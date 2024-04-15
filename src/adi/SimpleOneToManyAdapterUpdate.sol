@@ -28,6 +28,10 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
     NEW_ADAPTER = constructorInput.newAdapter;
   }
 
+  /**
+   * @notice method used to get the adapters for the destination chain ids
+   * @return array of adapter - destination chain pairs
+   */
   function getDestinationAdapters()
     public
     pure
@@ -37,8 +41,16 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
     return new DestinationAdaptersInput[](0);
   }
 
+  /**
+   * @notice method to get the chains that a new adapter will receive messages from
+   * @return an array of chain ids
+   */
   function getChainsToReceive() public pure virtual returns (uint256[] memory);
 
+  /**
+   * @notice method to get a list of chain ids that the new adapter will use to send messages to
+   * @return an array of chain ids
+   */
   function getChainsToSend() public pure virtual returns (uint256[] memory) {
     DestinationAdaptersInput[] memory destinationAdapters = getDestinationAdapters();
     uint256[] memory chainsToSend = new uint256[](destinationAdapters.length);
@@ -48,6 +60,7 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
     return chainsToSend;
   }
 
+  /// @inheritdoc IBaseReceiverAdaptersUpdate
   function getReceiverBridgeAdaptersToRemove()
     public
     view
@@ -67,6 +80,7 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
     return bridgeAdaptersToRemove;
   }
 
+  /// @inheritdoc IBaseForwarderAdaptersUpdate
   function getForwarderBridgeAdaptersToRemove()
     public
     view
@@ -85,6 +99,7 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
     return forwarderAdaptersToRemove;
   }
 
+  /// @inheritdoc IBaseReceiverAdaptersUpdate
   function getReceiverBridgeAdaptersToAllow()
     public
     view
@@ -103,6 +118,7 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
     return bridgeAdapterConfig;
   }
 
+  /// @inheritdoc IBaseForwarderAdaptersUpdate
   function getForwarderBridgeAdaptersToEnable()
     public
     view

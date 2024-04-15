@@ -4,10 +4,11 @@ pragma solidity ^0.8.0;
 import {IBaseForwarderAdaptersUpdate, ICrossChainForwarder} from './interfaces/IBaseForwarderAdaptersUpdate.sol';
 
 /**
- * @title Base payload aDI and bridge adapters update
+ * @title Base forwarder payload. It has the methods to update the forwarder bridge adapters.
  * @author BGD Labs @bgdlabs
  */
 abstract contract BaseForwarderAdaptersUpdate is IBaseForwarderAdaptersUpdate {
+  /// @inheritdoc IBaseForwarderAdaptersUpdate
   function getForwarderBridgeAdaptersToRemove()
     public
     view
@@ -17,6 +18,7 @@ abstract contract BaseForwarderAdaptersUpdate is IBaseForwarderAdaptersUpdate {
     return new ICrossChainForwarder.BridgeAdapterToDisable[](0);
   }
 
+  /// @inheritdoc IBaseForwarderAdaptersUpdate
   function getForwarderBridgeAdaptersToEnable()
     public
     view
@@ -26,6 +28,7 @@ abstract contract BaseForwarderAdaptersUpdate is IBaseForwarderAdaptersUpdate {
     return new ICrossChainForwarder.ForwarderBridgeAdapterConfigInput[](0);
   }
 
+  /// @inheritdoc IBaseForwarderAdaptersUpdate
   function executeForwardersUpdate(address crossChainController) public virtual {
     // remove forwarding adapters
     ICrossChainForwarder.BridgeAdapterToDisable[]

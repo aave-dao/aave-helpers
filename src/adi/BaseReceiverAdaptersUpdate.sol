@@ -4,10 +4,11 @@ pragma solidity ^0.8.0;
 import {IBaseReceiverAdaptersUpdate, ICrossChainReceiver} from './interfaces/IBaseReceiverAdaptersUpdate.sol';
 
 /**
- * @title Base payload aDI and bridge adapters update
+ * @title Base receiver payload. It has the methods to update the receiver bridge adapters.
  * @author BGD Labs @bgdlabs
  */
 abstract contract BaseReceiverAdaptersUpdate is IBaseReceiverAdaptersUpdate {
+  /// @inheritdoc IBaseReceiverAdaptersUpdate
   function getReceiverBridgeAdaptersToRemove()
     public
     view
@@ -18,6 +19,7 @@ abstract contract BaseReceiverAdaptersUpdate is IBaseReceiverAdaptersUpdate {
     return new ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[](0);
   }
 
+  /// @inheritdoc IBaseReceiverAdaptersUpdate
   function getReceiverBridgeAdaptersToAllow()
     public
     view
@@ -27,6 +29,7 @@ abstract contract BaseReceiverAdaptersUpdate is IBaseReceiverAdaptersUpdate {
     return new ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[](0);
   }
 
+  /// @inheritdoc IBaseReceiverAdaptersUpdate
   function executeReceiversUpdate(address crossChainController) public virtual {
     // remove old Receiver bridge adapter
     ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[]

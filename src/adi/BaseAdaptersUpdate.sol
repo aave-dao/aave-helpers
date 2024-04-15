@@ -16,6 +16,9 @@ abstract contract BaseAdaptersUpdate is
 {
   address public immutable CROSS_CHAIN_CONTROLLER;
 
+  /**
+   * @param crossChainController address of the CCC of the network where payload will be deployed
+   */
   constructor(address crossChainController) {
     CROSS_CHAIN_CONTROLLER = crossChainController;
   }
