@@ -89,7 +89,12 @@ contract ProtocolV3TestBase is CommonTestBase {
     string memory beforeString = string(abi.encodePacked(reportName, '_before'));
     ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
 
+    uint256 startGas = gasleft();
+
     executePayload(vm, payload);
+
+    uint256 gasUsed = startGas - gasleft();
+    assertLt(gasUsed, block.gaslimit, 'BLOCK_GAS_LIMIT_EXCEEDED');
 
     string memory afterString = string(abi.encodePacked(reportName, '_after'));
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
