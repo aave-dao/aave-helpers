@@ -31,5 +31,5 @@ interface IBaseForwarderAdaptersUpdate {
    * @notice method to add and remove forwarder adapters
    * @param crossChainController address of the CCC on the networks where the adapters are going to be updated
    */
-  function executeForwardersUpdate(address crossChainController) public;
+  function executeForwardersUpdate(address crossChainController) external;
 }

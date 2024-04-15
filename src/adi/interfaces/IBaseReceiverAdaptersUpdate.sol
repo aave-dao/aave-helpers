@@ -30,5 +30,5 @@ interface IBaseReceiverAdaptersUpdate {
    * @notice method to add and remove receiver adapters
    * @param crossChainController address of the CCC on the networks where the adapters are going to be updated
    */
-  function executeReceiversUpdate(address crossChainController) public;
+  function executeReceiversUpdate(address crossChainController) external;
 }
