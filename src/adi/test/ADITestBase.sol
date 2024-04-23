@@ -76,7 +76,7 @@ contract ADITestBase is Test {
 
     string[] memory inputs = new string[](7);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@0.10.0';
+    inputs[1] = '@bgd-labs/aave-cli@^0.12.0';
     inputs[2] = 'adi-diff-snapshots';
     inputs[3] = beforePath;
     inputs[4] = afterPath;
