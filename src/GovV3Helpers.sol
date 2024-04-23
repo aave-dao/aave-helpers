@@ -69,6 +69,7 @@ library GovV3Helpers {
   error ExecutorNotFound();
   error LongBytesNotSupportedYet();
   error FfiFailed();
+  error PayloadAlreadyCreated();
 
   struct StorageRootResponse {
     address account;
@@ -280,7 +281,7 @@ library GovV3Helpers {
       actions
     );
     if (payloadCreated && payload.createdAt > block.timestamp - 7 days) {
-      revert('PAYLOAD ALREADY CREATED');
+      revert PayloadAlreadyCreated();
     } else {
       return payloadsController.createPayload(actions);
     }
