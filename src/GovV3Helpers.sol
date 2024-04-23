@@ -275,8 +275,11 @@ library GovV3Helpers {
     IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
     require(actions.length > 0, 'INVALID ACTIONS');
 
-    bool payloadCreated = _isPayloadCreated(payloadsController, actions);
-    if (payloadCreated) {
+    (, IPayloadsControllerCore.Payload memory payload, bool payloadCreated) = _findCreatedPayload(
+      payloadsController,
+      actions
+    );
+    if (payloadCreated && payload.createdAt > block.timestamp - 7 days) {
       revert('PAYLOAD ALREADY CREATED');
     } else {
       return payloadsController.createPayload(actions);
@@ -786,36 +789,37 @@ library GovV3Helpers {
     return (payload.maximumAccessLevelRequired, payloadId);
   }
 
-  function _isPayloadCreated(
+  function _findCreatedPayload(
     IPayloadsControllerCore payloadsController,
     IPayloadsControllerCore.ExecutionAction[] memory actions
-  ) private view returns (bool) {
+  ) private view returns (uint40, IPayloadsControllerCore.Payload memory, bool) {
     uint40 count = payloadsController.getPayloadsCount();
     for (uint40 payloadId = count; payloadId > 0; payloadId--) {
       IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(
         payloadId - 1
       );
       if (_actionsAreEqual(actions, payload.actions)) {
-        return true;
+        return (payloadId - 1, payload, true);
       }
     }
-    return false;
+    IPayloadsControllerCore.Payload memory emptyPayload;
+    return (type(uint40).max, emptyPayload, false);
   }
 
   function _findPayloadId(
     IPayloadsControllerCore payloadsController,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) private view returns (uint40, IPayloadsControllerCore.Payload memory) {
-    uint40 count = payloadsController.getPayloadsCount();
-    for (uint40 payloadId = count; payloadId > 0; payloadId--) {
-      IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(
-        payloadId - 1
-      );
-      if (_actionsAreEqual(actions, payload.actions)) {
-        return (payloadId - 1, payload);
-      }
+    (
+      uint40 payloadId,
+      IPayloadsControllerCore.Payload memory payload,
+      bool payloadCreated
+    ) = _findCreatedPayload(payloadsController, actions);
+    if (payloadCreated) {
+      return (payloadId, payload);
+    } else {
+      revert CannotFindPayload();
     }
-    revert CannotFindPayload();
   }
 
   function _actionsAreEqual(
