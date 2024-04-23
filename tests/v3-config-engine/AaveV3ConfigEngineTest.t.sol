@@ -40,7 +40,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
 
   function setUp() public {
     mainnetFork = vm.createSelectFork(vm.rpcUrl('mainnet'), 18515746);
-    optimismFork = vm.createSelectFork(vm.rpcUrl('optimism'), 115008197);
+    optimismFork = vm.createSelectFork(vm.rpcUrl('optimism'), 119144694);
     polygonFork = vm.createSelectFork(vm.rpcUrl('polygon'), 55734786);
     avalancheFork = vm.createSelectFork(vm.rpcUrl('avalanche'), 37426577);
     arbitrumFork = vm.createSelectFork(vm.rpcUrl('arbitrum'), 147823152);
