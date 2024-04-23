@@ -94,7 +94,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     assertEq(pl.queuedAt, 1705004722);
     assertEq(uint256(pl.maximumAccessLevelRequired), 1);
     assertEq(pl.createdAt, block.timestamp);
-    assertEq(pl.creator, address(0x7FA9385bE102ac3EAc297483Dd6233D62b3e1496));
+    assertEq(pl.creator, address(this));
   }
 
   /**
