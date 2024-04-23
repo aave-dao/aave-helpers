@@ -163,7 +163,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     GovV3Helpers.createPayload(actions);
 
     // 3. create same payload
-    //    vm.expectRevert(bytes('PAYLOAD ALREADY CREATED'));
+    vm.expectRevert(bytes('PAYLOAD ALREADY CREATED'));
     GovV3Helpers.createPayload(actions);
   }
 
