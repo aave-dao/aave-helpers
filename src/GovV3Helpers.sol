@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
-import 'forge-std/console.sol';
 
 import {Vm} from 'forge-std/Vm.sol';
 import {ChainIds, ChainHelpers} from './ChainIds.sol';
@@ -277,7 +276,6 @@ library GovV3Helpers {
     require(actions.length > 0, 'INVALID ACTIONS');
 
     bool payloadCreated = _isPayloadCreated(payloadsController, actions);
-    console.log('created', payloadCreated);
     if (payloadCreated) {
       revert('PAYLOAD ALREADY CREATED');
     } else {
@@ -797,9 +795,7 @@ library GovV3Helpers {
       IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(
         payloadId - 1
       );
-      console.log('actions equal', _actionsAreEqual(actions, payload.actions));
       if (_actionsAreEqual(actions, payload.actions)) {
-        console.log('-----------');
         return true;
       }
     }
