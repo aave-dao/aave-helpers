@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
+import 'forge-std/console.sol';
 
 import {Vm} from 'forge-std/Vm.sol';
 import {ChainIds, ChainHelpers} from './ChainIds.sol';
@@ -275,7 +276,13 @@ library GovV3Helpers {
     IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
     require(actions.length > 0, 'INVALID ACTIONS');
 
-    return payloadsController.createPayload(actions);
+    bool payloadCreated = _isPayloadCreated(payloadsController, actions);
+    console.log('created', payloadCreated);
+    if (payloadCreated) {
+      revert('PAYLOAD ALREADY CREATED');
+    } else {
+      return payloadsController.createPayload(actions);
+    }
   }
 
   function createPayload(
@@ -779,6 +786,24 @@ library GovV3Helpers {
       ChainHelpers.selectChain(vm, ChainIds.MAINNET);
     }
     return (payload.maximumAccessLevelRequired, payloadId);
+  }
+
+  function _isPayloadCreated(
+    IPayloadsControllerCore payloadsController,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) private view returns (bool) {
+    uint40 count = payloadsController.getPayloadsCount();
+    for (uint40 payloadId = count; payloadId > 0; payloadId--) {
+      IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(
+        payloadId - 1
+      );
+      console.log('actions equal', _actionsAreEqual(actions, payload.actions));
+      if (_actionsAreEqual(actions, payload.actions)) {
+        console.log('-----------');
+        return true;
+      }
+    }
+    return false;
   }
 
   function _findPayloadId(

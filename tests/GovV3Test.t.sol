@@ -150,6 +150,23 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     vm.stopPrank();
   }
 
+  function test_payloadCreationWhenPayloadAlreadyCreated() public {
+    // 1. deploy payloads
+    PayloadWithEmit pl1 = new PayloadWithEmit();
+    PayloadWithEmit pl2 = new PayloadWithEmit();
+
+    // 2. create action & register action
+    IPayloadsControllerCore.ExecutionAction[]
+      memory actions = new IPayloadsControllerCore.ExecutionAction[](2);
+    actions[0] = GovV3Helpers.buildAction(address(pl1));
+    actions[1] = GovV3Helpers.buildAction(address(pl2));
+    GovV3Helpers.createPayload(actions);
+
+    // 3. create same payload
+    //    vm.expectRevert(bytes('PAYLOAD ALREADY CREATED'));
+    GovV3Helpers.createPayload(actions);
+  }
+
   function test_helpers() public {
     defaultTest('default', AaveV3Ethereum.POOL, address(payload));
   }
