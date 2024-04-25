@@ -272,7 +272,7 @@ library GovV3Helpers {
    */
   function createPayload(
     IPayloadsControllerCore.ExecutionAction[] memory actions
-  ) public returns (uint40) {
+  ) internal returns (uint40) {
     IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
     require(actions.length > 0, 'INVALID ACTIONS');
 

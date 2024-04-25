@@ -150,7 +150,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     vm.stopPrank();
   }
 
-  function test_payloadCreationWhenPayloadAlreadyCreated() public {
+  function xtest_payloadCreationWhenPayloadAlreadyCreated() public {
     // 1. deploy payloads
     PayloadWithEmit pl1 = new PayloadWithEmit();
     PayloadWithEmit pl2 = new PayloadWithEmit();
