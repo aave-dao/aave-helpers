@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import './BaseAdaptersUpdate.sol';
+import {GovV3Helpers} from '../GovV3Helpers.sol';
 
 /**
  * @title Base payload aDI and bridge adapters update
@@ -12,7 +13,7 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
   struct ConstructorInput {
     address ccc;
     address adapterToRemove;
-    address newAdapter;
+    //    address newAdapter;
   }
 
   struct DestinationAdaptersInput {
@@ -25,7 +26,22 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
 
   constructor(ConstructorInput memory constructorInput) BaseAdaptersUpdate(constructorInput.ccc) {
     ADAPTER_TO_REMOVE = constructorInput.adapterToRemove;
-    NEW_ADAPTER = constructorInput.newAdapter;
+    NEW_ADAPTER = getDeployedNewAdapter();
+  }
+
+  /**
+   * @notice method to get the bytecode of a new adapter contract
+   * @return the bytecode of the new adapter
+   */
+  function getNewAdapterCode() public virtual returns (bytes memory);
+
+  /**
+   * @notice method to get the address of the new adapter
+   * @return address of the new adapter
+   */
+  function getDeployedNewAdapter() public virtual returns (address) {
+    bytes memory adapterCode = getNewAdapterCode();
+    return GovV3Helpers.predictDeterministicAddress(adapterCode);
   }
 
   /**
@@ -68,16 +84,22 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
     override
     returns (ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[] memory)
   {
-    // remove old Receiver bridge adapter
-    ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[]
-      memory bridgeAdaptersToRemove = new ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[](1);
+    if (ADAPTER_TO_REMOVE != address(0)) {
+      // remove old Receiver bridge adapter
+      ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[]
+        memory bridgeAdaptersToRemove = new ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[](
+          1
+        );
 
-    bridgeAdaptersToRemove[0] = ICrossChainReceiver.ReceiverBridgeAdapterConfigInput({
-      bridgeAdapter: ADAPTER_TO_REMOVE,
-      chainIds: getChainsToReceive()
-    });
+      bridgeAdaptersToRemove[0] = ICrossChainReceiver.ReceiverBridgeAdapterConfigInput({
+        bridgeAdapter: ADAPTER_TO_REMOVE,
+        chainIds: getChainsToReceive()
+      });
 
-    return bridgeAdaptersToRemove;
+      return bridgeAdaptersToRemove;
+    } else {
+      return new ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[](0);
+    }
   }
 
   /// @inheritdoc IBaseForwarderAdaptersUpdate
@@ -107,15 +129,19 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
     override
     returns (ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[] memory)
   {
-    ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[]
-      memory bridgeAdapterConfig = new ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[](1);
+    if (NEW_ADAPTER != address(0)) {
+      ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[]
+        memory bridgeAdapterConfig = new ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[](1);
 
-    bridgeAdapterConfig[0] = ICrossChainReceiver.ReceiverBridgeAdapterConfigInput({
-      bridgeAdapter: NEW_ADAPTER,
-      chainIds: getChainsToReceive()
-    });
+      bridgeAdapterConfig[0] = ICrossChainReceiver.ReceiverBridgeAdapterConfigInput({
+        bridgeAdapter: NEW_ADAPTER,
+        chainIds: getChainsToReceive()
+      });
 
-    return bridgeAdapterConfig;
+      return bridgeAdapterConfig;
+    } else {
+      return new ICrossChainReceiver.ReceiverBridgeAdapterConfigInput[](0);
+    }
   }
 
   /// @inheritdoc IBaseForwarderAdaptersUpdate

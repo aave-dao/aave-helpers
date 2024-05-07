@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import './BaseAdaptersUpdate.sol';
+import {GovV3Helpers} from '../GovV3Helpers.sol';
 
 /**
  * @title Base payload aDI and bridge adapters update
@@ -13,7 +14,7 @@ abstract contract SimpleReceiverAdapterUpdate is BaseAdaptersUpdate {
   struct ConstructorInput {
     address ccc;
     address adapterToRemove;
-    address newAdapter;
+    //    address newAdapter;
   }
 
   struct DestinationAdaptersInput {
@@ -26,7 +27,22 @@ abstract contract SimpleReceiverAdapterUpdate is BaseAdaptersUpdate {
 
   constructor(ConstructorInput memory constructorInput) BaseAdaptersUpdate(constructorInput.ccc) {
     ADAPTER_TO_REMOVE = constructorInput.adapterToRemove;
-    NEW_ADAPTER = constructorInput.newAdapter;
+    NEW_ADAPTER = getDeployedNewAdapter();
+  }
+
+  /**
+   * @notice method to get the bytecode of a new adapter contract
+   * @return the bytecode of the new adapter
+   */
+  function getNewAdapterCode() public virtual returns (bytes memory);
+
+  /**
+   * @notice method to get the address of the new adapter
+   * @return address of the new adapter
+   */
+  function getDeployedNewAdapter() public virtual returns (address) {
+    bytes memory adapterCode = getNewAdapterCode();
+    return GovV3Helpers.predictDeterministicAddress(adapterCode);
   }
 
   /**
