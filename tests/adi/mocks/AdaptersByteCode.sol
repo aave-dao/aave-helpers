@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {LayerZeroAdapter, IBaseAdapter} from './mainnet/LayerZeroAdapter/src/contracts/adapters/layerZero/LayerZeroAdapter.sol';
+import {MockAdapter, IBaseAdapter} from './AdapterMock.sol';
 
-library LZAdapterDeploymentHelper {
+library MockAdapterDeploymentHelper {
   struct BaseAdapterArgs {
     address crossChainController;
     uint256 providerGasLimit;
@@ -11,18 +11,20 @@ library LZAdapterDeploymentHelper {
     bool isTestnet;
   }
 
-  function getAdapterCode(
-    BaseAdapterArgs memory baseArgs,
-    address lzEndpoint
-  ) internal pure returns (bytes memory) {
+  struct MockAdapterArgs {
+    BaseAdapterArgs baseArgs;
+    address mockEndpoint;
+  }
+
+  function getAdapterCode(MockAdapterArgs memory mockArgs) internal pure returns (bytes memory) {
     return
       abi.encodePacked(
-        type(LayerZeroAdapter).creationCode,
+        type(MockAdapter).creationCode,
         abi.encode(
-          lzEndpoint,
-          baseArgs.crossChainController,
-          baseArgs.providerGasLimit,
-          baseArgs.trustedRemotes
+          mockArgs.mockEndpoint,
+          mockArgs.baseArgs.crossChainController,
+          mockArgs.baseArgs.providerGasLimit,
+          mockArgs.baseArgs.trustedRemotes
         )
       );
   }

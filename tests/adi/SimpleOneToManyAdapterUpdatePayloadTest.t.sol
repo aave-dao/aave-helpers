@@ -6,7 +6,7 @@ import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import 'forge-std/Test.sol';
 import '../../src/adi/test/ADITestBase.sol';
-import {LZAdapterDeploymentHelper, IBaseAdapter as IBaseAdapterMock} from './mocks/AdaptersByteCode.sol';
+import {MockAdapterDeploymentHelper} from './mocks/AdaptersByteCode.sol';
 
 contract SimpleOneToManyAdapterUpdatePayload is
   SimpleOneToManyAdapterUpdate(
@@ -37,22 +37,24 @@ contract SimpleOneToManyAdapterUpdatePayload is
   }
 
   function getNewAdapterCode() public pure override returns (bytes memory) {
-    IBaseAdapterMock.TrustedRemotesConfig[]
-      memory trustedRemotes = new IBaseAdapterMock.TrustedRemotesConfig[](1);
-    trustedRemotes[0] = IBaseAdapterMock.TrustedRemotesConfig({
+    IBaseAdapter.TrustedRemotesConfig[]
+      memory trustedRemotes = new IBaseAdapter.TrustedRemotesConfig[](1);
+    trustedRemotes[0] = IBaseAdapter.TrustedRemotesConfig({
       originChainId: ChainIds.MAINNET,
       originForwarder: GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER
     });
 
     return
-      LZAdapterDeploymentHelper.getAdapterCode(
-        LZAdapterDeploymentHelper.BaseAdapterArgs({
-          crossChainController: GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER,
-          providerGasLimit: 0,
-          trustedRemotes: trustedRemotes,
-          isTestnet: false
-        }),
-        0x1a44076050125825900e736c501f859c50fE728c
+      MockAdapterDeploymentHelper.getAdapterCode(
+        MockAdapterDeploymentHelper.MockAdapterArgs({
+          baseArgs: MockAdapterDeploymentHelper.BaseAdapterArgs({
+            crossChainController: GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
+            providerGasLimit: 0,
+            trustedRemotes: trustedRemotes,
+            isTestnet: false
+          }),
+          mockEndpoint: 0x1a44076050125825900e736c501f859c50fE728c
+        })
       );
   }
 }
@@ -73,26 +75,28 @@ contract SimpleOneToManyAdapterUpdateEthereumPayload is
   }
 
   function getNewAdapterCode() public pure override returns (bytes memory) {
-    IBaseAdapterMock.TrustedRemotesConfig[]
-      memory trustedRemotes = new IBaseAdapterMock.TrustedRemotesConfig[](2);
-    trustedRemotes[0] = IBaseAdapterMock.TrustedRemotesConfig({
+    IBaseAdapter.TrustedRemotesConfig[]
+      memory trustedRemotes = new IBaseAdapter.TrustedRemotesConfig[](2);
+    trustedRemotes[0] = IBaseAdapter.TrustedRemotesConfig({
       originChainId: ChainIds.POLYGON,
       originForwarder: GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER
     });
-    trustedRemotes[1] = IBaseAdapterMock.TrustedRemotesConfig({
+    trustedRemotes[1] = IBaseAdapter.TrustedRemotesConfig({
       originChainId: ChainIds.AVALANCHE,
       originForwarder: GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER
     });
 
     return
-      LZAdapterDeploymentHelper.getAdapterCode(
-        LZAdapterDeploymentHelper.BaseAdapterArgs({
-          crossChainController: GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
-          providerGasLimit: 0,
-          trustedRemotes: trustedRemotes,
-          isTestnet: false
-        }),
-        0x1a44076050125825900e736c501f859c50fE728c
+      MockAdapterDeploymentHelper.getAdapterCode(
+        MockAdapterDeploymentHelper.MockAdapterArgs({
+          baseArgs: MockAdapterDeploymentHelper.BaseAdapterArgs({
+            crossChainController: GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
+            providerGasLimit: 0,
+            trustedRemotes: trustedRemotes,
+            isTestnet: false
+          }),
+          mockEndpoint: 0x1a44076050125825900e736c501f859c50fE728c
+        })
       );
   }
 }
