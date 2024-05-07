@@ -13,7 +13,6 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
   struct ConstructorInput {
     address ccc;
     address adapterToRemove;
-    //    address newAdapter;
   }
 
   struct DestinationAdaptersInput {

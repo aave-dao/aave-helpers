@@ -14,7 +14,6 @@ abstract contract SimpleReceiverAdapterUpdate is BaseAdaptersUpdate {
   struct ConstructorInput {
     address ccc;
     address adapterToRemove;
-    //    address newAdapter;
   }
 
   struct DestinationAdaptersInput {
