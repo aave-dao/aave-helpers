@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import 'forge-std/console.sol';
 import './BaseAdaptersUpdate.sol';
 import {GovV3Helpers} from '../GovV3Helpers.sol';
 
@@ -13,6 +14,7 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
   struct ConstructorInput {
     address ccc;
     address adapterToRemove;
+    address newAdapter;
   }
 
   struct DestinationAdaptersInput {
@@ -25,22 +27,8 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
 
   constructor(ConstructorInput memory constructorInput) BaseAdaptersUpdate(constructorInput.ccc) {
     ADAPTER_TO_REMOVE = constructorInput.adapterToRemove;
-    NEW_ADAPTER = getDeployedNewAdapter();
-  }
-
-  /**
-   * @notice method to get the bytecode of a new adapter contract
-   * @return the bytecode of the new adapter
-   */
-  function getNewAdapterCode() public virtual returns (bytes memory);
-
-  /**
-   * @notice method to get the address of the new adapter
-   * @return address of the new adapter
-   */
-  function getDeployedNewAdapter() public virtual returns (address) {
-    bytes memory adapterCode = getNewAdapterCode();
-    return GovV3Helpers.predictDeterministicAddress(adapterCode);
+    NEW_ADAPTER = constructorInput.newAdapter;
+    console.log('simple constructor', constructorInput.newAdapter);
   }
 
   /**
@@ -109,15 +97,19 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
     override
     returns (ICrossChainForwarder.BridgeAdapterToDisable[] memory)
   {
-    ICrossChainForwarder.BridgeAdapterToDisable[]
-      memory forwarderAdaptersToRemove = new ICrossChainForwarder.BridgeAdapterToDisable[](1);
+    if (ADAPTER_TO_REMOVE != address(0)) {
+      ICrossChainForwarder.BridgeAdapterToDisable[]
+        memory forwarderAdaptersToRemove = new ICrossChainForwarder.BridgeAdapterToDisable[](1);
 
-    forwarderAdaptersToRemove[0] = ICrossChainForwarder.BridgeAdapterToDisable({
-      bridgeAdapter: ADAPTER_TO_REMOVE,
-      chainIds: getChainsToSend()
-    });
+      forwarderAdaptersToRemove[0] = ICrossChainForwarder.BridgeAdapterToDisable({
+        bridgeAdapter: ADAPTER_TO_REMOVE,
+        chainIds: getChainsToSend()
+      });
 
-    return forwarderAdaptersToRemove;
+      return forwarderAdaptersToRemove;
+    } else {
+      return new ICrossChainForwarder.BridgeAdapterToDisable[](0);
+    }
   }
 
   /// @inheritdoc IBaseReceiverAdaptersUpdate

@@ -8,14 +8,31 @@ import 'forge-std/Test.sol';
 import '../../src/adi/test/ADITestBase.sol';
 import {MockAdapterDeploymentHelper} from './mocks/AdaptersByteCode.sol';
 
-contract SimpleOneToManyAdapterUpdatePayload is
-  SimpleOneToManyAdapterUpdate(
-    SimpleOneToManyAdapterUpdate.ConstructorInput({
-      ccc: GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER,
-      adapterToRemove: address(0)
-    })
+abstract contract BaseExamplePayload {
+  address public immutable PREDICTED_ADDRESS;
+
+  constructor(MockAdapterDeploymentHelper.MockAdapterArgs memory args) {
+    bytes memory adapterCode = MockAdapterDeploymentHelper.getAdapterCode(args);
+
+    PREDICTED_ADDRESS = GovV3Helpers.predictDeterministicAddress(adapterCode);
+    console.log('predicted', PREDICTED_ADDRESS);
+  }
+}
+
+contract SimpleOneToManyAdapterUpdatePayload is BaseExamplePayload, SimpleOneToManyAdapterUpdate {
+  constructor(
+    MockAdapterDeploymentHelper.MockAdapterArgs memory args
   )
-{
+    BaseExamplePayload(args)
+    SimpleOneToManyAdapterUpdate(
+      SimpleOneToManyAdapterUpdate.ConstructorInput({
+        ccc: args.baseArgs.crossChainController,
+        adapterToRemove: address(0),
+        newAdapter: PREDICTED_ADDRESS
+      })
+    )
+  {}
+
   function getChainsToReceive() public pure override returns (uint256[] memory) {
     uint256[] memory chains = new uint256[](1);
     chains[0] = ChainIds.MAINNET;
@@ -35,8 +52,40 @@ contract SimpleOneToManyAdapterUpdatePayload is
 
     return destinationAdapters;
   }
+}
 
-  function getNewAdapterCode() public pure override returns (bytes memory) {
+contract SimpleOneToManyAdapterUpdateEthereumPayload is
+  BaseExamplePayload,
+  SimpleOneToManyAdapterUpdate
+{
+  constructor(
+    MockAdapterDeploymentHelper.MockAdapterArgs memory args
+  )
+    BaseExamplePayload(args)
+    SimpleOneToManyAdapterUpdate(
+      SimpleOneToManyAdapterUpdate.ConstructorInput({
+        ccc: args.baseArgs.crossChainController,
+        adapterToRemove: address(0),
+        newAdapter: PREDICTED_ADDRESS
+      })
+    )
+  {}
+
+  function getChainsToReceive() public pure override returns (uint256[] memory) {
+    uint256[] memory chains = new uint256[](2);
+    chains[0] = ChainIds.POLYGON;
+    chains[1] = ChainIds.AVALANCHE;
+    return chains;
+  }
+}
+
+// provably here we should just define the blockNumber and network. And use base test that in theory could generate diffs
+contract SimpleOneToManyAdapterUpdatePayloadTest is ADITestBase {
+  SimpleOneToManyAdapterUpdatePayload public payload;
+
+  function setUp() public {
+    vm.createSelectFork(vm.rpcUrl('polygon'), 56680671);
+    // create payload constructor args
     IBaseAdapter.TrustedRemotesConfig[]
       memory trustedRemotes = new IBaseAdapter.TrustedRemotesConfig[](1);
     trustedRemotes[0] = IBaseAdapter.TrustedRemotesConfig({
@@ -44,37 +93,31 @@ contract SimpleOneToManyAdapterUpdatePayload is
       originForwarder: GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER
     });
 
-    return
-      MockAdapterDeploymentHelper.getAdapterCode(
-        MockAdapterDeploymentHelper.MockAdapterArgs({
-          baseArgs: MockAdapterDeploymentHelper.BaseAdapterArgs({
-            crossChainController: GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
-            providerGasLimit: 0,
-            trustedRemotes: trustedRemotes,
-            isTestnet: false
-          }),
-          mockEndpoint: 0x1a44076050125825900e736c501f859c50fE728c
-        })
-      );
-  }
-}
-
-contract SimpleOneToManyAdapterUpdateEthereumPayload is
-  SimpleOneToManyAdapterUpdate(
-    SimpleOneToManyAdapterUpdate.ConstructorInput({
-      ccc: GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
-      adapterToRemove: address(0)
-    })
-  )
-{
-  function getChainsToReceive() public pure override returns (uint256[] memory) {
-    uint256[] memory chains = new uint256[](2);
-    chains[0] = ChainIds.POLYGON;
-    chains[0] = ChainIds.AVALANCHE;
-    return chains;
+    MockAdapterDeploymentHelper.MockAdapterArgs memory args = MockAdapterDeploymentHelper
+      .MockAdapterArgs({
+        baseArgs: MockAdapterDeploymentHelper.BaseAdapterArgs({
+          crossChainController: GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER,
+          providerGasLimit: 0,
+          trustedRemotes: trustedRemotes,
+          isTestnet: false
+        }),
+        mockEndpoint: 0x1a44076050125825900e736c501f859c50fE728c
+      });
+    // deploy payload
+    payload = new SimpleOneToManyAdapterUpdatePayload(args);
+    // deploy adapter
+    GovV3Helpers.deployDeterministic(MockAdapterDeploymentHelper.getAdapterCode(args));
+    console.log('new adapter', payload.NEW_ADAPTER());
   }
 
-  function getNewAdapterCode() public pure override returns (bytes memory) {
+  function getDestinationPayloadsByChain()
+    public
+    pure
+    override
+    returns (DestinationPayload[] memory)
+  {
+    DestinationPayload[] memory destinationPayload = new DestinationPayload[](1);
+
     IBaseAdapter.TrustedRemotesConfig[]
       memory trustedRemotes = new IBaseAdapter.TrustedRemotesConfig[](2);
     trustedRemotes[0] = IBaseAdapter.TrustedRemotesConfig({
@@ -86,44 +129,23 @@ contract SimpleOneToManyAdapterUpdateEthereumPayload is
       originForwarder: GovernanceV3Avalanche.CROSS_CHAIN_CONTROLLER
     });
 
-    return
-      MockAdapterDeploymentHelper.getAdapterCode(
-        MockAdapterDeploymentHelper.MockAdapterArgs({
-          baseArgs: MockAdapterDeploymentHelper.BaseAdapterArgs({
-            crossChainController: GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
-            providerGasLimit: 0,
-            trustedRemotes: trustedRemotes,
-            isTestnet: false
-          }),
-          mockEndpoint: 0x1a44076050125825900e736c501f859c50fE728c
-        })
-      );
-  }
-}
+    MockAdapterDeploymentHelper.MockAdapterArgs memory args = MockAdapterDeploymentHelper
+      .MockAdapterArgs({
+        baseArgs: MockAdapterDeploymentHelper.BaseAdapterArgs({
+          crossChainController: GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
+          providerGasLimit: 0,
+          trustedRemotes: trustedRemotes,
+          isTestnet: false
+        }),
+        mockEndpoint: 0x1a44076050125825900e736c501f859c50fE728c
+      });
 
-// provably here we should just define the blockNumber and network. And use base test that in theory could generate diffs
-contract SimpleOneToManyAdapterUpdatePayloadTest is ADITestBase {
-  SimpleOneToManyAdapterUpdatePayload public payload;
-
-  function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 56680671);
-
-    // deploy payload
-    payload = new SimpleOneToManyAdapterUpdatePayload();
-    // deploy adapter
-    GovV3Helpers.deployDeterministic(payload.getNewAdapterCode());
-  }
-
-  function getDestinationPayloadsByChain()
-    public
-    pure
-    override
-    returns (DestinationPayload[] memory)
-  {
-    DestinationPayload[] memory destinationPayload = new DestinationPayload[](1);
     destinationPayload[0] = DestinationPayload({
       chainId: ChainIds.MAINNET,
-      payloadCode: type(SimpleOneToManyAdapterUpdateEthereumPayload).creationCode
+      payloadCode: abi.encodePacked(
+        type(SimpleOneToManyAdapterUpdateEthereumPayload).creationCode,
+        abi.encode(args)
+      )
     });
 
     return destinationPayload;
