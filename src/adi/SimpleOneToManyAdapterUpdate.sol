@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import 'forge-std/console.sol';
 import './BaseAdaptersUpdate.sol';
 import {GovV3Helpers} from '../GovV3Helpers.sol';
 
@@ -28,7 +27,6 @@ abstract contract SimpleOneToManyAdapterUpdate is BaseAdaptersUpdate {
   constructor(ConstructorInput memory constructorInput) BaseAdaptersUpdate(constructorInput.ccc) {
     ADAPTER_TO_REMOVE = constructorInput.adapterToRemove;
     NEW_ADAPTER = constructorInput.newAdapter;
-    console.log('simple constructor', constructorInput.newAdapter);
   }
 
   /**

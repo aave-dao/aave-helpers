@@ -8,27 +8,16 @@ import 'forge-std/Test.sol';
 import '../../src/adi/test/ADITestBase.sol';
 import {MockAdapterDeploymentHelper} from './mocks/AdaptersByteCode.sol';
 
-abstract contract BaseExamplePayload {
-  address public immutable PREDICTED_ADDRESS;
-
-  constructor(MockAdapterDeploymentHelper.MockAdapterArgs memory args) {
-    bytes memory adapterCode = MockAdapterDeploymentHelper.getAdapterCode(args);
-
-    PREDICTED_ADDRESS = GovV3Helpers.predictDeterministicAddress(adapterCode);
-    console.log('predicted', PREDICTED_ADDRESS);
-  }
-}
-
-contract SimpleOneToManyAdapterUpdatePayload is BaseExamplePayload, SimpleOneToManyAdapterUpdate {
+contract SimpleOneToManyAdapterUpdatePayload is SimpleOneToManyAdapterUpdate {
   constructor(
-    MockAdapterDeploymentHelper.MockAdapterArgs memory args
+    address crossChainController,
+    address newAdapter
   )
-    BaseExamplePayload(args)
     SimpleOneToManyAdapterUpdate(
       SimpleOneToManyAdapterUpdate.ConstructorInput({
-        ccc: args.baseArgs.crossChainController,
+        ccc: crossChainController,
         adapterToRemove: address(0),
-        newAdapter: PREDICTED_ADDRESS
+        newAdapter: newAdapter
       })
     )
   {}
@@ -54,19 +43,16 @@ contract SimpleOneToManyAdapterUpdatePayload is BaseExamplePayload, SimpleOneToM
   }
 }
 
-contract SimpleOneToManyAdapterUpdateEthereumPayload is
-  BaseExamplePayload,
-  SimpleOneToManyAdapterUpdate
-{
+contract SimpleOneToManyAdapterUpdateEthereumPayload is SimpleOneToManyAdapterUpdate {
   constructor(
-    MockAdapterDeploymentHelper.MockAdapterArgs memory args
+    address crossChainController,
+    address newAdapter
   )
-    BaseExamplePayload(args)
     SimpleOneToManyAdapterUpdate(
       SimpleOneToManyAdapterUpdate.ConstructorInput({
-        ccc: args.baseArgs.crossChainController,
+        ccc: crossChainController,
         adapterToRemove: address(0),
-        newAdapter: PREDICTED_ADDRESS
+        newAdapter: newAdapter
       })
     )
   {}
@@ -103,11 +89,16 @@ contract SimpleOneToManyAdapterUpdatePayloadTest is ADITestBase {
         }),
         mockEndpoint: 0x1a44076050125825900e736c501f859c50fE728c
       });
-    // deploy payload
-    payload = new SimpleOneToManyAdapterUpdatePayload(args);
+
     // deploy adapter
-    GovV3Helpers.deployDeterministic(MockAdapterDeploymentHelper.getAdapterCode(args));
-    console.log('new adapter', payload.NEW_ADAPTER());
+    address newAdapter = GovV3Helpers.deployDeterministic(
+      MockAdapterDeploymentHelper.getAdapterCode(args)
+    );
+    // deploy payload
+    payload = new SimpleOneToManyAdapterUpdatePayload(
+      GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER,
+      newAdapter
+    );
   }
 
   function getDestinationPayloadsByChain()
@@ -140,11 +131,15 @@ contract SimpleOneToManyAdapterUpdatePayloadTest is ADITestBase {
         mockEndpoint: 0x1a44076050125825900e736c501f859c50fE728c
       });
 
+    bytes memory adapterCode = MockAdapterDeploymentHelper.getAdapterCode(args);
+
+    address newAdapter = GovV3Helpers.predictDeterministicAddress(adapterCode);
+
     destinationPayload[0] = DestinationPayload({
       chainId: ChainIds.MAINNET,
       payloadCode: abi.encodePacked(
         type(SimpleOneToManyAdapterUpdateEthereumPayload).creationCode,
-        abi.encode(args)
+        abi.encode(GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER, newAdapter)
       )
     });
 
