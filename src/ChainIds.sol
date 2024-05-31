@@ -4,6 +4,7 @@ import {Vm} from 'forge-std/Vm.sol';
 
 library ChainIds {
   uint256 internal constant MAINNET = 1;
+  uint256 internal constant ETHEREUM = 1;
   uint256 internal constant OPTIMISM = 10;
   uint256 internal constant BNB = 56;
   uint256 internal constant POLYGON = 137;
