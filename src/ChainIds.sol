@@ -81,4 +81,61 @@ library ChainHelpers {
     }
     return (previousFork, newFork);
   }
+
+  function getNetworkNameFromId(uint256 chainId) internal pure returns (string memory) {
+    string memory networkName;
+    if (chainId == ChainIds.ETHEREUM) {
+      networkName = 'ethereum';
+    } else if (chainId == ChainIds.POLYGON) {
+      networkName = 'polygon';
+    } else if (chainId == ChainIds.AVALANCHE) {
+      networkName = 'avalanche';
+    } else if (chainId == ChainIds.ARBITRUM) {
+      networkName = 'arbitrum';
+    } else if (chainId == ChainIds.OPTIMISM) {
+      networkName = 'optimism';
+    } else if (chainId == ChainIds.METIS) {
+      networkName = 'metis';
+    } else if (chainId == ChainIds.BNB) {
+      networkName = 'binance';
+    } else if (chainId == ChainIds.BASE) {
+      networkName = 'base';
+    } else if (chainId == ChainIds.POLYGON_ZK_EVM) {
+      networkName = 'zkevm';
+    } else if (chainId == ChainIds.GNOSIS) {
+      networkName = 'gnosis';
+    } else if (chainId == ChainIds.SCROLL) {
+      networkName = 'scroll';
+    } else if (chainId == ChainIds.CELO) {
+      networkName = 'celo';
+    }
+    // testnets
+    else if (chainId == TestNetChainIds.ETHEREUM_SEPOLIA) {
+      networkName = 'ethereum_sepolia';
+    } else if (chainId == TestNetChainIds.POLYGON_AMOY) {
+      networkName = 'polygon_amoy';
+    } else if (chainId == TestNetChainIds.AVALANCHE_FUJI) {
+      networkName = 'avalanche_fuji';
+    } else if (chainId == TestNetChainIds.ARBITRUM_SEPOLIA) {
+      networkName = 'arbitrum_sepolia';
+    } else if (chainId == TestNetChainIds.OPTIMISM_SEPOLIA) {
+      networkName = 'optimism_sepolia';
+    } else if (chainId == TestNetChainIds.METIS_TESTNET) {
+      networkName = 'metis_test';
+    } else if (chainId == TestNetChainIds.BNB_TESTNET) {
+      networkName = 'binance_testnet';
+    } else if (chainId == TestNetChainIds.BASE_SEPOLIA) {
+      networkName = 'base_sepolia';
+    } else if (chainId == TestNetChainIds.GNOSIS_CHIADO) {
+      networkName = 'gno_chiado';
+    } else if (chainId == TestNetChainIds.SCROLL_SEPOLIA) {
+      networkName = 'scroll_sepolia';
+    } else if (chainId == TestNetChainIds.CELO_ALFAJORES) {
+      networkName = 'celo_alfajores';
+    } else {
+      revert('chain id is not supported');
+    }
+
+    return networkName;
+  }
 }
