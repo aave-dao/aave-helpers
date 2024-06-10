@@ -139,7 +139,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       // borrow cap should never exceed supply cap
       if (
         configAfter[i].borrowCap != 0 &&
-        keccak256(bytes(configAfter[i].symbol)) != keccak256(bytes('GHO')) // GHO is the exclusion from the rule
+        configAfter[i].underlying != AaveV3EthereumAssets.GHO_UNDERLYING // GHO is the exclusion from the rule
       ) {
         console.log(configAfter[i].underlying);
         require(configAfter[i].borrowCap <= configAfter[i].supplyCap, 'PL_SUPPLY_LT_BORROW');
