@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import './BaseAdaptersUpdate.sol';
-import {GovV3Helpers} from '../GovV3Helpers.sol';
 
 /**
  * @title Base payload aDI and bridge adapters update
