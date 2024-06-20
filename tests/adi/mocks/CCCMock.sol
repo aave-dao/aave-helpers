@@ -6,7 +6,9 @@ import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initiali
 contract CCCMock is Initializable {
   event MockEvent(address indexed caller);
 
-  function initializeRevision() external reinitializer(40) {
+  constructor() {}
+
+  function initializeRevision() external reinitializer(60) {
     emit MockEvent(msg.sender);
   }
 }

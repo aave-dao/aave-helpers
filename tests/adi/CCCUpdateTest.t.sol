@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
-import {MiscPolygon} from 'aave-address-book/MiscPolygon.sol';
+import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
+import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {CCCUpdateArgs, BaseCCCUpdate} from '../../src/adi/BaseCCCUpdate.sol';
 import '../../src/adi/test/ADITestBase.sol';
 import {CCCMock} from './mocks/CCCMock.sol';
@@ -13,8 +13,8 @@ contract UpdateCCCPayload is BaseCCCUpdate {
   )
     BaseCCCUpdate(
       CCCUpdateArgs({
-        crossChainController: GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER,
-        proxyAdmin: MiscPolygon.PROXY_ADMIN,
+        crossChainController: GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
+        proxyAdmin: MiscEthereum.PROXY_ADMIN,
         newCCCImpl: newCCCImpl
       })
     )
@@ -31,7 +31,7 @@ contract UpdateCCCImplTest is ADITestBase {
   UpdateCCCPayload public payload;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('polygon'), 58369335);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 20130837);
     address cccImpl = address(new CCCMock());
     console.log('impl', cccImpl);
     payload = new UpdateCCCPayload(cccImpl);
@@ -40,7 +40,7 @@ contract UpdateCCCImplTest is ADITestBase {
   function test_defaultTest() public {
     defaultTest(
       'test_ccc_update_adi_diffs',
-      GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER,
+      GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
       address(payload),
       false
     );

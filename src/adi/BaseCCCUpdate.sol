@@ -40,8 +40,6 @@ abstract contract BaseCCCUpdate is BaseADIPayloadUpdate {
 
   /// @inheritdoc IProposalGenericExecutor
   function execute() public virtual override {
-    console.log('new impl', NEW_CCC_IMPL);
-    console.log('--------------');
     ProxyAdmin(PROXY_ADMIN).upgradeAndCall(
       TransparentUpgradeableProxy(payable(CROSS_CHAIN_CONTROLLER)),
       NEW_CCC_IMPL,
