@@ -106,7 +106,7 @@ contract ADITestBase is Test {
     diffReports(beforeString, afterString);
 
     vm.revertTo(snapshotId);
-    //    if (runE2E) e2eTest(payload, crossChainController);
+    if (runE2E) e2eTest(payload, crossChainController);
 
     return (configBefore, configAfter);
   }
@@ -401,9 +401,9 @@ contract ADITestBase is Test {
     );
     vm.serializeUint('root', 'chainId', block.chainid);
     CCCConfig memory config = _getCCCConfig(crossChainController);
-    //    if (receiverConfigs) _writeReceiverConfigs(path, config);
-    //    if (receiverAdapterConfigs) _writeReceiverAdapters(path, config);
-    //    if (forwarderAdapterConfigs) _writeForwarderAdatpers(path, config);
+    if (receiverConfigs) _writeReceiverConfigs(path, config);
+    if (receiverAdapterConfigs) _writeReceiverAdapters(path, config);
+    if (forwarderAdapterConfigs) _writeForwarderAdatpers(path, config);
     if (cccImplUpdate) _writeCCCImplUpdate(path, config);
 
     return config;

@@ -4,48 +4,48 @@ pragma solidity ^0.8.0;
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {TransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/TransparentProxyFactory.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
-import './BaseAdaptersUpdate.sol';
+import './BasePayloadUpdate.sol';
+import 'forge-std/console.sol';
 
 /**
  * @param crossChainController address of the CCC of the network where payload will be deployed
  * @param newCCCImpl address of the new ccc implementation
  * @param proxyAdmin address of the proxy admin owner of ccc
- * @param _initializeSignature bytes with the encoded ccc initialize signature
  */
 struct CCCUpdateArgs {
   address crossChainController;
   address newCCCImpl;
   address proxyAdmin;
-  bytes initializeSignature;
 }
 
 /**
  * @title Base payload to update CCC
  * @author BGD Labs @bgdlabs
  */
-contract BaseCCCUpdate is BaseAdaptersUpdate {
+abstract contract BaseCCCUpdate is BaseADIPayloadUpdate {
   address public immutable NEW_CCC_IMPL;
   address public immutable PROXY_ADMIN;
 
-  bytes public initializeSignature;
+  function getInitializeSignature() public pure virtual returns (bytes memory);
 
   /*
    * @param cccUpdateArgs arguments necessary to update ccc implementation
    */
   constructor(
     CCCUpdateArgs memory cccUpdateArgs
-  ) BaseAdaptersUpdate(cccUpdateArgs.crossChainController) {
+  ) BaseADIPayloadUpdate(cccUpdateArgs.crossChainController) {
     NEW_CCC_IMPL = cccUpdateArgs.newCCCImpl;
     PROXY_ADMIN = cccUpdateArgs.proxyAdmin;
-    initializeSignature = cccUpdateArgs.initializeSignature;
   }
 
   /// @inheritdoc IProposalGenericExecutor
   function execute() public virtual override {
+    console.log('new impl', NEW_CCC_IMPL);
+    console.log('--------------');
     ProxyAdmin(PROXY_ADMIN).upgradeAndCall(
       TransparentUpgradeableProxy(payable(CROSS_CHAIN_CONTROLLER)),
       NEW_CCC_IMPL,
-      initializeSignature
+      getInitializeSignature()
     );
   }
 }
