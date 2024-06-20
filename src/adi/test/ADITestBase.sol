@@ -522,46 +522,46 @@ contract ADITestBase is Test {
     config.crossChainControllerImpl = ProxyHelpers
       .getInitializableAdminUpgradeabilityProxyImplementation(vm, ccc);
     // get supported networks
-    //    uint256[] memory receiverSupportedChains = ICrossChainReceiver(ccc).getSupportedChains();
-    //    ReceiverConfigByChain[] memory receiverConfigs = new ReceiverConfigByChain[](
-    //      receiverSupportedChains.length
-    //    );
-    //    ReceiverAdaptersByChain[] memory receiverAdaptersConfig = new ReceiverAdaptersByChain[](
-    //      receiverSupportedChains.length
-    //    );
-    //    for (uint256 i = 0; i < receiverSupportedChains.length; i++) {
-    //      uint256 chainId = receiverSupportedChains[i];
-    //      ICrossChainReceiver.ReceiverConfiguration memory receiverConfig = ICrossChainReceiver(ccc)
-    //        .getConfigurationByChain(chainId);
-    //      receiverConfigs[i] = ReceiverConfigByChain({
-    //        chainId: chainId,
-    //        requiredConfirmations: receiverConfig.requiredConfirmation,
-    //        validityTimestamp: receiverConfig.validityTimestamp
-    //      });
-    //      receiverAdaptersConfig[i] = ReceiverAdaptersByChain({
-    //        chainId: chainId,
-    //        receiverAdapters: ICrossChainReceiver(ccc).getReceiverBridgeAdaptersByChain(chainId)
-    //      });
-    //    }
-    //
-    //    config.receiverAdaptersConfig = receiverAdaptersConfig;
-    //    config.receiverConfigs = receiverConfigs;
-    //
-    //    // get receiver configs by network
-    //    uint256[] memory supportedForwardingNetworks = _getForwarderSupportedChainsByChainId(
-    //      block.chainid
-    //    );
-    //    ForwarderAdaptersByChain[] memory forwardersByChain = new ForwarderAdaptersByChain[](
-    //      supportedForwardingNetworks.length
-    //    );
-    //    for (uint256 i = 0; i < supportedForwardingNetworks.length; i++) {
-    //      uint256 chainId = supportedForwardingNetworks[i];
-    //      forwardersByChain[i] = ForwarderAdaptersByChain({
-    //        chainId: chainId,
-    //        forwarders: ICrossChainForwarder(ccc).getForwarderBridgeAdaptersByChain(chainId)
-    //      });
-    //    }
-    //    config.forwarderAdaptersConfig = forwardersByChain;
+    uint256[] memory receiverSupportedChains = ICrossChainReceiver(ccc).getSupportedChains();
+    ReceiverConfigByChain[] memory receiverConfigs = new ReceiverConfigByChain[](
+      receiverSupportedChains.length
+    );
+    ReceiverAdaptersByChain[] memory receiverAdaptersConfig = new ReceiverAdaptersByChain[](
+      receiverSupportedChains.length
+    );
+    for (uint256 i = 0; i < receiverSupportedChains.length; i++) {
+      uint256 chainId = receiverSupportedChains[i];
+      ICrossChainReceiver.ReceiverConfiguration memory receiverConfig = ICrossChainReceiver(ccc)
+        .getConfigurationByChain(chainId);
+      receiverConfigs[i] = ReceiverConfigByChain({
+        chainId: chainId,
+        requiredConfirmations: receiverConfig.requiredConfirmation,
+        validityTimestamp: receiverConfig.validityTimestamp
+      });
+      receiverAdaptersConfig[i] = ReceiverAdaptersByChain({
+        chainId: chainId,
+        receiverAdapters: ICrossChainReceiver(ccc).getReceiverBridgeAdaptersByChain(chainId)
+      });
+    }
+
+    config.receiverAdaptersConfig = receiverAdaptersConfig;
+    config.receiverConfigs = receiverConfigs;
+
+    // get receiver configs by network
+    uint256[] memory supportedForwardingNetworks = _getForwarderSupportedChainsByChainId(
+      block.chainid
+    );
+    ForwarderAdaptersByChain[] memory forwardersByChain = new ForwarderAdaptersByChain[](
+      supportedForwardingNetworks.length
+    );
+    for (uint256 i = 0; i < supportedForwardingNetworks.length; i++) {
+      uint256 chainId = supportedForwardingNetworks[i];
+      forwardersByChain[i] = ForwarderAdaptersByChain({
+        chainId: chainId,
+        forwarders: ICrossChainForwarder(ccc).getForwarderBridgeAdaptersByChain(chainId)
+      });
+    }
+    config.forwarderAdaptersConfig = forwardersByChain;
 
     return config;
   }
