@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {TransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/TransparentProxyFactory.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
-import './BasePayloadUpdate.sol';
+import './BaseADIPayloadUpdate.sol';
 import 'forge-std/console.sol';
 
 /**

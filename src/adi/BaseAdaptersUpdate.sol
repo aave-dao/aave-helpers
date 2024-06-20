@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import './BaseReceiverAdaptersUpdate.sol';
 import './BaseForwarderAdaptersUpdate.sol';
-import './BasePayloadUpdate.sol';
+import './BaseADIPayloadUpdate.sol';
 
 /**
  * @title Base payload aDI and bridge adapters update
