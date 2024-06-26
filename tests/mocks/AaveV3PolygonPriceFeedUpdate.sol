@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import '../../src/v3-config-engine/AaveV3Payload.sol';
+import 'aave-v3-origin/periphery/contracts/v3-config-engine/AaveV3Payload.sol';
 import {AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 
 /**

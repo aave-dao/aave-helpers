@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import '../src/ScriptUtils.sol';
 import {CapsPlusRiskSteward} from '../src/riskstewards/CapsPlusRiskSteward.sol';
-import {IAaveV3ConfigEngine} from '../src/v3-config-engine/IAaveV3ConfigEngine.sol';
+import {IAaveV3ConfigEngine} from 'aave-v3-origin/periphery/contracts/v3-config-engine/IAaveV3ConfigEngine.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';

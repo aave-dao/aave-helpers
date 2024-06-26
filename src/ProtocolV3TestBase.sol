@@ -2,17 +2,18 @@
 pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
-import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
+import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IReserveInterestRateStrategy, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
-import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {ReserveConfiguration} from 'aave-v3-origin/core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {IDefaultInterestRateStrategyV2} from 'aave-v3-origin/core/contracts/interfaces/IDefaultInterestRateStrategyV2.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
-import {IDefaultInterestRateStrategyV2} from './dependencies/IDefaultInterestRateStrategyV2.sol';
+import {ILegacyDefaultInterestRateStrategy} from './dependencies/ILegacyDefaultInterestRateStrategy.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -449,7 +450,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       IDefaultInterestRateStrategyV2 strategyV2 = IDefaultInterestRateStrategyV2(
         configs[i].interestRateStrategy
       );
-      IDefaultInterestRateStrategy strategyV1 = IDefaultInterestRateStrategy(
+      ILegacyDefaultInterestRateStrategy strategyV1 = ILegacyDefaultInterestRateStrategy(
         configs[i].interestRateStrategy
       );
       address asset = configs[i].underlying;
@@ -942,7 +943,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     address expectedStrategy,
     InterestStrategyValues memory expectedStrategyValues
   ) internal view {
-    IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
+    ILegacyDefaultInterestRateStrategy strategy = ILegacyDefaultInterestRateStrategy(
       interestRateStrategyAddress
     );
 

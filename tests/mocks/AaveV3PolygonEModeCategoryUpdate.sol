@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import '../../src/v3-config-engine/AaveV3Payload.sol';
+import 'aave-v3-origin/periphery/contracts/v3-config-engine/AaveV3Payload.sol';
 
 /**
  * @dev Smart contract for a mock update, to be able to test
