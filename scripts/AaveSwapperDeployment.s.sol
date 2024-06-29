@@ -8,7 +8,7 @@ import {TransparentProxyFactory} from 'solidity-utils/contracts/transparent-prox
 
 import {AaveSwapper} from 'src/swaps/AaveSwapper.sol';
 
-contract DeplyAaveSwapper is Script {
+contract DeployAaveSwapper is Script {
   function run() external {
     vm.startBroadcast();
 
