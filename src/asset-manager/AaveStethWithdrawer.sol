@@ -13,8 +13,9 @@ contract AaveStethWithdrawer is Ownable, Rescuable, IAaveStethWithdrawer {
   using SafeERC20 for IERC20;
 
   /// auto incrementing index to store requestIds of withdrawals
-  uint256 public lastIndex;
+  uint256 public nextIndex;
 
+  /// stores a mapping of index to arrays of requestIds
   mapping(uint256 => uint256[]) public requestIds;
 
   IWithdrawalQueueERC721 public constant WSETH_WITHDRAWAL_QUEUE =
@@ -32,8 +33,8 @@ contract AaveStethWithdrawer is Ownable, Rescuable, IAaveStethWithdrawer {
   function startWithdraw(uint256[] calldata amounts) external {
     uint256[] memory rIds = WSETH_WITHDRAWAL_QUEUE.requestWithdrawalsWstETH(amounts, address(this));
 
-    requestIds[lastIndex++] = rIds;
-    emit StartedWithdrawal(amounts, rIds);
+    requestIds[nextIndex] = rIds;
+    emit StartedWithdrawal(amounts, nextindex++);
   }
 
   /// @inheritdoc IAaveStethWithdrawer
@@ -56,7 +57,7 @@ contract AaveStethWithdrawer is Ownable, Rescuable, IAaveStethWithdrawer {
       ethBalance
     );
 
-    emit FinalizedWithdrawal(ethBalance, reqIds);
+    emit FinalizedWithdrawal(ethBalance, index);
   }
 
   /// @inheritdoc Rescuable
