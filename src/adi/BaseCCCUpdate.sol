@@ -26,7 +26,7 @@ abstract contract BaseCCCUpdate is BaseADIPayloadUpdate {
   address public immutable NEW_CCC_IMPL;
   address public immutable PROXY_ADMIN;
 
-  function getInitializeSignature() public pure virtual returns (bytes memory);
+  function getInitializeSignature() public view virtual returns (bytes memory);
 
   /*
    * @param cccUpdateArgs arguments necessary to update ccc implementation
