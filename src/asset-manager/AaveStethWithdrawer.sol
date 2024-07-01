@@ -5,6 +5,7 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {Rescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
+/// TODO include after Rescuable721 gets merged in
 // import {Rescuable721} from 'solidity-utils/contracts/utils/Rescuable721.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {IAaveStethWithdrawer, IWithdrawalQueueERC721, IWETH} from './interfaces/IAaveStethWithdrawer.sol';
@@ -21,8 +22,8 @@ contract AaveStethWithdrawer is Ownable, Rescuable, IAaveStethWithdrawer {
   IWithdrawalQueueERC721 public constant WSETH_WITHDRAWAL_QUEUE =
     IWithdrawalQueueERC721(0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1);
 
-  constructor(address _owner) {
-    _transferOwnership(_owner);
+  constructor(address owner) {
+    _transferOwnership(owner);
     IERC20(AaveV3EthereumAssets.wstETH_UNDERLYING).approve(
       address(WSETH_WITHDRAWAL_QUEUE),
       type(uint256).max
@@ -31,15 +32,16 @@ contract AaveStethWithdrawer is Ownable, Rescuable, IAaveStethWithdrawer {
 
   /// @inheritdoc IAaveStethWithdrawer
   function startWithdraw(uint256[] calldata amounts) external {
+    uint256 index = nextIndex++;
     uint256[] memory rIds = WSETH_WITHDRAWAL_QUEUE.requestWithdrawalsWstETH(amounts, address(this));
 
-    requestIds[nextIndex] = rIds;
-    emit StartedWithdrawal(amounts, nextindex++);
+    requestIds[index] = rIds;
+    emit StartedWithdrawal(amounts, index);
   }
 
   /// @inheritdoc IAaveStethWithdrawer
   function finalizeWithdraw(uint256 index) external {
-    uint256[] memory reqIds = requestIds[index];
+    uint256[] memory reqIds = getRequestIds(index);
     uint256[] memory hintIds = WSETH_WITHDRAWAL_QUEUE.findCheckpointHints(
       reqIds,
       1,
@@ -58,6 +60,11 @@ contract AaveStethWithdrawer is Ownable, Rescuable, IAaveStethWithdrawer {
     );
 
     emit FinalizedWithdrawal(ethBalance, index);
+  }
+  
+  /// @inheritdoc IAaveStethWithdrawer
+  function getRequestIds(uint256 index) public view returns (uint256[] memory reqIds) {
+    reqIds = requestIds[index];
   }
 
   /// @inheritdoc Rescuable

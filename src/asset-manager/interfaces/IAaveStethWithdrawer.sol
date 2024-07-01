@@ -19,6 +19,11 @@ interface IAaveStethWithdrawer {
   /// @notice Finalizes a withdrawal
   /// @param index the index of the withdrawal request data of the withdrawal to be finalized
   function finalizeWithdraw(uint256 index) external;
+  
+  /// @notice Gets the requestIds from a specific withdrawal request
+  /// @param index the index of the withdrawal request data to be returned
+  /// @return requestIds an array containing all the requestIds of a single withdrawal request
+  function getRequestIds(uint256 index) external view returns (uint256[] memory requestIds);
 }
 
 interface IWithdrawalQueueERC721 {
