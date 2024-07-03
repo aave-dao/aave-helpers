@@ -5,7 +5,6 @@ import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-
 import {TransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/TransparentProxyFactory.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import './BaseADIPayloadUpdate.sol';
-import 'forge-std/console.sol';
 
 /**
  * @param crossChainController address of the CCC of the network where payload will be deployed
@@ -14,7 +13,7 @@ import 'forge-std/console.sol';
  */
 struct CCCUpdateArgs {
   address crossChainController;
-  address newCCCImpl;
+  address crossChainControllerImpl;
   address proxyAdmin;
 }
 
@@ -26,20 +25,20 @@ abstract contract BaseCCCUpdate is BaseADIPayloadUpdate {
   address public immutable NEW_CCC_IMPL;
   address public immutable PROXY_ADMIN;
 
-  function getInitializeSignature() public view virtual returns (bytes memory);
-
   /*
    * @param cccUpdateArgs arguments necessary to update ccc implementation
    */
   constructor(
     CCCUpdateArgs memory cccUpdateArgs
   ) BaseADIPayloadUpdate(cccUpdateArgs.crossChainController) {
-    NEW_CCC_IMPL = cccUpdateArgs.newCCCImpl;
+    NEW_CCC_IMPL = cccUpdateArgs.crossChainControllerImpl;
     PROXY_ADMIN = cccUpdateArgs.proxyAdmin;
   }
 
+  function getInitializeSignature() public virtual returns (bytes memory);
+
   /// @inheritdoc IProposalGenericExecutor
-  function execute() public virtual override {
+  function execute() external virtual override {
     ProxyAdmin(PROXY_ADMIN).upgradeAndCall(
       TransparentUpgradeableProxy(payable(CROSS_CHAIN_CONTROLLER)),
       NEW_CCC_IMPL,

@@ -15,7 +15,7 @@ contract UpdateCCCPayload is BaseCCCUpdate {
       CCCUpdateArgs({
         crossChainController: GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
         proxyAdmin: MiscEthereum.PROXY_ADMIN,
-        newCCCImpl: newCCCImpl
+        crossChainControllerImpl: newCCCImpl
       })
     )
   {}
@@ -39,7 +39,8 @@ contract UpdateCCCImplTest is ADITestBase {
     //      'test_ccc_update_adi_diffs',
     //      GovernanceV3Ethereum.CROSS_CHAIN_CONTROLLER,
     //      address(payload),
-    //      false
+    //      false,
+    //      vm
     //    );
   }
 }

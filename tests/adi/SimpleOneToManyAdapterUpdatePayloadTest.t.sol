@@ -151,7 +151,8 @@ contract SimpleOneToManyAdapterUpdatePayloadTest is ADITestBase {
       'test_adi_diffs',
       GovernanceV3Polygon.CROSS_CHAIN_CONTROLLER,
       address(payload),
-      true
+      true,
+      vm
     );
   }
 }

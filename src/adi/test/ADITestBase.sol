@@ -91,7 +91,8 @@ contract ADITestBase is Test {
     string memory reportName,
     address crossChainController,
     address payload,
-    bool runE2E
+    bool runE2E,
+    Vm vm
   ) public returns (CCCConfig memory, CCCConfig memory) {
     string memory beforeString = string(abi.encodePacked('adi_', reportName, '_before'));
     CCCConfig memory configBefore = createConfigurationSnapshot(beforeString, crossChainController);
