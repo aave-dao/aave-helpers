@@ -63,8 +63,8 @@ contract AaveStethWithdrawer is Ownable, Rescuable, IAaveStethWithdrawer {
   }
   
   /// @inheritdoc IAaveStethWithdrawer
-  function getRequestIds(uint256 index) public view returns (uint256[] memory reqIds) {
-    reqIds = requestIds[index];
+  function getRequestIds(uint256 index) public view returns (uint256[] memory) {
+    return requestIds[index];
   }
 
   /// @inheritdoc Rescuable
