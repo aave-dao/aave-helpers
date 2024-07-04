@@ -2,12 +2,12 @@
 pragma solidity ^0.8.0;
 
 interface IAaveStethWithdrawer {
-  /// @notice emited when a new Withdrawal is requested
+  /// @notice emitted when a new Withdrawal is requested
   /// @param amounts the amounts requested to be withdrawn
   /// @param index the storage index of the respective requestIds used to finalize the withdrawal
   event StartedWithdrawal(uint256[] amounts, uint256 index);
 
-  /// @notice emited when a new Withdrawal is requested
+  /// @notice emitted when a new Withdrawal is requested
   /// @param amount the amount of WETH withdrawn to collector
   /// @param index the storage index of the respective requestIds used to finalize the withdrawal
   event FinalizedWithdrawal(uint256 amount, uint256 index);
