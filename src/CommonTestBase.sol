@@ -3,7 +3,7 @@ pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/StdJson.sol';
 import 'forge-std/Test.sol';
-import {VmSafe} from 'forge-std/Vm.sol';
+import {VmSafe, Vm} from 'forge-std/Vm.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
@@ -23,17 +23,7 @@ struct ReserveTokens {
   address variableDebtToken;
 }
 
-contract CommonTestBase is Test {
-  using stdJson for string;
-
-  address public constant ETH_MOCK_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-
-  address public constant EOA = 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045;
-
-  function executePayload(Vm vm, address payload) internal {
-    GovV3Helpers.executePayload(vm, payload);
-  }
-
+library StdDealPatch {
   /**
    * @notice deal doesn't support amounts stored in a script right now.
    * This function patches deal to mock and transfer funds instead.
@@ -42,10 +32,10 @@ contract CommonTestBase is Test {
    * @param amount the amount to deal
    * @return bool true if the caller has changed due to prank usage
    */
-  function _patchedDeal(address asset, address user, uint256 amount) internal returns (bool) {
+  function deal(Vm vm, address asset, address user, uint256 amount) internal returns (bool) {
     if (block.chainid == ChainIds.MAINNET) {
       // FXS
-      if (asset == 0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0) {
+      if (asset == AaveV3EthereumAssets.FXS_UNDERLYING) {
         vm.prank(0xF977814e90dA44bFA03b6295A0616a897441aceC);
         IERC20(asset).transfer(user, amount);
         return true;
@@ -86,21 +76,11 @@ contract CommonTestBase is Test {
         IERC20(asset).transfer(user, amount);
         return true;
       }
-      if (asset == AaveV3EthereumAssets.USDC_UNDERLYING) {
-        vm.prank(0xcEe284F754E854890e311e3280b767F80797180d);
-        IERC20(asset).transfer(user, amount);
-        return true;
-      }
     }
     if (block.chainid == ChainIds.OPTIMISM) {
       // sUSD
       if (asset == AaveV3OptimismAssets.sUSD_UNDERLYING) {
         vm.prank(AaveV3OptimismAssets.sUSD_A_TOKEN);
-        IERC20(asset).transfer(user, amount);
-        return true;
-      }
-      if (asset == AaveV3OptimismAssets.USDCn_UNDERLYING) {
-        vm.prank(0xf491d040110384DBcf7F241fFE2A546513fD873d);
         IERC20(asset).transfer(user, amount);
         return true;
       }
@@ -112,35 +92,19 @@ contract CommonTestBase is Test {
         return true;
       }
     }
-    if (block.chainid == ChainIds.POLYGON) {
-      if (asset == AaveV3PolygonAssets.USDCn_UNDERLYING) {
-        vm.prank(0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245);
-        IERC20(asset).transfer(user, amount);
-        return true;
-      }
-    }
-    if (block.chainid == ChainIds.ARBITRUM) {
-      if (asset == AaveV3ArbitrumAssets.USDCn_UNDERLYING) {
-        vm.prank(0x47c031236e19d024b42f8AE6780E44A573170703);
-        IERC20(asset).transfer(user, amount);
-        return true;
-      }
-    }
-    if (block.chainid == ChainIds.AVALANCHE) {
-      if (asset == AaveV3AvalancheAssets.USDC_UNDERLYING) {
-        vm.prank(0x9f8c163cBA728e99993ABe7495F06c0A3c8Ac8b9);
-        IERC20(asset).transfer(user, amount);
-        return true;
-      }
-    }
-    if (block.chainid == ChainIds.BASE) {
-      if (asset == AaveV3BaseAssets.USDC_UNDERLYING) {
-        vm.prank(0x20FE51A9229EEf2cF8Ad9E89d91CAb9312cF3b7A);
-        IERC20(asset).transfer(user, amount);
-        return true;
-      }
-    }
     return false;
+  }
+}
+
+contract CommonTestBase is Test {
+  using stdJson for string;
+
+  address public constant ETH_MOCK_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+
+  address public constant EOA = 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045;
+
+  function executePayload(Vm vm, address payload) internal {
+    GovV3Helpers.executePayload(vm, payload);
   }
 
   /**
@@ -152,7 +116,7 @@ contract CommonTestBase is Test {
   function deal2(address asset, address user, uint256 amount) internal {
     (VmSafe.CallerMode mode, address oldSender, ) = vm.readCallers();
     if (mode != VmSafe.CallerMode.None) vm.stopPrank();
-    bool patched = _patchedDeal(asset, user, amount);
+    bool patched = StdDealPatch.deal(vm, asset, user, amount);
     if (!patched) {
       deal(asset, user, amount);
     }
