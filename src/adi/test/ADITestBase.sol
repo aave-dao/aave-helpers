@@ -62,6 +62,15 @@ contract ADITestBase is Test {
     bytes payloadCode;
   }
 
+  struct SnapshotParams {
+    address crossChainController;
+    bool receiverConfigs;
+    bool receiverAdapterConfigs;
+    bool forwarderAdapterConfigs;
+    bool cccImplUpdate;
+    string reportName;
+  }
+
   function executePayload(Vm vm, address payload) internal {
     GovV3Helpers.executePayload(vm, payload);
   }
@@ -383,29 +392,34 @@ contract ADITestBase is Test {
     string memory reportName,
     address crossChainController
   ) public returns (CCCConfig memory) {
-    return createConfigurationSnapshot(reportName, crossChainController, true, true, true, true);
+    return
+      createConfigurationSnapshot(
+        SnapshotParams({
+          crossChainController: crossChainController,
+          receiverConfigs: true,
+          receiverAdapterConfigs: true,
+          forwarderAdapterConfigs: true,
+          cccImplUpdate: true,
+          reportName: reportName
+        })
+      );
   }
 
   function createConfigurationSnapshot(
-    string memory reportName,
-    address crossChainController,
-    bool receiverConfigs,
-    bool receiverAdapterConfigs,
-    bool forwarderAdapterConfigs,
-    bool cccImplUpdate
+    SnapshotParams memory snapshotParams
   ) public returns (CCCConfig memory) {
-    string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
+    string memory path = string(abi.encodePacked('./reports/', snapshotParams.reportName, '.json'));
     // overwrite with empty json to later be extended
     vm.writeFile(
       path,
       '{ "cccImplementation": {}, "receiverConfigsByChain": {}, "receiverAdaptersByChain": {}, "forwarderAdaptersByChain": {}}'
     );
     vm.serializeUint('root', 'chainId', block.chainid);
-    CCCConfig memory config = _getCCCConfig(crossChainController);
-    if (receiverConfigs) _writeReceiverConfigs(path, config);
-    if (receiverAdapterConfigs) _writeReceiverAdapters(path, config);
-    if (forwarderAdapterConfigs) _writeForwarderAdatpers(path, config);
-    if (cccImplUpdate) _writeCCCImplUpdate(path, config);
+    CCCConfig memory config = _getCCCConfig(snapshotParams.crossChainController);
+    if (snapshotParams.receiverConfigs) _writeReceiverConfigs(path, config);
+    if (snapshotParams.receiverAdapterConfigs) _writeReceiverAdapters(path, config);
+    if (snapshotParams.forwarderAdapterConfigs) _writeForwarderAdapters(path, config);
+    if (snapshotParams.cccImplUpdate) _writeCCCImplUpdate(path, config);
 
     return config;
   }
@@ -419,7 +433,7 @@ contract ADITestBase is Test {
     vm.writeJson(output, path);
   }
 
-  function _writeForwarderAdatpers(string memory path, CCCConfig memory config) internal {
+  function _writeForwarderAdapters(string memory path, CCCConfig memory config) internal {
     // keys for json stringification
     string memory forwarderAdaptersKey = 'forwarderAdapters';
     string memory content = '{}';
