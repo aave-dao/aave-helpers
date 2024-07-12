@@ -38,6 +38,9 @@ contract AaveStethWithdrawer is Ownable, Rescuable721, IAaveStethWithdrawer {
   /// stores a mapping of index to arrays of requestIds
   mapping(uint256 => uint256[]) public requestIds;
 
+  uint256 public immutable minCheckpointIndex;
+
+  /// https://etherscan.io/address/0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1
   IWithdrawalQueueERC721 public constant WSETH_WITHDRAWAL_QUEUE =
     IWithdrawalQueueERC721(0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1);
 
@@ -47,6 +50,7 @@ contract AaveStethWithdrawer is Ownable, Rescuable721, IAaveStethWithdrawer {
       address(WSETH_WITHDRAWAL_QUEUE),
       type(uint256).max
     );
+    minCheckpointIndex = WSETH_WITHDRAWAL_QUEUE.getLastCheckpointIndex();
   }
 
   /// @inheritdoc IAaveStethWithdrawer
@@ -60,10 +64,10 @@ contract AaveStethWithdrawer is Ownable, Rescuable721, IAaveStethWithdrawer {
 
   /// @inheritdoc IAaveStethWithdrawer
   function finalizeWithdraw(uint256 index) external {
-    uint256[] memory reqIds = getRequestIds(index);
+    uint256[] memory reqIds = requestIds[index];
     uint256[] memory hintIds = WSETH_WITHDRAWAL_QUEUE.findCheckpointHints(
       reqIds,
-      1,
+      minCheckpointIndex,
       WSETH_WITHDRAWAL_QUEUE.getLastCheckpointIndex()
     );
 
@@ -79,11 +83,6 @@ contract AaveStethWithdrawer is Ownable, Rescuable721, IAaveStethWithdrawer {
     );
 
     emit FinalizedWithdrawal(ethBalance, index);
-  }
-  
-  /// @inheritdoc IAaveStethWithdrawer
-  function getRequestIds(uint256 index) public view returns (uint256[] memory) {
-    return requestIds[index];
   }
 
   /// @inheritdoc Rescuable

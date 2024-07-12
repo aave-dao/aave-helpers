@@ -16,6 +16,8 @@ contract AaveStethWithdrawerTest is Test {
 
   event FinalizedWithdrawal(uint256 amount, uint256 indexed index);
 
+  uint256 public constant WITHDRAWAL_AMOUNT = 100;
+  uint256 public constant FINALIZED_WITHDRAWAL_AMOUNT = 115;
   address public constant EXECUTOR = GovernanceV3Ethereum.EXECUTOR_LVL_1;
   address public constant COLLECTOR = address(AaveV3Ethereum.COLLECTOR);
   IERC20 public constant WETH = IERC20(AaveV3EthereumAssets.WETH_UNDERLYING);
@@ -72,10 +74,10 @@ contract StartWithdrawal is AaveStethWithdrawerTest {
     AaveV3Ethereum.COLLECTOR.transfer(
       address(WSTETH), 
       address(withdrawer), 
-      100
+      WITHDRAWAL_AMOUNT
     );
     uint256[] memory amounts = new uint256[](1);
-    amounts[0] = 100;
+    amounts[0] = WITHDRAWAL_AMOUNT;
     vm.expectEmit(address(withdrawer));
     emit StartedWithdrawal(amounts, 0);
     withdrawer.startWithdraw(amounts);
@@ -95,41 +97,58 @@ contract FinalizeWithdrawal is AaveStethWithdrawerTest {
 
     vm.startPrank(EXECUTOR);
     vm.expectEmit(address(withdrawerReadyToWithdraw));
-    emit FinalizedWithdrawal(115, 0);
+    emit FinalizedWithdrawal(FINALIZED_WITHDRAWAL_AMOUNT, 0);
     withdrawerReadyToWithdraw.finalizeWithdraw(0);
     vm.stopPrank();
 
     uint256 collectorBalanceAfter = WETH.balanceOf(COLLECTOR);
 
-    assertEq(collectorBalanceAfter, collectorBalanceBefore + 115);
+    assertEq(collectorBalanceAfter, collectorBalanceBefore + FINALIZED_WITHDRAWAL_AMOUNT);
+  }
+  
+  function test_finalizeWithdrawalWithExtraFunds() public {
+    uint256 collectorBalanceBefore = WETH.balanceOf(COLLECTOR);
+
+    /// send 1 wei to withdrawer
+    vm.deal(address(withdrawerReadyToWithdraw), 1);
+
+    vm.startPrank(EXECUTOR);
+    vm.expectEmit(address(withdrawerReadyToWithdraw));
+    emit FinalizedWithdrawal(FINALIZED_WITHDRAWAL_AMOUNT + 1, 0);
+    withdrawerReadyToWithdraw.finalizeWithdraw(0);
+    vm.stopPrank();
+
+    uint256 collectorBalanceAfter = WETH.balanceOf(COLLECTOR);
+
+    assertEq(collectorBalanceAfter, collectorBalanceBefore + FINALIZED_WITHDRAWAL_AMOUNT + 1);
   }
 }
 
 contract EmergencyTokenTransfer is AaveStethWithdrawerTest {
   function test_revertsIf_invalidCaller() public {
-    deal(address(WSTETH), address(withdrawer), 100);
+    deal(address(WSTETH), address(withdrawer), WITHDRAWAL_AMOUNT);
     vm.expectRevert('ONLY_RESCUE_GUARDIAN');
     withdrawer.emergencyTokenTransfer(
       address(WSTETH),
       COLLECTOR,
-      100
+      WITHDRAWAL_AMOUNT
     );
   }
 
   function test_successful_governanceCaller() public {
     uint256 initialCollectorBalance = WSTETH.balanceOf(COLLECTOR);
-    deal(address(WSTETH), address(withdrawer), 100);
+    deal(address(WSTETH), address(withdrawer), WITHDRAWAL_AMOUNT);
     vm.startPrank(EXECUTOR);
     withdrawer.emergencyTokenTransfer(
       address(WSTETH),
       COLLECTOR,
-      100
+      WITHDRAWAL_AMOUNT
     );
     vm.stopPrank();
 
     assertEq(
       WSTETH.balanceOf(COLLECTOR),
-      initialCollectorBalance + 100
+      initialCollectorBalance + WITHDRAWAL_AMOUNT
     );
     assertEq(WSTETH.balanceOf(address(withdrawer)), 0);
   }
