@@ -40,6 +40,8 @@ struct ReserveConfig {
   uint256 borrowCap;
   uint256 debtCeiling;
   uint256 eModeCategory;
+  bool virtualAccActive;
+  uint256 virtualBalance;
 }
 
 struct LocalVars {
@@ -640,6 +642,10 @@ contract ProtocolV3TestBase is CommonTestBase {
         'oracleLatestAnswer',
         uint256(oracle.getAssetPrice(config.underlying))
       );
+
+      vm.serializeBool(key, 'virtual accounting active', config.virtualAccActive);
+      vm.serializeUint(key, 'virtual balance', config.virtualBalance);
+
       content = vm.serializeString(reservesKey, key, out);
     }
     string memory output = vm.serializeString('root', 'reserves', content);
@@ -758,6 +764,12 @@ contract ProtocolV3TestBase is CommonTestBase {
 
     localConfig.isFlashloanable = configuration.getFlashLoanEnabled();
 
+    // 3.1 configurations
+    try configuration.getIsVirtualAccActive() returns (bool active) {
+      localConfig.virtualAccActive = active;
+      localConfig.virtualBalance = pool.getVirtualUnderlyingBalance();
+    } catch (bytes memory) {}
+
     return localConfig;
   }
 
@@ -789,7 +801,9 @@ contract ProtocolV3TestBase is CommonTestBase {
         supplyCap: config.supplyCap,
         borrowCap: config.borrowCap,
         debtCeiling: config.debtCeiling,
-        eModeCategory: config.eModeCategory
+        eModeCategory: config.eModeCategory,
+        virtualAccActive: config.virtualAccActive,
+        virtualBalance: config.virtualBalance
       });
   }
 
@@ -846,6 +860,8 @@ contract ProtocolV3TestBase is CommonTestBase {
     console.log('Is siloed ', (config.isSiloed) ? 'Yes' : 'No');
     console.log('Is borrowable in isolation ', (config.isBorrowableInIsolation) ? 'Yes' : 'No');
     console.log('Is flashloanable ', (config.isFlashloanable) ? 'Yes' : 'No');
+    console.log('Is virtual accounting active ', (config.virtualAccActive) ? 'Yes' : 'No');
+    console.log('Virtual balance ', config.virtualBalance);
     console.log('-----');
     console.log('-----');
   }
