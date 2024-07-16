@@ -22,7 +22,7 @@ import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygo
 import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
-import {IDefaultInterestRateStrategy} from 'aave-address-book/AaveV3.sol';
+import {IDefaultInterestRateStrategyV2} from 'aave-address-book/AaveV3.sol';
 import {AaveV3PolygonRatesUpdates070322} from '../mocks/gauntlet-updates/AaveV3PolygonRatesUpdates070322.sol';
 import {AaveV3AvalancheRatesUpdates070322} from '../mocks/gauntlet-updates/AaveV3AvalancheRatesUpdates070322.sol';
 import {AaveV3OptimismRatesUpdates070322} from '../mocks/gauntlet-updates/AaveV3OptimismRatesUpdates070322.sol';
@@ -501,7 +501,7 @@ contract AaveV3ConfigEngineTest is ProtocolV3TestBase {
     AaveV3Optimism.ACL_MANAGER.addPoolAdmin(address(payload));
     vm.stopPrank();
 
-    IDefaultInterestRateStrategy initialStrategy = IDefaultInterestRateStrategy(
+    IDefaultInterestRateStrategyV2 initialStrategy = IDefaultInterestRateStrategyV2(
       AaveV3OptimismAssets.USDT_INTEREST_RATE_STRATEGY
     );
 

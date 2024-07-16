@@ -104,7 +104,7 @@ contract V3RateStrategyFactory is Initializable, IV3RateStrategyFactory {
   function getStrategyDataOfAsset(address asset) external view returns (RateStrategyParams memory) {
     RateStrategyParams memory params;
 
-    IDefaultInterestRateStrategyV2 strategy = IDefaultInterestRateStrategy(
+    IDefaultInterestRateStrategyV2 strategy = IDefaultInterestRateStrategyV2(
       IPool(ADDRESSES_PROVIDER.getPool()).getReserveData(asset).interestRateStrategyAddress
     );
 

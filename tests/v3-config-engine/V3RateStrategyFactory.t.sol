@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {AaveV3Ethereum} from 'aave-address-book/AaveAddressBook.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
-import {IDefaultInterestRateStrategy} from 'aave-address-book/AaveV3.sol';
+import {IDefaultInterestRateStrategyV2} from 'aave-address-book/AaveV3.sol';
 import {V3RateStrategyFactory, IV3RateStrategyFactory} from '../../src/v3-config-engine/V3RateStrategyFactory.sol';
 import '../../src/ProtocolV3TestBase.sol';
 
@@ -17,7 +17,7 @@ contract V3RateStrategyFactoryTest is ProtocolV3TestBase {
   }
 
   function testCreateStrategies() public {
-    IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
+    IDefaultInterestRateStrategyV2 strategy = IDefaultInterestRateStrategyV2(
       AaveV3EthereumAssets.AAVE_INTEREST_RATE_STRATEGY
     );
 
@@ -62,7 +62,7 @@ contract V3RateStrategyFactoryTest is ProtocolV3TestBase {
   }
 
   function test_multipleCreateStrategies() public {
-    IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
+    IDefaultInterestRateStrategyV2 strategy = IDefaultInterestRateStrategyV2(
       AaveV3EthereumAssets.USDT_INTEREST_RATE_STRATEGY
     );
 

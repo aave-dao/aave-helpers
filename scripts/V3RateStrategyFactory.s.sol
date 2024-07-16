@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import '../src/ScriptUtils.sol';
-import {IPoolAddressesProvider, IPool, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV3.sol';
+import {IPoolAddressesProvider, IPool, IDefaultInterestRateStrategyV2} from 'aave-address-book/AaveV3.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {MiscPolygon} from 'aave-address-book/MiscPolygon.sol';
@@ -33,11 +33,10 @@ library DeployRatesFactoryLib {
   // TODO check also by param, potentially there could be different contracts, but with exactly same params
   function _getUniqueStrategiesOnPool(
     IPool pool
-  ) internal view returns (IDefaultInterestRateStrategy[] memory) {
+  ) internal view returns (IDefaultInterestRateStrategyV2[] memory) {
     address[] memory listedAssets = pool.getReservesList();
-    IDefaultInterestRateStrategy[] memory uniqueRateStrategies = new IDefaultInterestRateStrategy[](
-      listedAssets.length
-    );
+    IDefaultInterestRateStrategyV2[]
+      memory uniqueRateStrategies = new IDefaultInterestRateStrategyV2[](listedAssets.length);
     uint256 uniqueRateStrategiesSize;
     for (uint256 i = 0; i < listedAssets.length; i++) {
       address strategy = pool.getReserveData(listedAssets[i]).interestRateStrategyAddress;
@@ -51,7 +50,7 @@ library DeployRatesFactoryLib {
       }
 
       if (!found) {
-        uniqueRateStrategies[uniqueRateStrategiesSize] = IDefaultInterestRateStrategy(strategy);
+        uniqueRateStrategies[uniqueRateStrategiesSize] = IDefaultInterestRateStrategyV2(strategy);
         uniqueRateStrategiesSize++;
       }
     }
@@ -69,7 +68,7 @@ library DeployRatesFactoryLib {
     address transparentProxyFactory,
     address ownerForFactory
   ) internal returns (address, address[] memory) {
-    IDefaultInterestRateStrategy[] memory uniqueStrategies = _getUniqueStrategiesOnPool(
+    IDefaultInterestRateStrategyV2[] memory uniqueStrategies = _getUniqueStrategiesOnPool(
       IPool(addressesProvider.getPool())
     );
 

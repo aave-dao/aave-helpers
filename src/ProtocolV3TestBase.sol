@@ -2,7 +2,7 @@
 pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
-import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategy, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
+import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IDefaultInterestRateStrategyV2, DataTypes, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
@@ -12,7 +12,7 @@ import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializabl
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
-import {IDefaultInterestRateStrategyV2} from './dependencies/IDefaultInterestRateStrategyV2.sol';
+//import {IDefaultInterestRateStrategyV2} from './dependencies/IDefaultInterestRateStrategyV2.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -451,7 +451,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       IDefaultInterestRateStrategyV2 strategyV2 = IDefaultInterestRateStrategyV2(
         configs[i].interestRateStrategy
       );
-      IDefaultInterestRateStrategy strategyV1 = IDefaultInterestRateStrategy(
+      IDefaultInterestRateStrategyV2 strategyV1 = IDefaultInterestRateStrategyV2(
         configs[i].interestRateStrategy
       );
       address asset = configs[i].underlying;
@@ -958,7 +958,7 @@ contract ProtocolV3TestBase is CommonTestBase {
     address expectedStrategy,
     InterestStrategyValues memory expectedStrategyValues
   ) internal view {
-    IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
+    IDefaultInterestRateStrategyV2 strategy = IDefaultInterestRateStrategyV2(
       interestRateStrategyAddress
     );
 
