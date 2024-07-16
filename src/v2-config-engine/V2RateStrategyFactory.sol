@@ -6,7 +6,7 @@ import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initiali
 import {IV2RateStrategyFactory} from './IV2RateStrategyFactory.sol';
 import {ILegacyDefaultInterestRateStrategy} from '../dependencies/ILegacyDefaultInterestRateStrategy.sol';
 import {DefaultReserveInterestRateStrategy} from '../dependencies/DefaultReserveInterestRateStrategy.sol';
-import {ILendingPoolAddressesProvider} from 'aave-address-book/AaveV2.sol';
+import {ILendingPoolAddressesProvider, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV2.sol';
 
 /**
  * @title V2RateStrategyFactory
@@ -117,16 +117,16 @@ contract V2RateStrategyFactory is Initializable, IV2RateStrategyFactory {
 
   ///@inheritdoc IV2RateStrategyFactory
   function getStrategyData(
-    DefaultReserveInterestRateStrategy strategy
+    ILegacyDefaultInterestRateStrategy strategy
   ) public view returns (RateStrategyParams memory) {
     return
       RateStrategyParams({
-        optimalUtilizationRate: strategy.OPTIMAL_UTILIZATION_RATE(),
-        baseVariableBorrowRate: strategy.baseVariableBorrowRate(),
-        variableRateSlope1: strategy.variableRateSlope1(),
-        variableRateSlope2: strategy.variableRateSlope2(),
-        stableRateSlope1: strategy.stableRateSlope1(),
-        stableRateSlope2: strategy.stableRateSlope2()
+        optimalUtilizationRate: strategy.OPTIMAL_USAGE_RATIO(),
+        baseVariableBorrowRate: strategy.getBaseVariableBorrowRate(),
+        variableRateSlope1: strategy.getVariableRateSlope1(),
+        variableRateSlope2: strategy.getVariableRateSlope2(),
+        stableRateSlope1: strategy.getStableRateSlope1(),
+        stableRateSlope2: strategy.getStableRateSlope2()
       });
   }
 }

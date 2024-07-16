@@ -41,6 +41,8 @@ struct ReserveConfig {
   uint256 borrowCap;
   uint256 debtCeiling;
   uint256 eModeCategory;
+  bool virtualAccActive;
+  uint256 virtualBalance;
 }
 
 struct LocalVars {
@@ -547,7 +549,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       ExtendedAggregatorV2V3Interface assetOracle = ExtendedAggregatorV2V3Interface(
         oracle.getSourceOfAsset(config.underlying)
       );
-      DataTypes.ReserveData memory reserveData = pool.getReserveData(config.underlying);
+      DataTypes.ReserveDataLegacy memory reserveData = pool.getReserveData(config.underlying);
 
       string memory key = vm.toString(config.underlying);
       vm.serializeJson(key, '{}');
@@ -636,6 +638,10 @@ contract ProtocolV3TestBase is CommonTestBase {
           } catch {}
         }
       }
+
+      vm.serializeBool(key, 'virtual accounting active', config.virtualAccActive);
+      vm.serializeUint(key, 'virtual balance', config.virtualBalance);
+
       string memory out = vm.serializeUint(
         key,
         'oracleLatestAnswer',
@@ -759,7 +765,19 @@ contract ProtocolV3TestBase is CommonTestBase {
 
     localConfig.isFlashloanable = configuration.getFlashLoanEnabled();
 
+    // 3.1 configurations
+    try this.getIsVirtualAccActive(configuration) returns (bool active) {
+      localConfig.virtualAccActive = active;
+      localConfig.virtualBalance = pool.getVirtualUnderlyingBalance(reserve.tokenAddress);
+    } catch (bytes memory) {}
+
     return localConfig;
+  }
+
+  function getIsVirtualAccActive(
+    DataTypes.ReserveConfigurationMap memory configuration
+  ) external pure returns (bool) {
+    return configuration.getIsVirtualAccActive();
   }
 
   // TODO This should probably be simplified with assembly, too much boilerplate
@@ -790,7 +808,9 @@ contract ProtocolV3TestBase is CommonTestBase {
         supplyCap: config.supplyCap,
         borrowCap: config.borrowCap,
         debtCeiling: config.debtCeiling,
-        eModeCategory: config.eModeCategory
+        eModeCategory: config.eModeCategory,
+        virtualAccActive: config.virtualAccActive,
+        virtualBalance: config.virtualBalance
       });
   }
 
@@ -847,6 +867,8 @@ contract ProtocolV3TestBase is CommonTestBase {
     console.log('Is siloed ', (config.isSiloed) ? 'Yes' : 'No');
     console.log('Is borrowable in isolation ', (config.isBorrowableInIsolation) ? 'Yes' : 'No');
     console.log('Is flashloanable ', (config.isFlashloanable) ? 'Yes' : 'No');
+    console.log('Is virtual accounting active ', (config.virtualAccActive) ? 'Yes' : 'No');
+    console.log('Virtual balance ', config.virtualBalance);
     console.log('-----');
     console.log('-----');
   }
