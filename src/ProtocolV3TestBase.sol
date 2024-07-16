@@ -769,7 +769,8 @@ contract ProtocolV3TestBase is CommonTestBase {
     try this.getIsVirtualAccActive(configuration) returns (bool active) {
       localConfig.virtualAccActive = active;
       if (active) {
-        localConfig.virtualBalance = pool.getVirtualUnderlyingBalance(reserve.tokenAddress);
+        localConfig.virtualBalance = (pool.getVirtualUnderlyingBalance(reserve.tokenAddress) /
+          (10 ** localConfig.decimals));
       }
     } catch (bytes memory) {}
 
