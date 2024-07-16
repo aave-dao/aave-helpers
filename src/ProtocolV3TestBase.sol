@@ -15,9 +15,6 @@ import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ILegacyDefaultInterestRateStrategy} from './dependencies/ILegacyDefaultInterestRateStrategy.sol';
 
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
-
 library StringUtils {
   function toString(uint256 value) internal pure returns (string memory) {
     if (value == 0) {
