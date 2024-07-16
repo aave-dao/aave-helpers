@@ -828,9 +828,8 @@ contract ProtocolV3TestBase is CommonTestBase {
           pool.getVirtualUnderlyingBalance(reserve.tokenAddress),
           localConfig.decimals
         );
-
-        //          (pool.getVirtualUnderlyingBalance(reserve.tokenAddress) /
-        //          (10 ** localConfig.decimals));
+      } else {
+        localConfig.virtualBalance = '/';
       }
     } catch (bytes memory) {}
 
