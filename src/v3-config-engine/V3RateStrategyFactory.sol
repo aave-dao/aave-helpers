@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {IPoolAddressesProvider, IPool} from 'aave-address-book/AaveV3.sol';
 import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initializable.sol';
-import {DefaultReserveInterestRateStrategy} from 'aave-v3-core/contracts/protocol/pool/DefaultReserveInterestRateStrategy.sol';
+import {IDefaultInterestRateStrategyV2} from 'aave-v3-core/contracts/protocol/pool/DefaultReserveInterestRateStrategyV2.sol';
 import './IV3RateStrategyFactory.sol';
 
 /**
@@ -24,7 +24,7 @@ contract V3RateStrategyFactory is Initializable, IV3RateStrategyFactory {
 
   /// @dev Passing a arbitrary list of rate strategies to be registered as if they would have been deployed
   /// from this factory, as they share exactly the same code
-  function initialize(IDefaultInterestRateStrategy[] memory liveStrategies) external initializer {
+  function initialize(IDefaultInterestRateStrategyV2[] memory liveStrategies) external initializer {
     for (uint256 i = 0; i < liveStrategies.length; i++) {
       RateStrategyParams memory params = getStrategyData(liveStrategies[i]);
 
@@ -47,7 +47,7 @@ contract V3RateStrategyFactory is Initializable, IV3RateStrategyFactory {
 
       if (cachedStrategy == address(0)) {
         cachedStrategy = address(
-          new DefaultReserveInterestRateStrategy(
+          new IDefaultInterestRateStrategyV2(
             ADDRESSES_PROVIDER,
             params[i].optimalUsageRatio,
             params[i].baseVariableBorrowRate,
@@ -104,7 +104,7 @@ contract V3RateStrategyFactory is Initializable, IV3RateStrategyFactory {
   function getStrategyDataOfAsset(address asset) external view returns (RateStrategyParams memory) {
     RateStrategyParams memory params;
 
-    IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
+    IDefaultInterestRateStrategyV2 strategy = IDefaultInterestRateStrategy(
       IPool(ADDRESSES_PROVIDER.getPool()).getReserveData(asset).interestRateStrategyAddress
     );
 
@@ -117,7 +117,7 @@ contract V3RateStrategyFactory is Initializable, IV3RateStrategyFactory {
 
   ///@inheritdoc IV3RateStrategyFactory
   function getStrategyData(
-    IDefaultInterestRateStrategy strategy
+    IDefaultInterestRateStrategyV2 strategy
   ) public view returns (RateStrategyParams memory) {
     return
       RateStrategyParams({

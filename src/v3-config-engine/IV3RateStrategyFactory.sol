@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {IPoolAddressesProvider} from 'aave-address-book/AaveV3.sol';
-import {IDefaultInterestRateStrategy} from 'aave-v3-core/contracts/interfaces/IDefaultInterestRateStrategy.sol';
+import {IDefaultInterestRateStrategyV2} from 'aave-v3-core/contracts/interfaces/IDefaultInterestRateStrategyV2.sol';
 
 interface IV3RateStrategyFactory {
   event RateStrategyCreated(
@@ -69,7 +69,7 @@ interface IV3RateStrategyFactory {
    * @return RateStrategyParams Struct with the parameters of the strategy
    */
   function getStrategyData(
-    IDefaultInterestRateStrategy strategy
+    IDefaultInterestRateStrategyV2 strategy
   ) external view returns (RateStrategyParams memory);
 
   function ADDRESSES_PROVIDER() external view returns (IPoolAddressesProvider);
