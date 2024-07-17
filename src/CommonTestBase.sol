@@ -171,7 +171,7 @@ contract CommonTestBase is Test {
 
     string[] memory inputs = new string[](7);
     inputs[0] = 'npx';
-    inputs[1] = 'github:bgd-labs/aave-cli#fix/show-full-decimals';
+    inputs[1] = '@bgd-labs/aave-cli@0.14.2-cf5fae56464362ee745e2c7e309bb2d6206e1a50.0';
     inputs[2] = 'diff-snapshots';
     inputs[3] = beforePath;
     inputs[4] = afterPath;
