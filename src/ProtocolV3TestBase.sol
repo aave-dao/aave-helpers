@@ -14,61 +14,7 @@ import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ILegacyDefaultInterestRateStrategy} from './dependencies/ILegacyDefaultInterestRateStrategy.sol';
-
-library StringUtils {
-  function toString(uint256 value) internal pure returns (string memory) {
-    if (value == 0) {
-      return '0';
-    }
-    uint256 temp = value;
-    uint256 digits;
-    while (temp != 0) {
-      digits++;
-      temp /= 10;
-    }
-    bytes memory buffer = new bytes(digits);
-    while (value != 0) {
-      digits -= 1;
-      buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
-      value /= 10;
-    }
-    return string(buffer);
-  }
-}
-
-library WeiConverter {
-  using StringUtils for uint256;
-
-  function weiToDecimal(uint256 weiValue, uint256 decimals) internal pure returns (string memory) {
-    uint256 integralPart = weiValue / (10 ** decimals);
-    uint256 fractionalPart = weiValue % (10 ** decimals);
-
-    string memory integralStr = integralPart.toString();
-    string memory fractionalStr = fractionalPart.toString();
-
-    // Pad fractional part with leading zeros if necessary
-    while (bytes(fractionalStr).length < decimals) {
-      fractionalStr = string(abi.encodePacked('0', fractionalStr));
-    }
-
-    // Remove trailing zeros from the fractional part
-    bytes memory fractionalBytes = bytes(fractionalStr);
-    uint256 fractionalLength = fractionalBytes.length;
-    while (fractionalLength > 0 && fractionalBytes[fractionalLength - 1] == '0') {
-      fractionalLength--;
-    }
-
-    bytes memory truncatedFractionalBytes = new bytes(fractionalLength);
-    for (uint256 i = 0; i < fractionalLength; i++) {
-      truncatedFractionalBytes[i] = fractionalBytes[i];
-    }
-
-    string memory result = string(
-      abi.encodePacked(integralStr, '.', string(truncatedFractionalBytes))
-    );
-    return result;
-  }
-}
+import {WeiConverter} from './DecimalsHelper.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -98,6 +44,7 @@ struct ReserveConfig {
   uint256 eModeCategory;
   bool virtualAccActive;
   string virtualBalance;
+  string aTokenUnderlyingBalance;
 }
 
 struct LocalVars {
@@ -696,6 +643,7 @@ contract ProtocolV3TestBase is CommonTestBase {
 
       vm.serializeBool(key, 'virtual accounting active', config.virtualAccActive);
       vm.serializeString(key, 'virtual balance', config.virtualBalance);
+      vm.serializeString(key, 'aToken underlying balance', config.aTokenUnderlyingBalance);
 
       string memory out = vm.serializeUint(
         key,
@@ -828,6 +776,10 @@ contract ProtocolV3TestBase is CommonTestBase {
           pool.getVirtualUnderlyingBalance(reserve.tokenAddress),
           localConfig.decimals
         );
+        localConfig.aTokenUnderlyingBalance = WeiConverter.weiToDecimal(
+          IERC20(reserve.tokenAddress).balanceOf(localConfig.aToken),
+          localConfig.decimals
+        );
       } else {
         localConfig.virtualBalance = '/';
       }
@@ -872,7 +824,8 @@ contract ProtocolV3TestBase is CommonTestBase {
         debtCeiling: config.debtCeiling,
         eModeCategory: config.eModeCategory,
         virtualAccActive: config.virtualAccActive,
-        virtualBalance: config.virtualBalance
+        virtualBalance: config.virtualBalance,
+        aTokenUnderlyingBalance: config.aTokenUnderlyingBalance
       });
   }
 
