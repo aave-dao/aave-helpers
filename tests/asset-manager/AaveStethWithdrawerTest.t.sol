@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import {Test} from 'forge-std/Test.sol';
-import {stdStorage, StdStorage} from 'forge-std/Test.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
@@ -10,14 +9,15 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {AaveStethWithdrawer} from '../../src/asset-manager/AaveStethWithdrawer.sol';
 
 contract AaveStethWithdrawerTest is Test {
-  using stdStorage for StdStorage;
 
   event StartedWithdrawal(uint256[] amounts, uint256 indexed index);
 
   event FinalizedWithdrawal(uint256 amount, uint256 indexed index);
-
+  
+  /// at block #20334488 0xb9b...A93 already has a UNSTETH token representing a 100 wei withdrawal
+  uint256 public constant EXISTING_UNSTETH_TOKENID = 46223;
   uint256 public constant WITHDRAWAL_AMOUNT = 100;
-  uint256 public constant FINALIZED_WITHDRAWAL_AMOUNT = 115;
+  uint256 public constant FINALIZED_WITHDRAWAL_AMOUNT = 116;
   address public constant EXECUTOR = GovernanceV3Ethereum.EXECUTOR_LVL_1;
   address public constant COLLECTOR = address(AaveV3Ethereum.COLLECTOR);
   IERC20 public constant WETH = IERC20(AaveV3EthereumAssets.WETH_UNDERLYING);
@@ -26,28 +26,11 @@ contract AaveStethWithdrawerTest is Test {
   IERC20 public UNSTETH;
 
   AaveStethWithdrawer public withdrawer;
-  AaveStethWithdrawer public withdrawerReadyToWithdraw;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 20197457);
-    
-    withdrawer = new AaveStethWithdrawer(EXECUTOR);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 20334488);
+    withdrawer = AaveStethWithdrawer(payable(0xb9b8F880dCF1bb34933fcDb375EEdE6252177A93));
     UNSTETH = IERC20(address(withdrawer.WSETH_WITHDRAWAL_QUEUE()));
-    bytes memory code = address(withdrawer).code;
-
-    /// At current block 0x3169db has an Lido withdrawal NFT
-    ///   this NFT represents an 100 wei STETH withdrawal that
-    ///   yields 115 wei of ETH when completed.
-    /// Most importantly, this withdrawal is ready to be finalized.
-    /// We etch our code into this to circumvent havign to mock
-    ///   Lido's internal processes to allow native withdrawals.
-    vm.etch(0x3169db715E8DE11B48a27B40bD80CbfF5d9620f4, code);
-    withdrawerReadyToWithdraw = AaveStethWithdrawer(payable(0x3169db715E8DE11B48a27B40bD80CbfF5d9620f4));
-    /// we also override owner(), as 0x3169db is a prev implementation of AaveStethWithdrawer
-    /// that was used as a live proof of concept
-    stdstore.target(address(withdrawerReadyToWithdraw)).sig('owner()').checked_write(
-      EXECUTOR
-    );
   }
 }
 
@@ -70,6 +53,10 @@ contract TransferOwnership is AaveStethWithdrawerTest {
 contract StartWithdrawal is AaveStethWithdrawerTest {
   function test_startWithdrawal() public {
 
+    uint256 stEthBalanceBefore = WSTETH.balanceOf(address(withdrawer));
+    uint256 lidoNftBalanceBefore = UNSTETH.balanceOf(address(withdrawer));
+    uint256 nextIndex = withdrawer.nextIndex();
+
     vm.startPrank(EXECUTOR);
     AaveV3Ethereum.COLLECTOR.transfer(
       address(WSTETH), 
@@ -79,15 +66,15 @@ contract StartWithdrawal is AaveStethWithdrawerTest {
     uint256[] memory amounts = new uint256[](1);
     amounts[0] = WITHDRAWAL_AMOUNT;
     vm.expectEmit(address(withdrawer));
-    emit StartedWithdrawal(amounts, 0);
+    emit StartedWithdrawal(amounts, nextIndex);
     withdrawer.startWithdraw(amounts);
     vm.stopPrank();
 
     uint256 stEthBalanceAfter = WSTETH.balanceOf(address(withdrawer));
     uint256 lidoNftBalanceAfter = UNSTETH.balanceOf(address(withdrawer));
 
-    assertEq(stEthBalanceAfter, 0);
-    assertEq(lidoNftBalanceAfter, 1);
+    assertEq(stEthBalanceAfter, stEthBalanceBefore);
+    assertEq(lidoNftBalanceAfter, lidoNftBalanceBefore + 1);
   }
 }
 
@@ -96,9 +83,9 @@ contract FinalizeWithdrawal is AaveStethWithdrawerTest {
     uint256 collectorBalanceBefore = WETH.balanceOf(COLLECTOR);
 
     vm.startPrank(EXECUTOR);
-    vm.expectEmit(address(withdrawerReadyToWithdraw));
+    vm.expectEmit(address(withdrawer));
     emit FinalizedWithdrawal(FINALIZED_WITHDRAWAL_AMOUNT, 0);
-    withdrawerReadyToWithdraw.finalizeWithdraw(0);
+    withdrawer.finalizeWithdraw(0);
     vm.stopPrank();
 
     uint256 collectorBalanceAfter = WETH.balanceOf(COLLECTOR);
@@ -110,12 +97,12 @@ contract FinalizeWithdrawal is AaveStethWithdrawerTest {
     uint256 collectorBalanceBefore = WETH.balanceOf(COLLECTOR);
 
     /// send 1 wei to withdrawer
-    vm.deal(address(withdrawerReadyToWithdraw), 1);
+    vm.deal(address(withdrawer), 1);
 
     vm.startPrank(EXECUTOR);
-    vm.expectEmit(address(withdrawerReadyToWithdraw));
+    vm.expectEmit(address(withdrawer));
     emit FinalizedWithdrawal(FINALIZED_WITHDRAWAL_AMOUNT + 1, 0);
-    withdrawerReadyToWithdraw.finalizeWithdraw(0);
+    withdrawer.finalizeWithdraw(0);
     vm.stopPrank();
 
     uint256 collectorBalanceAfter = WETH.balanceOf(COLLECTOR);
@@ -157,26 +144,29 @@ contract EmergencyTokenTransfer is AaveStethWithdrawerTest {
 contract Emergency721TokenTransfer is AaveStethWithdrawerTest {
   function test_revertsIf_invalidCaller() public {
     vm.expectRevert('ONLY_RESCUE_GUARDIAN');
-    withdrawerReadyToWithdraw.emergency721TokenTransfer(
+    withdrawer.emergency721TokenTransfer(
       address(UNSTETH),
       COLLECTOR,
-      43947
+      EXISTING_UNSTETH_TOKENID
     );
   }
 
   function test_successful_governanceCaller() public {
+    uint256 lidoNftBalanceBefore = UNSTETH.balanceOf(address(withdrawer));
     vm.startPrank(EXECUTOR);
-    withdrawerReadyToWithdraw.emergency721TokenTransfer(
+    withdrawer.emergency721TokenTransfer(
       address(UNSTETH),
       COLLECTOR,
-      43947
+      EXISTING_UNSTETH_TOKENID
     );
     vm.stopPrank();
+
+    uint256 lidoNftBalanceAfter = UNSTETH.balanceOf(address(withdrawer));
 
     assertEq(
       UNSTETH.balanceOf(COLLECTOR),
       1
     );
-    assertEq(UNSTETH.balanceOf(address(withdrawerReadyToWithdraw)), 0);
+    assertEq(lidoNftBalanceAfter, lidoNftBalanceBefore - 1);
   }
 }

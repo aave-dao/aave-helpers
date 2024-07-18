@@ -20,8 +20,10 @@ pragma solidity ^0.8.0;
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initializable.sol';
 import {Rescuable721, Rescuable} from 'solidity-utils/contracts/utils/Rescuable721.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
+import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {IAaveStethWithdrawer, IWithdrawalQueueERC721, IWETH} from './interfaces/IAaveStethWithdrawer.sol';
 
 /**
@@ -29,7 +31,7 @@ import {IAaveStethWithdrawer, IWithdrawalQueueERC721, IWETH} from './interfaces/
  * @author defijesus.eth
  * @notice Helper contract to natively withdraw wstETH to the collector
  */
-contract AaveStethWithdrawer is Ownable, Rescuable721, IAaveStethWithdrawer {
+contract AaveStethWithdrawer is Initializable, Ownable, Rescuable721, IAaveStethWithdrawer {
   using SafeERC20 for IERC20;
 
   /// auto incrementing index to store requestIds of withdrawals
@@ -38,14 +40,14 @@ contract AaveStethWithdrawer is Ownable, Rescuable721, IAaveStethWithdrawer {
   /// stores a mapping of index to arrays of requestIds
   mapping(uint256 => uint256[]) public requestIds;
 
-  uint256 public immutable minCheckpointIndex;
+  uint256 public minCheckpointIndex;
 
   /// https://etherscan.io/address/0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1
   IWithdrawalQueueERC721 public constant WSETH_WITHDRAWAL_QUEUE =
     IWithdrawalQueueERC721(0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1);
 
-  constructor(address owner) {
-    _transferOwnership(owner);
+  function initialize() external initializer {
+    _transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
     IERC20(AaveV3EthereumAssets.wstETH_UNDERLYING).approve(
       address(WSETH_WITHDRAWAL_QUEUE),
       type(uint256).max

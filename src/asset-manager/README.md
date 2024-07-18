@@ -169,3 +169,19 @@ function voteForGaugeWeight(
 
 Utilizing the veToken holdings, the DAO can vote to redirect emissions to the DAO's own gauge.
 Here, by voting for the DAO's gauge, and also purchasing boost, the DAO can expect to earn a lot more BAL rewards over time than just by holding a veToken for example.
+
+# Aave wstETH Withdrawer Information
+
+This contract allows the Aave DAO to easily withdraw wstETH back to ETH natively.
+
+![Aave Steth Withdrawer diagram](./images/AaveStethWithdrawer.png)
+
+## Usage
+
+To use it, you need to (1) transfer an `amount` of `wstETH` to the `Withdrawer`, (2) note the `index` returned by `nextIndex()`, (3) call `startWithdraw([amount])`, and after waiting <24h, (4) call `finalizeWithdrawal(index)` to collect the ETH, deposit it into WETH, and send it to the Aave DAO Collector.
+
+### Notes
+
+The function `startWithdraw(uint256[] amounts)` takes in an array of `amounts` due to Lido limitations. Each `amount` in the array must be at least 100 wei and at most 1000 stETH. For withdrawals larger than 1000 stETH, they need to be split into multiple withdrawal requests.
+
+For example, if we're trying to withdraw 1500 stETH, we would execute the following call: `startWithdraw([750e18, 750e18])`.
