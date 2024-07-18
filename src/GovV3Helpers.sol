@@ -320,6 +320,18 @@ library GovV3Helpers {
    * @param payloadAddress address of the payload to execute
    */
   function executePayload(Vm vm, address payloadAddress) internal {
+    IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
+    payloadsController.executePayload(readyPayload(vm, payloadAddress));
+  }
+
+  /**
+   * @dev prepares a payloadAddress for execution via payloadsController by injecting it into storage and changing state to ReadyForExecution afterwards.
+   * Injecting into storage is a convenience method to reduce the txs executed from 2 to 1, this allows awaiting emitted events on the payloadsController.
+   * @notice This method is for test purposes only.
+   * @param vm Vm
+   * @param payloadAddress address of the payload to execute
+   */
+  function readyPayload(Vm vm, address payloadAddress) internal returns (uint40) {
     require(Address.isContract(payloadAddress), 'PAYLOAD_ADDRESS_HAS_NO_CODE');
     IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
     IPayloadsControllerCore.ExecutionAction[]
@@ -327,7 +339,7 @@ library GovV3Helpers {
     actions[0] = buildAction(payloadAddress);
     uint40 payloadId = GovV3StorageHelpers.injectPayload(vm, payloadsController, actions);
     GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
-    payloadsController.executePayload(payloadId);
+    return payloadId;
   }
 
   /**
