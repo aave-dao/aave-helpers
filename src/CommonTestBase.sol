@@ -171,7 +171,7 @@ contract CommonTestBase is Test {
 
     string[] memory inputs = new string[](7);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@0.14.2-bf67e33f24b855d6e2ec0dfda3d0e21556a0ab11.0';
+    inputs[1] = '@bgd-labs/aave-cli@0.14.2-2969b1fcd8c3036e23eaef735b61da2a73913408.0';
     inputs[2] = 'diff-snapshots';
     inputs[3] = beforePath;
     inputs[4] = afterPath;
