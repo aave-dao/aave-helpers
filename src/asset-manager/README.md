@@ -178,7 +178,7 @@ This contract allows the Aave DAO to easily withdraw wstETH back to ETH natively
 
 ## Usage
 
-To use it, you need to (1) transfer an `amount` of `wstETH` to the `Withdrawer`, (2) note the `index` returned by `nextIndex()`, (3) call `startWithdraw([amount])`, and after waiting <24h, (4) call `finalizeWithdrawal(index)` to collect the ETH, deposit it into WETH, and send it to the Aave DAO Collector.
+To use it, you need to (1) transfer an `amount` of `wstETH` to the `Withdrawer`, (2) note the `index` returned by `nextIndex()`, (3) call `startWithdraw([amount])`, and after waiting <24h, (4) call `finalizeWithdraw(index)` to collect the ETH, deposit it into WETH, and send it to the Aave DAO Collector.
 
 ### AaveStethWithdrawer is deployed at eth:[0xb9b8F880dCF1bb34933fcDb375EEdE6252177A93](https://etherscan.io/address/0xb9b8F880dCF1bb34933fcDb375EEdE6252177A93)
 
