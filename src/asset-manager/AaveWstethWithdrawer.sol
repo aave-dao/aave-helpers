@@ -19,28 +19,27 @@ pragma solidity ^0.8.0;
 
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
-import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
+import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
 import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initializable.sol';
 import {Rescuable721, Rescuable} from 'solidity-utils/contracts/utils/Rescuable721.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
-import {IAaveStethWithdrawer, IWithdrawalQueueERC721, IWETH} from './interfaces/IAaveStethWithdrawer.sol';
+import {IAaveWstethWithdrawer, IWithdrawalQueueERC721, IWETH} from './interfaces/IAaveWstethWithdrawer.sol';
 
 /**
- * @title AaveStethWithdrawer
+ * @title AaveWstethWithdrawer
  * @author defijesus.eth
  * @notice Helper contract to natively withdraw wstETH to the collector
  */
-contract AaveStethWithdrawer is Initializable, Ownable, Rescuable721, IAaveStethWithdrawer {
+contract AaveWstethWithdrawer is Initializable, OwnableWithGuardian, Rescuable721, IAaveWstethWithdrawer {
   using SafeERC20 for IERC20;
 
   /// auto incrementing index to store requestIds of withdrawals
   uint256 public nextIndex;
+  uint256 public minCheckpointIndex;
 
   /// stores a mapping of index to arrays of requestIds
   mapping(uint256 => uint256[]) public requestIds;
-
-  uint256 public minCheckpointIndex;
 
   /// https://etherscan.io/address/0x889edC2eDab5f40e902b864aD4d7AdE8E412F9B1
   IWithdrawalQueueERC721 public constant WSETH_WITHDRAWAL_QUEUE =
@@ -48,6 +47,7 @@ contract AaveStethWithdrawer is Initializable, Ownable, Rescuable721, IAaveSteth
 
   function initialize() external initializer {
     _transferOwnership(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    _updateGuardian(0x2cc1ADE245020FC5AAE66Ad443e1F66e01c54Df1);
     IERC20(AaveV3EthereumAssets.wstETH_UNDERLYING).approve(
       address(WSETH_WITHDRAWAL_QUEUE),
       type(uint256).max
@@ -55,8 +55,8 @@ contract AaveStethWithdrawer is Initializable, Ownable, Rescuable721, IAaveSteth
     minCheckpointIndex = WSETH_WITHDRAWAL_QUEUE.getLastCheckpointIndex();
   }
 
-  /// @inheritdoc IAaveStethWithdrawer
-  function startWithdraw(uint256[] calldata amounts) external {
+  /// @inheritdoc IAaveWstethWithdrawer
+  function startWithdraw(uint256[] calldata amounts) external onlyOwner {
     uint256 index = nextIndex++;
     uint256[] memory rIds = WSETH_WITHDRAWAL_QUEUE.requestWithdrawalsWstETH(amounts, address(this));
 
@@ -64,8 +64,8 @@ contract AaveStethWithdrawer is Initializable, Ownable, Rescuable721, IAaveSteth
     emit StartedWithdrawal(amounts, index);
   }
 
-  /// @inheritdoc IAaveStethWithdrawer
-  function finalizeWithdraw(uint256 index) external {
+  /// @inheritdoc IAaveWstethWithdrawer
+  function finalizeWithdraw(uint256 index) external onlyOwnerOrGuardian {
     uint256[] memory reqIds = requestIds[index];
     uint256[] memory hintIds = WSETH_WITHDRAWAL_QUEUE.findCheckpointHints(
       reqIds,

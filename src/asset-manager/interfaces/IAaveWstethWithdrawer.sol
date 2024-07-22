@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-interface IAaveStethWithdrawer {
+interface IAaveWstethWithdrawer {
   /// @notice emitted when a new Withdrawal is requested
   /// @param amounts the amounts requested to be withdrawn
   /// @param index the storage index of the respective requestIds used to finalize the withdrawal
