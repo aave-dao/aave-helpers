@@ -14,6 +14,7 @@ import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ILegacyDefaultInterestRateStrategy} from './dependencies/ILegacyDefaultInterestRateStrategy.sol';
+import {WeiConverter} from './DecimalsHelper.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -41,6 +42,9 @@ struct ReserveConfig {
   uint256 borrowCap;
   uint256 debtCeiling;
   uint256 eModeCategory;
+  bool virtualAccActive;
+  string virtualBalance;
+  string aTokenUnderlyingBalance;
 }
 
 struct LocalVars {
@@ -636,6 +640,11 @@ contract ProtocolV3TestBase is CommonTestBase {
           } catch {}
         }
       }
+
+      vm.serializeBool(key, 'virtual accounting active', config.virtualAccActive);
+      vm.serializeString(key, 'virtual balance', config.virtualBalance);
+      vm.serializeString(key, 'aToken underlying balance', config.aTokenUnderlyingBalance);
+
       string memory out = vm.serializeUint(
         key,
         'oracleLatestAnswer',
@@ -759,7 +768,30 @@ contract ProtocolV3TestBase is CommonTestBase {
 
     localConfig.isFlashloanable = configuration.getFlashLoanEnabled();
 
+    // 3.1 configurations
+    try this.getIsVirtualAccActive(configuration) returns (bool active) {
+      localConfig.virtualAccActive = active;
+      if (active) {
+        localConfig.virtualBalance = WeiConverter.weiToDecimal(
+          pool.getVirtualUnderlyingBalance(reserve.tokenAddress),
+          localConfig.decimals
+        );
+        localConfig.aTokenUnderlyingBalance = WeiConverter.weiToDecimal(
+          IERC20(reserve.tokenAddress).balanceOf(localConfig.aToken),
+          localConfig.decimals
+        );
+      } else {
+        localConfig.virtualBalance = '/';
+      }
+    } catch (bytes memory) {}
+
     return localConfig;
+  }
+
+  function getIsVirtualAccActive(
+    DataTypes.ReserveConfigurationMap memory configuration
+  ) external pure returns (bool) {
+    return configuration.getIsVirtualAccActive();
   }
 
   // TODO This should probably be simplified with assembly, too much boilerplate
@@ -790,7 +822,10 @@ contract ProtocolV3TestBase is CommonTestBase {
         supplyCap: config.supplyCap,
         borrowCap: config.borrowCap,
         debtCeiling: config.debtCeiling,
-        eModeCategory: config.eModeCategory
+        eModeCategory: config.eModeCategory,
+        virtualAccActive: config.virtualAccActive,
+        virtualBalance: config.virtualBalance,
+        aTokenUnderlyingBalance: config.aTokenUnderlyingBalance
       });
   }
 
@@ -847,6 +882,8 @@ contract ProtocolV3TestBase is CommonTestBase {
     console.log('Is siloed ', (config.isSiloed) ? 'Yes' : 'No');
     console.log('Is borrowable in isolation ', (config.isBorrowableInIsolation) ? 'Yes' : 'No');
     console.log('Is flashloanable ', (config.isFlashloanable) ? 'Yes' : 'No');
+    console.log('Is virtual accounting active ', (config.virtualAccActive) ? 'Yes' : 'No');
+    console.log('Virtual balance ', config.virtualBalance);
     console.log('-----');
     console.log('-----');
   }

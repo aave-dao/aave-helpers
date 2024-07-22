@@ -76,15 +76,15 @@ contract V2RateStrategyFactory is Initializable, IV2RateStrategyFactory {
   function strategyHashFromParams(RateStrategyParams memory params) public pure returns (bytes32) {
     return
       keccak256(
-        abi.encodePacked(
-          params.optimalUtilizationRate,
-          params.baseVariableBorrowRate,
-          params.variableRateSlope1,
-          params.variableRateSlope2,
-          params.stableRateSlope1,
-          params.stableRateSlope2
-        )
-      );
+      abi.encodePacked(
+        params.optimalUtilizationRate,
+        params.baseVariableBorrowRate,
+        params.variableRateSlope1,
+        params.variableRateSlope2,
+        params.stableRateSlope1,
+        params.stableRateSlope2
+      )
+    );
   }
 
   ///@inheritdoc IV2RateStrategyFactory
@@ -103,8 +103,8 @@ contract V2RateStrategyFactory is Initializable, IV2RateStrategyFactory {
 
     IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
       ILendingPool(ADDRESSES_PROVIDER.getLendingPool())
-        .getReserveData(asset)
-        .interestRateStrategyAddress
+      .getReserveData(asset)
+      .interestRateStrategyAddress
     );
 
     if (address(strategy) != address(0)) {
@@ -120,12 +120,12 @@ contract V2RateStrategyFactory is Initializable, IV2RateStrategyFactory {
   ) public view returns (RateStrategyParams memory) {
     return
       RateStrategyParams({
-        optimalUtilizationRate: strategy.OPTIMAL_UTILIZATION_RATE(),
-        baseVariableBorrowRate: strategy.baseVariableBorrowRate(),
-        variableRateSlope1: strategy.variableRateSlope1(),
-        variableRateSlope2: strategy.variableRateSlope2(),
-        stableRateSlope1: strategy.stableRateSlope1(),
-        stableRateSlope2: strategy.stableRateSlope2()
-      });
+      optimalUtilizationRate: strategy.OPTIMAL_UTILIZATION_RATE(),
+      baseVariableBorrowRate: strategy.baseVariableBorrowRate(),
+      variableRateSlope1: strategy.variableRateSlope1(),
+      variableRateSlope2: strategy.variableRateSlope2(),
+      stableRateSlope1: strategy.stableRateSlope1(),
+      stableRateSlope2: strategy.stableRateSlope2()
+    });
   }
 }
