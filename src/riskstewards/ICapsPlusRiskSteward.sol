@@ -23,7 +23,7 @@ interface ICapsPlusRiskSteward {
   /**
    * @notice The minimum delay that must be respected between updating a specific cap twice
    */
-  function MINIMUM_DELAY() external pure returns (uint256);
+  function MINIMUM_DELAY() external view returns (uint256);
 
   /**
    * @notice The config engine used to perform the cap update via delegatecall

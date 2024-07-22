@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {IProposalGenericExecutor} from '../interfaces/IProposalGenericExecutor.sol';
 import './BaseReceiverAdaptersUpdate.sol';
 import './BaseForwarderAdaptersUpdate.sol';
+import './BaseADIPayloadUpdate.sol';
 
 /**
  * @title Base payload aDI and bridge adapters update
@@ -12,18 +12,14 @@ import './BaseForwarderAdaptersUpdate.sol';
 abstract contract BaseAdaptersUpdate is
   BaseReceiverAdaptersUpdate,
   BaseForwarderAdaptersUpdate,
-  IProposalGenericExecutor
+  BaseADIPayloadUpdate
 {
-  address public immutable CROSS_CHAIN_CONTROLLER;
-
   /**
    * @param crossChainController address of the CCC of the network where payload will be deployed
    */
-  constructor(address crossChainController) {
-    CROSS_CHAIN_CONTROLLER = crossChainController;
-  }
+  constructor(address crossChainController) BaseADIPayloadUpdate(crossChainController) {}
 
-  function execute() public override {
+  function execute() public virtual {
     executeReceiversUpdate(CROSS_CHAIN_CONTROLLER);
 
     executeForwardersUpdate(CROSS_CHAIN_CONTROLLER);

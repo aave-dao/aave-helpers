@@ -18,7 +18,8 @@ contract CapsPlusRiskSteward_Test is Test {
     steward = new CapsPlusRiskSteward(
       AaveV3Ethereum.AAVE_PROTOCOL_DATA_PROVIDER,
       IAaveV3ConfigEngine(AaveV3Ethereum.CONFIG_ENGINE),
-      user
+      user,
+      5 days
     );
     vm.startPrank(AaveGovernanceV2.SHORT_EXECUTOR);
     AaveV3Ethereum.ACL_MANAGER.addRiskAdmin(address(steward));

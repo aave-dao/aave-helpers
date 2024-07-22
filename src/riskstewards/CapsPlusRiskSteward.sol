@@ -48,7 +48,7 @@ contract CapsPlusRiskSteward is ICapsPlusRiskSteward {
   using Address for address;
 
   /// @inheritdoc ICapsPlusRiskSteward
-  uint256 public constant MINIMUM_DELAY = 5 days;
+  uint256 public immutable MINIMUM_DELAY;
 
   /// @inheritdoc ICapsPlusRiskSteward
   IAaveV3ConfigEngine public immutable CONFIG_ENGINE;
@@ -73,11 +73,18 @@ contract CapsPlusRiskSteward is ICapsPlusRiskSteward {
    * @param poolDataProvider The pool data provider of the pool to be controlled by the steward
    * @param engine the config engine to be used by the steward
    * @param riskCouncil the safe address of the council being able to interact with the steward
+   * @param minimumDelay the minimum delay between two cap updates
    */
-  constructor(IPoolDataProvider poolDataProvider, IAaveV3ConfigEngine engine, address riskCouncil) {
+  constructor(
+    IPoolDataProvider poolDataProvider,
+    IAaveV3ConfigEngine engine,
+    address riskCouncil,
+    uint256 minimumDelay
+  ) {
     POOL_DATA_PROVIDER = poolDataProvider;
     RISK_COUNCIL = riskCouncil;
     CONFIG_ENGINE = engine;
+    MINIMUM_DELAY = minimumDelay;
   }
 
   /// @inheritdoc ICapsPlusRiskSteward
