@@ -3,7 +3,7 @@
 pragma solidity >=0.6.12;
 
 import {SafeMath} from '../dependencies/SafeMath.sol';
-import {ILegacyDefaultInterestRateStrategy} from './ILegacyDefaultInterestRateStrategy.sol';
+import {IReserveInterestRateStrategy} from './IReserveInterestRateStrategy.sol';
 import {WadRayMath} from '../dependencies/WadRayMath.sol';
 import {PercentageMath} from '../dependencies/PercentageMath.sol';
 import {ILendingPoolAddressesProvider, ILendingRateOracle} from 'aave-address-book/AaveV2.sol';
@@ -18,7 +18,7 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
  *   of the LendingPoolAddressesProvider
  * @author Aave
  **/
-contract DefaultReserveInterestRateStrategy is ILegacyDefaultInterestRateStrategy {
+contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
   using WadRayMath for uint256;
   using SafeMath for uint256;
   using PercentageMath for uint256;

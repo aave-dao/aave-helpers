@@ -547,7 +547,7 @@ contract ProtocolV3TestBase is CommonTestBase {
       ExtendedAggregatorV2V3Interface assetOracle = ExtendedAggregatorV2V3Interface(
         oracle.getSourceOfAsset(config.underlying)
       );
-      DataTypes.ReserveData memory reserveData = pool.getReserveData(config.underlying);
+      DataTypes.ReserveDataLegacy memory reserveData = pool.getReserveData(config.underlying);
 
       string memory key = vm.toString(config.underlying);
       vm.serializeJson(key, '{}');
