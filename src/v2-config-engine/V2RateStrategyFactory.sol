@@ -4,9 +4,8 @@ pragma solidity ^0.8.0;
 import {ILendingPool} from 'aave-address-book/AaveV2.sol';
 import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initializable.sol';
 import {IV2RateStrategyFactory} from './IV2RateStrategyFactory.sol';
-import {ILegacyDefaultInterestRateStrategy} from '../dependencies/ILegacyDefaultInterestRateStrategy.sol';
 import {DefaultReserveInterestRateStrategy} from '../dependencies/DefaultReserveInterestRateStrategy.sol';
-import {ILendingPoolAddressesProvider, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV2.sol';
+import {IDefaultInterestRateStrategy, ILendingPoolAddressesProvider} from 'aave-address-book/AaveV2.sol';
 
 /**
  * @title V2RateStrategyFactory
@@ -27,7 +26,7 @@ contract V2RateStrategyFactory is Initializable, IV2RateStrategyFactory {
   /// @dev Passing a arbitrary list of rate strategies to be registered as if they would have been deployed
   /// from this factory, as they share exactly the same code
   function initialize(
-    ILegacyDefaultInterestRateStrategy[] memory liveStrategies
+    IDefaultInterestRateStrategy[] memory liveStrategies
   ) external initializer {
     for (uint256 i = 0; i < liveStrategies.length; i++) {
       RateStrategyParams memory params = getStrategyData(liveStrategies[i]);
@@ -77,15 +76,15 @@ contract V2RateStrategyFactory is Initializable, IV2RateStrategyFactory {
   function strategyHashFromParams(RateStrategyParams memory params) public pure returns (bytes32) {
     return
       keccak256(
-        abi.encodePacked(
-          params.optimalUtilizationRate,
-          params.baseVariableBorrowRate,
-          params.variableRateSlope1,
-          params.variableRateSlope2,
-          params.stableRateSlope1,
-          params.stableRateSlope2
-        )
-      );
+      abi.encodePacked(
+        params.optimalUtilizationRate,
+        params.baseVariableBorrowRate,
+        params.variableRateSlope1,
+        params.variableRateSlope2,
+        params.stableRateSlope1,
+        params.stableRateSlope2
+      )
+    );
   }
 
   ///@inheritdoc IV2RateStrategyFactory
@@ -102,10 +101,10 @@ contract V2RateStrategyFactory is Initializable, IV2RateStrategyFactory {
   function getStrategyDataOfAsset(address asset) external view returns (RateStrategyParams memory) {
     RateStrategyParams memory params;
 
-    ILegacyDefaultInterestRateStrategy strategy = ILegacyDefaultInterestRateStrategy(
+    IDefaultInterestRateStrategy strategy = IDefaultInterestRateStrategy(
       ILendingPool(ADDRESSES_PROVIDER.getLendingPool())
-        .getReserveData(asset)
-        .interestRateStrategyAddress
+      .getReserveData(asset)
+      .interestRateStrategyAddress
     );
 
     if (address(strategy) != address(0)) {
@@ -117,16 +116,16 @@ contract V2RateStrategyFactory is Initializable, IV2RateStrategyFactory {
 
   ///@inheritdoc IV2RateStrategyFactory
   function getStrategyData(
-    ILegacyDefaultInterestRateStrategy strategy
+    IDefaultInterestRateStrategy strategy
   ) public view returns (RateStrategyParams memory) {
     return
       RateStrategyParams({
-        optimalUtilizationRate: strategy.OPTIMAL_USAGE_RATIO(),
-        baseVariableBorrowRate: strategy.getBaseVariableBorrowRate(),
-        variableRateSlope1: strategy.getVariableRateSlope1(),
-        variableRateSlope2: strategy.getVariableRateSlope2(),
-        stableRateSlope1: strategy.getStableRateSlope1(),
-        stableRateSlope2: strategy.getStableRateSlope2()
-      });
+      optimalUtilizationRate: strategy.OPTIMAL_UTILIZATION_RATE(),
+      baseVariableBorrowRate: strategy.baseVariableBorrowRate(),
+      variableRateSlope1: strategy.variableRateSlope1(),
+      variableRateSlope2: strategy.variableRateSlope2(),
+      stableRateSlope1: strategy.stableRateSlope1(),
+      stableRateSlope2: strategy.stableRateSlope2()
+    });
   }
 }

@@ -3,7 +3,7 @@
 pragma solidity >=0.6.12;
 
 import {SafeMath} from '../dependencies/SafeMath.sol';
-import {ILegacyDefaultInterestRateStrategy, IPoolAddressesProvider} from './ILegacyDefaultInterestRateStrategy.sol';
+import {IReserveInterestRateStrategy} from './IReserveInterestRateStrategy.sol';
 import {WadRayMath} from '../dependencies/WadRayMath.sol';
 import {PercentageMath} from '../dependencies/PercentageMath.sol';
 import {ILendingPoolAddressesProvider, ILendingRateOracle} from 'aave-address-book/AaveV2.sol';
@@ -18,16 +18,10 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
  *   of the LendingPoolAddressesProvider
  * @author Aave
  **/
-contract DefaultReserveInterestRateStrategy is ILegacyDefaultInterestRateStrategy {
+contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
   using WadRayMath for uint256;
   using SafeMath for uint256;
   using PercentageMath for uint256;
-
-  uint256 public OPTIMAL_USAGE_RATIO;
-  uint256 public OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO;
-  uint256 public MAX_EXCESS_USAGE_RATIO;
-  uint256 public MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO;
-  IPoolAddressesProvider public ADDRESSES_PROVIDER;
 
   /**
    * @dev this constant represents the utilization rate at which the pool aims to obtain most competitive borrow rates.
@@ -79,14 +73,6 @@ contract DefaultReserveInterestRateStrategy is ILegacyDefaultInterestRateStrateg
     _stableRateSlope2 = stableRateSlope2_;
   }
 
-  function getStableRateExcessOffset() external view returns (uint256) {
-    return 0;
-  }
-
-  function getBaseStableBorrowRate() external view returns (uint256) {
-    return 0;
-  }
-
   function variableRateSlope1() external view returns (uint256) {
     return _variableRateSlope1;
   }
@@ -103,27 +89,7 @@ contract DefaultReserveInterestRateStrategy is ILegacyDefaultInterestRateStrateg
     return _stableRateSlope2;
   }
 
-  function baseVariableBorrowRate() external view returns (uint256) {
-    return _baseVariableBorrowRate;
-  }
-
-  function getVariableRateSlope1() external view returns (uint256) {
-    return _variableRateSlope1;
-  }
-
-  function getVariableRateSlope2() external view returns (uint256) {
-    return _variableRateSlope2;
-  }
-
-  function getStableRateSlope1() external view returns (uint256) {
-    return _stableRateSlope1;
-  }
-
-  function getStableRateSlope2() external view returns (uint256) {
-    return _stableRateSlope2;
-  }
-
-  function getBaseVariableBorrowRate() external view returns (uint256) {
+  function baseVariableBorrowRate() external view override returns (uint256) {
     return _baseVariableBorrowRate;
   }
 
@@ -151,20 +117,20 @@ contract DefaultReserveInterestRateStrategy is ILegacyDefaultInterestRateStrateg
     uint256 totalVariableDebt,
     uint256 averageStableBorrowRate,
     uint256 reserveFactor
-  ) external view returns (uint256, uint256, uint256) {
+  ) external view override returns (uint256, uint256, uint256) {
     uint256 availableLiquidity = IERC20(reserve).balanceOf(aToken);
     //avoid stack too deep
     availableLiquidity = availableLiquidity.add(liquidityAdded).sub(liquidityTaken);
 
     return
       calculateInterestRates(
-        reserve,
-        availableLiquidity,
-        totalStableDebt,
-        totalVariableDebt,
-        averageStableBorrowRate,
-        reserveFactor
-      );
+      reserve,
+      availableLiquidity,
+      totalStableDebt,
+      totalVariableDebt,
+      averageStableBorrowRate,
+      reserveFactor
+    );
   }
 
   struct CalcInterestRatesLocalVars {
@@ -194,7 +160,7 @@ contract DefaultReserveInterestRateStrategy is ILegacyDefaultInterestRateStrateg
     uint256 totalVariableDebt,
     uint256 averageStableBorrowRate,
     uint256 reserveFactor
-  ) public view returns (uint256, uint256, uint256) {
+  ) public view override returns (uint256, uint256, uint256) {
     CalcInterestRatesLocalVars memory vars;
 
     vars.totalDebt = totalStableDebt.add(totalVariableDebt);
