@@ -56,7 +56,7 @@ contract AaveWstethWithdrawer is Initializable, OwnableWithGuardian, Rescuable72
   }
 
   /// @inheritdoc IAaveWstethWithdrawer
-  function startWithdraw(uint256[] calldata amounts) external onlyOwner {
+  function startWithdraw(uint256[] calldata amounts) external onlyOwnerOrGuardian {
     uint256 index = nextIndex++;
     uint256[] memory rIds = WSETH_WITHDRAWAL_QUEUE.requestWithdrawalsWstETH(amounts, address(this));
 

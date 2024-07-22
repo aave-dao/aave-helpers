@@ -78,8 +78,8 @@ contract AaveWstethWithdrawerTest is Test {
   }
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 20362610);
-    withdrawer = AaveWstethWithdrawer(payable(0x2C6dddcf49e64422E3F9e2bA1BCA7be2A468C2d6));
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 20363790);
+    withdrawer = AaveWstethWithdrawer(payable(0x9f489554d5909F372d80C88229E83dcB6629827a));
     UNSTETH = IERC20(address(withdrawer.WSETH_WITHDRAWAL_QUEUE()));
   }
 }
@@ -126,12 +126,11 @@ contract StartWithdrawal is AaveWstethWithdrawerTest {
     );
     uint256[] memory amounts = new uint256[](1);
     amounts[0] = WITHDRAWAL_AMOUNT;
-    vm.expectRevert('Ownable: caller is not the owner');
+    vm.expectRevert('ONLY_BY_OWNER_OR_GUARDIAN');
     withdrawer.startWithdraw(amounts);
   }
 
-  function test_startWithdrawal() public {
-
+  function test_startWithdrawalOwner() public {
     uint256 stEthBalanceBefore = WSTETH.balanceOf(address(withdrawer));
     uint256 lidoNftBalanceBefore = UNSTETH.balanceOf(address(withdrawer));
     uint256 nextIndex = withdrawer.nextIndex();
@@ -148,6 +147,31 @@ contract StartWithdrawal is AaveWstethWithdrawerTest {
     emit StartedWithdrawal(amounts, nextIndex);
     withdrawer.startWithdraw(amounts);
     vm.stopPrank();
+
+    uint256 stEthBalanceAfter = WSTETH.balanceOf(address(withdrawer));
+    uint256 lidoNftBalanceAfter = UNSTETH.balanceOf(address(withdrawer));
+
+    assertEq(stEthBalanceAfter, stEthBalanceBefore);
+    assertEq(lidoNftBalanceAfter, lidoNftBalanceBefore + 1);
+  }
+
+  function test_startWithdrawalGuardian() public {
+    uint256 stEthBalanceBefore = WSTETH.balanceOf(address(withdrawer));
+    uint256 lidoNftBalanceBefore = UNSTETH.balanceOf(address(withdrawer));
+    uint256 nextIndex = withdrawer.nextIndex();
+
+    vm.prank(OWNER);
+    AaveV3Ethereum.COLLECTOR.transfer(
+      address(WSTETH), 
+      address(withdrawer), 
+      WITHDRAWAL_AMOUNT
+    );
+    uint256[] memory amounts = new uint256[](1);
+    amounts[0] = WITHDRAWAL_AMOUNT;
+    vm.expectEmit(address(withdrawer));
+    emit StartedWithdrawal(amounts, nextIndex);
+    vm.prank(GUARDIAN);
+    withdrawer.startWithdraw(amounts);
 
     uint256 stEthBalanceAfter = WSTETH.balanceOf(address(withdrawer));
     uint256 lidoNftBalanceAfter = UNSTETH.balanceOf(address(withdrawer));
