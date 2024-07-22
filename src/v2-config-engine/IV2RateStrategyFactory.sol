@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {ILendingPoolAddressesProvider} from 'aave-address-book/AaveV2.sol';
-import {ILegacyDefaultInterestRateStrategy} from '../dependencies/ILegacyDefaultInterestRateStrategy.sol';
+import {IDefaultInterestRateStrategy, ILendingPoolAddressesProvider} from 'aave-address-book/AaveV2.sol';
 
 interface IV2RateStrategyFactory {
   event RateStrategyCreated(
@@ -66,7 +65,7 @@ interface IV2RateStrategyFactory {
    * @return RateStrategyParams Struct with the parameters of the strategy
    */
   function getStrategyData(
-    ILegacyDefaultInterestRateStrategy strategy
+    IDefaultInterestRateStrategy strategy
   ) external view returns (RateStrategyParams memory);
 
   function ADDRESSES_PROVIDER() external view returns (ILendingPoolAddressesProvider);
