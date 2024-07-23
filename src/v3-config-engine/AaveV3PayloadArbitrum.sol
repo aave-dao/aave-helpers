@@ -5,7 +5,7 @@ import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 import 'aave-v3-origin/periphery/contracts/v3-config-engine/AaveV3Payload.sol';
 
 /**
- * @dev Base smart contract for an Aave v3.0.1 (compatible with 3.0.0) listing on v3 Arbitrum.
+ * @dev Base smart contract for an Aave v3.1.0 listing on v3 Arbitrum.
  * @author BGD Labs
  */
 abstract contract AaveV3PayloadArbitrum is AaveV3Payload(IEngine(AaveV3Arbitrum.CONFIG_ENGINE)) {
