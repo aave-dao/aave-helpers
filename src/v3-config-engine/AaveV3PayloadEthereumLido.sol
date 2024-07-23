@@ -10,6 +10,6 @@ import 'aave-v3-origin/periphery/contracts/v3-config-engine/AaveV3Payload.sol';
  */
 abstract contract AaveV3PayloadEthereumLido is AaveV3Payload(IEngine(AaveV3EthereumLido.CONFIG_ENGINE)) {
   function getPoolContext() public pure override returns (IEngine.PoolContext memory) {
-    return IEngine.PoolContext({networkName: 'Lido Ethereum', networkAbbreviation: 'EthLido'});
+    return IEngine.PoolContext({networkName: 'Ethereum Lido', networkAbbreviation: 'EthLido'});
   }
 }
