@@ -3,6 +3,13 @@ pragma solidity ^0.8.0;
 
 import './BaseAdaptersUpdate.sol';
 
+struct AddForwarderAdapterArgs {
+  address crossChainController;
+  address currentChainBridgeAdapter;
+  address destinationChainBridgeAdapter;
+  uint256 destinationChainId;
+}
+
 /**
  * @title SimpleAddForwarderAdapter
  * @author BGD Labs @bgdlabs
@@ -12,13 +19,6 @@ contract SimpleAddForwarderAdapter is BaseAdaptersUpdate {
   address public immutable CURRENT_CHAIN_BRIDGE_ADAPTER;
   address public immutable DESTINATION_CHAIN_BRIDGE_ADAPTER;
   uint256 public immutable DESTINATION_CHAIN_ID;
-
-  struct AddForwarderAdapterArgs {
-    address crossChainController;
-    address currentChainBridgeAdapter;
-    address destinationChainBridgeAdapter;
-    uint256 destinationChainId;
-  }
 
   constructor(
     AddForwarderAdapterArgs memory forwarderArgs
