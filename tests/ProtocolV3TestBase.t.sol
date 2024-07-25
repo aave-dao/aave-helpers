@@ -137,6 +137,6 @@ contract ProtocolV3TestFantomSnapshot is ProtocolV3TestBase {
   }
 
   function test_snapshot() public {
-    createConfigurationSnapshot('snapshot', AaveV3Fantom.POOL, true, false, false, false);
+    createConfigurationSnapshot('snapshotFtm', AaveV3Fantom.POOL, true, false, false, false);
   }
 }
