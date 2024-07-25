@@ -382,6 +382,99 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     console.log('-----');
   }
 
+  function _writeStrategyConfigs(
+    string memory path,
+    ReserveConfig[] memory configs
+  ) internal override {
+    // keys for json stringification
+    string memory strategiesKey = 'stategies';
+    string memory content = '{}';
+    vm.serializeJson(strategiesKey, '{}');
+
+    for (uint256 i = 0; i < configs.length; i++) {
+      IDefaultInterestRateStrategyV2 strategyV2 = IDefaultInterestRateStrategyV2(
+        configs[i].interestRateStrategy
+      );
+      ILegacyDefaultInterestRateStrategy strategyV1 = ILegacyDefaultInterestRateStrategy(
+        configs[i].interestRateStrategy
+      );
+      address asset = configs[i].underlying;
+      string memory key = vm.toString(asset);
+      vm.serializeJson(key, '{}');
+      vm.serializeString(key, 'address', vm.toString(configs[i].interestRateStrategy));
+      string memory object;
+      try strategyV1.getVariableRateSlope1() {
+        vm.serializeString(
+          key,
+          'baseStableBorrowRate',
+          vm.toString(strategyV1.getBaseStableBorrowRate())
+        );
+        vm.serializeString(key, 'stableRateSlope1', vm.toString(strategyV1.getStableRateSlope1()));
+        vm.serializeString(key, 'stableRateSlope2', vm.toString(strategyV1.getStableRateSlope2()));
+        vm.serializeString(
+          key,
+          'baseVariableBorrowRate',
+          vm.toString(strategyV1.getBaseVariableBorrowRate())
+        );
+        vm.serializeString(
+          key,
+          'variableRateSlope1',
+          vm.toString(strategyV1.getVariableRateSlope1())
+        );
+        vm.serializeString(
+          key,
+          'variableRateSlope2',
+          vm.toString(strategyV1.getVariableRateSlope2())
+        );
+        vm.serializeString(
+          key,
+          'optimalStableToTotalDebtRatio',
+          vm.toString(strategyV1.OPTIMAL_STABLE_TO_TOTAL_DEBT_RATIO())
+        );
+        vm.serializeString(
+          key,
+          'maxExcessStableToTotalDebtRatio',
+          vm.toString(strategyV1.MAX_EXCESS_STABLE_TO_TOTAL_DEBT_RATIO())
+        );
+        vm.serializeString(key, 'optimalUsageRatio', vm.toString(strategyV1.OPTIMAL_USAGE_RATIO()));
+        object = vm.serializeString(
+          key,
+          'maxExcessUsageRatio',
+          vm.toString(strategyV1.MAX_EXCESS_USAGE_RATIO())
+        );
+      } catch {
+        vm.serializeString(
+          key,
+          'baseVariableBorrowRate',
+          vm.toString(strategyV2.getBaseVariableBorrowRate(asset))
+        );
+        vm.serializeString(
+          key,
+          'variableRateSlope1',
+          vm.toString(strategyV2.getVariableRateSlope1(asset))
+        );
+        vm.serializeString(
+          key,
+          'variableRateSlope2',
+          vm.toString(strategyV2.getVariableRateSlope2(asset))
+        );
+        vm.serializeString(
+          key,
+          'maxVariableBorrowRate',
+          vm.toString(strategyV2.getMaxVariableBorrowRate(asset))
+        );
+        object = vm.serializeString(
+          key,
+          'optimalUsageRatio',
+          vm.toString(strategyV2.getOptimalUsageRatio(asset))
+        );
+      }
+      content = vm.serializeString(strategiesKey, key, object);
+    }
+    string memory output = vm.serializeString('root', 'strategies', content);
+    vm.writeJson(output, path);
+  }
+
   // TODO: deprecated, remove it later
   function _validateInterestRateStrategy(
     address interestRateStrategyAddress,

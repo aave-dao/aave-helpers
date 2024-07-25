@@ -170,7 +170,6 @@ contract GovernanceV3Test is ProtocolV3TestBase {
   }
 
   function test_helpers() public {
-    GovV3Helpers.executePayload(vm, uint40(146));
     defaultTest('default', AaveV3Ethereum.POOL, address(payload));
   }
 
