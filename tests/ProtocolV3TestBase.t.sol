@@ -63,7 +63,7 @@ contract ProtocolV3TestE2ETestAsset is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestOptimismAll is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('optimism', 105213914);
+    vm.createSelectFork('optimism', 123145540);
   }
 
   function test_e2e() public {

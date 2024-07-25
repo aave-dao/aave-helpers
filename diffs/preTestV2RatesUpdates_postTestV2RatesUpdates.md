@@ -11,7 +11,7 @@
 | stableRateSlope1 | 2 % | 69 % |
 | optimalUsageRatio | 90 % | 69 % |
 | maxExcessUsageRatio | 10 % | 31 % |
-| interestRate | ![before](/.assets/5e79e9a56ca8a6038bc1021944bea8eab572d775.svg) | ![after](/.assets/6146163fc3328000e8abf4d8dff2529a55aa4a0e.svg) |
+| interestRate | ![before](/.assets/9defa590e93604d91464c4293d3f91bc9a17d069.svg) | ![after](/.assets/4e3bda25f9469c04492ac551019b4fd15d85bd8a.svg) |
 
 ## Raw diff
 

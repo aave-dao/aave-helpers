@@ -86,11 +86,6 @@ contract CommonTestBase is Test {
         IERC20(asset).transfer(user, amount);
         return true;
       }
-      if (asset == AaveV3EthereumAssets.USDC_UNDERLYING) {
-        vm.prank(0xcEe284F754E854890e311e3280b767F80797180d);
-        IERC20(asset).transfer(user, amount);
-        return true;
-      }
     }
     if (block.chainid == ChainIds.OPTIMISM) {
       // sUSD
@@ -99,43 +94,10 @@ contract CommonTestBase is Test {
         IERC20(asset).transfer(user, amount);
         return true;
       }
-      if (asset == AaveV3OptimismAssets.USDCn_UNDERLYING) {
-        vm.prank(0xf491d040110384DBcf7F241fFE2A546513fD873d);
-        IERC20(asset).transfer(user, amount);
-        return true;
-      }
     }
     if (block.chainid == ChainIds.GNOSIS) {
       if (asset == AaveV3GnosisAssets.EURe_UNDERLYING) {
         vm.prank(0xBA12222222228d8Ba445958a75a0704d566BF2C8);
-        IERC20(asset).transfer(user, amount);
-        return true;
-      }
-    }
-    if (block.chainid == ChainIds.POLYGON) {
-      if (asset == AaveV3PolygonAssets.USDCn_UNDERLYING) {
-        vm.prank(0xe7804c37c13166fF0b37F5aE0BB07A3aEbb6e245);
-        IERC20(asset).transfer(user, amount);
-        return true;
-      }
-    }
-    if (block.chainid == ChainIds.ARBITRUM) {
-      if (asset == AaveV3ArbitrumAssets.USDCn_UNDERLYING) {
-        vm.prank(0x47c031236e19d024b42f8AE6780E44A573170703);
-        IERC20(asset).transfer(user, amount);
-        return true;
-      }
-    }
-    if (block.chainid == ChainIds.AVALANCHE) {
-      if (asset == AaveV3AvalancheAssets.USDC_UNDERLYING) {
-        vm.prank(0x9f8c163cBA728e99993ABe7495F06c0A3c8Ac8b9);
-        IERC20(asset).transfer(user, amount);
-        return true;
-      }
-    }
-    if (block.chainid == ChainIds.BASE) {
-      if (asset == AaveV3BaseAssets.USDC_UNDERLYING) {
-        vm.prank(0x20FE51A9229EEf2cF8Ad9E89d91CAb9312cF3b7A);
         IERC20(asset).transfer(user, amount);
         return true;
       }
@@ -157,54 +119,5 @@ contract CommonTestBase is Test {
       deal(asset, user, amount);
     }
     if (mode != VmSafe.CallerMode.None) vm.startPrank(oldSender);
-  }
-
-  /**
-   * @dev generates the diff between two reports
-   */
-  function diffReports(string memory reportBefore, string memory reportAfter) internal {
-    string memory outPath = string(
-      abi.encodePacked('./diffs/', reportBefore, '_', reportAfter, '.md')
-    );
-    string memory beforePath = string(abi.encodePacked('./reports/', reportBefore, '.json'));
-    string memory afterPath = string(abi.encodePacked('./reports/', reportAfter, '.json'));
-
-    string[] memory inputs = new string[](7);
-    inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@0.15.0';
-    inputs[2] = 'diff-snapshots';
-    inputs[3] = beforePath;
-    inputs[4] = afterPath;
-    inputs[5] = '-o';
-    inputs[6] = outPath;
-    vm.ffi(inputs);
-  }
-
-  /**
-   * @dev forwards time by x blocks
-   */
-  function _skipBlocks(uint128 blocks) internal {
-    vm.roll(block.number + blocks);
-    vm.warp(block.timestamp + blocks * 12); // assuming a block is around 12seconds
-  }
-
-  function _isInUint256Array(
-    uint256[] memory haystack,
-    uint256 needle
-  ) internal pure returns (bool) {
-    for (uint256 i = 0; i < haystack.length; i++) {
-      if (haystack[i] == needle) return true;
-    }
-    return false;
-  }
-
-  function _isInAddressArray(
-    address[] memory haystack,
-    address needle
-  ) internal pure returns (bool) {
-    for (uint256 i = 0; i < haystack.length; i++) {
-      if (haystack[i] == needle) return true;
-    }
-    return false;
   }
 }

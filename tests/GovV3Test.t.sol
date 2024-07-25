@@ -22,8 +22,10 @@ contract GovernanceV3Test is ProtocolV3TestBase {
 
   PayloadWithEmit payload;
 
+  uint256 public constant BLOCK_NUMBER = 20381808;
+
   function setUp() public {
-    vm.createSelectFork('mainnet', 18993187);
+    vm.createSelectFork('mainnet', BLOCK_NUMBER);
     payload = new PayloadWithEmit();
   }
 
@@ -91,7 +93,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
     IPayloadsControllerCore.Payload memory pl = payloadsController.getPayloadById(payloadId);
     assertEq(uint256(pl.state), uint256(IPayloadsControllerCore.PayloadState.Queued));
-    assertEq(pl.queuedAt, 1705004722);
+    assertEq(pl.queuedAt, block.timestamp - pl.delay -1);
     assertEq(uint256(pl.maximumAccessLevelRequired), 1);
     assertEq(pl.createdAt, block.timestamp);
     assertEq(pl.creator, address(this));
@@ -168,6 +170,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
   }
 
   function test_helpers() public {
+    GovV3Helpers.executePayload(vm, uint40(146));
     defaultTest('default', AaveV3Ethereum.POOL, address(payload));
   }
 
