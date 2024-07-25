@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-
 import './BaseAdaptersUpdate.sol';
 
 /**
@@ -14,25 +13,29 @@ contract SimpleAddForwarderAdapter is BaseAdaptersUpdate {
   address public immutable DESTINATION_CHAIN_BRIDGE_ADAPTER;
   uint256 public immutable DESTINATION_CHAIN_ID;
 
+  struct AddForwarderAdapterArgs {
+    address crossChainController;
+    address currentChainBridgeAdapter;
+    address destinationChainBridgeAdapter;
+    uint256 destinationChainId;
+  }
+
   constructor(
-    address crossChainController,
-    address currentChainBridgeAdapter,
-    address destinationChainBridgeAdapter,
-    uint256 destinationChainId
-  ) BaseAdaptersUpdate(crossChainController) {
-  CURRENT_CHAIN_BRIDGE_ADAPTER = currentChainBridgeAdapter;
-  DESTINATION_CHAIN_BRIDGE_ADAPTER = destinationChainBridgeAdapter;
-  DESTINATION_CHAIN_ID = destinationChainId;
+    AddForwarderAdapterArgs memory forwarderArgs
+  ) BaseAdaptersUpdate(forwarderArgs.crossChainController) {
+    CURRENT_CHAIN_BRIDGE_ADAPTER = forwarderArgs.currentChainBridgeAdapter;
+    DESTINATION_CHAIN_BRIDGE_ADAPTER = forwarderArgs.destinationChainBridgeAdapter;
+    DESTINATION_CHAIN_ID = forwarderArgs.destinationChainId;
   }
 
   function getForwarderBridgeAdaptersToEnable()
-  public
-  view
-  override
-  returns (ICrossChainForwarder.ForwarderBridgeAdapterConfigInput[] memory)
+    public
+    view
+    override
+    returns (ICrossChainForwarder.ForwarderBridgeAdapterConfigInput[] memory)
   {
     ICrossChainForwarder.ForwarderBridgeAdapterConfigInput[]
-    memory newForwarders = new ICrossChainForwarder.ForwarderBridgeAdapterConfigInput[](1);
+      memory newForwarders = new ICrossChainForwarder.ForwarderBridgeAdapterConfigInput[](1);
 
     newForwarders[0] = ICrossChainForwarder.ForwarderBridgeAdapterConfigInput({
       currentChainBridgeAdapter: CURRENT_CHAIN_BRIDGE_ADAPTER,
