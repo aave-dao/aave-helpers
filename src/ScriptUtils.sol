@@ -10,7 +10,6 @@ import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
-import {ChainIds} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 import 'solidity-utils/contracts/utils/ScriptUtils.sol';
 
 // TODO: this is legacy file, should be removed soon
