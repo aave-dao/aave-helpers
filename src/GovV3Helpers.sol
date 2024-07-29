@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 import {Vm} from 'forge-std/Vm.sol';
-import {ChainIds, ChainHelpers} from './ChainIds.sol';
+import {ChainIds, ChainHelpers} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 import {IpfsUtils} from './IpfsUtils.sol';
 import {console2} from 'forge-std/console2.sol';
 import {PayloadsControllerUtils, IGovernancePowerStrategy, IPayloadsControllerCore, IGovernanceCore} from 'aave-address-book/GovernanceV3.sol';

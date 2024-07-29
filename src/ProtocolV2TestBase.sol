@@ -9,11 +9,11 @@ import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {DiffUtils} from 'aave-v3-origin/../tests/utils/DiffUtils.sol';
+import {ChainIds} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
-import {ChainIds} from './ChainIds.sol';
 
 struct ReserveConfig {
   string symbol;
