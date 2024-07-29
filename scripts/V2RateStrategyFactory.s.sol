@@ -6,9 +6,13 @@ import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {MiscPolygon} from 'aave-address-book/MiscPolygon.sol';
 import {MiscAvalanche} from 'aave-address-book/MiscAvalanche.sol';
+import {AaveV2Ethereum} from 'aave-address-book/AaveV2Ethereum.sol';
+import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
+import {AaveV2Polygon} from 'aave-address-book/AaveV2Polygon.sol';
+import {AaveV2Avalanche} from 'aave-address-book/AaveV2Avalanche.sol';
+import 'solidity-utils/contracts/utils/ScriptUtils.sol';
 import {ITransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/interfaces/ITransparentProxyFactory.sol';
 import {V2RateStrategyFactory} from '../src/v2-config-engine/V2RateStrategyFactory.sol';
-import '../src/ScriptUtils.sol';
 
 library DeployV2RatesFactoryLib {
   function _getUniqueStrategiesOnPool(
