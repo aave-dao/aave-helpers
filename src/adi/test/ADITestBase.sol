@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import 'forge-std/StdJson.sol';
 import 'forge-std/Test.sol';
 import {ICrossChainReceiver, ICrossChainForwarder} from 'aave-address-book/common/ICrossChainController.sol';
-import {ChainIds, ChainHelpers} from '../../ChainIds.sol';
+import {ChainIds, ChainHelpers} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 import {GovV3Helpers} from '../../GovV3Helpers.sol';
 import {IBaseAdaptersUpdate} from '../interfaces/IBaseAdaptersUpdate.sol';
 import {ProxyHelpers} from '../../ProxyHelpers.sol';
