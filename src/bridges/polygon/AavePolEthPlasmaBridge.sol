@@ -7,8 +7,8 @@ import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {Rescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
+import {ChainIds} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 
-import {ChainIds} from '../../ChainIds.sol';
 import {IAavePolEthPlasmaBridge} from './IAavePolEthPlasmaBridge.sol';
 
 interface IERC20Polygon {

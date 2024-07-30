@@ -8,8 +8,8 @@ import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {Rescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV2Polygon} from 'aave-address-book/AaveV2Polygon.sol';
+import {ChainIds} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 
-import {ChainIds} from '../../ChainIds.sol';
 import {IAavePolEthERC20Bridge} from './IAavePolEthERC20Bridge.sol';
 
 interface IRootChainManager {
