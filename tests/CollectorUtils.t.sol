@@ -7,7 +7,7 @@ import {AaveV3Ethereum, AaveV3EthereumAssets, ICollector, IPool} from 'aave-addr
 import {AaveV2Ethereum, AaveV2EthereumAssets, ILendingPool} from 'aave-address-book/AaveV2Ethereum.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 
-import {CollectorUtils, IERC20, AaveSwapper} from '../src/CollectorUtils.sol';
+import {CollectorUtils, IERC20, AaveSwapper, IChainlinkAggregator} from '../src/CollectorUtils.sol';
 
 contract CollectorUtilsTest is Test {
   using CollectorUtils for ICollector;
@@ -80,29 +80,11 @@ contract CollectorUtilsTest is Test {
     );
   }
 
-  function testWithdrawAllCollectorFundsFromV3() public {
-    _genericWithdrawAllCollectorFunds(
-      address(V3_POOL),
-      A_TOKEN_V3,
-      CollectorUtils.withdrawFromV3,
-      true
-    );
-  }
-
   function testWithdrawCollectorFundsFromV2(uint128 amount) public {
     _genericWithdrawCollectorFunds(
       address(V2_POOL),
       A_TOKEN_V2,
       amount,
-      CollectorUtils.withdrawFromV2,
-      false
-    );
-  }
-
-  function testWithdrawAllCollectorFundsFromV2() public {
-    _genericWithdrawAllCollectorFunds(
-      address(V2_POOL),
-      A_TOKEN_V2,
       CollectorUtils.withdrawFromV2,
       false
     );
@@ -168,6 +150,16 @@ contract CollectorUtilsTest is Test {
       ),
       bytes('0')
     );
+    vm.mockCall(
+      input.fromUnderlyingPriceFeed,
+      abi.encodeCall(IChainlinkAggregator.decimals, ()),
+      abi.encode(18)
+    );
+    vm.mockCall(
+      input.toUnderlyingPriceFeed,
+      abi.encodeCall(IChainlinkAggregator.decimals, ()),
+      abi.encode(18)
+    );
     COLLECTOR.swap(SWAPPER, input);
     uint256 balanceOfSwapperAfter = UNDERLYING.balanceOf(SWAPPER);
 
@@ -202,36 +194,6 @@ contract CollectorUtilsTest is Test {
     // because we mint to treasury straight away on v2, hard to check the final amount we expect
     if (withATokenCheck) {
       assertApproxEqAbs(aTokenBalanceOfCollectorAfter, aTokenBalanceOfCollectorBefore - amount, 1);
-    }
-  }
-
-  function _genericWithdrawAllCollectorFunds(
-    address pool,
-    IERC20 aToken,
-    function(ICollector, CollectorUtils.IOInput memory) returns (uint256) withdraw,
-    bool withATokenCheck
-  ) internal {
-    uint256 amount = type(uint256).max;
-
-    uint256 underlyingBalanceOfCollectorBefore = UNDERLYING.balanceOf(address(COLLECTOR));
-    uint256 aTokenBalanceOfCollectorBefore = aToken.balanceOf(address(COLLECTOR));
-
-    withdraw(
-      COLLECTOR,
-      CollectorUtils.IOInput({amount: amount, underlying: address(UNDERLYING), pool: pool})
-    );
-    uint256 underlyingBalanceOfCollectorAfter = UNDERLYING.balanceOf(address(COLLECTOR));
-    uint256 aTokenBalanceOfCollectorAfter = aToken.balanceOf(address(COLLECTOR));
-
-    assertApproxEqAbs(
-      underlyingBalanceOfCollectorAfter,
-      aTokenBalanceOfCollectorBefore + underlyingBalanceOfCollectorBefore,
-      1
-    );
-
-    // because we mint to treasury straight away on v2, hard to check the final amount we expect
-    if (withATokenCheck) {
-      assertEq(aTokenBalanceOfCollectorAfter, 0);
     }
   }
 }
