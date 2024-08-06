@@ -25,7 +25,7 @@ import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
 import {Create2Utils} from 'solidity-utils/contracts/utils/ScriptUtils.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
-import {Create2UtilsZkSync} from '../zksync/src/Create2UtilsZkSync.sol';
+import {Create2UtilsZkSync} from 'solidity-utils/../zksync/src/contracts/utils/ScriptUtilsZkSync.sol';
 
 interface IGovernance_V2_5 {
   /**
@@ -672,7 +672,7 @@ library GovV3Helpers {
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (PayloadsControllerUtils.Payload memory) {
-    return _buildPayload(vm, ChainIds.ZK_SYNC, actions);
+    return _buildPayload(vm, ChainIds.ZKSYNC, actions);
   }
 
   /**
@@ -684,7 +684,7 @@ library GovV3Helpers {
     Vm vm,
     IPayloadsControllerCore.ExecutionAction memory action
   ) internal returns (PayloadsControllerUtils.Payload memory) {
-    return _buildPayload(vm, ChainIds.ZK_SYNC, action);
+    return _buildPayload(vm, ChainIds.ZKSYNC, action);
   }
 
   /**
@@ -766,7 +766,7 @@ library GovV3Helpers {
       return GovernanceV3Scroll.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.ZK_EVM) {
       return GovernanceV3PolygonZkEvm.PAYLOADS_CONTROLLER;
-    } else if (chainId == ChainIds.ZK_SYNC) {
+    } else if (chainId == ChainIds.ZKSYNC) {
       return GovernanceV3ZkSync.PAYLOADS_CONTROLLER;
     }
 
