@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import '../src/ScriptUtils.sol';
+import 'solidity-utils/contracts/utils/ScriptUtils.sol';
 import {CapsPlusRiskSteward} from '../src/riskstewards/CapsPlusRiskSteward.sol';
 import {IAaveV3ConfigEngine} from 'aave-v3-origin/periphery/contracts/v3-config-engine/IAaveV3ConfigEngine.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
