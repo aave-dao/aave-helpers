@@ -196,14 +196,12 @@ library CollectorUtils {
     }
 
     collector.transfer(aTokenAddress, address(this), input.amount);
-    // @dev withdrawal interfaces of v2 and v3 is the same, so we use any
-    IPool(input.pool).withdraw(input.underlying, type(uint256).max, address(collector));
 
-    // in case of imprecision during the aToken transfer we check the final withdrawn amount
-    uint256 balanceAfterTransfer = IERC20(input.underlying).balanceOf(address(this));
-    if (balanceAfterTransfer < input.amount) {
-      return balanceAfterTransfer;
-    }
-    return input.amount;
+    // in case of imprecision during the aTokenTransfer withdraw a bit less
+    uint256 balanceAfterTransfer = IERC20(aTokenAddress).balanceOf(address(this));
+    input.amount = balanceAfterTransfer >= input.amount ? input.amount : balanceAfterTransfer;
+
+    // @dev withdrawal interfaces of v2 and v3 is the same, so we use any
+    return IPool(input.pool).withdraw(input.underlying, input.amount, address(collector));
   }
 }
