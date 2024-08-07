@@ -23,4 +23,4 @@ jobs:
       ROOT_DIR: "zksync"
   release:
     needs: [test]
-    uses: bgd-labs/github-workflows/.github/workflows/release.yml@main
+    uses: bgd-labs/github-workflows/.github/workflows/release.yml@fix/zksync-test
