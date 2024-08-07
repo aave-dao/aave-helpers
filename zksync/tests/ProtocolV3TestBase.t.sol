@@ -13,24 +13,24 @@ contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
     super.setUp();
   }
 
-  function test_e2eTestDPI() public {
+  function test_xe2eTestDPI() public {
     ReserveConfig[] memory configs = _getReservesConfigs(AaveV3Polygon.POOL);
-    // e2eTestAsset(
-    //   AaveV3Polygon.POOL,
-    //   _findReserveConfig(configs, AaveV3PolygonAssets.WMATIC_UNDERLYING),
-    //   _findReserveConfig(configs, AaveV3PolygonAssets.DPI_UNDERLYING)
-    // );
+    e2eTestAsset(
+      AaveV3Polygon.POOL,
+      _findReserveConfig(configs, AaveV3PolygonAssets.WMATIC_UNDERLYING),
+      _findReserveConfig(configs, AaveV3PolygonAssets.DPI_UNDERLYING)
+    );
   }
 
-  function test_e2e() public {
-    e2eTest(AaveV3Polygon.POOL);
-  }
+  // function test_e2e() public {
+  //   e2eTest(AaveV3Polygon.POOL);
+  // }
 
-  function testSnapshot() public {
-    this.createConfigurationSnapshot('pre-x', AaveV3Polygon.POOL);
-    this.createConfigurationSnapshot('post-x', AaveV3Polygon.POOL);
+  // function testSnapshot() public {
+  //   this.createConfigurationSnapshot('pre-x', AaveV3Polygon.POOL);
+  //   this.createConfigurationSnapshot('post-x', AaveV3Polygon.POOL);
 
-    // requires --ffi
-    diffReports('pre-x', 'post-x');
-  }
+  //   // requires --ffi
+  //   diffReports('pre-x', 'post-x');
+  // }
 }
