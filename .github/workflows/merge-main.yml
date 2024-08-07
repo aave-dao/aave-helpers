@@ -12,10 +12,10 @@ on:
 
 jobs:
   test:
-    uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@main
+    uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@fix/zksync-test
     secrets: inherit
   test-sol-zksync:
-    uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@main
+    uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@fix/zksync-test
     secrets: inherit
     with:
       mode: "CHANGED"
