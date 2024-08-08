@@ -21,22 +21,6 @@ import {DiffUtils} from 'aave-v3-origin/../tests/utils/DiffUtils.sol';
 contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
 
-  function generateDiffReport(
-    string memory reportName,
-    IPool pool,
-    address payload
-  ) public {
-    string memory beforeString = string(abi.encodePacked(reportName, '_before'));
-    createConfigurationSnapshot(beforeString, pool, true, true, true, true);
-
-    executePayload(vm, payload);
-
-    string memory afterString = string(abi.encodePacked(reportName, '_after'));
-    createConfigurationSnapshot(afterString, pool, true, true, true, true);
-
-    diffReports(beforeString, afterString);
-  }
-
   function createConfigurationSnapshot(
     string memory reportName,
     IPool pool,
@@ -45,6 +29,7 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
     bool eModeConigs,
     bool poolConfigs
   ) public returns (ReserveConfig[] memory) {
+    _switchOnZkVm();
     string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
     // overwrite with empty json to later be extended
     vm.writeFile(
@@ -66,6 +51,7 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
     ReserveConfig[] memory configs,
     IPool pool
   ) public {
+    _switchOnZkVm();
     // keys for json stringification
     string memory eModesKey = 'emodes';
     string memory content = '{}';
@@ -94,6 +80,7 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
   }
 
   function writeStrategyConfigs(string memory path, ReserveConfig[] memory configs) public {
+    _switchOnZkVm();
     // keys for json stringification
     string memory strategiesKey = 'stategies';
     string memory content = '{}';
@@ -188,6 +175,7 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
     ReserveConfig[] memory configs,
     IPool pool
   ) public {
+    _switchOnZkVm();
     // keys for json stringification
     string memory reservesKey = 'reserves';
     string memory content = '{}';
@@ -299,6 +287,7 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
   }
 
   function writePoolConfiguration(string memory path, IPool pool) public {
+    _switchOnZkVm();
     // keys for json stringification
     string memory poolConfigKey = 'poolConfig';
 
@@ -421,5 +410,12 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       if (haystack[i] == needle) return true;
     }
     return false;
+  }
+
+  function _switchOnZkVm() internal {
+    (bool success, ) = address(vm).call(
+      abi.encodeWithSignature("zkVm(bool)", true)
+    );
+    require(success, 'ERROR SWITCHING ON ZKVM');
   }
 }

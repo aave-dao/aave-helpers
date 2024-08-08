@@ -45,6 +45,8 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
 
   function setUp() virtual public {
     snapshotHelper = new SnapshotHelpersV3();
+    vm.makePersistent(address(snapshotHelper));
+    vm.allowCheatcodes(address(snapshotHelper));
   }
 
   /**
@@ -67,8 +69,8 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     address payload,
     bool runE2E
   ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
-    // string memory beforeString = string(abi.encodePacked(reportName, '_before'));
-    ReserveConfig[] memory configBefore; // createConfigurationSnapshot(beforeString, pool);
+    string memory beforeString = string(abi.encodePacked(reportName, '_before'));
+    ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
 
     uint256 startGas = gasleft();
 
@@ -77,10 +79,10 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     uint256 gasUsed = startGas - gasleft();
     assertLt(gasUsed, (block.gaslimit * 95) / 100, 'BLOCK_GAS_LIMIT_EXCEEDED'); // 5% is kept as a buffer
 
-    // string memory afterString = string(abi.encodePacked(reportName, '_after'));
-    ReserveConfig[] memory configAfter; // createConfigurationSnapshot(afterString, pool);
+    string memory afterString = string(abi.encodePacked(reportName, '_after'));
+    ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
 
-    // diffReports(beforeString, afterString);
+    diffReports(beforeString, afterString);
 
     configChangePlausibilityTest(configBefore, configAfter);
 
@@ -145,6 +147,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     bool eModeConigs,
     bool poolConfigs
   ) public override returns (ReserveConfig[] memory) {
+    _switchOffZkVm();
     return snapshotHelper.createConfigurationSnapshot(
       reportName,
       pool,
@@ -387,6 +390,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     ReserveConfig[] memory configs,
     IPool pool
   ) internal override {
+    _switchOffZkVm();
     return snapshotHelper.writeEModeConfigs(
       path,
       configs,
@@ -395,6 +399,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
   }
 
   function _writeStrategyConfigs(string memory path, ReserveConfig[] memory configs) internal override {
+    _switchOffZkVm();
     return snapshotHelper.writeStrategyConfigs(path, configs);
   }
 
@@ -403,10 +408,12 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     ReserveConfig[] memory configs,
     IPool pool
   ) internal override {
+    _switchOffZkVm();
     return snapshotHelper.writeReserveConfigs(path, configs, pool);
   }
 
   function _writePoolConfiguration(string memory path, IPool pool) internal override {
+    _switchOffZkVm();
     return snapshotHelper.writePoolConfiguration(path, pool);
   }
 
@@ -457,6 +464,13 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     console.log('Virtual balance ', config.virtualBalance);
     console.log('-----');
     console.log('-----');
+  }
+
+  function _switchOffZkVm() internal {
+    (bool success, ) = address(vm).call(
+      abi.encodeWithSignature("zkVm(bool)", false)
+    );
+    require(success, 'ERROR SWITCHING OFF ZKVM');
   }
 
   function getIsVirtualAccActive(
