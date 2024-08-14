@@ -351,7 +351,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     return configuration.getIsVirtualAccActive();
   }
 
-  function _logReserveConfig(ReserveConfig memory config) internal view {
+  function _logReserveConfig(ReserveConfig memory config) internal pure {
     console.log('Symbol ', config.symbol);
     console.log('Underlying address ', config.underlying);
     console.log('AToken address ', config.aToken);

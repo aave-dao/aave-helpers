@@ -86,29 +86,39 @@ library CollectorUtils {
   }
 
   /**
-   * @notice Withdraw funds of the collector from the Aave v3
+   * @notice Withdraw funds of the collector from the Aave v3 to the collector
    * @dev due to imprecision may get 1-2 wei less then specified amount
    * @param collector aave collector
+   * @param receiver receiver of the underlying
    * @param input withdraw parameters wrapped as IOInput
    */
-  function withdrawFromV3(ICollector collector, IOInput memory input) internal returns (uint256) {
+  function withdrawFromV3(
+    ICollector collector,
+    IOInput memory input,
+    address receiver
+  ) internal returns (uint256) {
     DataTypes.ReserveDataLegacy memory reserveData = IPool(input.pool).getReserveData(
       input.underlying
     );
-    return __withdraw(collector, input, reserveData.aTokenAddress);
+    return __withdraw(collector, input, reserveData.aTokenAddress, receiver);
   }
 
   /**
-   * @notice Withdraw funds of the collector from the Aave v2
+   * @notice Withdraw funds of the collector from the Aave v2 to the collector
    * @dev due to imprecision may get 1-2 wei less then specified amount
    * @param collector aave collector
+   * @param receiver receiver of the underlying
    * @param input withdraw parameters wrapped as IOInput
    */
-  function withdrawFromV2(ICollector collector, IOInput memory input) internal returns (uint256) {
+  function withdrawFromV2(
+    ICollector collector,
+    IOInput memory input,
+    address receiver
+  ) internal returns (uint256) {
     V2DataTypes.ReserveData memory reserveData = ILendingPool(input.pool).getReserveData(
       input.underlying
     );
-    return __withdraw(collector, input, reserveData.aTokenAddress);
+    return __withdraw(collector, input, reserveData.aTokenAddress, receiver);
   }
 
   /**
@@ -183,13 +193,14 @@ library CollectorUtils {
    * @param collector aave collector
    * @param input withdraw parameters wrapped as IOInput
    * @param aTokenAddress aToken address for the corresponding reserve in the pool
-   * @param aTokenAddress aToken address for the corresponding reserve in the pool
+   * @param receiver receiver of the underlying
    * @return the actual amount of underlying withdrawn
    */
   function __withdraw(
     ICollector collector,
     IOInput memory input,
-    address aTokenAddress
+    address aTokenAddress,
+    address receiver
   ) internal returns (uint256) {
     if (input.amount == 0) {
       revert InvalidZeroAmount();
@@ -202,6 +213,6 @@ library CollectorUtils {
     input.amount = balanceAfterTransfer >= input.amount ? input.amount : balanceAfterTransfer;
 
     // @dev withdrawal interfaces of v2 and v3 is the same, so we use any
-    return IPool(input.pool).withdraw(input.underlying, input.amount, address(collector));
+    return IPool(input.pool).withdraw(input.underlying, input.amount, address(receiver));
   }
 }

@@ -20,6 +20,9 @@ contract CollectorUtilsTest is Test {
   ILendingPool public constant V2_POOL = AaveV2Ethereum.POOL;
   address public constant SWAPPER = MiscEthereum.AAVE_SWAPPER;
 
+  // using static address instead of fuzz address as it's slow on a non anvil fork
+  address testReceiver = address(0xB0B);
+
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('mainnet'), 20420006);
 
@@ -71,20 +74,22 @@ contract CollectorUtilsTest is Test {
   }
 
   function testWithdrawCollectorFundsFromV3(uint128 amount) public {
-    _genericWithdrawCollectorFunds(
+    _genericWithdrawCollectorFundsToReceiver(
       address(V3_POOL),
       A_TOKEN_V3,
       amount,
+      testReceiver,
       CollectorUtils.withdrawFromV3,
       true
     );
   }
 
   function testWithdrawCollectorFundsFromV2(uint128 amount) public {
-    _genericWithdrawCollectorFunds(
+    _genericWithdrawCollectorFundsToReceiver(
       address(V2_POOL),
       A_TOKEN_V2,
       amount,
+      testReceiver,
       CollectorUtils.withdrawFromV2,
       false
     );
@@ -166,27 +171,29 @@ contract CollectorUtilsTest is Test {
     assertEq(balanceOfSwapperAfter, balanceOfSwapperBefore + amount);
   }
 
-  function _genericWithdrawCollectorFunds(
+  function _genericWithdrawCollectorFundsToReceiver(
     address pool,
     IERC20 aToken,
     uint256 amount,
-    function(ICollector, CollectorUtils.IOInput memory) returns (uint256) withdraw,
+    address receiver,
+    function(ICollector, CollectorUtils.IOInput memory, address) returns (uint256) withdraw,
     bool withATokenCheck
   ) internal {
     uint256 aTokenBalanceOfCollectorBefore = aToken.balanceOf(address(COLLECTOR));
-    vm.assume(amount <= aTokenBalanceOfCollectorBefore && amount != 0);
-    uint256 underlyingBalanceOfCollectorBefore = UNDERLYING.balanceOf(address(COLLECTOR));
+    amount = bound(amount, 1, aTokenBalanceOfCollectorBefore);
+    uint256 underlyingBalanceOfReceiverBefore = UNDERLYING.balanceOf(address(receiver));
 
     uint256 withdrawnAmount = withdraw(
       COLLECTOR,
-      CollectorUtils.IOInput({amount: amount, underlying: address(UNDERLYING), pool: pool})
+      CollectorUtils.IOInput({amount: amount, underlying: address(UNDERLYING), pool: pool}),
+      receiver
     );
-    uint256 underlyingBalanceOfCollectorAfter = UNDERLYING.balanceOf(address(COLLECTOR));
+    uint256 underlyingBalanceOfReceiverAfter = UNDERLYING.balanceOf(address(receiver));
     uint256 aTokenBalanceOfCollectorAfter = aToken.balanceOf(address(COLLECTOR));
 
     assertApproxEqAbs(
-      underlyingBalanceOfCollectorAfter,
-      underlyingBalanceOfCollectorBefore + amount,
+      underlyingBalanceOfReceiverAfter,
+      underlyingBalanceOfReceiverBefore + amount,
       1
     );
     assertApproxEqAbs(withdrawnAmount, amount, 1);
