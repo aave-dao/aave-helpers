@@ -86,7 +86,7 @@ library CollectorUtils {
   }
 
   /**
-   * @notice Withdraw funds of the collector from the Aave v3 to the collector
+   * @notice Withdraw funds of the collector from the Aave v3 to the receiver
    * @dev due to imprecision may get 1-2 wei less then specified amount
    * @param collector aave collector
    * @param receiver receiver of the underlying
@@ -104,7 +104,7 @@ library CollectorUtils {
   }
 
   /**
-   * @notice Withdraw funds of the collector from the Aave v2 to the collector
+   * @notice Withdraw funds of the collector from the Aave v2 to the receiver
    * @dev due to imprecision may get 1-2 wei less then specified amount
    * @param collector aave collector
    * @param receiver receiver of the underlying
