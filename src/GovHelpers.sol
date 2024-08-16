@@ -11,7 +11,7 @@ import {AaveV3Harmony} from 'aave-address-book/AaveV3Harmony.sol';
 import {AaveV3Fantom} from 'aave-address-book/AaveV3Fantom.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {ChainIds} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
-import {ProxyHelpers} from './ProxyHelpers.sol';
+import {ProxyHelpers} from 'aave-v3-origin/../tests/utils/ProxyHelpers.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 
 interface CommonExecutor {

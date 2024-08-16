@@ -23,8 +23,8 @@ import {GovernanceV3ZkSync} from 'aave-address-book/GovernanceV3ZkSync.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
 import {Create2Utils} from 'solidity-utils/contracts/utils/ScriptUtils.sol';
+import {ProxyHelpers} from 'aave-v3-origin/../tests/utils/ProxyHelpers.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
-import {ProxyHelpers} from './ProxyHelpers.sol';
 import {Create2UtilsZkSync} from 'solidity-utils/../zksync/src/contracts/utils/ScriptUtilsZkSync.sol';
 
 interface IGovernance_V2_5 {
@@ -232,10 +232,19 @@ library GovV3Helpers {
     return buildAction(payloadAddress);
   }
 
-  function _getBytecodeHashFromArtifacts(Vm vm, string memory contractName) private view returns (bytes32 bytecodeHash) {
-    string memory artifactPath = string.concat('zkout/', contractName, '.sol/', contractName, '.json');
+  function _getBytecodeHashFromArtifacts(
+    Vm vm,
+    string memory contractName
+  ) private view returns (bytes32 bytecodeHash) {
+    string memory artifactPath = string.concat(
+      'zkout/',
+      contractName,
+      '.sol/',
+      contractName,
+      '.json'
+    );
     string memory artifact = vm.readFile(artifactPath);
-    bytecodeHash = vm.parseJsonBytes32(artifact, ".hash");
+    bytecodeHash = vm.parseJsonBytes32(artifact, '.hash');
 
     require(bytecodeHash != (bytes32(0)), 'Unable to fetch bytecodeHash from the zkout artifacts');
     return bytecodeHash;
