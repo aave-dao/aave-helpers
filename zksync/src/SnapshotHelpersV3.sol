@@ -399,6 +399,16 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
 
     localConfig.isFlashloanable = configuration.getFlashLoanEnabled();
 
+    // 3.1 configurations
+    localConfig.virtualAccActive = configuration.getIsVirtualAccActive();
+
+    if (localConfig.virtualAccActive) {
+      localConfig.virtualBalance = pool.getVirtualUnderlyingBalance(reserve.tokenAddress);
+    }
+    localConfig.aTokenUnderlyingBalance = IERC20Detailed(reserve.tokenAddress).balanceOf(
+      localConfig.aToken
+    );
+
     return localConfig;
   }
 
@@ -413,9 +423,7 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
   }
 
   function _switchOnZkVm() internal {
-    (bool success, ) = address(vm).call(
-      abi.encodeWithSignature("zkVm(bool)", true)
-    );
+    (bool success, ) = address(vm).call(abi.encodeWithSignature('zkVm(bool)', true));
     require(success, 'ERROR SWITCHING ON ZKVM');
   }
 }
