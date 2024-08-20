@@ -409,7 +409,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     IPool pool
   ) internal override {
     _switchOffZkVm();
-    return snapshotHelper.writeReserveConfigs(path, configs, pool);
+    return super._writeReserveConfigs(path, configs, pool);
   }
 
   function _writePoolConfiguration(string memory path, IPool pool) internal override {
@@ -418,14 +418,14 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
   }
 
   function _getReservesConfigs(IPool pool) internal view override returns (ReserveConfig[] memory) {
-    return snapshotHelper.getReservesConfigs(pool);
+    return super._getReservesConfigs(pool);
   }
 
   function _getStructReserveTokens(
     IPoolDataProvider pdp,
     address underlyingAddress
   ) internal view override returns (ReserveTokens memory) {
-    return snapshotHelper.getStructReserveTokens(pdp, underlyingAddress);
+    return super._getStructReserveTokens(pdp, underlyingAddress);
   }
 
   function _getStructReserveConfig(
@@ -433,7 +433,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     IPoolDataProvider poolDataProvider,
     IPoolDataProvider.TokenData memory reserve
   ) internal view override returns (ReserveConfig memory) {
-    return snapshotHelper.getStructReserveConfig(pool, poolDataProvider, reserve);
+    return super._getStructReserveConfig(pool, poolDataProvider, reserve);
   }
 
   function _switchOffZkVm() internal {
