@@ -338,14 +338,7 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
     vars.configs = new ReserveConfig[](vars.reserves.length);
 
     for (uint256 i = 0; i < vars.reserves.length; i++) {
-      vars.configs[i] = getStructReserveConfig(pool, vars.reserves[i]);
-      ReserveTokens memory reserveTokens = getStructReserveTokens(
-        poolDataProvider,
-        vars.configs[i].underlying
-      );
-      vars.configs[i].aToken = reserveTokens.aToken;
-      vars.configs[i].variableDebtToken = reserveTokens.variableDebtToken;
-      vars.configs[i].stableDebtToken = reserveTokens.stableDebtToken;
+      vars.configs[i] = getStructReserveConfig(pool, poolDataProvider, vars.reserves[i]);
     }
 
     return vars.configs;
@@ -364,12 +357,22 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
 
   function getStructReserveConfig(
     IPool pool,
+    IPoolDataProvider poolDataProvider,
     IPoolDataProvider.TokenData memory reserve
   ) public view returns (ReserveConfig memory) {
     ReserveConfig memory localConfig;
     DataTypes.ReserveConfigurationMap memory configuration = pool.getConfiguration(
       reserve.tokenAddress
     );
+
+    localConfig.underlying = reserve.tokenAddress;
+    ReserveTokens memory reserveTokens = getStructReserveTokens(
+      poolDataProvider,
+      reserve.tokenAddress
+    );
+    localConfig.aToken = reserveTokens.aToken;
+    localConfig.variableDebtToken = reserveTokens.variableDebtToken;
+    localConfig.stableDebtToken = reserveTokens.stableDebtToken;
     localConfig.interestRateStrategy = pool
       .getReserveData(reserve.tokenAddress)
       .interestRateStrategyAddress;
@@ -389,7 +392,6 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       localConfig.isPaused
     ) = configuration.getFlags();
     localConfig.symbol = reserve.symbol;
-    localConfig.underlying = reserve.tokenAddress;
     localConfig.usageAsCollateralEnabled = localConfig.liquidationThreshold != 0;
     localConfig.isSiloed = configuration.getSiloedBorrowing();
     (localConfig.borrowCap, localConfig.supplyCap) = configuration.getCaps();

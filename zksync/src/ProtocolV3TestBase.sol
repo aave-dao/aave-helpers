@@ -43,7 +43,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
 
   SnapshotHelpersV3 public snapshotHelper;
 
-  function setUp() virtual public {
+  function setUp() public virtual {
     snapshotHelper = new SnapshotHelpersV3();
     vm.makePersistent(address(snapshotHelper));
     vm.allowCheatcodes(address(snapshotHelper));
@@ -148,14 +148,15 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     bool poolConfigs
   ) public override returns (ReserveConfig[] memory) {
     _switchOffZkVm();
-    return snapshotHelper.createConfigurationSnapshot(
-      reportName,
-      pool,
-      reserveConfigs,
-      strategyConfigs,
-      eModeConigs,
-      poolConfigs
-    );
+    return
+      snapshotHelper.createConfigurationSnapshot(
+        reportName,
+        pool,
+        reserveConfigs,
+        strategyConfigs,
+        eModeConigs,
+        poolConfigs
+      );
   }
 
   /**
@@ -391,14 +392,13 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     IPool pool
   ) internal override {
     _switchOffZkVm();
-    return snapshotHelper.writeEModeConfigs(
-      path,
-      configs,
-      pool
-    );
+    return snapshotHelper.writeEModeConfigs(path, configs, pool);
   }
 
-  function _writeStrategyConfigs(string memory path, ReserveConfig[] memory configs) internal override {
+  function _writeStrategyConfigs(
+    string memory path,
+    ReserveConfig[] memory configs
+  ) internal override {
     _switchOffZkVm();
     return snapshotHelper.writeStrategyConfigs(path, configs);
   }
@@ -430,46 +430,14 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
 
   function _getStructReserveConfig(
     IPool pool,
+    IPoolDataProvider poolDataProvider,
     IPoolDataProvider.TokenData memory reserve
-  ) internal view virtual returns (ReserveConfig memory) {
-    return snapshotHelper.getStructReserveConfig(pool, reserve);
-  }
-
-  function _logReserveConfig(ReserveConfig memory config) internal pure {
-    console.log('Symbol ', config.symbol);
-    console.log('Underlying address ', config.underlying);
-    console.log('AToken address ', config.aToken);
-    console.log('Stable debt token address ', config.stableDebtToken);
-    console.log('Variable debt token address ', config.variableDebtToken);
-    console.log('Decimals ', config.decimals);
-    console.log('LTV ', config.ltv);
-    console.log('Liquidation Threshold ', config.liquidationThreshold);
-    console.log('Liquidation Bonus ', config.liquidationBonus);
-    console.log('Liquidation protocol fee ', config.liquidationProtocolFee);
-    console.log('Reserve Factor ', config.reserveFactor);
-    console.log('Usage as collateral enabled ', (config.usageAsCollateralEnabled) ? 'Yes' : 'No');
-    console.log('Borrowing enabled ', (config.borrowingEnabled) ? 'Yes' : 'No');
-    console.log('Stable borrow rate enabled ', (config.stableBorrowRateEnabled) ? 'Yes' : 'No');
-    console.log('Supply cap ', config.supplyCap);
-    console.log('Borrow cap ', config.borrowCap);
-    console.log('Debt ceiling ', config.debtCeiling);
-    console.log('eMode category ', config.eModeCategory);
-    console.log('Interest rate strategy ', config.interestRateStrategy);
-    console.log('Is active ', (config.isActive) ? 'Yes' : 'No');
-    console.log('Is frozen ', (config.isFrozen) ? 'Yes' : 'No');
-    console.log('Is siloed ', (config.isSiloed) ? 'Yes' : 'No');
-    console.log('Is borrowable in isolation ', (config.isBorrowableInIsolation) ? 'Yes' : 'No');
-    console.log('Is flashloanable ', (config.isFlashloanable) ? 'Yes' : 'No');
-    console.log('Is virtual accounting active ', (config.virtualAccActive) ? 'Yes' : 'No');
-    console.log('Virtual balance ', config.virtualBalance);
-    console.log('-----');
-    console.log('-----');
+  ) internal view override returns (ReserveConfig memory) {
+    return snapshotHelper.getStructReserveConfig(pool, poolDataProvider, reserve);
   }
 
   function _switchOffZkVm() internal {
-    (bool success, ) = address(vm).call(
-      abi.encodeWithSignature("zkVm(bool)", false)
-    );
+    (bool success, ) = address(vm).call(abi.encodeWithSignature('zkVm(bool)', false));
     require(success, 'ERROR SWITCHING OFF ZKVM');
   }
 
