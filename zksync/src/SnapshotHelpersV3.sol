@@ -27,7 +27,8 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
     bool reserveConfigs,
     bool strategyConfigs,
     bool eModeConigs,
-    bool poolConfigs
+    bool poolConfigs,
+    ReserveConfig[] memory configs
   ) public returns (ReserveConfig[] memory) {
     _switchOnZkVm();
     string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
@@ -37,7 +38,6 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       '{ "eModes": {}, "reserves": {}, "strategies": {}, "poolConfiguration": {} }'
     );
     vm.serializeUint('root', 'chainId', block.chainid);
-    ReserveConfig[] memory configs = getReservesConfigs(pool);
     if (reserveConfigs) writeReserveConfigs(path, configs, pool);
     if (strategyConfigs) writeStrategyConfigs(path, configs);
     if (eModeConigs) writeEModeConfigs(path, configs, pool);
@@ -326,92 +326,6 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
 
     string memory output = vm.serializeString('root', 'poolConfig', content);
     vm.writeJson(output, path);
-  }
-
-  function getReservesConfigs(IPool pool) public view returns (ReserveConfig[] memory) {
-    IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
-    IPoolDataProvider poolDataProvider = IPoolDataProvider(addressesProvider.getPoolDataProvider());
-    LocalVars memory vars;
-
-    vars.reserves = poolDataProvider.getAllReservesTokens();
-
-    vars.configs = new ReserveConfig[](vars.reserves.length);
-
-    for (uint256 i = 0; i < vars.reserves.length; i++) {
-      vars.configs[i] = getStructReserveConfig(pool, poolDataProvider, vars.reserves[i]);
-    }
-
-    return vars.configs;
-  }
-
-  function getStructReserveTokens(
-    IPoolDataProvider pdp,
-    address underlyingAddress
-  ) public view returns (ReserveTokens memory) {
-    ReserveTokens memory reserveTokens;
-    (reserveTokens.aToken, reserveTokens.stableDebtToken, reserveTokens.variableDebtToken) = pdp
-      .getReserveTokensAddresses(underlyingAddress);
-
-    return reserveTokens;
-  }
-
-  function getStructReserveConfig(
-    IPool pool,
-    IPoolDataProvider poolDataProvider,
-    IPoolDataProvider.TokenData memory reserve
-  ) public view returns (ReserveConfig memory) {
-    ReserveConfig memory localConfig;
-    DataTypes.ReserveConfigurationMap memory configuration = pool.getConfiguration(
-      reserve.tokenAddress
-    );
-
-    localConfig.underlying = reserve.tokenAddress;
-    ReserveTokens memory reserveTokens = getStructReserveTokens(
-      poolDataProvider,
-      reserve.tokenAddress
-    );
-    localConfig.aToken = reserveTokens.aToken;
-    localConfig.variableDebtToken = reserveTokens.variableDebtToken;
-    localConfig.stableDebtToken = reserveTokens.stableDebtToken;
-    localConfig.interestRateStrategy = pool
-      .getReserveData(reserve.tokenAddress)
-      .interestRateStrategyAddress;
-    (
-      localConfig.ltv,
-      localConfig.liquidationThreshold,
-      localConfig.liquidationBonus,
-      localConfig.decimals,
-      localConfig.reserveFactor,
-      localConfig.eModeCategory
-    ) = configuration.getParams();
-    (
-      localConfig.isActive,
-      localConfig.isFrozen,
-      localConfig.borrowingEnabled,
-      localConfig.stableBorrowRateEnabled,
-      localConfig.isPaused
-    ) = configuration.getFlags();
-    localConfig.symbol = reserve.symbol;
-    localConfig.usageAsCollateralEnabled = localConfig.liquidationThreshold != 0;
-    localConfig.isSiloed = configuration.getSiloedBorrowing();
-    (localConfig.borrowCap, localConfig.supplyCap) = configuration.getCaps();
-    localConfig.debtCeiling = configuration.getDebtCeiling();
-    localConfig.liquidationProtocolFee = configuration.getLiquidationProtocolFee();
-    localConfig.isBorrowableInIsolation = configuration.getBorrowableInIsolation();
-
-    localConfig.isFlashloanable = configuration.getFlashLoanEnabled();
-
-    // 3.1 configurations
-    localConfig.virtualAccActive = configuration.getIsVirtualAccActive();
-
-    if (localConfig.virtualAccActive) {
-      localConfig.virtualBalance = pool.getVirtualUnderlyingBalance(reserve.tokenAddress);
-    }
-    localConfig.aTokenUnderlyingBalance = IERC20Detailed(reserve.tokenAddress).balanceOf(
-      localConfig.aToken
-    );
-
-    return localConfig;
   }
 
   function _isInUint256Array(

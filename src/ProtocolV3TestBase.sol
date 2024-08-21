@@ -170,13 +170,8 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
       uint256 snapshot = vm.snapshot();
       // test variable borrowing
       if (testAssetConfig.borrowingEnabled) {
-        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
+        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount);
         vm.revertTo(snapshot);
-        // test stable borrowing
-        if (testAssetConfig.stableBorrowRateEnabled) {
-          _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
-          vm.revertTo(snapshot);
-        }
       }
     } else {
       _deposit(collateralConfig, pool, collateralSupplier, collateralAssetAmount);
@@ -195,13 +190,8 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
           console.log('Skip Borrowing: %s, borrow cap fully utilized', testAssetConfig.symbol);
           return;
         }
-        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
+        _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount);
         vm.revertTo(snapshot);
-        // test stable borrowing
-        if (testAssetConfig.stableBorrowRateEnabled) {
-          _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
-          vm.revertTo(snapshot);
-        }
       }
     }
   }
@@ -228,24 +218,14 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     IPool pool,
     address borrower,
     ReserveConfig memory testAssetConfig,
-    uint256 amount,
-    bool stable
+    uint256 amount
   ) internal {
-    this._borrow(testAssetConfig, pool, borrower, amount, stable);
-    // switching back and forth between rate modes should work
-    if (testAssetConfig.stableBorrowRateEnabled) {
-      vm.startPrank(borrower);
-      pool.swapBorrowRateMode(testAssetConfig.underlying, stable ? 1 : 2);
-      pool.swapBorrowRateMode(testAssetConfig.underlying, stable ? 2 : 1);
-    } else {
-      vm.expectRevert();
-      pool.swapBorrowRateMode(testAssetConfig.underlying, stable ? 1 : 2);
-    }
-    _repay(testAssetConfig, pool, borrower, amount, stable);
+    this._borrow(testAssetConfig, pool, borrower, amount);
+    _repay(testAssetConfig, pool, borrower, amount);
   }
 
   /**
-   * @dev returns a "good" collateral in the list that cannot be borrowed in stable mode
+   * @dev returns a "good" collateral in the list
    */
   function _getGoodCollateral(
     ReserveConfig[] memory configs
@@ -256,8 +236,6 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
         _includeInE2e(configs[i]) &&
         // usable as collateral
         configs[i].usageAsCollateralEnabled &&
-        // not stable borrowable as this makes testing stable borrowing unnecessary hard to reason about
-        !configs[i].stableBorrowRateEnabled &&
         // not isolated asset as we can only borrow stablecoins against it
         configs[i].debtCeiling == 0
       ) return configs[i];
@@ -305,37 +283,25 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     return amountOut;
   }
 
-  function _borrow(
-    ReserveConfig memory config,
-    IPool pool,
-    address user,
-    uint256 amount,
-    bool stable
-  ) external {
+  function _borrow(ReserveConfig memory config, IPool pool, address user, uint256 amount) external {
     vm.startPrank(user);
-    address debtToken = stable ? config.stableDebtToken : config.variableDebtToken;
+    address debtToken = config.variableDebtToken;
     uint256 debtBefore = IERC20(debtToken).balanceOf(user);
-    console.log('BORROW: %s, Amount %s, Stable: %s', config.symbol, amount, stable);
-    pool.borrow(config.underlying, amount, stable ? 1 : 2, 0, user);
+    console.log('BORROW: %s, Amount %s', config.symbol, amount);
+    pool.borrow(config.underlying, amount, 2, 0, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
     assertApproxEqAbs(debtAfter, debtBefore + amount, 1);
     vm.stopPrank();
   }
 
-  function _repay(
-    ReserveConfig memory config,
-    IPool pool,
-    address user,
-    uint256 amount,
-    bool stable
-  ) internal {
+  function _repay(ReserveConfig memory config, IPool pool, address user, uint256 amount) internal {
     vm.startPrank(user);
-    address debtToken = stable ? config.stableDebtToken : config.variableDebtToken;
+    address debtToken = config.variableDebtToken;
     uint256 debtBefore = IERC20(debtToken).balanceOf(user);
     deal2(config.underlying, user, amount);
     IERC20(config.underlying).forceApprove(address(pool), amount);
     console.log('REPAY: %s, Amount: %s', config.symbol, amount);
-    pool.repay(config.underlying, amount, stable ? 1 : 2, user);
+    pool.repay(config.underlying, amount, 2, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
     if (amount >= debtBefore) {
       assertEq(debtAfter, 0, '_repay() : ERROR MUST_BE_ZERO');
