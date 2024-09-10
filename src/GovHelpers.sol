@@ -10,6 +10,11 @@ import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveV3Harmony} from 'aave-address-book/AaveV3Harmony.sol';
 import {AaveV3Fantom} from 'aave-address-book/AaveV3Fantom.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
+import {MiscArbitrum} from 'aave-address-book/MiscArbitrum.sol';
+import {MiscPolygon} from 'aave-address-book/MiscPolygon.sol';
+import {MiscOptimism} from 'aave-address-book/MiscOptimism.sol';
+import {MiscBase} from 'aave-address-book/MiscBase.sol';
+import {MiscMetis} from 'aave-address-book/MiscMetis.sol';
 import {ChainIds} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 import {ProxyHelpers} from './ProxyHelpers.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
@@ -37,11 +42,11 @@ library GovHelpers {
   function buildMainnet(address payloadAddress) internal pure returns (Payload memory) {
     require(payloadAddress != address(0), 'NON_ZERO_TARGET');
     require(
-      payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_OPTIMISM &&
-        payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_METIS &&
-        payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_ARBITRUM &&
-        payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_POLYGON &&
-        payloadAddress != AaveGovernanceV2.CROSSCHAIN_FORWARDER_BASE,
+      payloadAddress != MiscOptimism.LEGACY_BRIDGE_EXECUTOR &&
+        payloadAddress != MiscMetis.LEGACY_BRIDGE_EXECUTOR &&
+        payloadAddress != MiscArbitrum.LEGACY_BRIDGE_EXECUTOR &&
+        payloadAddress != MiscPolygon.LEGACY_BRIDGE_EXECUTOR &&
+        payloadAddress != MiscBase.LEGACY_BRIDGE_EXECUTOR,
       'PAYLOAD_CANT_BE_FORWARDER'
     );
 
@@ -58,7 +63,7 @@ library GovHelpers {
   function buildOptimism(address payloadAddress) internal pure returns (Payload memory) {
     return
       _buildL2({
-        forwarder: AaveGovernanceV2.CROSSCHAIN_FORWARDER_OPTIMISM,
+        forwarder: MiscOptimism.LEGACY_BRIDGE_EXECUTOR,
         payloadAddress: payloadAddress
       });
   }
@@ -74,7 +79,7 @@ library GovHelpers {
   function buildPolygon(address payloadAddress) internal pure returns (Payload memory) {
     return
       _buildL2({
-        forwarder: AaveGovernanceV2.CROSSCHAIN_FORWARDER_POLYGON,
+        forwarder: MiscPolygon.LEGACY_BRIDGE_EXECUTOR,
         payloadAddress: payloadAddress
       });
   }
@@ -82,7 +87,7 @@ library GovHelpers {
   function buildMetis(address payloadAddress) internal pure returns (Payload memory) {
     return
       _buildL2({
-        forwarder: AaveGovernanceV2.CROSSCHAIN_FORWARDER_METIS,
+        forwarder: MiscMetis.LEGACY_BRIDGE_EXECUTOR,
         payloadAddress: payloadAddress
       });
   }
@@ -90,7 +95,7 @@ library GovHelpers {
   function buildBase(address payloadAddress) internal pure returns (Payload memory) {
     return
       _buildL2({
-        forwarder: AaveGovernanceV2.CROSSCHAIN_FORWARDER_BASE,
+        forwarder: MiscBase.LEGACY_BRIDGE_EXECUTOR,
         payloadAddress: payloadAddress
       });
   }
@@ -236,15 +241,15 @@ library GovHelpers {
   }
 
   function _isKnownL2Executor(address executor) internal view returns (bool) {
-    if (executor == AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR && block.chainid == ChainIds.OPTIMISM)
+    if (executor == MiscOptimism.LEGACY_BRIDGE_EXECUTOR && block.chainid == ChainIds.OPTIMISM)
       return true;
-    if (executor == AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR && block.chainid == ChainIds.POLYGON)
+    if (executor == MiscPolygon.LEGACY_BRIDGE_EXECUTOR && block.chainid == ChainIds.POLYGON)
       return true;
-    if (executor == AaveGovernanceV2.METIS_BRIDGE_EXECUTOR && block.chainid == ChainIds.METIS)
+    if (executor == MiscMetis.LEGACY_BRIDGE_EXECUTOR && block.chainid == ChainIds.METIS)
       return true;
-    if (executor == AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR && block.chainid == ChainIds.ARBITRUM)
+    if (executor == MiscArbitrum.LEGACY_BRIDGE_EXECUTOR && block.chainid == ChainIds.ARBITRUM)
       return true;
-    if (executor == AaveGovernanceV2.BASE_BRIDGE_EXECUTOR && block.chainid == ChainIds.BASE)
+    if (executor == MiscBase.LEGACY_BRIDGE_EXECUTOR && block.chainid == ChainIds.BASE)
       return true;
     // not a l2, but following same interface & storage
     if (executor == AaveGovernanceV2.ARC_TIMELOCK && block.chainid == ChainIds.MAINNET) return true;
