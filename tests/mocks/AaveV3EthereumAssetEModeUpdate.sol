@@ -12,7 +12,7 @@ import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 contract AaveV3EthereumAssetEModeUpdate is AaveV3Payload {
   constructor(IEngine customEngine) AaveV3Payload(customEngine) {}
 
-  function assetEModeUpdates() public pure override returns (IEngine.AssetEModeUpdate[] memory) {
+  function assetsEModeUpdates() public pure override returns (IEngine.AssetEModeUpdate[] memory) {
     IEngine.AssetEModeUpdate[] memory eModeUpdate = new IEngine.AssetEModeUpdate[](1);
 
     eModeUpdate[0] = IEngine.AssetEModeUpdate({
