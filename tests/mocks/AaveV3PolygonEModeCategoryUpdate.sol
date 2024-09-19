@@ -25,7 +25,6 @@ contract AaveV3PolygonEModeCategoryUpdate is AaveV3Payload {
       ltv: 97_40,
       liqThreshold: 97_60,
       liqBonus: 1_50,
-      priceSource: EngineFlags.KEEP_CURRENT_ADDRESS,
       label: EngineFlags.KEEP_CURRENT_STRING
     });
 
@@ -59,7 +58,6 @@ contract AaveV3AvalancheEModeCategoryUpdateEdgeBonus is AaveV3Payload {
       ltv: 97_40,
       liqThreshold: 97_60,
       liqBonus: 2_50,
-      priceSource: EngineFlags.KEEP_CURRENT_ADDRESS,
       label: EngineFlags.KEEP_CURRENT_STRING
     });
 

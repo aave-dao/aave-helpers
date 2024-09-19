@@ -18,7 +18,6 @@ contract AaveV3PolygonBorrowUpdateNoChange is AaveV3Payload {
       asset: AaveV3PolygonAssets.AAVE_UNDERLYING,
       enabledToBorrow: EngineFlags.KEEP_CURRENT,
       flashloanable: EngineFlags.KEEP_CURRENT,
-      stableRateModeEnabled: EngineFlags.KEEP_CURRENT,
       borrowableInIsolation: EngineFlags.KEEP_CURRENT,
       withSiloedBorrowing: EngineFlags.KEEP_CURRENT,
       reserveFactor: EngineFlags.KEEP_CURRENT
