@@ -345,6 +345,48 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     console.log('-----');
   }
 
+  function _writeEModeConfigs(string memory path, IPool pool) internal virtual override {
+    // keys for json stringification
+    string memory eModesKey = 'emodes';
+    string memory content = '{}';
+    uint8 emptyCounter = 0;
+    for (uint8 i = 0; i < 256; i++) {
+      try pool.getEModeCategoryCollateralConfig(i) returns (DataTypes.CollateralConfig memory cfg) {
+        if (cfg.liquidationThreshold == 0) {
+          if (++emptyCounter > 2) break;
+        } else {
+          string memory key = vm.toString(i);
+          vm.serializeUint(key, 'eModeCategory', i);
+          vm.serializeString(key, 'label', pool.getEModeCategoryLabel(i));
+          vm.serializeUint(key, 'ltv', cfg.ltv);
+          vm.serializeUint(key, 'collateralBitmap', pool.getEModeCategoryCollateralBitmap(i));
+          vm.serializeUint(key, 'borrowableBitmap', pool.getEModeCategoryBorrowableBitmap(i));
+          vm.serializeUint(key, 'liquidationThreshold', cfg.liquidationThreshold);
+          string memory object = vm.serializeUint(key, 'liquidationBonus', cfg.liquidationBonus);
+          content = vm.serializeString(eModesKey, key, object);
+          emptyCounter = 0;
+        }
+      } catch {
+        DataTypes.EModeCategoryLegacy memory category = pool.getEModeCategoryData(i);
+        if (category.liquidationThreshold == 0) {
+          if (++emptyCounter > 2) break;
+        } else {
+          string memory key = vm.toString(i);
+          vm.serializeUint(key, 'eModeCategory', i);
+          vm.serializeString(key, 'label', category.label);
+          vm.serializeUint(key, 'ltv', category.ltv);
+          vm.serializeUint(key, 'liquidationThreshold', category.liquidationThreshold);
+          vm.serializeUint(key, 'liquidationBonus', category.liquidationBonus);
+          string memory object = vm.serializeAddress(key, 'priceSource', category.priceSource);
+          content = vm.serializeString(eModesKey, key, object);
+          emptyCounter = 0;
+        }
+      }
+    }
+    string memory output = vm.serializeString('root', 'eModes', content);
+    vm.writeJson(output, path);
+  }
+
   function _writeStrategyConfigs(
     string memory path,
     ReserveConfig[] memory configs
