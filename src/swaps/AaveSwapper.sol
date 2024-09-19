@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {Rescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
+import {RescuableBase, IRescuableBase} from 'solidity-utils/contracts/utils/RescuableBase.sol';
 import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
 import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initializable.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
@@ -138,6 +139,13 @@ contract AaveSwapper is Initializable, OwnableWithGuardian, Rescuable {
 
   function whoCanRescue() public view override returns (address) {
     return owner();
+  }
+
+  /// @inheritdoc IRescuableBase
+  function maxRescue(
+    address erc20Token
+  ) public view override(RescuableBase, IRescuableBase) returns (uint256) {
+    return type(uint256).max;
   }
 
   function _getPriceCheckerAndData(

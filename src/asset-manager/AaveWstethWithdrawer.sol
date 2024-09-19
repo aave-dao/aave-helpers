@@ -22,6 +22,7 @@ import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
 import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initializable.sol';
 import {Rescuable721, Rescuable} from 'solidity-utils/contracts/utils/Rescuable721.sol';
+import {RescuableBase, IRescuableBase} from 'solidity-utils/contracts/utils/RescuableBase.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {IAaveWstethWithdrawer, IWithdrawalQueueERC721, IWETH} from './interfaces/IAaveWstethWithdrawer.sol';
@@ -31,7 +32,12 @@ import {IAaveWstethWithdrawer, IWithdrawalQueueERC721, IWETH} from './interfaces
  * @author defijesus.eth
  * @notice Helper contract to natively withdraw wstETH to the collector
  */
-contract AaveWstethWithdrawer is Initializable, OwnableWithGuardian, Rescuable721, IAaveWstethWithdrawer {
+contract AaveWstethWithdrawer is
+  Initializable,
+  OwnableWithGuardian,
+  Rescuable721,
+  IAaveWstethWithdrawer
+{
   using SafeERC20 for IERC20;
 
   /// auto incrementing index to store requestIds of withdrawals
@@ -58,7 +64,10 @@ contract AaveWstethWithdrawer is Initializable, OwnableWithGuardian, Rescuable72
   /// @inheritdoc IAaveWstethWithdrawer
   function startWithdraw(uint256[] calldata amounts) external onlyOwnerOrGuardian {
     uint256 index = nextIndex++;
-    uint256[] memory rIds = WSTETH_WITHDRAWAL_QUEUE.requestWithdrawalsWstETH(amounts, address(this));
+    uint256[] memory rIds = WSTETH_WITHDRAWAL_QUEUE.requestWithdrawalsWstETH(
+      amounts,
+      address(this)
+    );
 
     requestIds[index] = rIds;
     emit StartedWithdrawal(amounts, index);
@@ -92,6 +101,14 @@ contract AaveWstethWithdrawer is Initializable, OwnableWithGuardian, Rescuable72
     return owner();
   }
 
+  /// @inheritdoc IRescuableBase
+  function maxRescue(
+    address erc20Token
+  ) public view override(RescuableBase, IRescuableBase) returns (uint256) {
+    return type(uint256).max;
+  }
+
   fallback() external payable {}
+
   receive() external payable {}
 }
