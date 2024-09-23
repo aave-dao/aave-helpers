@@ -6,13 +6,13 @@ import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IReserveI
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
-import {ReserveConfiguration} from 'aave-v3-origin/core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {ReserveConfiguration} from 'aave-v3-origin/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
-import {DiffUtils} from 'aave-v3-origin/../tests/utils/DiffUtils.sol';
-import {ProtocolV3TestBase as RawProtocolV3TestBase, ReserveConfig, ReserveTokens} from 'aave-v3-origin/../tests/utils/ProtocolV3TestBase.sol';
+import {DiffUtils} from 'aave-v3-origin-tests/utils/DiffUtils.sol';
+import {ProtocolV3TestBase as RawProtocolV3TestBase, ReserveConfig, ReserveTokens} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
+import {ProxyHelpers} from 'aave-v3-origin-tests/utils/ProxyHelpers.sol';
 import {IInitializableAdminUpgradeabilityProxy} from '../../src/interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from '../../src/interfaces/ExtendedAggregatorV2V3Interface.sol';
-import {ProxyHelpers} from 'aave-v3-origin/../tests/utils/ProxyHelpers.sol';
 import {CommonTestBase} from '../../src/CommonTestBase.sol';
 import {SnapshotHelpersV3} from './SnapshotHelpersV3.sol';
 import {ILegacyDefaultInterestRateStrategy} from '../../src/dependencies/ILegacyDefaultInterestRateStrategy.sol';
@@ -355,13 +355,9 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     vm.stopPrank();
   }
 
-  function _writeEModeConfigs(
-    string memory path,
-    ReserveConfig[] memory configs,
-    IPool pool
-  ) internal override {
+  function _writeEModeConfigs(string memory path, IPool pool) internal override {
     _switchOffZkVm();
-    return snapshotHelper.writeEModeConfigs(path, configs, pool);
+    return snapshotHelper.writeEModeConfigs(path, pool);
   }
 
   function _writeStrategyConfigs(

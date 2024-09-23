@@ -5,6 +5,7 @@ import {Vm} from 'forge-std/Vm.sol';
 import {ChainIds, ChainHelpers} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 import {IpfsUtils} from './IpfsUtils.sol';
 import {console2} from 'forge-std/console2.sol';
+import {ProxyHelpers} from 'aave-v3-origin-tests/utils/ProxyHelpers.sol';
 import {PayloadsControllerUtils, IGovernancePowerStrategy, IPayloadsControllerCore, IGovernanceCore} from 'aave-address-book/GovernanceV3.sol';
 import {IVotingMachineWithProofs} from 'aave-address-book/governance-v3/IVotingMachineWithProofs.sol';
 import {IVotingPortal} from 'aave-address-book/governance-v3/IVotingPortal.sol';
@@ -24,7 +25,6 @@ import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
 import {Create2Utils} from 'solidity-utils/contracts/utils/ScriptUtils.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
-import {ProxyHelpers} from './ProxyHelpers.sol';
 import {Create2UtilsZkSync} from 'solidity-utils/../zksync/src/contracts/utils/ScriptUtilsZkSync.sol';
 
 interface IGovernance_V2_5 {
