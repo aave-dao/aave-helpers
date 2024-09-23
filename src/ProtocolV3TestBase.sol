@@ -317,34 +317,6 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     return configuration.getIsVirtualAccActive();
   }
 
-  function _logReserveConfig(ReserveConfig memory config) internal pure {
-    console.log('Symbol ', config.symbol);
-    console.log('Underlying address ', config.underlying);
-    console.log('AToken address ', config.aToken);
-    console.log('Variable debt token address ', config.variableDebtToken);
-    console.log('Decimals ', config.decimals);
-    console.log('LTV ', config.ltv);
-    console.log('Liquidation Threshold ', config.liquidationThreshold);
-    console.log('Liquidation Bonus ', config.liquidationBonus);
-    console.log('Liquidation protocol fee ', config.liquidationProtocolFee);
-    console.log('Reserve Factor ', config.reserveFactor);
-    console.log('Usage as collateral enabled ', (config.usageAsCollateralEnabled) ? 'Yes' : 'No');
-    console.log('Borrowing enabled ', (config.borrowingEnabled) ? 'Yes' : 'No');
-    console.log('Supply cap ', config.supplyCap);
-    console.log('Borrow cap ', config.borrowCap);
-    console.log('Debt ceiling ', config.debtCeiling);
-    console.log('Interest rate strategy ', config.interestRateStrategy);
-    console.log('Is active ', (config.isActive) ? 'Yes' : 'No');
-    console.log('Is frozen ', (config.isFrozen) ? 'Yes' : 'No');
-    console.log('Is siloed ', (config.isSiloed) ? 'Yes' : 'No');
-    console.log('Is borrowable in isolation ', (config.isBorrowableInIsolation) ? 'Yes' : 'No');
-    console.log('Is flashloanable ', (config.isFlashloanable) ? 'Yes' : 'No');
-    console.log('Is virtual accounting active ', (config.virtualAccActive) ? 'Yes' : 'No');
-    console.log('Virtual balance ', config.virtualBalance);
-    console.log('-----');
-    console.log('-----');
-  }
-
   function _writeEModeConfigs(string memory path, IPool pool) internal virtual override {
     // keys for json stringification
     string memory eModesKey = 'emodes';
@@ -359,8 +331,16 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
           vm.serializeUint(key, 'eModeCategory', i);
           vm.serializeString(key, 'label', pool.getEModeCategoryLabel(i));
           vm.serializeUint(key, 'ltv', cfg.ltv);
-          vm.serializeUint(key, 'collateralBitmap', pool.getEModeCategoryCollateralBitmap(i));
-          vm.serializeUint(key, 'borrowableBitmap', pool.getEModeCategoryBorrowableBitmap(i));
+          vm.serializeString(
+            key,
+            'collateralBitmap',
+            vm.toString(pool.getEModeCategoryCollateralBitmap(i))
+          );
+          vm.serializeString(
+            key,
+            'borrowableBitmap',
+            vm.toString(pool.getEModeCategoryBorrowableBitmap(i))
+          );
           vm.serializeUint(key, 'liquidationThreshold', cfg.liquidationThreshold);
           string memory object = vm.serializeUint(key, 'liquidationBonus', cfg.liquidationBonus);
           content = vm.serializeString(eModesKey, key, object);

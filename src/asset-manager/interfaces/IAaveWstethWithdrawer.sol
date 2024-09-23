@@ -22,7 +22,6 @@ interface IAaveWstethWithdrawer {
 }
 
 interface IWithdrawalQueueERC721 {
-
   /// @notice Request the batch of wstETH for withdrawal. Approvals for the passed amounts should be done before.
   /// @param _amounts an array of wstETH amount values.
   ///  The standalone withdrawal request will be created for each item in the passed list.

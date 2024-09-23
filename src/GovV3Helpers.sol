@@ -232,10 +232,19 @@ library GovV3Helpers {
     return buildAction(payloadAddress);
   }
 
-  function _getBytecodeHashFromArtifacts(Vm vm, string memory contractName) private view returns (bytes32 bytecodeHash) {
-    string memory artifactPath = string.concat('zkout/', contractName, '.sol/', contractName, '.json');
+  function _getBytecodeHashFromArtifacts(
+    Vm vm,
+    string memory contractName
+  ) private view returns (bytes32 bytecodeHash) {
+    string memory artifactPath = string.concat(
+      'zkout/',
+      contractName,
+      '.sol/',
+      contractName,
+      '.json'
+    );
     string memory artifact = vm.readFile(artifactPath);
-    bytecodeHash = vm.parseJsonBytes32(artifact, ".hash");
+    bytecodeHash = vm.parseJsonBytes32(artifact, '.hash');
 
     require(bytecodeHash != (bytes32(0)), 'Unable to fetch bytecodeHash from the zkout artifacts');
     return bytecodeHash;
