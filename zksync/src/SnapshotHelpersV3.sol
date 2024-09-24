@@ -210,6 +210,7 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
 
       string memory key = vm.toString(config.underlying);
       vm.serializeString(key, 'symbol', config.symbol);
+      vm.serializeUint(key, 'id', i);
       vm.serializeUint(key, 'ltv', config.ltv);
       vm.serializeUint(key, 'liquidationThreshold', config.liquidationThreshold);
       vm.serializeUint(key, 'liquidationBonus', config.liquidationBonus);
