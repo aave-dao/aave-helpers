@@ -328,7 +328,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
           if (++emptyCounter > 2) break;
         } else {
           string memory key = vm.toString(i);
-          vm.serializeJson(eModesKey, '{}');
+          vm.serializeJson(key, '{}');
           vm.serializeUint(key, 'eModeCategory', i);
           vm.serializeString(key, 'label', pool.getEModeCategoryLabel(i));
           vm.serializeUint(key, 'ltv', cfg.ltv);
@@ -353,6 +353,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
           if (++emptyCounter > 2) break;
         } else {
           string memory key = vm.toString(i);
+          vm.serializeJson(key, '{}');
           vm.serializeUint(key, 'eModeCategory', i);
           vm.serializeString(key, 'label', category.label);
           vm.serializeUint(key, 'ltv', category.ltv);
