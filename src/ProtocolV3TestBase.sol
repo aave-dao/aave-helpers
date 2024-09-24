@@ -320,6 +320,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     // keys for json stringification
     string memory eModesKey = 'emodes';
     string memory content = '{}';
+    vm.serializeJson(eModesKey, '{}');
     uint8 emptyCounter = 0;
     for (uint8 i = 0; i < 256; i++) {
       try pool.getEModeCategoryCollateralConfig(i) returns (DataTypes.CollateralConfig memory cfg) {
@@ -327,6 +328,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
           if (++emptyCounter > 2) break;
         } else {
           string memory key = vm.toString(i);
+          vm.serializeJson(eModesKey, '{}');
           vm.serializeUint(key, 'eModeCategory', i);
           vm.serializeString(key, 'label', pool.getEModeCategoryLabel(i));
           vm.serializeUint(key, 'ltv', cfg.ltv);
