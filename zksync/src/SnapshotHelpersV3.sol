@@ -199,6 +199,7 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
     // keys for json stringification
     string memory reservesKey = 'reserves';
     string memory content = '{}';
+    vm.serializeJson(reservesKey, '{}');
 
     IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
     IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
@@ -209,8 +210,8 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       );
 
       string memory key = vm.toString(config.underlying);
+      vm.serializeJson(key, '{}');
       vm.serializeString(key, 'symbol', config.symbol);
-      vm.serializeAddress(key, 'address', config.underlying);
       vm.serializeUint(key, 'id', i);
       vm.serializeUint(key, 'ltv', config.ltv);
       vm.serializeUint(key, 'liquidationThreshold', config.liquidationThreshold);
@@ -238,8 +239,8 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
         'aTokenImpl',
         ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, config.aToken)
       );
-      vm.serializeString(key, 'aTokenSymbol', IERC20Metadata(config.aToken).symbol());
-      vm.serializeString(key, 'aTokenName', IERC20Metadata(config.aToken).name());
+      vm.serializeString(key, 'aTokenSymbol', IERC20Detailed(config.aToken).symbol());
+      vm.serializeString(key, 'aTokenName', IERC20Detailed(config.aToken).name());
       vm.serializeAddress(
         key,
         'variableDebtTokenImpl',
@@ -251,12 +252,12 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       vm.serializeString(
         key,
         'variableDebtTokenSymbol',
-        IERC20Metadata(config.variableDebtToken).symbol()
+        IERC20Detailed(config.variableDebtToken).symbol()
       );
       vm.serializeString(
         key,
         'variableDebtTokenName',
-        IERC20Metadata(config.variableDebtToken).name()
+        IERC20Detailed(config.variableDebtToken).name()
       );
       vm.serializeAddress(key, 'oracle', address(assetOracle));
       if (address(assetOracle) != address(0)) {
@@ -277,13 +278,17 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       }
 
       vm.serializeBool(key, 'virtualAccountingActive', config.virtualAccActive);
-      vm.serializeUint(key, 'virtualBalance', config.virtualBalance);
-      vm.serializeUint(key, 'aTokenUnderlyingBalance', config.aTokenUnderlyingBalance);
+      vm.serializeString(key, 'virtualBalance', vm.toString(config.virtualBalance));
+      vm.serializeString(
+        key,
+        'aTokenUnderlyingBalance',
+        vm.toString(config.aTokenUnderlyingBalance)
+      );
 
-      string memory out = vm.serializeUint(
+      string memory out = vm.serializeString(
         key,
         'oracleLatestAnswer',
-        uint256(oracle.getAssetPrice(config.underlying))
+        vm.toString(uint256(oracle.getAssetPrice(config.underlying)))
       );
       content = vm.serializeString(reservesKey, key, out);
     }
