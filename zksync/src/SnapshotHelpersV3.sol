@@ -239,8 +239,8 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
         'aTokenImpl',
         ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, config.aToken)
       );
-      vm.serializeString(key, 'aTokenSymbol', IERC20Detailed(config.aToken).symbol());
-      vm.serializeString(key, 'aTokenName', IERC20Detailed(config.aToken).name());
+      vm.serializeString(key, 'aTokenSymbol', IERC20Metadata(config.aToken).symbol());
+      vm.serializeString(key, 'aTokenName', IERC20Metadata(config.aToken).name());
       vm.serializeAddress(
         key,
         'variableDebtTokenImpl',
@@ -252,12 +252,12 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       vm.serializeString(
         key,
         'variableDebtTokenSymbol',
-        IERC20Detailed(config.variableDebtToken).symbol()
+        IERC20Metadata(config.variableDebtToken).symbol()
       );
       vm.serializeString(
         key,
         'variableDebtTokenName',
-        IERC20Detailed(config.variableDebtToken).name()
+        IERC20Metadata(config.variableDebtToken).name()
       );
       vm.serializeAddress(key, 'oracle', address(assetOracle));
       if (address(assetOracle) != address(0)) {
