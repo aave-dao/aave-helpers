@@ -890,7 +890,10 @@ library GovV3Helpers {
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) private view returns (uint40, IPayloadsControllerCore.Payload memory, bool) {
     uint40 count = payloadsController.getPayloadsCount();
-    for (uint40 payloadId = count; payloadId > 0; payloadId--) {
+    uint40 maxPayloadCheck = 20;
+    uint40 payloadIdLowerBound = count < maxPayloadCheck ? 0 : count - maxPayloadCheck; // only validate across last 20 payloadIds
+
+    for (uint40 payloadId = count; payloadId > payloadIdLowerBound; payloadId--) {
       IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(
         payloadId - 1
       );
