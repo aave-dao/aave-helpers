@@ -21,7 +21,7 @@ contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
     ReserveConfig[] memory configs = _getReservesConfigs(AaveV3Optimism.POOL);
     e2eTestAsset(
       AaveV3Optimism.POOL,
-      _findReserveConfig(configs, AaveV3PolygonAssets.WMATIC_UNDERLYING),
+      _findReserveConfig(configs, AaveV3PolygonAssets.WPOL_UNDERLYING),
       _findReserveConfig(configs, AaveV3PolygonAssets.DPI_UNDERLYING)
     );
   }

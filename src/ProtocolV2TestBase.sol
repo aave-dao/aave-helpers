@@ -13,7 +13,7 @@ import {ChainIds} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
-import {ProxyHelpers} from './ProxyHelpers.sol';
+import {ProxyHelpers} from 'aave-v3-origin/../tests/utils/ProxyHelpers.sol';
 
 struct ReserveConfig {
   string symbol;
