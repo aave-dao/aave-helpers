@@ -18,9 +18,6 @@ jobs:
     uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@main
     secrets: inherit
     with:
-      mode: "CHANGED"
+      mode: 'CHANGED'
       zksync: true
-      ROOT_DIR: "zksync"
-  release:
-    needs: [test]
-    uses: bgd-labs/github-workflows/.github/workflows/release.yml@main
+      ROOT_DIR: 'zksync'
