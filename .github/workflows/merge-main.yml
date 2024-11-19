@@ -41,3 +41,13 @@ jobs:
         with:
           ZKSYNC: true
           mode: 'CHANGED'
+
+      - name: Run Forge tests
+        uses: bgd-labs/github-workflows/.github/actions/comment-artifact@main
+
+      # we let failing tests pass so we can log them in the comment, still we want the ci to fail
+      - name: Post test
+        if: ${{ steps.test.outputs.testStatus != 0 || steps.zktest.outputs.testStatus != 0 }}
+        run: |
+          echo "tests failed"
+          exit 1
