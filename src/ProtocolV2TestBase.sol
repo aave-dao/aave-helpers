@@ -117,11 +117,11 @@ contract ProtocolV2TestBase is CommonTestBase, DiffUtils {
   function e2eTest(ILendingPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ReserveConfig memory collateralConfig = _getGoodCollateral(configs);
-    uint256 snapshot = vm.snapshot();
+    uint256 snapshot = vm.snapshotState();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
         e2eTestAsset(pool, collateralConfig, configs[i]);
-        vm.revertTo(snapshot);
+        vm.revertToState(snapshot);
       }
     }
   }
@@ -147,19 +147,19 @@ contract ProtocolV2TestBase is CommonTestBase, DiffUtils {
       _getTokenAmountByEthValue(pool, collateralConfig, 100)
     );
     _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
-    uint256 snapshot = vm.snapshot();
+    uint256 snapshot = vm.snapshotState();
     // test withdrawal
     _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
     _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
-    vm.revertTo(snapshot);
+    vm.revertToState(snapshot);
     // test variable borrowing
     if (testAssetConfig.borrowingEnabled) {
       _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
-      vm.revertTo(snapshot);
+      vm.revertToState(snapshot);
       // test stable borrowing
       if (testAssetConfig.stableBorrowRateEnabled) {
         _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
-        vm.revertTo(snapshot);
+        vm.revertToState(snapshot);
       }
     }
   }
@@ -191,7 +191,7 @@ contract ProtocolV2TestBase is CommonTestBase, DiffUtils {
     uint256 amount,
     bool stable
   ) internal {
-    uint256 snapshot = vm.snapshot();
+    uint256 snapshot = vm.snapshotState();
     this._borrow(testAssetConfig, pool, borrower, amount, stable);
     // switching back and forth between rate modes should work
     if (testAssetConfig.stableBorrowRateEnabled) {
@@ -203,7 +203,7 @@ contract ProtocolV2TestBase is CommonTestBase, DiffUtils {
       pool.swapBorrowRateMode(testAssetConfig.underlying, stable ? 1 : 2);
     }
     _repay(testAssetConfig, pool, borrower, amount, stable);
-    vm.revertTo(snapshot);
+    vm.revertToState(snapshot);
   }
 
   /**

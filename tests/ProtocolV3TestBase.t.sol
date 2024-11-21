@@ -125,18 +125,17 @@ contract ProtocolV3TestOptimismSnapshot is ProtocolV3TestBase {
     vm.createSelectFork('optimism', 117408311);
   }
 
-  function test_snapshot() public {
+  function test_snapshotState() public {
     createConfigurationSnapshot('snapshot', AaveV3Optimism.POOL, true, false, false, false);
   }
 }
-
 
 contract ProtocolV3TestFantomSnapshot is ProtocolV3TestBase {
   function setUp() public {
     vm.createSelectFork('fantom', 86731015);
   }
 
-  function test_snapshot() public {
+  function test_snapshotState() public {
     createConfigurationSnapshot('snapshotFtm', AaveV3Fantom.POOL, true, false, false, false);
   }
 }

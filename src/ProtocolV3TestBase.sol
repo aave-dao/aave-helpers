@@ -124,11 +124,11 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
   function e2eTest(IPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ReserveConfig memory collateralConfig = _getGoodCollateral(configs);
-    uint256 snapshot = vm.snapshot();
+    uint256 snapshot = vm.snapshotState();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
         e2eTestAsset(pool, collateralConfig, configs[i]);
-        vm.revertTo(snapshot);
+        vm.revertToState(snapshot);
       } else {
         console.log('E2E: TestAsset %s SKIPPED', configs[i].symbol);
       }
@@ -166,20 +166,20 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     // GHO is a special case as it cannot be supplied
     if (testAssetConfig.underlying == AaveV3EthereumAssets.GHO_UNDERLYING) {
       _deposit(collateralConfig, pool, collateralSupplier, collateralAssetAmount);
-      uint256 snapshot = vm.snapshot();
+      uint256 snapshot = vm.snapshotState();
       // test variable borrowing
       if (testAssetConfig.borrowingEnabled) {
         _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount);
-        vm.revertTo(snapshot);
+        vm.revertToState(snapshot);
       }
     } else {
       _deposit(collateralConfig, pool, collateralSupplier, collateralAssetAmount);
       _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
-      uint256 snapshot = vm.snapshot();
+      uint256 snapshot = vm.snapshotState();
       // test withdrawal
       _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
       _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
-      vm.revertTo(snapshot);
+      vm.revertToState(snapshot);
       // test variable borrowing
       if (testAssetConfig.borrowingEnabled) {
         if (
@@ -190,7 +190,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
           return;
         }
         _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount);
-        vm.revertTo(snapshot);
+        vm.revertToState(snapshot);
       }
     }
   }
