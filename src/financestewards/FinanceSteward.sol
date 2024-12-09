@@ -5,7 +5,7 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
 import {ICollector, CollectorUtils as CU} from '../CollectorUtils.sol';
-import {IFinanceSteward} from './IFinanceSteward.sol';
+import {IFinanceSteward} from './interfaces/IFinanceSteward.sol';
 
 /**
  * @title FinanceSteward

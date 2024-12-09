@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {ICollector} from '../CollectorUtils.sol';
+import {ICollector} from '../../CollectorUtils.sol';
 import {IPool} from 'aave-address-book/AaveV3.sol';
 import {ILendingPool} from 'aave-address-book/AaveV2.sol';
 
@@ -16,6 +16,7 @@ interface IPoolV3FinSteward {
   /// @dev Aave V3 Pool must have been previously approved
   error UnrecognizedV3Pool();
 
+  /// @dev Could not identify V2 Pool
   error V2PoolNotFound();
 
   /// @notice Emitted when a new V3 Pool gets listed
@@ -67,6 +68,15 @@ interface IPoolV3FinSteward {
   /// @param reserve The address of the reserve token to withdraw
   /// @param amount The amount of the reserve token to withdraw
   function withdrawV3(address V3Pool, address reserve, uint amount) external;
+
+  /// @notice Checks whether aToken amount can be withdrawn from a reserve
+  /// @param token Address of the Aave Token
+  /// @param amount The amount to withdraw from the reserve
+  function validateAmount(address token, uint256 amount) external view;
+
+  /// @notice Checks whether a V3 pool instance is configured to be interacted with
+  /// @param pool Address of the V3 pool to check
+  function validateV3Pool(address pool) external view;
 
   /// @notice Sets the minimum balance shield for a specified token
   /// @param token The address of the token

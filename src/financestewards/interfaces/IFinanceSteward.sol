@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {ICollector} from '../CollectorUtils.sol';
+import {ICollector} from '../../CollectorUtils.sol';
 import {IPool} from 'aave-address-book/AaveV3.sol';
 import {ILendingPool} from 'aave-address-book/AaveV2.sol';
 
@@ -137,5 +137,4 @@ interface IFinanceSteward {
   /// @param token The address of the token
   /// @param amount The minimum balance to shield
   function setMinimumBalanceShield(address token, uint amount) external;
-
 }

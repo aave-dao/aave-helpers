@@ -9,7 +9,7 @@ import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethe
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {IPool, DataTypes as DataTypesV3} from 'aave-address-book/AaveV3.sol';
 import {ILendingPool, DataTypes as DataTypesV2} from 'aave-address-book/AaveV2.sol';
-import {IPoolV3FinSteward} from './IPoolV3FinSteward.sol';
+import {IPoolV3FinSteward} from './interfaces/IPoolV3FinSteward.sol';
 
 /**
  * @title PoolV3FinSteward
@@ -107,6 +107,16 @@ contract PoolV3FinSteward is OwnableWithGuardian, IPoolV3FinSteward {
     CU.withdrawFromV2(COLLECTOR, withdrawData, address(COLLECTOR));
   }
 
+  /// @inheritdoc IPoolV3FinSteward
+  function validateAmount(address token, uint256 amount) external view {
+    _validateAmount(token, amount);
+  }
+
+  /// @inheritdoc IPoolV3FinSteward
+  function validateV3Pool(address pool) external view {
+    _validateV3Pool(pool);
+  }
+
   /// DAO Actions
 
   /// @inheritdoc IPoolV3FinSteward
@@ -144,13 +154,15 @@ contract PoolV3FinSteward is OwnableWithGuardian, IPoolV3FinSteward {
     if (v3Pools[pool] == false) revert UnrecognizedV3Pool();
   }
 
-  function _validateAmount(address token, uint256 amount) internal view returns (uint256 validAmount) {
+  /// @dev Internal function to validate minimum-amount to be left in a reserve
+  function _validateAmount(address token, uint256 amount) internal view returns (uint256) {
     uint256 balance = IERC20(token).balanceOf(address(COLLECTOR));
     if (minTokenBalance[token] > 0) {
       uint256 leftover = (amount > balance) ? 0 : balance - amount;
 
       if (minTokenBalance[token] > leftover) revert MinimumBalanceShield(minTokenBalance[token]);
     }
-    validAmount = (amount > balance) ? balance : amount;
+
+    return (amount > balance) ? balance : amount;
   }
 }
