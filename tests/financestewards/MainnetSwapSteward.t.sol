@@ -14,7 +14,7 @@ import {ICollector} from 'collector-upgrade-rev6/lib/aave-v3-origin/src/contract
 import {Collector} from 'collector-upgrade-rev6/lib/aave-v3-origin/src/contracts/treasury/Collector.sol';
 import {IAccessControl} from 'aave-v3-origin/core/contracts/dependencies/openzeppelin/contracts/IAccessControl.sol';
 
-import {SwapSteward, ISwapSteward} from 'src/financestewards/SwapSteward.sol';
+import {MainnetSwapSteward, ISwapSteward} from 'src/financestewards/MainnetSwapSteward.sol';
 import {PoolV3FinSteward, IPoolV3FinSteward} from 'src/financestewards/PoolV3FinSteward.sol';
 import {AggregatorInterface} from 'src/financestewards/AggregatorInterface.sol';
 import {CollectorUtils} from 'src/CollectorUtils.sol';
@@ -23,7 +23,10 @@ import {CollectorUtils} from 'src/CollectorUtils.sol';
  * @dev Test for SwapSteward contract
  * command: make test-swap-steward
  */
-contract SwapStewardTest is Test {
+contract MainnetSwapStewardTest is Test {
+  event MilkmanAddressUpdated(address oldAddress, address newAddress);
+  event PoolV3StewardUpdated(address oldAddress, address newAddress);
+  event PriceCheckerUpdated(address oldAddress, address newAddress);
   event SwapRequested(
     address milkman,
     address indexed fromToken,
@@ -49,20 +52,20 @@ contract SwapStewardTest is Test {
   TransparentUpgradeableProxy public constant COLLECTOR_PROXY = TransparentUpgradeableProxy(payable(address(AaveV3Ethereum.COLLECTOR)));
   ICollector collector = ICollector(address(COLLECTOR_PROXY));
   PoolV3FinSteward public poolv3Steward;
-  SwapSteward public steward;
+  MainnetSwapSteward public steward;
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('mainnet'), 21353255);
 
     Collector new_collector_impl = new Collector(ACL_MANAGER);
     poolv3Steward = new PoolV3FinSteward(GovernanceV3Ethereum.EXECUTOR_LVL_1, guardian);
-    steward = new SwapSteward(GovernanceV3Ethereum.EXECUTOR_LVL_1, guardian, address(poolv3Steward));
+    steward = new MainnetSwapSteward(GovernanceV3Ethereum.EXECUTOR_LVL_1, guardian, address(poolv3Steward));
 
     vm.label(alice, "alice");
     vm.label(guardian, "guardian");
     vm.label(EXECUTOR, "EXECUTOR");
     vm.label(address(AaveV3Ethereum.COLLECTOR), "Collector");
-    vm.label(address(steward), "SwapSteward");
+    vm.label(address(steward), "MainnetSwapSteward");
 
     vm.startPrank(EXECUTOR);
 
@@ -86,7 +89,7 @@ contract SwapStewardTest is Test {
   }
 }
 
-contract Function_withdrawV2andSwap is SwapStewardTest {
+contract Function_withdrawV2andSwap is MainnetSwapStewardTest {
   function test_revertsIf_notOwnerOrQuardian() public {
     vm.startPrank(alice);
 
@@ -185,7 +188,7 @@ contract Function_withdrawV2andSwap is SwapStewardTest {
   }
 }
 
-contract Function_withdrawV3andSwap is SwapStewardTest {
+contract Function_withdrawV3andSwap is MainnetSwapStewardTest {
   function test_revertsIf_notOwnerOrQuardian() public {
     vm.startPrank(alice);
 
@@ -288,7 +291,7 @@ contract Function_withdrawV3andSwap is SwapStewardTest {
   }
 }
 
-contract Function_tokenSwap is SwapStewardTest {
+contract Function_tokenSwap is MainnetSwapStewardTest {
   function test_revertsIf_notOwnerOrQuardian() public {
     vm.startPrank(alice);
 
@@ -399,7 +402,7 @@ contract Function_tokenSwap is SwapStewardTest {
   }
 }
 
-contract Function_setSwappableToken is SwapStewardTest {
+contract Function_setSwappableToken is MainnetSwapStewardTest {
   function test_revertsIf_notOwner() public {
     vm.startPrank(alice);
     vm.expectRevert('Ownable: caller is not the owner');
@@ -431,6 +434,75 @@ contract Function_setSwappableToken is SwapStewardTest {
     emit SwapApprovedToken(AaveV3EthereumAssets.USDC_UNDERLYING, USDC_PRICE_FEED);
     steward.setSwappableToken(AaveV3EthereumAssets.USDC_UNDERLYING, USDC_PRICE_FEED);
     vm.stopPrank();
+  }
+}
+
+contract SetPoolV3Steward is MainnetSwapStewardTest {
+  function test_revertsIf_invalidCaller() public {
+    vm.expectRevert('Ownable: caller is not the owner');
+    steward.setPoolV3Steward(makeAddr('v3-steward'));
+  }
+
+  function test_revertsIf_invalidZeroAddress() public {
+    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    vm.expectRevert(ISwapSteward.InvalidZeroAddress.selector);
+    steward.setPoolV3Steward(address(0));
+  }
+
+  function test_successful() public {
+    address newSteward = makeAddr('v3-steward');
+    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    vm.expectEmit(true, true, true, true, address(steward));
+    emit PoolV3StewardUpdated(address(steward.POOLV3STEWARD()), newSteward);
+    steward.setPoolV3Steward(newSteward);
+
+    assertEq(address(steward.POOLV3STEWARD()), newSteward);
+  }
+}
+
+contract SetPriceChecker is MainnetSwapStewardTest {
+  function test_revertsIf_invalidCaller() public {
+    vm.expectRevert('Ownable: caller is not the owner');
+    steward.setPriceChecker(makeAddr('price-checker'));
+  }
+
+  function test_revertsIf_invalidZeroAddress() public {
+    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    vm.expectRevert(ISwapSteward.InvalidZeroAddress.selector);
+    steward.setPriceChecker(address(0));
+  }
+
+  function test_successful() public {
+    address newChecker = makeAddr('new-checker');
+    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    vm.expectEmit(true, true, true, true, address(steward));
+    emit PriceCheckerUpdated(steward.PRICE_CHECKER(), newChecker);
+    steward.setPriceChecker(newChecker);
+
+    assertEq(address(steward.PRICE_CHECKER()), newChecker);
+  }
+}
+
+contract SetMilkman is MainnetSwapStewardTest {
+  function test_revertsIf_invalidCaller() public {
+    vm.expectRevert('Ownable: caller is not the owner');
+    steward.setMilkman(makeAddr('new-milkman'));
+  }
+
+  function test_revertsIf_invalidZeroAddress() public {
+    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    vm.expectRevert(ISwapSteward.InvalidZeroAddress.selector);
+    steward.setMilkman(address(0));
+  }
+
+  function test_successful() public {
+    address newMilkman = makeAddr('new-milkman');
+    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
+    vm.expectEmit(true, true, true, true, address(steward));
+    emit MilkmanAddressUpdated(steward.MILKMAN(), newMilkman);
+    steward.setMilkman(newMilkman);
+
+    assertEq(address(steward.MILKMAN()), newMilkman);
   }
 }
 

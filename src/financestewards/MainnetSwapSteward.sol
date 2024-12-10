@@ -15,7 +15,7 @@ import {ICollector, CollectorUtils as CU} from 'src/CollectorUtils.sol';
 import {IPoolV3FinSteward} from 'src/financestewards/interfaces/IPoolV3FinSteward.sol';
 import {ISwapSteward} from 'src/financestewards/interfaces/ISwapSteward.sol';
 
-contract SwapSteward is OwnableWithGuardian, ISwapSteward {
+contract MainnetSwapSteward is OwnableWithGuardian, ISwapSteward {
   using DataTypesV2 for DataTypesV2.ReserveData;
   using DataTypesV3 for DataTypesV3.ReserveDataLegacy;
   using CU for CU.SwapInput;
@@ -174,13 +174,19 @@ contract SwapSteward is OwnableWithGuardian, ISwapSteward {
   /// @dev Internal function to set the PoolV3FinSteward
   function _setPoolV3Steward(address poolV3Steward) internal {
     if (poolV3Steward == address(0)) revert InvalidZeroAddress();
+    address old = address(POOLV3STEWARD);
     POOLV3STEWARD = IPoolV3FinSteward(poolV3Steward);
+
+    emit PoolV3StewardUpdated(old, poolV3Steward);
   }
 
   /// @dev Internal function to set the price checker
   function _setPriceChecker(address newPriceChecker) internal {
     if (newPriceChecker == address(0)) revert InvalidZeroAddress();
+    address old = PRICE_CHECKER;
     PRICE_CHECKER = newPriceChecker;
+
+    emit PriceCheckerUpdated(old, newPriceChecker);
   }
 
   /// @dev Internal function to set the Milkman instance address

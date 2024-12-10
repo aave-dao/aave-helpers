@@ -29,6 +29,16 @@ interface ISwapSteward {
   /// @param newAddress The new Milkman instance address
   event MilkmanAddressUpdated(address oldAddress, address newAddress);
 
+  /// @notice Emitted when the PoolV3Steward contract address is updated
+  /// @param oldAddress The old PoolV3Steward instance address
+  /// @param newAddress The new PoolV3Steward instance address
+  event PoolV3StewardUpdated(address oldAddress, address newAddress);
+
+  /// @notice Emitted when the Chainlink Price Checker contract address is updated
+  /// @param oldAddress The old Price Checker instance address
+  /// @param newAddress The new Price Checker instance address
+  event PriceCheckerUpdated(address oldAddress, address newAddress);
+
   /// @notice Emitted when a token is approved for swapping with its corresponding USD oracle
   /// @param token The address of the token approved for swapping
   /// @param oracleUSD The address of the oracle providing the USD price feed for the token
