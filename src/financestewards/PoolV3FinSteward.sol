@@ -27,7 +27,7 @@ contract PoolV3FinSteward is OwnableWithGuardian, IPoolV3FinSteward {
   ICollector public immutable COLLECTOR = AaveV3Ethereum.COLLECTOR;
 
   /// @inheritdoc IPoolV3FinSteward
-  ILendingPool public v2Pool = ILendingPool(AaveV2Ethereum.POOL);
+  ILendingPool public v2Pool;
 
   /// @inheritdoc IPoolV3FinSteward
   mapping(address pool => bool isApproved) public v3Pools;
@@ -35,12 +35,16 @@ contract PoolV3FinSteward is OwnableWithGuardian, IPoolV3FinSteward {
   /// @inheritdoc IPoolV3FinSteward
   mapping(address token => uint256 minimumBalanceLeft) public minTokenBalance;
 
-  constructor(address _owner, address _guardian) {
+  constructor(address _owner, address _guardian, address _v2Pool, address[] memory _v3Pools) {
     _transferOwnership(_owner);
     _updateGuardian(_guardian);
-    _setV3Pool(address(AaveV3Ethereum.POOL)); // Main
-    _setV3Pool(0x0AA97c284e98396202b6A04024F5E2c65026F3c0); // EtherFi
-    _setV3Pool(0x4e033931ad43597d96D6bcc25c280717730B58B1); // Lido
+    _setV2Pool(_v2Pool);
+
+    for (uint256 i; i < _v3Pools.length; ) {
+      _setV3Pool(_v3Pools[i]); // Main
+      unchecked { ++i; }
+}
+
   }
 
   /// Steward Actions

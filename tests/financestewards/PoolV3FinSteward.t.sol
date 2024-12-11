@@ -45,7 +45,13 @@ contract PoolV3FinSteward_Test is Test {
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('mainnet'), 21244865);
-    steward = new PoolV3FinSteward(GovernanceV3Ethereum.EXECUTOR_LVL_1, guardian);
+
+    address v2Pool = address(AaveV2Ethereum.POOL);
+    address[] memory v3Pools = new address[](3);
+    v3Pools[0] = address(AaveV3Ethereum.POOL);
+    v3Pools[1] = 0x0AA97c284e98396202b6A04024F5E2c65026F3c0;
+    v3Pools[2] = 0x4e033931ad43597d96D6bcc25c280717730B58B1;
+    steward = new PoolV3FinSteward(GovernanceV3Ethereum.EXECUTOR_LVL_1, guardian, v2Pool, v3Pools);
 
     Collector new_collector_impl = new Collector(ACL_MANAGER);
 
@@ -457,7 +463,7 @@ contract Function_setV2Pool is PoolV3FinSteward_Test {
 }
 
 contract Function_validateAmount is PoolV3FinSteward_Test {
-    function test_resvertsIf_minimumBalanceShield() public {
+  function test_resvertsIf_minimumBalanceShield() public {
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
     steward.setMinimumBalanceShield(AaveV2EthereumAssets.USDC_A_TOKEN, 1_000e6);
 
@@ -470,10 +476,7 @@ contract Function_validateAmount is PoolV3FinSteward_Test {
     vm.expectRevert(
       abi.encodeWithSelector(IPoolV3FinSteward.MinimumBalanceShield.selector, 1_000e6)
     );
-    steward.validateAmount(
-      AaveV2EthereumAssets.USDC_A_TOKEN,
-      currentBalance
-    );
+    steward.validateAmount(AaveV2EthereumAssets.USDC_A_TOKEN, currentBalance);
     vm.stopPrank();
   }
 
@@ -482,10 +485,7 @@ contract Function_validateAmount is PoolV3FinSteward_Test {
       address(AaveV3Ethereum.COLLECTOR)
     );
 
-    steward.validateAmount(
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      currentBalance + 1
-    );
+    steward.validateAmount(AaveV3EthereumAssets.USDC_UNDERLYING, currentBalance + 1);
   }
 
   function test_successful_amountLowerThanBalance() public {
@@ -493,10 +493,7 @@ contract Function_validateAmount is PoolV3FinSteward_Test {
       address(AaveV3Ethereum.COLLECTOR)
     );
 
-    steward.validateAmount(
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      currentBalance - 1
-    );
+    steward.validateAmount(AaveV3EthereumAssets.USDC_UNDERLYING, currentBalance - 1);
   }
 }
 

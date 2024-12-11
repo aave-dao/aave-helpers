@@ -49,7 +49,8 @@ contract MainnetSwapStewardTest is Test {
 
   bytes32 public constant FUNDS_ADMIN_ROLE = 'FUNDS_ADMIN';
 
-  TransparentUpgradeableProxy public constant COLLECTOR_PROXY = TransparentUpgradeableProxy(payable(address(AaveV3Ethereum.COLLECTOR)));
+  TransparentUpgradeableProxy public constant COLLECTOR_PROXY =
+    TransparentUpgradeableProxy(payable(address(AaveV3Ethereum.COLLECTOR)));
   ICollector collector = ICollector(address(COLLECTOR_PROXY));
   PoolV3FinSteward public poolv3Steward;
   MainnetSwapSteward public steward;
@@ -58,14 +59,25 @@ contract MainnetSwapStewardTest is Test {
     vm.createSelectFork(vm.rpcUrl('mainnet'), 21353255);
 
     Collector new_collector_impl = new Collector(ACL_MANAGER);
-    poolv3Steward = new PoolV3FinSteward(GovernanceV3Ethereum.EXECUTOR_LVL_1, guardian);
-    steward = new MainnetSwapSteward(GovernanceV3Ethereum.EXECUTOR_LVL_1, guardian, address(poolv3Steward));
+    address v2Pool = address(AaveV2Ethereum.POOL);
+    address[] memory v3Pools = new address[](3);
+    v3Pools[0] = address(AaveV3Ethereum.POOL);
+    v3Pools[1] = 0x0AA97c284e98396202b6A04024F5E2c65026F3c0;
+    v3Pools[2] = 0x4e033931ad43597d96D6bcc25c280717730B58B1;
+    poolv3Steward = new PoolV3FinSteward(GovernanceV3Ethereum.EXECUTOR_LVL_1, guardian, v2Pool, v3Pools);
 
-    vm.label(alice, "alice");
-    vm.label(guardian, "guardian");
-    vm.label(EXECUTOR, "EXECUTOR");
-    vm.label(address(AaveV3Ethereum.COLLECTOR), "Collector");
-    vm.label(address(steward), "MainnetSwapSteward");
+
+    steward = new MainnetSwapSteward(
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
+      guardian,
+      address(poolv3Steward)
+    );
+
+    vm.label(alice, 'alice');
+    vm.label(guardian, 'guardian');
+    vm.label(EXECUTOR, 'EXECUTOR');
+    vm.label(address(AaveV3Ethereum.COLLECTOR), 'Collector');
+    vm.label(address(steward), 'MainnetSwapSteward');
 
     vm.startPrank(EXECUTOR);
 
@@ -126,7 +138,9 @@ contract Function_withdrawV2andSwap is MainnetSwapStewardTest {
       address(AaveV3Ethereum.COLLECTOR)
     );
 
-    vm.expectRevert(abi.encodeWithSelector(IPoolV3FinSteward.MinimumBalanceShield.selector, 1_000e6));
+    vm.expectRevert(
+      abi.encodeWithSelector(IPoolV3FinSteward.MinimumBalanceShield.selector, 1_000e6)
+    );
     steward.withdrawV2andSwap(
       AaveV3EthereumAssets.USDC_UNDERLYING,
       currentBalance - 999e6,
@@ -227,7 +241,9 @@ contract Function_withdrawV3andSwap is MainnetSwapStewardTest {
       address(AaveV3Ethereum.COLLECTOR)
     );
 
-    vm.expectRevert(abi.encodeWithSelector(IPoolV3FinSteward.MinimumBalanceShield.selector, 1_000e6));
+    vm.expectRevert(
+      abi.encodeWithSelector(IPoolV3FinSteward.MinimumBalanceShield.selector, 1_000e6)
+    );
     steward.withdrawV3andSwap(
       address(AaveV3Ethereum.POOL),
       AaveV3EthereumAssets.USDC_UNDERLYING,
@@ -328,7 +344,9 @@ contract Function_tokenSwap is MainnetSwapStewardTest {
       address(AaveV3Ethereum.COLLECTOR)
     );
 
-    vm.expectRevert(abi.encodeWithSelector(IPoolV3FinSteward.MinimumBalanceShield.selector, 1_000e6));
+    vm.expectRevert(
+      abi.encodeWithSelector(IPoolV3FinSteward.MinimumBalanceShield.selector, 1_000e6)
+    );
     steward.tokenSwap(
       AaveV3EthereumAssets.USDC_UNDERLYING,
       currentBalance - 999e6,
