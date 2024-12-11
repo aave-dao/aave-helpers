@@ -20,7 +20,6 @@ import {IPoolV3FinSteward} from './interfaces/IPoolV3FinSteward.sol';
 contract PoolV3FinSteward is OwnableWithGuardian, IPoolV3FinSteward {
   using DataTypesV2 for DataTypesV2.ReserveData;
   using DataTypesV3 for DataTypesV3.ReserveDataLegacy;
-
   using CU for ICollector;
   using CU for CU.IOInput;
 
@@ -28,7 +27,7 @@ contract PoolV3FinSteward is OwnableWithGuardian, IPoolV3FinSteward {
   ICollector public immutable COLLECTOR = AaveV3Ethereum.COLLECTOR;
 
   /// @inheritdoc IPoolV3FinSteward
-  ILendingPool public v2Pool = ILendingPool(address(0));
+  ILendingPool public v2Pool = ILendingPool(AaveV2Ethereum.POOL);
 
   /// @inheritdoc IPoolV3FinSteward
   mapping(address pool => bool isApproved) public v3Pools;
@@ -39,7 +38,6 @@ contract PoolV3FinSteward is OwnableWithGuardian, IPoolV3FinSteward {
   constructor(address _owner, address _guardian) {
     _transferOwnership(_owner);
     _updateGuardian(_guardian);
-    _setV2Pool(address(AaveV2Ethereum.POOL));
     _setV3Pool(address(AaveV3Ethereum.POOL)); // Main
     _setV3Pool(0x0AA97c284e98396202b6A04024F5E2c65026F3c0); // EtherFi
     _setV3Pool(0x4e033931ad43597d96D6bcc25c280717730B58B1); // Lido
@@ -139,12 +137,16 @@ contract PoolV3FinSteward is OwnableWithGuardian, IPoolV3FinSteward {
 
   /// @dev Internal function to approve an Aave V3 Pool instance
   function _setV3Pool(address newV3pool) internal {
+    if (newV3pool == address(0)) revert InvalidZeroAddress();
+
     v3Pools[newV3pool] = true;
     emit AddedV3Pool(newV3pool);
   }
 
   /// @dev Internal function to approve an Aave V2 Pool instance
   function _setV2Pool(address newV2pool) internal {
+    if (newV2pool == address(0)) revert InvalidZeroAddress();
+    
     v2Pool = ILendingPool(newV2pool);
     emit AddedV2Pool(newV2pool);
   }

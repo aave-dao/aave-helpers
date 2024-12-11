@@ -15,7 +15,7 @@ test-v2-config-engine:; forge test -vvv --match-path src/test/AaveV2ConfigEngine
 test-v2-rates-factory:; forge test -vvv --match-path src/test/V2RateStrategyFactory.t.sol --gas-report
 test-financesteward:; forge test -vvv --match-path tests/financestewards/FinanceSteward.t.sol
 test-poolv3-steward:; forge test -vvv --match-path tests/financestewards/PoolV3FinSteward.t.sol
-test-swap-steward:; forge test -vvv --match-path tests/financestewards/SwapSteward.t.sol
+test-swap-steward:; forge test -vvv --match-path tests/financestewards/MainnetSwapSteward.t.sol
 
 # Scripts
 deploy-engine-eth :;  forge script scripts/AaveV3ConfigEngine.s.sol:DeployEngineEth --rpc-url mainnet --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv

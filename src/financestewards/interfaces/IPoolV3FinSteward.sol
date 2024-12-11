@@ -6,6 +6,9 @@ import {IPool} from 'aave-address-book/AaveV3.sol';
 import {ILendingPool} from 'aave-address-book/AaveV2.sol';
 
 interface IPoolV3FinSteward {
+  /// @dev Provided address cannot be the zero-address
+  error InvalidZeroAddress();
+  
   /// @dev Amount cannot be zero
   error InvalidZeroAmount();
 
