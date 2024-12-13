@@ -9,15 +9,17 @@ import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethe
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
-import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {ICollector} from 'collector-upgrade-rev6/lib/aave-v3-origin/src/contracts/treasury/ICollector.sol';
 import {Collector} from 'collector-upgrade-rev6/lib/aave-v3-origin/src/contracts/treasury/Collector.sol';
-import {IAccessControl} from 'aave-v3-origin/core/contracts/dependencies/openzeppelin/contracts/IAccessControl.sol';
-
+import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
+import {ITransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol'; 
 import {MainnetSwapSteward, ISwapSteward} from 'src/financestewards/MainnetSwapSteward.sol';
 import {PoolV3FinSteward, IPoolV3FinSteward} from 'src/financestewards/PoolV3FinSteward.sol';
 import {AggregatorInterface} from 'src/financestewards/AggregatorInterface.sol';
 import {CollectorUtils} from 'src/CollectorUtils.sol';
+import {IAccessControl} from 'openzeppelin-contracts/contracts/access/AccessControl.sol';
+
+
 
 /**
  * @dev Test for SwapSteward contract
@@ -49,8 +51,8 @@ contract MainnetSwapStewardTest is Test {
 
   bytes32 public constant FUNDS_ADMIN_ROLE = 'FUNDS_ADMIN';
 
-  TransparentUpgradeableProxy public constant COLLECTOR_PROXY =
-    TransparentUpgradeableProxy(payable(address(AaveV3Ethereum.COLLECTOR)));
+  ITransparentUpgradeableProxy public constant COLLECTOR_PROXY =
+    ITransparentUpgradeableProxy(payable(address(AaveV3Ethereum.COLLECTOR)));
   ICollector collector = ICollector(address(COLLECTOR_PROXY));
   PoolV3FinSteward public poolv3Steward;
   MainnetSwapSteward public steward;
@@ -83,7 +85,7 @@ contract MainnetSwapStewardTest is Test {
 
     uint256 streamID = collector.getNextStreamId();
 
-    ProxyAdmin(PROXY_ADMIN).upgrade(COLLECTOR_PROXY, address(new_collector_impl));
+    ProxyAdmin(PROXY_ADMIN).upgradeAndCall(COLLECTOR_PROXY, address(new_collector_impl), '');
     IAccessControl(ACL_MANAGER).grantRole(FUNDS_ADMIN_ROLE, address(steward));
     IAccessControl(ACL_MANAGER).grantRole(FUNDS_ADMIN_ROLE, EXECUTOR);
     collector.initialize(streamID);

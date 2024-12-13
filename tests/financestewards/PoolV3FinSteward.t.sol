@@ -12,10 +12,10 @@ import {PoolV3FinSteward, IPoolV3FinSteward} from 'src/financestewards/PoolV3Fin
 import {AggregatorInterface} from 'src/financestewards/AggregatorInterface.sol';
 import {CollectorUtils} from 'src/CollectorUtils.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
-import {TransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
+import {ITransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol'; 
 import {ICollector} from 'collector-upgrade-rev6/lib/aave-v3-origin/src/contracts/treasury/ICollector.sol';
 import {Collector} from 'collector-upgrade-rev6/lib/aave-v3-origin/src/contracts/treasury/Collector.sol';
-import {IAccessControl} from 'aave-v3-origin/core/contracts/dependencies/openzeppelin/contracts/IAccessControl.sol';
+import {IAccessControl} from 'openzeppelin-contracts/contracts/access/AccessControl.sol';
 
 /**
  * @dev Test for Finance Steward contract
@@ -37,8 +37,8 @@ contract PoolV3FinSteward_Test is Test {
   address public constant EXECUTOR = 0x5300A1a15135EA4dc7aD5a167152C01EFc9b192A;
   address public constant PROXY_ADMIN = 0xD3cF979e676265e4f6379749DECe4708B9A22476;
   address public constant ACL_MANAGER = 0xc2aaCf6553D20d1e9d78E365AAba8032af9c85b0;
-  TransparentUpgradeableProxy public constant COLLECTOR_PROXY =
-    TransparentUpgradeableProxy(payable(0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c));
+  ITransparentUpgradeableProxy public constant COLLECTOR_PROXY =
+    ITransparentUpgradeableProxy(payable(0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c));
   bytes32 public constant FUNDS_ADMIN_ROLE = 'FUNDS_ADMIN';
 
   ICollector collector = ICollector(address(COLLECTOR_PROXY));
@@ -65,7 +65,7 @@ contract PoolV3FinSteward_Test is Test {
 
     uint256 streamID = collector.getNextStreamId();
 
-    ProxyAdmin(PROXY_ADMIN).upgrade(COLLECTOR_PROXY, address(new_collector_impl));
+    ProxyAdmin(PROXY_ADMIN).upgradeAndCall(COLLECTOR_PROXY, address(new_collector_impl), '');
 
     IAccessControl(ACL_MANAGER).grantRole(FUNDS_ADMIN_ROLE, address(steward));
     IAccessControl(ACL_MANAGER).grantRole(FUNDS_ADMIN_ROLE, EXECUTOR);
