@@ -10,6 +10,7 @@ interface IMilkman {
   /// @param fromToken The token that the user wishes to sell.
   /// @param toToken The token that the user wishes to receive.
   /// @param to Who should receive the tokens.
+  /// @param appData The app data to be used in the CoW Protocol order.
   /// @param priceChecker A contract that verifies an order (mainly its minOut and fee) before Milkman signs it.
   /// @param priceCheckerData Data that gets passed to the price checker.
   function requestSwapExactTokensForTokens(
@@ -17,6 +18,7 @@ interface IMilkman {
     IERC20 fromToken,
     IERC20 toToken,
     address to,
+    bytes32 appData,
     address priceChecker,
     bytes calldata priceCheckerData
   ) external;
@@ -28,6 +30,7 @@ interface IMilkman {
     IERC20 fromToken,
     IERC20 toToken,
     address to,
+    bytes32 appData,
     address priceChecker,
     bytes calldata priceCheckerData
   ) external;

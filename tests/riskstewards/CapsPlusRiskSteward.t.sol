@@ -5,16 +5,16 @@ import 'forge-std/Test.sol';
 import {IACLManager, IPoolConfigurator, IPoolDataProvider} from 'aave-address-book/AaveV3.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {CapsPlusRiskSteward, CapsPlusRiskStewardErrors} from '../../src/riskstewards/CapsPlusRiskSteward.sol';
-import {IAaveV3ConfigEngine} from 'aave-v3-origin/periphery/contracts/v3-config-engine/IAaveV3ConfigEngine.sol';
-import {EngineFlags} from 'aave-v3-origin/periphery/contracts/v3-config-engine/EngineFlags.sol';
-import {GovernanceV3Ethereum} from "aave-address-book/GovernanceV3Ethereum.sol";
+import {IAaveV3ConfigEngine} from 'aave-v3-origin/contracts/extensions/v3-config-engine/IAaveV3ConfigEngine.sol';
+import {EngineFlags} from 'aave-v3-origin/contracts/extensions/v3-config-engine/EngineFlags.sol';
+import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 
 contract CapsPlusRiskSteward_Test is Test {
   address public constant user = address(42);
   CapsPlusRiskSteward public steward;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 20368412);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 20933854);
     steward = new CapsPlusRiskSteward(
       AaveV3Ethereum.AAVE_PROTOCOL_DATA_PROVIDER,
       IAaveV3ConfigEngine(AaveV3Ethereum.CONFIG_ENGINE),

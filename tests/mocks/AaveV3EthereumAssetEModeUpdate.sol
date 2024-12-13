@@ -17,7 +17,9 @@ contract AaveV3EthereumAssetEModeUpdate is AaveV3Payload {
 
     eModeUpdate[0] = IEngine.AssetEModeUpdate({
       asset: AaveV3EthereumAssets.rETH_UNDERLYING,
-      eModeCategory: 1
+      eModeCategory: 1,
+      borrowable: EngineFlags.ENABLED,
+      collateral: EngineFlags.ENABLED
     });
 
     return eModeUpdate;

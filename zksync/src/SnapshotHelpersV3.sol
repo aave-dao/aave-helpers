@@ -1,22 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-import {IERC20Detailed} from 'aave-v3-core/contracts/dependencies/openzeppelin/contracts/IERC20Detailed.sol';
-import {IPoolAddressesProvider} from 'aave-v3-core/contracts/interfaces/IPoolAddressesProvider.sol';
-import {IPoolDataProvider} from 'aave-v3-core/contracts/interfaces/IPoolDataProvider.sol';
-import {IPool} from 'aave-v3-core/contracts/interfaces/IPool.sol';
-import {IAaveOracle} from 'aave-v3-core/contracts/interfaces/IAaveOracle.sol';
-import {IPoolConfigurator} from 'aave-v3-core/contracts/interfaces/IPoolConfigurator.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
-import {ReserveConfiguration} from 'aave-v3-core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {IPoolAddressesProvider} from 'aave-v3-origin/contracts/interfaces/IPoolAddressesProvider.sol';
+import {IPoolDataProvider} from 'aave-v3-origin/contracts/interfaces/IPoolDataProvider.sol';
+import {IPool} from 'aave-v3-origin/contracts/interfaces/IPool.sol';
+import {IAaveOracle} from 'aave-v3-origin/contracts/interfaces/IAaveOracle.sol';
+import {IPoolConfigurator} from 'aave-v3-origin/contracts/interfaces/IPoolConfigurator.sol';
+import {ReserveConfiguration} from 'aave-v3-origin/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
 import {ExtendedAggregatorV2V3Interface} from '../../src/interfaces/ExtendedAggregatorV2V3Interface.sol';
-import {ProxyHelpers} from 'aave-v3-origin/../tests/utils/ProxyHelpers.sol';
+import {ProxyHelpers} from 'aave-v3-origin-tests/utils/ProxyHelpers.sol';
 import {CommonTestBase} from '../../src/CommonTestBase.sol';
-import {IDefaultInterestRateStrategyV2} from 'aave-v3-core/contracts/interfaces/IDefaultInterestRateStrategyV2.sol';
-import {ReserveConfig, ReserveTokens, DataTypes} from 'aave-v3-origin/../tests/utils/ProtocolV3TestBase.sol';
+import {IDefaultInterestRateStrategyV2} from 'aave-v3-origin/contracts/interfaces/IDefaultInterestRateStrategyV2.sol';
+import {ReserveConfig, ReserveTokens, DataTypes} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
 import {ProtocolV3TestBase as TestBase, LocalVars} from './ProtocolV3TestBase.sol';
 import {ILegacyDefaultInterestRateStrategy} from '../../src/dependencies/ILegacyDefaultInterestRateStrategy.sol';
-import {DiffUtils} from 'aave-v3-origin/../tests/utils/DiffUtils.sol';
+import {DiffUtils} from 'aave-v3-origin-tests/utils/DiffUtils.sol';
 
 contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
@@ -40,39 +39,60 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
     vm.serializeUint('root', 'chainId', block.chainid);
     if (reserveConfigs) writeReserveConfigs(path, configs, pool);
     if (strategyConfigs) writeStrategyConfigs(path, configs);
-    if (eModeConigs) writeEModeConfigs(path, configs, pool);
+    if (eModeConigs) writeEModeConfigs(path, pool);
     if (poolConfigs) writePoolConfiguration(path, pool);
 
     return configs;
   }
 
-  function writeEModeConfigs(
-    string memory path,
-    ReserveConfig[] memory configs,
-    IPool pool
-  ) public {
+  function writeEModeConfigs(string memory path, IPool pool) public {
     _switchOnZkVm();
     // keys for json stringification
     string memory eModesKey = 'emodes';
     string memory content = '{}';
     vm.serializeJson(eModesKey, '{}');
-
-    uint256[] memory usedCategories = new uint256[](configs.length);
-    for (uint256 i = 0; i < configs.length; i++) {
-      if (!_isInUint256Array(usedCategories, configs[i].eModeCategory)) {
-        usedCategories[i] = configs[i].eModeCategory;
-        DataTypes.EModeCategory memory category = pool.getEModeCategoryData(
-          uint8(configs[i].eModeCategory)
-        );
-        string memory key = vm.toString(configs[i].eModeCategory);
-        vm.serializeJson(key, '{}');
-        vm.serializeUint(key, 'eModeCategory', configs[i].eModeCategory);
-        vm.serializeString(key, 'label', category.label);
-        vm.serializeUint(key, 'ltv', category.ltv);
-        vm.serializeUint(key, 'liquidationThreshold', category.liquidationThreshold);
-        vm.serializeUint(key, 'liquidationBonus', category.liquidationBonus);
-        string memory object = vm.serializeAddress(key, 'priceSource', category.priceSource);
-        content = vm.serializeString(eModesKey, key, object);
+    uint8 emptyCounter = 0;
+    for (uint8 i = 0; i < 256; i++) {
+      try pool.getEModeCategoryCollateralConfig(i) returns (DataTypes.CollateralConfig memory cfg) {
+        if (cfg.liquidationThreshold == 0) {
+          if (++emptyCounter > 2) break;
+        } else {
+          string memory key = vm.toString(i);
+          vm.serializeJson(key, '{}');
+          vm.serializeUint(key, 'eModeCategory', i);
+          vm.serializeString(key, 'label', pool.getEModeCategoryLabel(i));
+          vm.serializeUint(key, 'ltv', cfg.ltv);
+          vm.serializeString(
+            key,
+            'collateralBitmap',
+            vm.toString(pool.getEModeCategoryCollateralBitmap(i))
+          );
+          vm.serializeString(
+            key,
+            'borrowableBitmap',
+            vm.toString(pool.getEModeCategoryBorrowableBitmap(i))
+          );
+          vm.serializeUint(key, 'liquidationThreshold', cfg.liquidationThreshold);
+          string memory object = vm.serializeUint(key, 'liquidationBonus', cfg.liquidationBonus);
+          content = vm.serializeString(eModesKey, key, object);
+          emptyCounter = 0;
+        }
+      } catch {
+        DataTypes.EModeCategoryLegacy memory category = pool.getEModeCategoryData(i);
+        if (category.liquidationThreshold == 0) {
+          if (++emptyCounter > 2) break;
+        } else {
+          string memory key = vm.toString(i);
+          vm.serializeJson(key, '{}');
+          vm.serializeUint(key, 'eModeCategory', i);
+          vm.serializeString(key, 'label', category.label);
+          vm.serializeUint(key, 'ltv', category.ltv);
+          vm.serializeUint(key, 'liquidationThreshold', category.liquidationThreshold);
+          vm.serializeUint(key, 'liquidationBonus', category.liquidationBonus);
+          string memory object = vm.serializeAddress(key, 'priceSource', category.priceSource);
+          content = vm.serializeString(eModesKey, key, object);
+          emptyCounter = 0;
+        }
       }
     }
     string memory output = vm.serializeString('root', 'eModes', content);
@@ -179,6 +199,7 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
     // keys for json stringification
     string memory reservesKey = 'reserves';
     string memory content = '{}';
+    vm.serializeJson(reservesKey, '{}');
 
     IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
     IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
@@ -189,7 +210,9 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       );
 
       string memory key = vm.toString(config.underlying);
+      vm.serializeJson(key, '{}');
       vm.serializeString(key, 'symbol', config.symbol);
+      vm.serializeUint(key, 'id', i);
       vm.serializeUint(key, 'ltv', config.ltv);
       vm.serializeUint(key, 'liquidationThreshold', config.liquidationThreshold);
       vm.serializeUint(key, 'liquidationBonus', config.liquidationBonus);
@@ -199,10 +222,8 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       vm.serializeUint(key, 'borrowCap', config.borrowCap);
       vm.serializeUint(key, 'supplyCap', config.supplyCap);
       vm.serializeUint(key, 'debtCeiling', config.debtCeiling);
-      vm.serializeUint(key, 'eModeCategory', config.eModeCategory);
       vm.serializeBool(key, 'usageAsCollateralEnabled', config.usageAsCollateralEnabled);
       vm.serializeBool(key, 'borrowingEnabled', config.borrowingEnabled);
-      vm.serializeBool(key, 'stableBorrowRateEnabled', config.stableBorrowRateEnabled);
       vm.serializeBool(key, 'isPaused', config.isPaused);
       vm.serializeBool(key, 'isActive', config.isActive);
       vm.serializeBool(key, 'isFrozen', config.isFrozen);
@@ -212,29 +233,14 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       vm.serializeAddress(key, 'interestRateStrategy', config.interestRateStrategy);
       vm.serializeAddress(key, 'underlying', config.underlying);
       vm.serializeAddress(key, 'aToken', config.aToken);
-      vm.serializeAddress(key, 'stableDebtToken', config.stableDebtToken);
       vm.serializeAddress(key, 'variableDebtToken', config.variableDebtToken);
       vm.serializeAddress(
         key,
         'aTokenImpl',
         ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(vm, config.aToken)
       );
-      vm.serializeString(key, 'aTokenSymbol', IERC20Detailed(config.aToken).symbol());
-      vm.serializeString(key, 'aTokenName', IERC20Detailed(config.aToken).name());
-      vm.serializeAddress(
-        key,
-        'stableDebtTokenImpl',
-        ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
-          vm,
-          config.stableDebtToken
-        )
-      );
-      vm.serializeString(
-        key,
-        'stableDebtTokenSymbol',
-        IERC20Detailed(config.stableDebtToken).symbol()
-      );
-      vm.serializeString(key, 'stableDebtTokenName', IERC20Detailed(config.stableDebtToken).name());
+      vm.serializeString(key, 'aTokenSymbol', IERC20Metadata(config.aToken).symbol());
+      vm.serializeString(key, 'aTokenName', IERC20Metadata(config.aToken).name());
       vm.serializeAddress(
         key,
         'variableDebtTokenImpl',
@@ -246,12 +252,12 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       vm.serializeString(
         key,
         'variableDebtTokenSymbol',
-        IERC20Detailed(config.variableDebtToken).symbol()
+        IERC20Metadata(config.variableDebtToken).symbol()
       );
       vm.serializeString(
         key,
         'variableDebtTokenName',
-        IERC20Detailed(config.variableDebtToken).name()
+        IERC20Metadata(config.variableDebtToken).name()
       );
       vm.serializeAddress(key, 'oracle', address(assetOracle));
       if (address(assetOracle) != address(0)) {
@@ -272,13 +278,17 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       }
 
       vm.serializeBool(key, 'virtualAccountingActive', config.virtualAccActive);
-      vm.serializeUint(key, 'virtualBalance', config.virtualBalance);
-      vm.serializeUint(key, 'aTokenUnderlyingBalance', config.aTokenUnderlyingBalance);
+      vm.serializeString(key, 'virtualBalance', vm.toString(config.virtualBalance));
+      vm.serializeString(
+        key,
+        'aTokenUnderlyingBalance',
+        vm.toString(config.aTokenUnderlyingBalance)
+      );
 
-      string memory out = vm.serializeUint(
+      string memory out = vm.serializeString(
         key,
         'oracleLatestAnswer',
-        uint256(oracle.getAssetPrice(config.underlying))
+        vm.toString(uint256(oracle.getAssetPrice(config.underlying)))
       );
       content = vm.serializeString(reservesKey, key, out);
     }

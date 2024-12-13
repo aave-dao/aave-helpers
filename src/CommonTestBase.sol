@@ -102,6 +102,14 @@ contract CommonTestBase is Test {
         return true;
       }
     }
+    if(block.chainid == ChainIds.AVALANCHE) {
+      // AUSD
+      if (asset == 0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a) {
+        vm.prank(0x2CD78aD719a8c74898c5283f5Bc70920D8A061fd);
+        IERC20(asset).transfer(user, amount);
+        return true;
+      }
+    }
     return false;
   }
 

@@ -6,6 +6,14 @@ on:
     types:
       - completed
 
+permissions:
+  actions: read
+  issues: write
+  checks: read
+  statuses: read
+  pull-requests: write
+
 jobs:
   test:
     uses: bgd-labs/github-workflows/.github/workflows/comment.yml@main
+    secrets: inherit

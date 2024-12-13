@@ -6,13 +6,13 @@ import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IReserveI
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
-import {ReserveConfiguration} from 'aave-v3-origin/core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {ReserveConfiguration} from 'aave-v3-origin/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
-import {DiffUtils} from 'aave-v3-origin/../tests/utils/DiffUtils.sol';
-import {ProtocolV3TestBase as RawProtocolV3TestBase, ReserveConfig, ReserveTokens} from 'aave-v3-origin/../tests/utils/ProtocolV3TestBase.sol';
+import {DiffUtils} from 'aave-v3-origin-tests/utils/DiffUtils.sol';
+import {ProtocolV3TestBase as RawProtocolV3TestBase, ReserveConfig, ReserveTokens} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
+import {ProxyHelpers} from 'aave-v3-origin-tests/utils/ProxyHelpers.sol';
 import {IInitializableAdminUpgradeabilityProxy} from '../../src/interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from '../../src/interfaces/ExtendedAggregatorV2V3Interface.sol';
-import {ProxyHelpers} from 'aave-v3-origin/../tests/utils/ProxyHelpers.sol';
 import {CommonTestBase} from '../../src/CommonTestBase.sol';
 import {SnapshotHelpersV3} from './SnapshotHelpersV3.sol';
 import {ILegacyDefaultInterestRateStrategy} from '../../src/dependencies/ILegacyDefaultInterestRateStrategy.sol';
@@ -168,11 +168,11 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
   function e2eTest(IPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ReserveConfig memory collateralConfig = _getGoodCollateral(configs);
-    uint256 snapshot = vm.snapshot();
+    uint256 snapshot = vm.snapshotState();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
         e2eTestAsset(pool, collateralConfig, configs[i]);
-        vm.revertTo(snapshot);
+        vm.revertToState(snapshot);
       } else {
         console.log('E2E: TestAsset %s SKIPPED', configs[i].symbol);
       }
@@ -210,20 +210,20 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     // GHO is a special case as it cannot be supplied
     if (testAssetConfig.underlying == AaveV3EthereumAssets.GHO_UNDERLYING) {
       _deposit(collateralConfig, pool, collateralSupplier, collateralAssetAmount);
-      uint256 snapshot = vm.snapshot();
+      uint256 snapshot = vm.snapshotState();
       // test variable borrowing
       if (testAssetConfig.borrowingEnabled) {
         _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount);
-        vm.revertTo(snapshot);
+        vm.revertToState(snapshot);
       }
     } else {
       _deposit(collateralConfig, pool, collateralSupplier, collateralAssetAmount);
       _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
-      uint256 snapshot = vm.snapshot();
+      uint256 snapshot = vm.snapshotState();
       // test withdrawal
       _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
       _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
-      vm.revertTo(snapshot);
+      vm.revertToState(snapshot);
       // test variable borrowing
       if (testAssetConfig.borrowingEnabled) {
         if (
@@ -234,7 +234,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
           return;
         }
         _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount);
-        vm.revertTo(snapshot);
+        vm.revertToState(snapshot);
       }
     }
   }
@@ -355,13 +355,9 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     vm.stopPrank();
   }
 
-  function _writeEModeConfigs(
-    string memory path,
-    ReserveConfig[] memory configs,
-    IPool pool
-  ) internal override {
+  function _writeEModeConfigs(string memory path, IPool pool) internal override {
     _switchOffZkVm();
-    return snapshotHelper.writeEModeConfigs(path, configs, pool);
+    return snapshotHelper.writeEModeConfigs(path, pool);
   }
 
   function _writeStrategyConfigs(

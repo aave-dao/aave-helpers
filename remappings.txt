@@ -1,6 +1,5 @@
 aave-address-book/=lib/aave-address-book/src/
 aave-v3-origin/=lib/aave-address-book/lib/aave-v3-origin/src/
-aave-v3-core/=lib/aave-address-book/lib/aave-v3-origin/src/core
-aave-v3-periphery/=lib/aave-address-book/lib/aave-v3-origin/src/periphery
+aave-v3-origin-tests/=lib/aave-address-book/lib/aave-v3-origin/tests
 forge-std/=lib/forge-std/src/
-solidity-utils/=lib/solidity-utils/src/
+solidity-utils/=lib/aave-address-book/lib/aave-v3-origin/lib/solidity-utils/src/

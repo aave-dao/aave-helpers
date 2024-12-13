@@ -11,7 +11,7 @@ import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV2Polygon} from 'aave-address-book/AaveV2Polygon.sol';
 import {AaveV2Avalanche} from 'aave-address-book/AaveV2Avalanche.sol';
 import 'solidity-utils/contracts/utils/ScriptUtils.sol';
-import {ITransparentProxyFactory} from 'solidity-utils/contracts/transparent-proxy/interfaces/ITransparentProxyFactory.sol';
+import {ITransparentProxyFactory, ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/interfaces/ITransparentProxyFactory.sol';
 import {V2RateStrategyFactory} from '../src/v2-config-engine/V2RateStrategyFactory.sol';
 
 library DeployV2RatesFactoryLib {
@@ -59,7 +59,7 @@ library DeployV2RatesFactoryLib {
     V2RateStrategyFactory ratesFactory = V2RateStrategyFactory(
       ITransparentProxyFactory(transparentProxyFactory).create(
         address(new V2RateStrategyFactory(addressesProvider)),
-        ownerForFactory,
+        ProxyAdmin(ownerForFactory),
         abi.encodeWithSelector(V2RateStrategyFactory.initialize.selector, uniqueStrategies)
       )
     );

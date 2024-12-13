@@ -124,13 +124,13 @@ contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
 
     return
       calculateInterestRates(
-      reserve,
-      availableLiquidity,
-      totalStableDebt,
-      totalVariableDebt,
-      averageStableBorrowRate,
-      reserveFactor
-    );
+        reserve,
+        availableLiquidity,
+        totalStableDebt,
+        totalVariableDebt,
+        averageStableBorrowRate,
+        reserveFactor
+      );
   }
 
   struct CalcInterestRatesLocalVars {
