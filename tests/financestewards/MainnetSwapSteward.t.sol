@@ -61,18 +61,19 @@ contract MainnetSwapStewardTest is Test {
     vm.createSelectFork(vm.rpcUrl('mainnet'), 21353255);
 
     Collector new_collector_impl = new Collector(ACL_MANAGER);
-    address v2Pool = address(AaveV2Ethereum.POOL);
+    address[] memory v2Pools = new address[](1);
+    v2Pools[0] = address(AaveV2Ethereum.POOL);
     address[] memory v3Pools = new address[](3);
     v3Pools[0] = address(AaveV3Ethereum.POOL);
     v3Pools[1] = 0x0AA97c284e98396202b6A04024F5E2c65026F3c0;
     v3Pools[2] = 0x4e033931ad43597d96D6bcc25c280717730B58B1;
-    poolv3Steward = new PoolV3FinSteward(GovernanceV3Ethereum.EXECUTOR_LVL_1, guardian, v2Pool, v3Pools);
+    poolv3Steward = new PoolV3FinSteward(GovernanceV3Ethereum.EXECUTOR_LVL_1, guardian,address(collector), v2Pools, v3Pools);
 
 
     steward = new MainnetSwapSteward(
       GovernanceV3Ethereum.EXECUTOR_LVL_1,
       guardian,
-      address(poolv3Steward)
+      address(collector)
     );
 
     vm.label(alice, 'alice');
@@ -103,212 +104,6 @@ contract MainnetSwapStewardTest is Test {
   }
 }
 
-contract Function_withdrawV2andSwap is MainnetSwapStewardTest {
-  function test_revertsIf_notOwnerOrQuardian() public {
-    vm.startPrank(alice);
-
-    vm.expectRevert('ONLY_BY_OWNER_OR_GUARDIAN');
-    steward.withdrawV2andSwap(
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      1_000e6,
-      AaveV3EthereumAssets.AAVE_UNDERLYING,
-      100
-    );
-    vm.stopPrank();
-  }
-
-  function test_resvertsIf_zeroAmount() public {
-    vm.startPrank(guardian);
-
-    vm.expectRevert(ISwapSteward.InvalidZeroAmount.selector);
-    steward.withdrawV2andSwap(
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      0,
-      AaveV3EthereumAssets.AAVE_UNDERLYING,
-      100
-    );
-    vm.stopPrank();
-  }
-
-  function test_resvertsIf_minimumBalanceShield() public {
-    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    poolv3Steward.setMinimumBalanceShield(AaveV2EthereumAssets.USDC_A_TOKEN, 1_000e6);
-
-    vm.startPrank(guardian);
-
-    uint256 currentBalance = IERC20(AaveV2EthereumAssets.USDC_A_TOKEN).balanceOf(
-      address(AaveV3Ethereum.COLLECTOR)
-    );
-
-    vm.expectRevert(
-      abi.encodeWithSelector(IPoolV3FinSteward.MinimumBalanceShield.selector, 1_000e6)
-    );
-    steward.withdrawV2andSwap(
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      currentBalance - 999e6,
-      AaveV3EthereumAssets.AAVE_UNDERLYING,
-      100
-    );
-    vm.stopPrank();
-  }
-
-  function test_resvertsIf_unrecognizedToken() public {
-    vm.startPrank(guardian);
-
-    vm.expectRevert(ISwapSteward.UnrecognizedToken.selector);
-    steward.withdrawV2andSwap(
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      1_000e6,
-      AaveV3EthereumAssets.AAVE_UNDERLYING,
-      100
-    );
-    vm.stopPrank();
-  }
-
-  function test_success() public {
-    uint256 balanceV2Before = IERC20(AaveV2EthereumAssets.USDC_A_TOKEN).balanceOf(
-      address(AaveV3Ethereum.COLLECTOR)
-    );
-    uint256 slippage = 100;
-
-    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    steward.setSwappableToken(AaveV3EthereumAssets.USDC_UNDERLYING, USDC_PRICE_FEED);
-    steward.setSwappableToken(AaveV3EthereumAssets.AAVE_UNDERLYING, AAVE_PRICE_FEED);
-
-    vm.startPrank(guardian);
-    vm.expectEmit(true, true, true, true, address(steward.SWAPPER()));
-    emit SwapRequested(
-      steward.MILKMAN(),
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      AaveV3EthereumAssets.AAVE_UNDERLYING,
-      USDC_PRICE_FEED,
-      AAVE_PRICE_FEED,
-      1_000e6,
-      address(AaveV3Ethereum.COLLECTOR),
-      slippage
-    );
-
-    steward.withdrawV2andSwap(
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      1_000e6,
-      AaveV3EthereumAssets.AAVE_UNDERLYING,
-      slippage
-    );
-
-    assertLt(
-      IERC20(AaveV2EthereumAssets.USDC_A_TOKEN).balanceOf(address(AaveV3Ethereum.COLLECTOR)),
-      balanceV2Before
-    );
-
-    vm.stopPrank();
-  }
-}
-
-contract Function_withdrawV3andSwap is MainnetSwapStewardTest {
-  function test_revertsIf_notOwnerOrQuardian() public {
-    vm.startPrank(alice);
-
-    vm.expectRevert('ONLY_BY_OWNER_OR_GUARDIAN');
-    steward.withdrawV3andSwap(
-      address(AaveV3Ethereum.POOL),
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      1_000e6,
-      AaveV3EthereumAssets.AAVE_UNDERLYING,
-      100
-    );
-    vm.stopPrank();
-  }
-
-  function test_resvertsIf_zeroAmount() public {
-    vm.startPrank(guardian);
-
-    vm.expectRevert(ISwapSteward.InvalidZeroAmount.selector);
-    steward.withdrawV3andSwap(
-      address(AaveV3Ethereum.POOL),
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      0,
-      AaveV3EthereumAssets.AAVE_UNDERLYING,
-      100
-    );
-    vm.stopPrank();
-  }
-
-  function test_resvertsIf_minimumBalanceShield() public {
-    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    poolv3Steward.setMinimumBalanceShield(AaveV3EthereumAssets.USDC_A_TOKEN, 1_000e6);
-
-    vm.startPrank(guardian);
-
-    uint256 currentBalance = IERC20(AaveV3EthereumAssets.USDC_A_TOKEN).balanceOf(
-      address(AaveV3Ethereum.COLLECTOR)
-    );
-
-    vm.expectRevert(
-      abi.encodeWithSelector(IPoolV3FinSteward.MinimumBalanceShield.selector, 1_000e6)
-    );
-    steward.withdrawV3andSwap(
-      address(AaveV3Ethereum.POOL),
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      currentBalance - 999e6,
-      AaveV3EthereumAssets.AAVE_UNDERLYING,
-      100
-    );
-    vm.stopPrank();
-  }
-
-  function test_resvertsIf_unrecognizedToken() public {
-    vm.startPrank(guardian);
-
-    vm.expectRevert(ISwapSteward.UnrecognizedToken.selector);
-    steward.withdrawV3andSwap(
-      address(AaveV3Ethereum.POOL),
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      1_000e6,
-      AaveV3EthereumAssets.AAVE_UNDERLYING,
-      100
-    );
-    vm.stopPrank();
-  }
-
-  function test_success() public {
-    uint256 balanceV3Before = IERC20(AaveV3EthereumAssets.USDC_A_TOKEN).balanceOf(
-      address(AaveV3Ethereum.COLLECTOR)
-    );
-    uint256 slippage = 100;
-
-    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    steward.setSwappableToken(AaveV3EthereumAssets.USDC_UNDERLYING, USDC_PRICE_FEED);
-    steward.setSwappableToken(AaveV3EthereumAssets.AAVE_UNDERLYING, AAVE_PRICE_FEED);
-
-    vm.startPrank(guardian);
-    vm.expectEmit(true, true, true, true, address(steward.SWAPPER()));
-    emit SwapRequested(
-      steward.MILKMAN(),
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      AaveV3EthereumAssets.AAVE_UNDERLYING,
-      USDC_PRICE_FEED,
-      AAVE_PRICE_FEED,
-      1_000e6,
-      address(AaveV3Ethereum.COLLECTOR),
-      slippage
-    );
-
-    steward.withdrawV3andSwap(
-      address(AaveV3Ethereum.POOL),
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      1_000e6,
-      AaveV3EthereumAssets.AAVE_UNDERLYING,
-      slippage
-    );
-
-    assertLt(
-      IERC20(AaveV3EthereumAssets.USDC_A_TOKEN).balanceOf(address(AaveV3Ethereum.COLLECTOR)),
-      balanceV3Before
-    );
-    vm.stopPrank();
-  }
-}
-
 contract Function_tokenSwap is MainnetSwapStewardTest {
   function test_revertsIf_notOwnerOrQuardian() public {
     vm.startPrank(alice);
@@ -336,27 +131,6 @@ contract Function_tokenSwap is MainnetSwapStewardTest {
     vm.stopPrank();
   }
 
-  function test_resvertsIf_minimumBalanceShield() public {
-    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    poolv3Steward.setMinimumBalanceShield(AaveV3EthereumAssets.USDC_UNDERLYING, 1_000e6);
-
-    vm.startPrank(guardian);
-
-    uint256 currentBalance = IERC20(AaveV3EthereumAssets.USDC_UNDERLYING).balanceOf(
-      address(AaveV3Ethereum.COLLECTOR)
-    );
-
-    vm.expectRevert(
-      abi.encodeWithSelector(IPoolV3FinSteward.MinimumBalanceShield.selector, 1_000e6)
-    );
-    steward.tokenSwap(
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      currentBalance - 999e6,
-      AaveV3EthereumAssets.AAVE_UNDERLYING,
-      100
-    );
-    vm.stopPrank();
-  }
 
   function test_resvertsIf_unrecognizedToken() public {
     vm.startPrank(guardian);
@@ -457,28 +231,6 @@ contract Function_setSwappableToken is MainnetSwapStewardTest {
   }
 }
 
-contract SetPoolV3Steward is MainnetSwapStewardTest {
-  function test_revertsIf_invalidCaller() public {
-    vm.expectRevert('Ownable: caller is not the owner');
-    steward.setPoolV3Steward(makeAddr('v3-steward'));
-  }
-
-  function test_revertsIf_invalidZeroAddress() public {
-    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    vm.expectRevert(ISwapSteward.InvalidZeroAddress.selector);
-    steward.setPoolV3Steward(address(0));
-  }
-
-  function test_successful() public {
-    address newSteward = makeAddr('v3-steward');
-    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    vm.expectEmit(true, true, true, true, address(steward));
-    emit PoolV3StewardUpdated(address(steward.POOLV3STEWARD()), newSteward);
-    steward.setPoolV3Steward(newSteward);
-
-    assertEq(address(steward.POOLV3STEWARD()), newSteward);
-  }
-}
 
 contract SetPriceChecker is MainnetSwapStewardTest {
   function test_revertsIf_invalidCaller() public {
