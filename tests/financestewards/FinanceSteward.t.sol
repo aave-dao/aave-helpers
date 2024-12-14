@@ -12,11 +12,10 @@ import {FinanceSteward, IFinanceSteward} from 'src/financestewards/FinanceStewar
 import {AggregatorInterface} from 'src/financestewards/AggregatorInterface.sol';
 import {CollectorUtils} from 'src/CollectorUtils.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
-import {ITransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol'; 
+import {ITransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {ICollector} from 'collector-upgrade-rev6/lib/aave-v3-origin/src/contracts/treasury/ICollector.sol';
 import {Collector} from 'collector-upgrade-rev6/lib/aave-v3-origin/src/contracts/treasury/Collector.sol';
 import {IAccessControl} from 'openzeppelin-contracts/contracts/access/AccessControl.sol';
-
 
 /**
  * Helper contract to mock price feed calls
@@ -71,23 +70,23 @@ contract FinanceSteward_Test is Test {
   address public constant EXECUTOR = 0x5300A1a15135EA4dc7aD5a167152C01EFc9b192A;
   address public constant PROXY_ADMIN = 0xD3cF979e676265e4f6379749DECe4708B9A22476;
   address public constant ACL_MANAGER = 0xc2aaCf6553D20d1e9d78E365AAba8032af9c85b0;
-  ITransparentUpgradeableProxy public constant COLLECTOR_PROXY = ITransparentUpgradeableProxy(0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c);
+  ITransparentUpgradeableProxy public constant COLLECTOR_PROXY =
+    ITransparentUpgradeableProxy(0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c);
   bytes32 public constant FUNDS_ADMIN_ROLE = 'FUNDS_ADMIN';
 
   ICollector collector = ICollector(address(COLLECTOR_PROXY));
 
-
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'),21244865);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 21244865);
     steward = new FinanceSteward(GovernanceV3Ethereum.EXECUTOR_LVL_1, guardian, address(collector));
 
     Collector new_collector_impl = new Collector(ACL_MANAGER);
 
-    vm.label(0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c, "Collector");
-    vm.label(alice, "alice");
-    vm.label(guardian, "guardian");
-    vm.label(EXECUTOR, "EXECUTOR");
-    vm.label(address(steward), "FinanceSteward");
+    vm.label(0x464C71f6c2F760DdA6093dCB91C24c39e5d6e18c, 'Collector');
+    vm.label(alice, 'alice');
+    vm.label(guardian, 'guardian');
+    vm.label(EXECUTOR, 'EXECUTOR');
+    vm.label(address(steward), 'FinanceSteward');
 
     vm.startPrank(EXECUTOR);
 
@@ -102,7 +101,7 @@ contract FinanceSteward_Test is Test {
 
     vm.stopPrank();
 
-     vm.prank(0x4B16c5dE96EB2117bBE5fd171E4d203624B014aa); //RANDOM USDC HOLDER
+    vm.prank(0x4B16c5dE96EB2117bBE5fd171E4d203624B014aa); //RANDOM USDC HOLDER
     IERC20(AaveV3EthereumAssets.USDC_UNDERLYING).transfer(
       address(AaveV3Ethereum.COLLECTOR),
       1_000_000e6
@@ -184,13 +183,25 @@ contract Function_approve is FinanceSteward_Test {
     emit BudgetUpdate(AaveV3EthereumAssets.USDC_UNDERLYING, 1_000e6);
     steward.increaseBudget(AaveV3EthereumAssets.USDC_UNDERLYING, 1_000e6);
 
-    assertEq(IERC20(AaveV3EthereumAssets.USDC_UNDERLYING).allowance(address(AaveV3Ethereum.COLLECTOR), alice), 0);
+    assertEq(
+      IERC20(AaveV3EthereumAssets.USDC_UNDERLYING).allowance(
+        address(AaveV3Ethereum.COLLECTOR),
+        alice
+      ),
+      0
+    );
 
     vm.startPrank(guardian);
     steward.approve(AaveV3EthereumAssets.USDC_UNDERLYING, alice, 1_000e6);
     vm.stopPrank();
 
-    assertEq(IERC20(AaveV3EthereumAssets.USDC_UNDERLYING).allowance(address(AaveV3Ethereum.COLLECTOR), alice), 1_000e6);
+    assertEq(
+      IERC20(AaveV3EthereumAssets.USDC_UNDERLYING).allowance(
+        address(AaveV3Ethereum.COLLECTOR),
+        alice
+      ),
+      1_000e6
+    );
   }
 }
 
@@ -259,13 +270,18 @@ contract Function_transfer is FinanceSteward_Test {
     steward.setWhitelistedReceiver(alice);
     steward.increaseBudget(AaveV3EthereumAssets.USDC_UNDERLYING, 1_000e6);
 
-    uint256 balance = IERC20(AaveV3EthereumAssets.USDC_UNDERLYING).balanceOf(address(AaveV3Ethereum.COLLECTOR));
+    uint256 balance = IERC20(AaveV3EthereumAssets.USDC_UNDERLYING).balanceOf(
+      address(AaveV3Ethereum.COLLECTOR)
+    );
 
     vm.startPrank(guardian);
 
     steward.transfer(AaveV3EthereumAssets.USDC_UNDERLYING, alice, 1_000e6);
 
-    assertEq(IERC20(AaveV3EthereumAssets.USDC_UNDERLYING).balanceOf(address(AaveV3Ethereum.COLLECTOR)), balance - 1_000e6);
+    assertEq(
+      IERC20(AaveV3EthereumAssets.USDC_UNDERLYING).balanceOf(address(AaveV3Ethereum.COLLECTOR)),
+      balance - 1_000e6
+    );
     vm.stopPrank();
   }
 }
@@ -420,9 +436,9 @@ contract Function_createStream is FinanceSteward_Test {
 }
 
 contract Function_cancelStream is FinanceSteward_Test {
-uint256 constant STREAM_ID = uint256(100050);
-  function test_revertsIf_notOwnerOrQuardian() public {
+  uint256 constant STREAM_ID = uint256(100050);
 
+  function test_revertsIf_notOwnerOrQuardian() public {
     vm.startPrank(alice);
 
     vm.expectRevert('ONLY_BY_OWNER_OR_GUARDIAN');
@@ -431,7 +447,7 @@ uint256 constant STREAM_ID = uint256(100050);
   }
 
   function test_success() public {
-  (      address sender,,,,,,,  ) = collector.getStream(STREAM_ID);
+    (address sender, , , , , , , ) = collector.getStream(STREAM_ID);
     assertNotEq(sender, address(0));
     vm.startPrank(guardian);
     steward.cancelStream(STREAM_ID);

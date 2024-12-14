@@ -12,7 +12,7 @@ import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.
 import {ICollector} from 'collector-upgrade-rev6/lib/aave-v3-origin/src/contracts/treasury/ICollector.sol';
 import {Collector} from 'collector-upgrade-rev6/lib/aave-v3-origin/src/contracts/treasury/Collector.sol';
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
-import {ITransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol'; 
+import {ITransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol';
 import {MainnetSwapSteward, ISwapSteward} from 'src/financestewards/MainnetSwapSteward.sol';
 import {AggregatorInterface} from 'src/financestewards/AggregatorInterface.sol';
 import {CollectorUtils} from 'src/CollectorUtils.sol';
@@ -124,7 +124,6 @@ contract Function_tokenSwap is MainnetSwapStewardTest {
     vm.stopPrank();
   }
 
-
   function test_resvertsIf_unrecognizedToken() public {
     vm.startPrank(guardian);
 
@@ -223,7 +222,6 @@ contract Function_setSwappableToken is MainnetSwapStewardTest {
     vm.stopPrank();
   }
 }
-
 
 contract SetPriceChecker is MainnetSwapStewardTest {
   function test_revertsIf_invalidCaller() public {
