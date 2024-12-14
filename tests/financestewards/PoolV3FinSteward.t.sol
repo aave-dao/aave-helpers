@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import 'forge-std/Test.sol';
+import {Test} from 'forge-std/Test.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
@@ -349,27 +349,5 @@ contract Function_revokePool is PoolV3FinSteward_Test {
     emit RevokedPool(address(AaveV3Ethereum.POOL));
     steward.revokePool(address(AaveV3Ethereum.POOL), true);
     vm.stopPrank();
-  }
-}
-
-contract Function_validateV3Pool is PoolV3FinSteward_Test {
-  function test_revertsIf_v3PoolIsNotSet() public {
-    vm.expectRevert(IPoolV3FinSteward.UnrecognizedPool.selector);
-    steward.validateV3Pool(makeAddr('v3-pool'));
-  }
-
-  function test_successful() public {
-    steward.validateV3Pool(address(AaveV3Ethereum.POOL));
-  }
-}
-
-contract Function_validateV2Pool is PoolV3FinSteward_Test {
-  function test_revertsIf_v2PoolIsNotSet() public {
-    vm.expectRevert(IPoolV3FinSteward.UnrecognizedPool.selector);
-    steward.validateV2Pool(makeAddr('v2-pool'));
-  }
-
-  function test_successful() public {
-    steward.validateV2Pool(address(AaveV2Ethereum.POOL));
   }
 }

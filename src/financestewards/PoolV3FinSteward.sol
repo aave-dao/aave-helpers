@@ -111,18 +111,6 @@ contract PoolV3FinSteward is OwnableWithGuardian, IPoolV3FinSteward {
         CU.depositToV3(COLLECTOR, depositData);
     }
 
-    /// Getter functions
-
-    /// @inheritdoc IPoolV3FinSteward
-    function validateV3Pool(address pool) external view {
-        _validateV3Pool(pool);
-    }
-
-    /// @inheritdoc IPoolV3FinSteward
-    function validateV2Pool(address pool) external view {
-        _validateV2Pool(pool);
-    }
-
     /// DAO Actions
 
     /// @inheritdoc IPoolV3FinSteward

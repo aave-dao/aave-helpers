@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import 'forge-std/Test.sol';
+import {Test} from 'forge-std/Test.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
@@ -14,12 +14,9 @@ import {Collector} from 'collector-upgrade-rev6/lib/aave-v3-origin/src/contracts
 import {ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/ProxyAdmin.sol';
 import {ITransparentUpgradeableProxy} from 'solidity-utils/contracts/transparent-proxy/TransparentUpgradeableProxy.sol'; 
 import {MainnetSwapSteward, ISwapSteward} from 'src/financestewards/MainnetSwapSteward.sol';
-import {PoolV3FinSteward, IPoolV3FinSteward} from 'src/financestewards/PoolV3FinSteward.sol';
 import {AggregatorInterface} from 'src/financestewards/AggregatorInterface.sol';
 import {CollectorUtils} from 'src/CollectorUtils.sol';
 import {IAccessControl} from 'openzeppelin-contracts/contracts/access/AccessControl.sol';
-
-
 
 /**
  * @dev Test for SwapSteward contract
@@ -27,7 +24,6 @@ import {IAccessControl} from 'openzeppelin-contracts/contracts/access/AccessCont
  */
 contract MainnetSwapStewardTest is Test {
   event MilkmanAddressUpdated(address oldAddress, address newAddress);
-  event PoolV3StewardUpdated(address oldAddress, address newAddress);
   event PriceCheckerUpdated(address oldAddress, address newAddress);
   event SwapRequested(
     address milkman,
@@ -54,7 +50,6 @@ contract MainnetSwapStewardTest is Test {
   ITransparentUpgradeableProxy public constant COLLECTOR_PROXY =
     ITransparentUpgradeableProxy(payable(address(AaveV3Ethereum.COLLECTOR)));
   ICollector collector = ICollector(address(COLLECTOR_PROXY));
-  PoolV3FinSteward public poolv3Steward;
   MainnetSwapSteward public steward;
 
   function setUp() public {
@@ -67,8 +62,6 @@ contract MainnetSwapStewardTest is Test {
     v3Pools[0] = address(AaveV3Ethereum.POOL);
     v3Pools[1] = 0x0AA97c284e98396202b6A04024F5E2c65026F3c0;
     v3Pools[2] = 0x4e033931ad43597d96D6bcc25c280717730B58B1;
-    poolv3Steward = new PoolV3FinSteward(GovernanceV3Ethereum.EXECUTOR_LVL_1, guardian,address(collector), v2Pools, v3Pools);
-
 
     steward = new MainnetSwapSteward(
       GovernanceV3Ethereum.EXECUTOR_LVL_1,

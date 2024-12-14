@@ -74,14 +74,6 @@ interface IPoolV3FinSteward {
     uint256 amount
   ) external;
 
-  /// @notice Checks whether a V3 pool instance is configured to be interacted with
-  /// @param pool Address of the V3 pool to check
-  function validateV3Pool(address pool) external view;
-
-  /// @notice Checks whether a V2 pool instance is configured to be interacted with
-  /// @param pool Address of the V2 pool to check
-  function validateV2Pool(address pool) external view;
-
   /// @notice Approves the permission to use a new pool
   /// @param pool Address of the new Pool
   /// @param version3 True if new pool is a V3 isntance
