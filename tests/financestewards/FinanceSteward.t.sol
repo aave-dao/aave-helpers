@@ -57,7 +57,6 @@ contract FinanceSteward_Test is Test {
   event BudgetUpdate(address indexed token, uint newAmount);
   event SwapApprovedToken(address indexed token, address indexed oracleUSD);
   event ReceiverWhitelisted(address indexed receiver);
-  event MinimumTokenBalanceUpdated(address indexed token, uint newAmount);
   event Upgraded(address indexed impl);
 
   address public constant guardian = address(82);
@@ -144,22 +143,6 @@ contract Function_approve is FinanceSteward_Test {
     vm.stopPrank();
   }
 
-  function test_resvertsIf_minimumBalanceShield() public {
-    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    steward.setWhitelistedReceiver(alice);
-    steward.setMinimumBalanceShield(AaveV3EthereumAssets.USDC_UNDERLYING, 1_000e6);
-
-    vm.startPrank(guardian);
-
-    uint256 currentBalance = IERC20(AaveV3EthereumAssets.USDC_UNDERLYING).balanceOf(
-      address(AaveV3Ethereum.COLLECTOR)
-    );
-
-    vm.expectRevert(abi.encodeWithSelector(IFinanceSteward.MinimumBalanceShield.selector, 1_000e6));
-    steward.approve(AaveV3EthereumAssets.USDC_UNDERLYING, alice, currentBalance - 999e6);
-    vm.stopPrank();
-  }
-
   function test_resvertsIf_exceedsBudget() public {
     vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
     steward.setWhitelistedReceiver(alice);
@@ -234,22 +217,6 @@ contract Function_transfer is FinanceSteward_Test {
 
     vm.expectRevert(IFinanceSteward.ExceedsBalance.selector);
     steward.transfer(AaveV3EthereumAssets.USDC_UNDERLYING, alice, currentBalance + 1_000e6);
-    vm.stopPrank();
-  }
-
-  function test_resvertsIf_minimumBalanceShield() public {
-    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    steward.setWhitelistedReceiver(alice);
-    steward.setMinimumBalanceShield(AaveV3EthereumAssets.USDC_UNDERLYING, 1_000e6);
-
-    vm.startPrank(guardian);
-
-    uint256 currentBalance = IERC20(AaveV3EthereumAssets.USDC_UNDERLYING).balanceOf(
-      address(AaveV3Ethereum.COLLECTOR)
-    );
-
-    vm.expectRevert(abi.encodeWithSelector(IFinanceSteward.MinimumBalanceShield.selector, 1_000e6));
-    steward.transfer(AaveV3EthereumAssets.USDC_UNDERLYING, alice, currentBalance - 999e6);
     vm.stopPrank();
   }
 
@@ -363,29 +330,6 @@ contract Function_createStream is FinanceSteward_Test {
     vm.startPrank(guardian);
 
     vm.expectRevert(IFinanceSteward.ExceedsBalance.selector);
-    steward.createStream(alice, data);
-    vm.stopPrank();
-  }
-
-  function test_resvertsIf_minimumBalanceShield() public {
-    uint256 currentBalance = IERC20(AaveV3EthereumAssets.USDC_UNDERLYING).balanceOf(
-      address(AaveV3Ethereum.COLLECTOR)
-    );
-
-    IFinanceSteward.StreamData memory data = IFinanceSteward.StreamData(
-      AaveV3EthereumAssets.USDC_UNDERLYING,
-      currentBalance - 999e6,
-      block.timestamp,
-      block.timestamp + DURATION
-    );
-
-    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-    steward.setWhitelistedReceiver(alice);
-    steward.setMinimumBalanceShield(AaveV3EthereumAssets.USDC_UNDERLYING, 1_000e6);
-
-    vm.startPrank(guardian);
-
-    vm.expectRevert(abi.encodeWithSelector(IFinanceSteward.MinimumBalanceShield.selector, 1_000e6));
     steward.createStream(alice, data);
     vm.stopPrank();
   }
@@ -530,25 +474,6 @@ contract Function_setWhitelistedReceiver is FinanceSteward_Test {
     vm.expectEmit(true, true, true, true, address(steward));
     emit ReceiverWhitelisted(alice);
     steward.setWhitelistedReceiver(alice);
-    vm.stopPrank();
-  }
-}
-
-contract Function_setMinimumBalanceShield is FinanceSteward_Test {
-  function test_revertsIf_notOwner() public {
-    vm.startPrank(alice);
-
-    vm.expectRevert('Ownable: caller is not the owner');
-    steward.setMinimumBalanceShield(AaveV3EthereumAssets.USDC_UNDERLYING, 1_000e6);
-    vm.stopPrank();
-  }
-
-  function test_success() public {
-    vm.startPrank(GovernanceV3Ethereum.EXECUTOR_LVL_1);
-
-    vm.expectEmit(true, true, true, true, address(steward));
-    emit MinimumTokenBalanceUpdated(AaveV3EthereumAssets.USDC_UNDERLYING, 1_000e6);
-    steward.setMinimumBalanceShield(AaveV3EthereumAssets.USDC_UNDERLYING, 1_000e6);
     vm.stopPrank();
   }
 }

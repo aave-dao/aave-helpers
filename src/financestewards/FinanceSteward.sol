@@ -27,9 +27,6 @@ contract FinanceSteward is OwnableWithGuardian, IFinanceSteward {
   /// @inheritdoc IFinanceSteward
   mapping(address token => uint256 budget) public tokenBudget;
 
-  /// @inheritdoc IFinanceSteward
-  mapping(address token => uint256 minimumBalanceLeft) public minTokenBalance;
-
   constructor(address _owner, address _guardian, address collector) {
     _transferOwnership(_owner);
     _updateGuardian(_guardian);
@@ -99,12 +96,6 @@ contract FinanceSteward is OwnableWithGuardian, IFinanceSteward {
     emit ReceiverWhitelisted(to);
   }
 
-  /// @inheritdoc IFinanceSteward
-  function setMinimumBalanceShield(address token, uint256 amount) external onlyOwner {
-    minTokenBalance[token] = amount;
-    emit MinimumTokenBalanceUpdated(token, amount);
-  }
-
   /// Logic
 
   /// @dev Internal function to validate a transfer's parameters
@@ -116,11 +107,6 @@ contract FinanceSteward is OwnableWithGuardian, IFinanceSteward {
     uint256 currentBalance = IERC20(token).balanceOf(address(COLLECTOR));
     if (currentBalance < amount) {
       revert ExceedsBalance();
-    }
-    if (minTokenBalance[token] > 0) {
-      if (currentBalance - amount < minTokenBalance[token]) {
-        revert MinimumBalanceShield(minTokenBalance[token]);
-      }
     }
 
     uint256 currentBudget = tokenBudget[token];

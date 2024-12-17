@@ -48,10 +48,6 @@ interface IFinanceSteward {
   /// @dev Start time cannot be greater than end time
   error InvalidDate();
 
-  /// @dev Cannot deplete reserves to less than minimum allowed
-  /// @param minimumBalance The minimum allowed balance to keep in the Collector
-  error MinimumBalanceShield(uint256 minimumBalance);
-
   /// @dev Slippage is too high
   error InvalidSlippage();
 
@@ -78,11 +74,6 @@ interface IFinanceSteward {
   /// @param receiver The address that has been whitelisted
   event ReceiverWhitelisted(address indexed receiver);
 
-  /// @notice Emitted when the minimum balance for a token is updated
-  /// @param token The address of the token
-  /// @param newAmount The new minimum balance for the token
-  event MinimumTokenBalanceUpdated(address indexed token, uint256 newAmount);
-
   /// @notice Returns instance of Aave V3 Collector
   function COLLECTOR() external view returns (ICollector);
 
@@ -93,10 +84,6 @@ interface IFinanceSteward {
   /// @notice Returns remaining budget for FinanceSteward to use with respective token
   /// @param token Address of the token to swap/transfer
   function tokenBudget(address token) external view returns (uint256);
-
-  /// @notice Returns minimum balance of token to keep in Aave Pools
-  /// @param token Address of the token to check balance for
-  function minTokenBalance(address token) external view returns (uint256);
 
   /// @notice Approves a specified amount of a token for transfer to a recipient
   /// @param token The address of the token to approve
@@ -132,9 +119,4 @@ interface IFinanceSteward {
   /// @notice Sets an address as a whitelisted receiver for transfers
   /// @param to The address to whitelist
   function setWhitelistedReceiver(address to) external;
-
-  /// @notice Sets the minimum balance shield for a specified token
-  /// @param token The address of the token
-  /// @param amount The minimum balance to shield
-  function setMinimumBalanceShield(address token, uint256 amount) external;
 }
