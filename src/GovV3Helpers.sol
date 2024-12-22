@@ -239,7 +239,7 @@ library GovV3Helpers {
     return Create2UtilsZkSync.computeCreate2Address('v1', bytecodeHash, arguments);
   }
 
-  function deployTransparentUpgradableProxy(
+  function deployTransparentUpgradeableProxy(
     address transparentProxyFactory,
     address proxyAdmin,
     address implementation,
@@ -253,7 +253,7 @@ library GovV3Helpers {
       );
   }
 
-  function deployDeterministicTransparentUpgradableProxy(
+  function deployDeterministicTransparentUpgradeableProxy(
     address transparentProxyFactory,
     address proxyAdmin,
     address implementation,
@@ -268,7 +268,7 @@ library GovV3Helpers {
       );
   }
 
-  function predictDeterministicTransparentUpgradableProxy(
+  function predictDeterministicTransparentUpgradeableProxy(
     address transparentProxyFactory,
     address proxyAdmin,
     address implementation,
