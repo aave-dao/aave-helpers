@@ -26,6 +26,7 @@ import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
 import {Create2Utils} from 'solidity-utils/contracts/utils/ScriptUtils.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 import {Create2UtilsZkSync} from 'solidity-utils/../zksync/src/contracts/utils/ScriptUtilsZkSync.sol';
+import {ITransparentProxyFactory, ProxyAdmin} from 'solidity-utils/contracts/transparent-proxy/interfaces/ITransparentProxyFactory.sol';
 
 interface IGovernance_V2_5 {
   /**
@@ -158,17 +159,17 @@ library GovV3Helpers {
     IVotingMachineWithProofs(machine).submitVote(proposalId, support, votingBalanceProofs);
   }
 
-  // Deploys using the unsanitized bytecodeHash we get via `type(Contract).creationCode`
-  function deployDeterministicZkSync(bytes memory bytecodeHash) internal returns (address) {
-    return Create2UtilsZkSync.create2Deploy('v1', bytecodeHash);
+  // for zksync creation code check Create2UtilsZkSync documentation
+  function deployDeterministicZkSync(bytes memory creationCode) internal returns (address) {
+    return Create2UtilsZkSync.create2Deploy('v1', creationCode);
   }
 
-  // Deploys using the unsanitized bytecodeHash we get via `type(Contract).creationCode`
+  // for zksync creation code check Create2UtilsZkSync documentation
   function deployDeterministicZkSync(
-    bytes memory bytecodeHash,
+    bytes memory creationCode,
     bytes memory arguments
   ) internal returns (address) {
-    return Create2UtilsZkSync.create2Deploy('v1', bytecodeHash, arguments);
+    return Create2UtilsZkSync.create2Deploy('v1', creationCode, arguments);
   }
 
   // Deploys using the sanitized bytecodeHash
@@ -212,6 +213,21 @@ library GovV3Helpers {
     return Create2Utils.computeCreate2Address('v1', bytecode, arguments);
   }
 
+  // for zksync creation code check Create2UtilsZkSync documentation
+  function predictDeterministicAddressZkSync(
+    bytes memory creationCode
+  ) internal pure returns (address) {
+    return Create2UtilsZkSync.computeCreate2Address('v1', creationCode);
+  }
+
+  // for zksync creation code check Create2UtilsZkSync documentation
+  function predictDeterministicAddressZkSync(
+    bytes memory creationCode,
+    bytes memory arguments
+  ) internal pure returns (address) {
+    return Create2UtilsZkSync.computeCreate2Address('v1', creationCode, arguments);
+  }
+
   function predictDeterministicAddressZkSync(bytes32 bytecodeHash) internal pure returns (address) {
     return Create2UtilsZkSync.computeCreate2Address('v1', bytecodeHash);
   }
@@ -223,13 +239,34 @@ library GovV3Helpers {
     return Create2UtilsZkSync.computeCreate2Address('v1', bytecodeHash, arguments);
   }
 
-  function buildActionZkSync(
-    Vm vm,
-    string memory contractName
-  ) internal view returns (IPayloadsControllerCore.ExecutionAction memory) {
-    bytes32 bytecodeHash = _getBytecodeHashFromArtifacts(vm, contractName);
-    address payloadAddress = predictDeterministicAddressZkSync(bytecodeHash);
-    return buildAction(payloadAddress);
+  function deployDeterministicTransparentUpgradableProxy(
+    address transparentProxyFactory,
+    address proxyAdmin,
+    address implementation,
+    bytes memory initData
+  ) internal returns (address) {
+    return
+      ITransparentProxyFactory(transparentProxyFactory).createDeterministic(
+        implementation,
+        ProxyAdmin(proxyAdmin),
+        initData,
+        'v1'
+      );
+  }
+
+  function predictDeterministicTransparentUpgradableProxy(
+    address transparentProxyFactory,
+    address proxyAdmin,
+    address implementation,
+    bytes memory initData
+  ) internal view returns (address) {
+    return
+      ITransparentProxyFactory(transparentProxyFactory).predictCreateDeterministic(
+        implementation,
+        ProxyAdmin(proxyAdmin),
+        initData,
+        'v1'
+      );
   }
 
   function _getBytecodeHashFromArtifacts(
@@ -248,6 +285,15 @@ library GovV3Helpers {
 
     require(bytecodeHash != (bytes32(0)), 'Unable to fetch bytecodeHash from the zkout artifacts');
     return bytecodeHash;
+  }
+
+  function buildActionZkSync(
+    Vm vm,
+    string memory contractName
+  ) internal view returns (IPayloadsControllerCore.ExecutionAction memory) {
+    bytes32 bytecodeHash = _getBytecodeHashFromArtifacts(vm, contractName);
+    address payloadAddress = predictDeterministicAddressZkSync(bytecodeHash);
+    return buildAction(payloadAddress);
   }
 
   /**
