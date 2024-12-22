@@ -81,6 +81,8 @@ library GovV3Helpers {
     bytes accountStateProofRLP;
   }
 
+  bytes32 constant private SALT = 'v1';
+
   function ipfsHashFile(Vm vm, string memory filePath) internal returns (bytes32) {
     return IpfsUtils.ipfsHashFile(vm, filePath, false);
   }
@@ -161,7 +163,7 @@ library GovV3Helpers {
 
   // for zksync creation code check Create2UtilsZkSync documentation
   function deployDeterministicZkSync(bytes memory creationCode) internal returns (address) {
-    return Create2UtilsZkSync.create2Deploy('v1', creationCode);
+    return Create2UtilsZkSync.create2Deploy(SALT, creationCode);
   }
 
   // for zksync creation code check Create2UtilsZkSync documentation
@@ -169,12 +171,12 @@ library GovV3Helpers {
     bytes memory creationCode,
     bytes memory arguments
   ) internal returns (address) {
-    return Create2UtilsZkSync.create2Deploy('v1', creationCode, arguments);
+    return Create2UtilsZkSync.create2Deploy(SALT, creationCode, arguments);
   }
 
   // Deploys using the sanitized bytecodeHash
   function deployDeterministicZkSync(bytes32 bytecodeHash) internal returns (address) {
-    return Create2UtilsZkSync.create2Deploy('v1', bytecodeHash);
+    return Create2UtilsZkSync.create2Deploy(SALT, bytecodeHash);
   }
 
   // Deploys using the sanitized bytecodeHash
@@ -182,42 +184,42 @@ library GovV3Helpers {
     bytes32 bytecodeHash,
     bytes memory arguments
   ) internal returns (address) {
-    return Create2UtilsZkSync.create2Deploy('v1', bytecodeHash, arguments);
+    return Create2UtilsZkSync.create2Deploy(SALT, bytecodeHash, arguments);
   }
 
   /**
    * Deploys a contract with a constant salt
    */
   function deployDeterministic(bytes memory bytecode) internal returns (address) {
-    return Create2Utils.create2Deploy('v1', bytecode);
+    return Create2Utils.create2Deploy(SALT, bytecode);
   }
 
   function deployDeterministic(
     bytes memory bytecode,
     bytes memory arguments
   ) internal returns (address) {
-    return Create2Utils.create2Deploy('v1', bytecode, arguments);
+    return Create2Utils.create2Deploy(SALT, bytecode, arguments);
   }
 
   /**
    * Predicts the payload based on a constant salt
    */
   function predictDeterministicAddress(bytes memory bytecode) internal pure returns (address) {
-    return Create2Utils.computeCreate2Address('v1', bytecode);
+    return Create2Utils.computeCreate2Address(SALT, bytecode);
   }
 
   function predictDeterministicAddress(
     bytes memory bytecode,
     bytes memory arguments
   ) internal pure returns (address) {
-    return Create2Utils.computeCreate2Address('v1', bytecode, arguments);
+    return Create2Utils.computeCreate2Address(SALT, bytecode, arguments);
   }
 
   // for zksync creation code check Create2UtilsZkSync documentation
   function predictDeterministicAddressZkSync(
     bytes memory creationCode
   ) internal pure returns (address) {
-    return Create2UtilsZkSync.computeCreate2Address('v1', creationCode);
+    return Create2UtilsZkSync.computeCreate2Address(SALT, creationCode);
   }
 
   // for zksync creation code check Create2UtilsZkSync documentation
@@ -225,18 +227,18 @@ library GovV3Helpers {
     bytes memory creationCode,
     bytes memory arguments
   ) internal pure returns (address) {
-    return Create2UtilsZkSync.computeCreate2Address('v1', creationCode, arguments);
+    return Create2UtilsZkSync.computeCreate2Address(SALT, creationCode, arguments);
   }
 
   function predictDeterministicAddressZkSync(bytes32 bytecodeHash) internal pure returns (address) {
-    return Create2UtilsZkSync.computeCreate2Address('v1', bytecodeHash);
+    return Create2UtilsZkSync.computeCreate2Address(SALT, bytecodeHash);
   }
 
   function predictDeterministicAddressZkSync(
     bytes32 bytecodeHash,
     bytes memory arguments
   ) internal pure returns (address) {
-    return Create2UtilsZkSync.computeCreate2Address('v1', bytecodeHash, arguments);
+    return Create2UtilsZkSync.computeCreate2Address(SALT, bytecodeHash, arguments);
   }
 
   function deployTransparentUpgradeableProxy(
@@ -264,7 +266,7 @@ library GovV3Helpers {
         implementation,
         ProxyAdmin(proxyAdmin),
         initData,
-        'v1'
+        SALT
       );
   }
 
@@ -279,7 +281,7 @@ library GovV3Helpers {
         implementation,
         ProxyAdmin(proxyAdmin),
         initData,
-        'v1'
+        SALT
       );
   }
 
