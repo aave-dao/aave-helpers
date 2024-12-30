@@ -24,13 +24,10 @@ contract MainnetSwapSteward is OwnableWithGuardian, ISwapSteward {
   uint256 public constant MAX_SLIPPAGE = 1000; // 10%
 
   /// @inheritdoc ISwapSteward
-  AaveSwapper public immutable SWAPPER = AaveSwapper(MiscEthereum.AAVE_SWAPPER);
+  AaveSwapper public immutable SWAPPER;
 
   /// @inheritdoc ISwapSteward
-  ICollector public immutable COLLECTOR = AaveV3Ethereum.COLLECTOR;
-
-  /// @inheritdoc ISwapSteward
-  IPoolV3FinSteward public POOLV3STEWARD;
+  ICollector public immutable COLLECTOR;
 
   /// @inheritdoc ISwapSteward
   address public MILKMAN;
@@ -44,79 +41,18 @@ contract MainnetSwapSteward is OwnableWithGuardian, ISwapSteward {
   /// @inheritdoc ISwapSteward
   mapping(address token => address oracle) public priceOracle;
 
-  constructor(address _owner, address _guardian, address _poolV3Steward) {
+  constructor(address _owner, address _guardian, address collector) {
     _transferOwnership(_owner);
     _updateGuardian(_guardian);
+
+    COLLECTOR = ICollector(collector);
+    SWAPPER = AaveSwapper(MiscEthereum.AAVE_SWAPPER);
 
     // https://etherscan.io/address/0x060373D064d0168931dE2AB8DDA7410923d06E88
     _setMilkman(0x060373D064d0168931dE2AB8DDA7410923d06E88);
 
     // https://etherscan.io/address/0xe80a1C615F75AFF7Ed8F08c9F21f9d00982D666c
     _setPriceChecker(0xe80a1C615F75AFF7Ed8F08c9F21f9d00982D666c);
-    _setPoolV3Steward(_poolV3Steward);
-  }
-
-  /// @inheritdoc ISwapSteward
-  function withdrawV2andSwap(
-    address reserve,
-    uint256 amount,
-    address buyToken,
-    uint256 slippage
-  ) external onlyOwnerOrGuardian {
-    DataTypesV2.ReserveData memory reserveData = POOLV3STEWARD.v2Pool().getReserveData(reserve);
-
-    POOLV3STEWARD.validateAmount(reserveData.aTokenAddress, amount);
-    _validateSwap(reserve, amount, buyToken, slippage);
-
-    CU.IOInput memory withdrawData = CU.IOInput(address(POOLV3STEWARD.v2Pool()), reserve, amount);
-
-    uint256 withdrawAmount = CU.withdrawFromV2(COLLECTOR, withdrawData, address(this));
-
-    CU.SwapInput memory swapData = CU.SwapInput(
-      MILKMAN,
-      PRICE_CHECKER,
-      reserve,
-      buyToken,
-      priceOracle[reserve],
-      priceOracle[buyToken],
-      withdrawAmount,
-      slippage
-    );
-
-    CU.swap(COLLECTOR, address(SWAPPER), swapData);
-  }
-
-  /// @inheritdoc ISwapSteward
-  function withdrawV3andSwap(
-    address pool,
-    address reserve,
-    uint256 amount,
-    address buyToken,
-    uint256 slippage
-  ) external onlyOwnerOrGuardian {
-    POOLV3STEWARD.validateV3Pool(pool);
-
-    DataTypesV3.ReserveDataLegacy memory reserveData = IPool(pool).getReserveData(reserve);
-
-    POOLV3STEWARD.validateAmount(reserveData.aTokenAddress, amount);
-    _validateSwap(reserve, amount, buyToken, slippage);
-
-    CU.IOInput memory withdrawData = CU.IOInput(pool, reserve, amount);
-
-    uint256 withdrawAmount = CU.withdrawFromV3(COLLECTOR, withdrawData, address(this));
-
-    CU.SwapInput memory swapData = CU.SwapInput(
-      MILKMAN,
-      PRICE_CHECKER,
-      reserve,
-      buyToken,
-      priceOracle[reserve],
-      priceOracle[buyToken],
-      withdrawAmount,
-      slippage
-    );
-
-    CU.swap(COLLECTOR, address(SWAPPER), swapData);
   }
 
   /// @inheritdoc ISwapSteward
@@ -126,7 +62,6 @@ contract MainnetSwapSteward is OwnableWithGuardian, ISwapSteward {
     address buyToken,
     uint256 slippage
   ) external onlyOwnerOrGuardian {
-    POOLV3STEWARD.validateAmount(sellToken, amount);
     _validateSwap(sellToken, amount, buyToken, slippage);
 
     CU.SwapInput memory swapData = CU.SwapInput(
@@ -151,14 +86,10 @@ contract MainnetSwapSteward is OwnableWithGuardian, ISwapSteward {
     priceOracle[token] = priceFeedUSD;
 
     // Validate oracle has necessary functions
-    AggregatorInterface(priceFeedUSD).decimals();
-    AggregatorInterface(priceFeedUSD).latestAnswer();
+    if (AggregatorInterface(priceFeedUSD).decimals() != 8) revert PriceFeedIncompatibility();
+    if (AggregatorInterface(priceFeedUSD).latestAnswer() == 0) revert PriceFeedIncompatibility();
 
     emit SwapApprovedToken(token, priceFeedUSD);
-  }
-
-  function setPoolV3Steward(address newPoolV3Steward) external onlyOwner {
-    _setPoolV3Steward(newPoolV3Steward);
   }
 
   /// @inheritdoc ISwapSteward
@@ -169,15 +100,6 @@ contract MainnetSwapSteward is OwnableWithGuardian, ISwapSteward {
   /// @inheritdoc ISwapSteward
   function setMilkman(address newMilkman) external onlyOwner {
     _setMilkman(newMilkman);
-  }
-
-  /// @dev Internal function to set the PoolV3FinSteward
-  function _setPoolV3Steward(address poolV3Steward) internal {
-    if (poolV3Steward == address(0)) revert InvalidZeroAddress();
-    address old = address(POOLV3STEWARD);
-    POOLV3STEWARD = IPoolV3FinSteward(poolV3Steward);
-
-    emit PoolV3StewardUpdated(old, poolV3Steward);
   }
 
   /// @dev Internal function to set the price checker

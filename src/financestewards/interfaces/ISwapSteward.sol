@@ -21,6 +21,9 @@ interface ISwapSteward {
   /// @dev Oracle did not return a valid value
   error PriceFeedFailure();
 
+  /// @dev Oracle is returning unexpected values
+  error PriceFeedIncompatibility();
+
   /// @dev Token has not been previously approved for swapping
   error UnrecognizedToken();
 
@@ -28,11 +31,6 @@ interface ISwapSteward {
   /// @param oldAddress The old Milkman instance address
   /// @param newAddress The new Milkman instance address
   event MilkmanAddressUpdated(address oldAddress, address newAddress);
-
-  /// @notice Emitted when the PoolV3Steward contract address is updated
-  /// @param oldAddress The old PoolV3Steward instance address
-  /// @param newAddress The new PoolV3Steward instance address
-  event PoolV3StewardUpdated(address oldAddress, address newAddress);
 
   /// @notice Emitted when the Chainlink Price Checker contract address is updated
   /// @param oldAddress The old Price Checker instance address
@@ -46,9 +44,6 @@ interface ISwapSteward {
 
   /// @notice Returns instance of Aave V3 Collector
   function COLLECTOR() external view returns (ICollector);
-
-  /// @notice Returns instance of PoolV3FinSteward
-  function POOLV3STEWARD() external view returns (IPoolV3FinSteward);
 
   /// @notice Returns the maximum allowed slippage for swaps (in BPS)
   function MAX_SLIPPAGE() external view returns (uint256);
@@ -69,32 +64,6 @@ interface ISwapSteward {
   /// @notice Returns address of the Oracle to use for token swaps
   /// @param token Address of the token to swap
   function priceOracle(address token) external view returns (address);
-
-  /// @notice Withdraws a specified amount of a reserve token from Aave V2 and swaps it for another token
-  /// @param reserve The address of the reserve token to withdraw
-  /// @param amount The amount of the reserve token to withdraw
-  /// @param buyToken The address of the token to buy with the withdrawn reserve token
-  /// @param slippage The slippage allowed in the swap
-  function withdrawV2andSwap(
-    address reserve,
-    uint amount,
-    address buyToken,
-    uint256 slippage
-  ) external;
-
-  /// @notice Withdraws a specified amount of a reserve token from Aave V3 and swaps it for another token
-  /// @param V3Pool The address of the V3 Pool to withdraw from
-  /// @param reserve The address of the reserve token to withdraw
-  /// @param amount The amount of the reserve token to withdraw
-  /// @param buyToken The address of the token to buy with the withdrawn reserve token
-  /// @param slippage The slippage allowed in the swap
-  function withdrawV3andSwap(
-    address V3Pool,
-    address reserve,
-    uint amount,
-    address buyToken,
-    uint256 slippage
-  ) external;
 
   /// @notice Swaps a specified amount of a sell token for a buy token
   /// @param sellToken The address of the token to sell

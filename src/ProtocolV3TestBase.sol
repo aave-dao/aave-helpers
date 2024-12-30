@@ -6,14 +6,13 @@ import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IReserveI
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC20Metadata.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
-import {ReserveConfiguration} from 'aave-v3-origin/core/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
-import {IDefaultInterestRateStrategyV2} from 'aave-v3-origin/core/contracts/interfaces/IDefaultInterestRateStrategyV2.sol';
+import {ReserveConfiguration} from 'aave-v3-origin/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {IDefaultInterestRateStrategyV2} from 'aave-v3-origin/contracts/interfaces/IDefaultInterestRateStrategyV2.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
-import {DiffUtils} from 'aave-v3-origin/../tests/utils/DiffUtils.sol';
-import {ProtocolV3TestBase as RawProtocolV3TestBase, ReserveConfig} from 'aave-v3-origin/../tests/utils/ProtocolV3TestBase.sol';
+import {DiffUtils} from 'aave-v3-origin-tests/utils/DiffUtils.sol';
+import {ProtocolV3TestBase as RawProtocolV3TestBase, ReserveConfig} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
-import {ProxyHelpers} from './ProxyHelpers.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ILegacyDefaultInterestRateStrategy} from './dependencies/ILegacyDefaultInterestRateStrategy.sol';
 
@@ -125,11 +124,11 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
   function e2eTest(IPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ReserveConfig memory collateralConfig = _getGoodCollateral(configs);
-    uint256 snapshot = vm.snapshot();
+    uint256 snapshot = vm.snapshotState();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
         e2eTestAsset(pool, collateralConfig, configs[i]);
-        vm.revertTo(snapshot);
+        vm.revertToState(snapshot);
       } else {
         console.log('E2E: TestAsset %s SKIPPED', configs[i].symbol);
       }
@@ -167,20 +166,20 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     // GHO is a special case as it cannot be supplied
     if (testAssetConfig.underlying == AaveV3EthereumAssets.GHO_UNDERLYING) {
       _deposit(collateralConfig, pool, collateralSupplier, collateralAssetAmount);
-      uint256 snapshot = vm.snapshot();
+      uint256 snapshot = vm.snapshotState();
       // test variable borrowing
       if (testAssetConfig.borrowingEnabled) {
         _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount);
-        vm.revertTo(snapshot);
+        vm.revertToState(snapshot);
       }
     } else {
       _deposit(collateralConfig, pool, collateralSupplier, collateralAssetAmount);
       _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
-      uint256 snapshot = vm.snapshot();
+      uint256 snapshot = vm.snapshotState();
       // test withdrawal
       _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
       _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
-      vm.revertTo(snapshot);
+      vm.revertToState(snapshot);
       // test variable borrowing
       if (testAssetConfig.borrowingEnabled) {
         if (
@@ -191,7 +190,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
           return;
         }
         _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount);
-        vm.revertTo(snapshot);
+        vm.revertToState(snapshot);
       }
     }
   }
@@ -317,35 +316,57 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     return configuration.getIsVirtualAccActive();
   }
 
-  function _logReserveConfig(ReserveConfig memory config) internal pure {
-    console.log('Symbol ', config.symbol);
-    console.log('Underlying address ', config.underlying);
-    console.log('AToken address ', config.aToken);
-    console.log('Stable debt token address ', config.stableDebtToken);
-    console.log('Variable debt token address ', config.variableDebtToken);
-    console.log('Decimals ', config.decimals);
-    console.log('LTV ', config.ltv);
-    console.log('Liquidation Threshold ', config.liquidationThreshold);
-    console.log('Liquidation Bonus ', config.liquidationBonus);
-    console.log('Liquidation protocol fee ', config.liquidationProtocolFee);
-    console.log('Reserve Factor ', config.reserveFactor);
-    console.log('Usage as collateral enabled ', (config.usageAsCollateralEnabled) ? 'Yes' : 'No');
-    console.log('Borrowing enabled ', (config.borrowingEnabled) ? 'Yes' : 'No');
-    console.log('Stable borrow rate enabled ', (config.stableBorrowRateEnabled) ? 'Yes' : 'No');
-    console.log('Supply cap ', config.supplyCap);
-    console.log('Borrow cap ', config.borrowCap);
-    console.log('Debt ceiling ', config.debtCeiling);
-    console.log('eMode category ', config.eModeCategory);
-    console.log('Interest rate strategy ', config.interestRateStrategy);
-    console.log('Is active ', (config.isActive) ? 'Yes' : 'No');
-    console.log('Is frozen ', (config.isFrozen) ? 'Yes' : 'No');
-    console.log('Is siloed ', (config.isSiloed) ? 'Yes' : 'No');
-    console.log('Is borrowable in isolation ', (config.isBorrowableInIsolation) ? 'Yes' : 'No');
-    console.log('Is flashloanable ', (config.isFlashloanable) ? 'Yes' : 'No');
-    console.log('Is virtual accounting active ', (config.virtualAccActive) ? 'Yes' : 'No');
-    console.log('Virtual balance ', config.virtualBalance);
-    console.log('-----');
-    console.log('-----');
+  function _writeEModeConfigs(string memory path, IPool pool) internal virtual override {
+    // keys for json stringification
+    string memory eModesKey = 'emodes';
+    string memory content = '{}';
+    vm.serializeJson(eModesKey, '{}');
+    uint8 emptyCounter = 0;
+    for (uint8 i = 0; i < 256; i++) {
+      try pool.getEModeCategoryCollateralConfig(i) returns (DataTypes.CollateralConfig memory cfg) {
+        if (cfg.liquidationThreshold == 0) {
+          if (++emptyCounter > 2) break;
+        } else {
+          string memory key = vm.toString(i);
+          vm.serializeJson(key, '{}');
+          vm.serializeUint(key, 'eModeCategory', i);
+          vm.serializeString(key, 'label', pool.getEModeCategoryLabel(i));
+          vm.serializeUint(key, 'ltv', cfg.ltv);
+          vm.serializeString(
+            key,
+            'collateralBitmap',
+            vm.toString(pool.getEModeCategoryCollateralBitmap(i))
+          );
+          vm.serializeString(
+            key,
+            'borrowableBitmap',
+            vm.toString(pool.getEModeCategoryBorrowableBitmap(i))
+          );
+          vm.serializeUint(key, 'liquidationThreshold', cfg.liquidationThreshold);
+          string memory object = vm.serializeUint(key, 'liquidationBonus', cfg.liquidationBonus);
+          content = vm.serializeString(eModesKey, key, object);
+          emptyCounter = 0;
+        }
+      } catch {
+        DataTypes.EModeCategoryLegacy memory category = pool.getEModeCategoryData(i);
+        if (category.liquidationThreshold == 0) {
+          if (++emptyCounter > 2) break;
+        } else {
+          string memory key = vm.toString(i);
+          vm.serializeJson(key, '{}');
+          vm.serializeUint(key, 'eModeCategory', i);
+          vm.serializeString(key, 'label', category.label);
+          vm.serializeUint(key, 'ltv', category.ltv);
+          vm.serializeUint(key, 'liquidationThreshold', category.liquidationThreshold);
+          vm.serializeUint(key, 'liquidationBonus', category.liquidationBonus);
+          string memory object = vm.serializeAddress(key, 'priceSource', category.priceSource);
+          content = vm.serializeString(eModesKey, key, object);
+          emptyCounter = 0;
+        }
+      }
+    }
+    string memory output = vm.serializeString('root', 'eModes', content);
+    vm.writeJson(output, path);
   }
 
   function _writeStrategyConfigs(

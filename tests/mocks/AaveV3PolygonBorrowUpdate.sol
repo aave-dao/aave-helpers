@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import 'aave-v3-origin/periphery/contracts/v3-config-engine/AaveV3Payload.sol';
+import 'aave-v3-origin/contracts/extensions/v3-config-engine/AaveV3Payload.sol';
 import {AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 
 /**
@@ -20,7 +20,6 @@ contract AaveV3PolygonBorrowUpdate is AaveV3Payload {
       asset: AaveV3PolygonAssets.AAVE_UNDERLYING,
       enabledToBorrow: EngineFlags.ENABLED,
       flashloanable: EngineFlags.DISABLED,
-      stableRateModeEnabled: EngineFlags.KEEP_CURRENT,
       borrowableInIsolation: EngineFlags.KEEP_CURRENT,
       withSiloedBorrowing: EngineFlags.KEEP_CURRENT,
       reserveFactor: 15_00
