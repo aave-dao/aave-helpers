@@ -19,27 +19,37 @@ ffi = true
 evm_version = 'shanghai'
 
 [profile.zksync.zksync]
+bytecode_hash = 'none'
 compile = true
 fallback_oz = true
 mode = '3'
-zksolc = '1.5.1'
+zksolc = '1.5.4'
 
 [rpc_endpoints]
 mainnet = "${RPC_MAINNET}"
-optimism = "${RPC_OPTIMISM}"
-avalanche = "${RPC_AVALANCHE}"
 polygon = "${RPC_POLYGON}"
+polygon_amoy = "${RPC_POLYGON_AMOY}"
+avalanche = "${RPC_AVALANCHE}"
+avalanche_fuji = "${RPC_AVALANCHE_FUJI}"
 arbitrum = "${RPC_ARBITRUM}"
+arbitrum_sepolia = "${RPC_ARBITRUM_SEPOLIA}"
 fantom = "${RPC_FANTOM}"
+fantom_testnet = "${RPC_FANTOM_TESTNET}"
+optimism = "${RPC_OPTIMISM}"
+optimism_sepolia = "${RPC_OPTIMISM_SEPOLIA}"
 harmony = "${RPC_HARMONY}"
+sepolia = "${RPC_SEPOLIA}"
+scroll = "${RPC_SCROLL}"
+scroll_sepolia = "${RPC_SCROLL_SEPOLIA}"
 metis = "${RPC_METIS}"
 base = "${RPC_BASE}"
+base_sepolia = "${RPC_BASE_SEPOLIA}"
 bnb = "${RPC_BNB}"
-sepolia = "${RPC_SEPOLIA}"
 gnosis = "${RPC_GNOSIS}"
-scroll = "${RPC_SCROLL}"
-zkevm = "${RPC_ZKEVM}"
+zkEVM = "${RPC_ZKEVM}"
+celo = "${RPC_CELO}"
 zksync = "${RPC_ZKSYNC}"
+linea = "${RPC_LINEA}"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY_MAINNET}", chainId = 1 }

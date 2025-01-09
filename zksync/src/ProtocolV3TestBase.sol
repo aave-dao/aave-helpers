@@ -74,13 +74,16 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
 
     uint256 startGas = gasleft();
 
+    vm.startStateDiffRecording();
     executePayload(vm, payload);
+    string memory rawDiff = vm.getStateDiffJson();
 
     uint256 gasUsed = startGas - gasleft();
     assertLt(gasUsed, (block.gaslimit * 95) / 100, 'BLOCK_GAS_LIMIT_EXCEEDED'); // 5% is kept as a buffer
 
     string memory afterString = string(abi.encodePacked(reportName, '_after'));
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
+    vm.writeJson(rawDiff, string(abi.encodePacked('./reports/', afterString, '.json')), '.chainId');
 
     diffReports(beforeString, afterString);
 

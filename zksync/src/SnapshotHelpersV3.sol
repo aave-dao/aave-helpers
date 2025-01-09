@@ -34,7 +34,7 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
     // overwrite with empty json to later be extended
     vm.writeFile(
       path,
-      '{ "eModes": {}, "reserves": {}, "strategies": {}, "poolConfiguration": {} }'
+      '{ "eModes": {}, "reserves": {}, "strategies": {}, "poolConfiguration": {}, "raw": {} }'
     );
     vm.serializeUint('root', 'chainId', block.chainid);
     if (reserveConfigs) writeReserveConfigs(path, configs, pool);
