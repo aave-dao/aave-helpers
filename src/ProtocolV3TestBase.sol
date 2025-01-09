@@ -74,11 +74,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
 
     string memory afterString = string(abi.encodePacked(reportName, '_after'));
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
-    vm.writeJson(
-      rawDiff,
-      string(abi.encodePacked('./reports/', afterString, '.json')),
-      '.poolConfiguration'
-    );
+    vm.writeJson(rawDiff, string(abi.encodePacked('./reports/', afterString, '.json')), '.chainId');
 
     diffReports(beforeString, afterString);
 
