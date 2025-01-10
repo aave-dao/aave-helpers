@@ -7,6 +7,7 @@ import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethe
 import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
+import {IRescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
 
 import {AaveArbEthERC20Bridge} from '../../../src/bridges/arbitrum/AaveArbEthERC20Bridge.sol';
 import {IAaveArbEthERC20Bridge} from '../../../src/bridges/arbitrum/IAaveArbEthERC20Bridge.sol';
@@ -93,10 +94,9 @@ contract BridgeTest is AaveArbEthERC20BridgeTest {
     bridgeArbitrum.transferOwnership(GovernanceV3Arbitrum.EXECUTOR_LVL_1);
 
     vm.startPrank(GovernanceV3Arbitrum.EXECUTOR_LVL_1);
-    
 
     ArbSysMock arbsys = new ArbSysMock();
-        vm.etch(address(0x0000000000000000000000000000000000000064), address(arbsys).code);
+    vm.etch(address(0x0000000000000000000000000000000000000064), address(arbsys).code);
 
     vm.expectEmit();
     emit Bridge(AaveV3ArbitrumAssets.USDC_UNDERLYING, amount);
@@ -113,7 +113,7 @@ contract BridgeTest is AaveArbEthERC20BridgeTest {
 
 contract EmergencyTokenTransfer is AaveArbEthERC20BridgeTest {
   function test_revertsIf_invalidCaller() public {
-    vm.expectRevert('ONLY_RESCUE_GUARDIAN');
+    vm.expectRevert(IRescuable.OnlyRescueGuardian.selector);
     vm.startPrank(makeAddr('random-caller'));
     bridgeArbitrum.emergencyTokenTransfer(
       AaveV3ArbitrumAssets.LINK_UNDERLYING,

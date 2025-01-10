@@ -7,6 +7,7 @@ import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {IRescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
 
 import {AaveSwapper} from 'src/swaps/AaveSwapper.sol';
 import {IAaveSwapper} from 'src/swaps/interfaces/IAaveSwapper.sol';
@@ -314,7 +315,7 @@ contract CancelSwap is AaveSwapperTest {
 
 contract EmergencyTokenTransfer is AaveSwapperTest {
   function test_revertsIf_invalidCaller() public {
-    vm.expectRevert('ONLY_RESCUE_GUARDIAN');
+    vm.expectRevert(IRescuable.OnlyRescueGuardian.selector);
     swaps.emergencyTokenTransfer(
       AaveV2EthereumAssets.BAL_UNDERLYING,
       address(AaveV2Ethereum.COLLECTOR),

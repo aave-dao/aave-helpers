@@ -9,6 +9,7 @@ import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygo
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
+import {IRescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
 
 import {AavePolEthERC20Bridge} from 'src/bridges/polygon/AavePolEthERC20Bridge.sol';
 import {IAavePolEthERC20Bridge} from 'src/bridges/polygon/IAavePolEthERC20Bridge.sol';
@@ -84,7 +85,7 @@ contract BridgeTest is AavePolEthERC20BridgeTest {
 
 contract EmergencyTokenTransfer is AavePolEthERC20BridgeTest {
   function test_revertsIf_invalidCaller() public {
-    vm.expectRevert('ONLY_RESCUE_GUARDIAN');
+    vm.expectRevert(IRescuable.OnlyRescueGuardian.selector);
     vm.startPrank(makeAddr('random-caller'));
     bridgePolygon.emergencyTokenTransfer(
       AaveV2PolygonAssets.BAL_UNDERLYING,
@@ -289,11 +290,12 @@ contract ForkedBridgeTests is Test {
       MiscEthereum.AAVE_POL_ETH_BRIDGE
     );
 
-
     IAavePolEthERC20Bridge(0xc928002904Ec475663A83063D492EA2aE09EbDA1).exit(burnProof); // Old bridge address for this TX
 
     assertGt(
-      IERC20(AaveV3EthereumAssets.DAI_UNDERLYING).balanceOf(0xc928002904Ec475663A83063D492EA2aE09EbDA1),
+      IERC20(AaveV3EthereumAssets.DAI_UNDERLYING).balanceOf(
+        0xc928002904Ec475663A83063D492EA2aE09EbDA1
+      ),
       balanceDaiBefore
     );
   }

@@ -10,6 +10,7 @@ import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygo
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
+import {IRescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
 
 import {AavePolEthPlasmaBridge} from 'src/bridges/polygon/AavePolEthPlasmaBridge.sol';
 import {IAavePolEthPlasmaBridge} from 'src/bridges/polygon/IAavePolEthPlasmaBridge.sol';
@@ -118,9 +119,7 @@ contract WithdrawToCollectorTest is AavePolEthPlasmaBridgeTest {
     uint256 balanceCollectorBefore = IERC20(MATIC_MAINNET).balanceOf(
       address(AaveV3Ethereum.COLLECTOR)
     );
-    uint256 balanceBridgeBefore = IERC20(MATIC_MAINNET).balanceOf(
-      address(bridgeMainnet)
-    );
+    uint256 balanceBridgeBefore = IERC20(MATIC_MAINNET).balanceOf(address(bridgeMainnet));
 
     assertEq(balanceBridgeBefore, amount);
 
@@ -136,7 +135,7 @@ contract WithdrawToCollectorTest is AavePolEthPlasmaBridgeTest {
 
 contract EmergencyTokenTransfer is AavePolEthPlasmaBridgeTest {
   function test_revertsIf_invalidCaller() public {
-    vm.expectRevert('ONLY_RESCUE_GUARDIAN');
+    vm.expectRevert(IRescuable.OnlyRescueGuardian.selector);
     vm.startPrank(makeAddr('random-caller'));
     bridgePolygon.emergencyTokenTransfer(
       AaveV2PolygonAssets.BAL_UNDERLYING,
@@ -207,7 +206,7 @@ contract ExitTest is AavePolEthPlasmaBridgeTest {
 /// The TX can be found here: https://etherscan.io/tx/0x75849d87d15d6a5837c29e2d97a10a442fa71bee50c8cb8ddc01058a474e581e
 contract ForkedBridgeTests is Test {
   event ConfirmExit(bytes proof);
-  
+
   function test_successful() public {
     vm.createSelectFork(vm.rpcUrl('mainnet'), 19419577); // One block before an actual exit
 

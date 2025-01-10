@@ -10,11 +10,11 @@ import {AaveWstethWithdrawer} from '../../src/asset-manager/AaveWstethWithdrawer
 
 contract AaveWstethWithdrawerTest is Test {
   using stdStorage for StdStorage;
-  
+
   event StartedWithdrawal(uint256[] amounts, uint256 indexed index);
 
   event FinalizedWithdrawal(uint256 amount, uint256 indexed index);
-  
+
   uint256 public constant EXISTING_UNSTETH_TOKENID = 46283;
   uint256 public constant WITHDRAWAL_AMOUNT = 999999999900;
   uint256 public constant FINALIZED_WITHDRAWAL_AMOUNT = 1173102309960;
@@ -30,7 +30,6 @@ contract AaveWstethWithdrawerTest is Test {
 
   AaveWstethWithdrawer public withdrawer;
 
-
   /// At current block oldWithdrawer (UNSTETH_OWNER) has an Lido withdrawal NFT
   ///   this NFT represents an WITHDRAWAL_AMOUNT of STETH that
   ///   yields FINALIZED_WITHDRAWAL_AMOUNT of ETH when completed.
@@ -45,19 +44,15 @@ contract AaveWstethWithdrawerTest is Test {
       address(withdrawer),
       46283
     );
-    
+
     /// start an withdrawal to create the storage slot
-    AaveV3Ethereum.COLLECTOR.transfer(
-      address(WSTETH), 
-      address(withdrawer), 
-      WITHDRAWAL_AMOUNT
-    );
+    AaveV3Ethereum.COLLECTOR.transfer(address(WSTETH), address(withdrawer), WITHDRAWAL_AMOUNT);
     uint256[] memory amounts = new uint256[](1);
     amounts[0] = WITHDRAWAL_AMOUNT;
     withdrawer.startWithdraw(amounts);
     vm.stopPrank();
-    
-    /// override the storage slot to the requestId respective to the unSTETH NFT 
+
+    /// override the storage slot to the requestId respective to the unSTETH NFT
     /// and the minCheckpointIndex
     AaveWstethWithdrawer oldWithdrawer = AaveWstethWithdrawer(payable(UNSTETH_OWNER));
     uint256 key = 0;
@@ -70,10 +65,7 @@ contract AaveWstethWithdrawerTest is Test {
       .with_key(key)
       .checked_write(reqId);
 
-    stdstore
-      .target(address(withdrawer))
-      .sig('minCheckpointIndex()')
-      .checked_write(minIndex);
+    stdstore.target(address(withdrawer)).sig('minCheckpointIndex()').checked_write(minIndex);
     _;
   }
 
@@ -119,11 +111,7 @@ contract UpdateGuardian is AaveWstethWithdrawerTest {
 contract StartWithdrawal is AaveWstethWithdrawerTest {
   function test_revertsIf_invalidCaller() public {
     vm.prank(OWNER);
-    AaveV3Ethereum.COLLECTOR.transfer(
-      address(WSTETH), 
-      address(withdrawer), 
-      WITHDRAWAL_AMOUNT
-    );
+    AaveV3Ethereum.COLLECTOR.transfer(address(WSTETH), address(withdrawer), WITHDRAWAL_AMOUNT);
     uint256[] memory amounts = new uint256[](1);
     amounts[0] = WITHDRAWAL_AMOUNT;
     vm.expectRevert('ONLY_BY_OWNER_OR_GUARDIAN');
@@ -136,11 +124,7 @@ contract StartWithdrawal is AaveWstethWithdrawerTest {
     uint256 nextIndex = withdrawer.nextIndex();
 
     vm.startPrank(OWNER);
-    AaveV3Ethereum.COLLECTOR.transfer(
-      address(WSTETH), 
-      address(withdrawer), 
-      WITHDRAWAL_AMOUNT
-    );
+    AaveV3Ethereum.COLLECTOR.transfer(address(WSTETH), address(withdrawer), WITHDRAWAL_AMOUNT);
     uint256[] memory amounts = new uint256[](1);
     amounts[0] = WITHDRAWAL_AMOUNT;
     vm.expectEmit(address(withdrawer));
@@ -161,11 +145,7 @@ contract StartWithdrawal is AaveWstethWithdrawerTest {
     uint256 nextIndex = withdrawer.nextIndex();
 
     vm.prank(OWNER);
-    AaveV3Ethereum.COLLECTOR.transfer(
-      address(WSTETH), 
-      address(withdrawer), 
-      WITHDRAWAL_AMOUNT
-    );
+    AaveV3Ethereum.COLLECTOR.transfer(address(WSTETH), address(withdrawer), WITHDRAWAL_AMOUNT);
     uint256[] memory amounts = new uint256[](1);
     amounts[0] = WITHDRAWAL_AMOUNT;
     vm.expectEmit(address(withdrawer));
@@ -207,7 +187,7 @@ contract FinalizeWithdrawal is AaveWstethWithdrawerTest {
 
     assertEq(collectorBalanceAfter, collectorBalanceBefore + FINALIZED_WITHDRAWAL_AMOUNT);
   }
-  
+
   function test_finalizeWithdrawalWithExtraFunds() public withUnsteth {
     uint256 collectorBalanceBefore = WETH.balanceOf(COLLECTOR);
 
@@ -230,28 +210,17 @@ contract EmergencyTokenTransfer is AaveWstethWithdrawerTest {
   function test_revertsIf_invalidCaller() public {
     deal(address(WSTETH), address(withdrawer), WITHDRAWAL_AMOUNT);
     vm.expectRevert('ONLY_RESCUE_GUARDIAN');
-    withdrawer.emergencyTokenTransfer(
-      address(WSTETH),
-      COLLECTOR,
-      WITHDRAWAL_AMOUNT
-    );
+    withdrawer.emergencyTokenTransfer(address(WSTETH), COLLECTOR, WITHDRAWAL_AMOUNT);
   }
 
   function test_successful_governanceCaller() public {
     uint256 initialCollectorBalance = WSTETH.balanceOf(COLLECTOR);
     deal(address(WSTETH), address(withdrawer), WITHDRAWAL_AMOUNT);
     vm.startPrank(OWNER);
-    withdrawer.emergencyTokenTransfer(
-      address(WSTETH),
-      COLLECTOR,
-      WITHDRAWAL_AMOUNT
-    );
+    withdrawer.emergencyTokenTransfer(address(WSTETH), COLLECTOR, WITHDRAWAL_AMOUNT);
     vm.stopPrank();
 
-    assertEq(
-      WSTETH.balanceOf(COLLECTOR),
-      initialCollectorBalance + WITHDRAWAL_AMOUNT
-    );
+    assertEq(WSTETH.balanceOf(COLLECTOR), initialCollectorBalance + WITHDRAWAL_AMOUNT);
     assertEq(WSTETH.balanceOf(address(withdrawer)), 0);
   }
 }
@@ -259,29 +228,18 @@ contract EmergencyTokenTransfer is AaveWstethWithdrawerTest {
 contract Emergency721TokenTransfer is AaveWstethWithdrawerTest {
   function test_revertsIf_invalidCaller() public withUnsteth {
     vm.expectRevert('ONLY_RESCUE_GUARDIAN');
-    withdrawer.emergency721TokenTransfer(
-      address(UNSTETH),
-      COLLECTOR,
-      EXISTING_UNSTETH_TOKENID
-    );
+    withdrawer.emergency721TokenTransfer(address(UNSTETH), COLLECTOR, EXISTING_UNSTETH_TOKENID);
   }
 
   function test_successful_governanceCaller() public withUnsteth {
     uint256 lidoNftBalanceBefore = UNSTETH.balanceOf(address(withdrawer));
     vm.startPrank(OWNER);
-    withdrawer.emergency721TokenTransfer(
-      address(UNSTETH),
-      COLLECTOR,
-      EXISTING_UNSTETH_TOKENID
-    );
+    withdrawer.emergency721TokenTransfer(address(UNSTETH), COLLECTOR, EXISTING_UNSTETH_TOKENID);
     vm.stopPrank();
 
     uint256 lidoNftBalanceAfter = UNSTETH.balanceOf(address(withdrawer));
 
-    assertEq(
-      UNSTETH.balanceOf(COLLECTOR),
-      1
-    );
+    assertEq(UNSTETH.balanceOf(COLLECTOR), 1);
     assertEq(lidoNftBalanceAfter, lidoNftBalanceBefore - 1);
   }
 }
