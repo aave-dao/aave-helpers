@@ -100,8 +100,8 @@ contract AavePolEthERC20Bridge is Ownable, Rescuable, IAavePolEthERC20Bridge {
 
   /// @inheritdoc IRescuableBase
   function maxRescue(
-    address erc20Token
-  ) public view override(RescuableBase, IRescuableBase) returns (uint256) {
+    address
+  ) public pure override(RescuableBase, IRescuableBase) returns (uint256) {
     return type(uint256).max;
   }
 
