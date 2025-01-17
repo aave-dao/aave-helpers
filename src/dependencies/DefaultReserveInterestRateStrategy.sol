@@ -3,7 +3,7 @@
 pragma solidity >=0.6.12;
 
 import {SafeMath} from '../dependencies/SafeMath.sol';
-import {IReserveInterestRateStrategy} from '../dependencies/IReserveInterestRateStrategy.sol';
+import {IReserveInterestRateStrategy} from './IReserveInterestRateStrategy.sol';
 import {WadRayMath} from '../dependencies/WadRayMath.sol';
 import {PercentageMath} from '../dependencies/PercentageMath.sol';
 import {ILendingPoolAddressesProvider, ILendingRateOracle} from 'aave-address-book/AaveV2.sol';

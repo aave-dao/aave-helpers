@@ -22,16 +22,11 @@ contract AaveV3OptimismMockRatesUpdate is AaveV3Payload {
 
     ratesUpdate[0] = IEngine.RateStrategyUpdate({
       asset: AaveV3OptimismAssets.USDT_UNDERLYING,
-      params: Rates.RateStrategyParams({
+      params: IEngine.InterestRateInputData({
         optimalUsageRatio: _bpsToRay(80_00),
         baseVariableBorrowRate: EngineFlags.KEEP_CURRENT,
         variableRateSlope1: EngineFlags.KEEP_CURRENT,
-        variableRateSlope2: _bpsToRay(75_00),
-        stableRateSlope1: EngineFlags.KEEP_CURRENT,
-        stableRateSlope2: _bpsToRay(75_00),
-        baseStableRateOffset: EngineFlags.KEEP_CURRENT,
-        stableRateExcessOffset: EngineFlags.KEEP_CURRENT,
-        optimalStableToTotalDebtRatio: EngineFlags.KEEP_CURRENT
+        variableRateSlope2: _bpsToRay(75_00)
       })
     });
 

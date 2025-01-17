@@ -6,9 +6,10 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {Ownable} from 'solidity-utils/contracts/oz-common/Ownable.sol';
 import {Rescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
+import {RescuableBase, IRescuableBase} from 'solidity-utils/contracts/utils/RescuableBase.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
+import {ChainIds} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 
-import {ChainIds} from '../../ChainIds.sol';
 import {IAavePolEthPlasmaBridge} from './IAavePolEthPlasmaBridge.sol';
 
 interface IERC20Polygon {
@@ -100,6 +101,13 @@ contract AavePolEthPlasmaBridge is Ownable, Rescuable, IAavePolEthPlasmaBridge {
   /// @inheritdoc Rescuable
   function whoCanRescue() public view override returns (address) {
     return owner();
+  }
+
+  /// @inheritdoc IRescuableBase
+  function maxRescue(
+    address
+  ) public pure override(RescuableBase, IRescuableBase) returns (uint256) {
+    return type(uint256).max;
   }
 
   /// @dev Allows the contract to receive Matic on Polygon

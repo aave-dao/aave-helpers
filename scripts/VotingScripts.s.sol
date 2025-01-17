@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {IVotingMachineWithProofs} from 'aave-address-book/governance-v3/IVotingMachineWithProofs.sol';
-import '../src/ScriptUtils.sol';
+import {EthereumScript} from 'solidity-utils/contracts/utils/ScriptUtils.sol';
 import {GovV3Helpers} from '../src/GovV3Helpers.sol';
 
 contract VoteForProposal is EthereumScript {

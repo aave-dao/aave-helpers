@@ -1,9 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import 'solidity-utils/contracts/utils/ScriptUtils.sol';
+import {AaveV2Ethereum} from 'aave-address-book/AaveV2Ethereum.sol';
+import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
+import {AaveV2Polygon} from 'aave-address-book/AaveV2Polygon.sol';
+import {AaveV2Avalanche} from 'aave-address-book/AaveV2Avalanche.sol';
+
 import {AaveV2ConfigEngine} from '../src/v2-config-engine/AaveV2ConfigEngine.sol';
 import {IV2RateStrategyFactory} from '../src/v2-config-engine/IV2RateStrategyFactory.sol';
-import '../src/ScriptUtils.sol';
 
 library DeployV2EngineEthLib {
   function deploy(address ratesFactory) internal returns (address) {

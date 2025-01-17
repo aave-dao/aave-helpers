@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {Rescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
+import {RescuableBase, IRescuableBase} from 'solidity-utils/contracts/utils/RescuableBase.sol';
 import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
 import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initializable.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
@@ -13,22 +14,12 @@ import {ComposableCoW} from 'composable-cow/ComposableCoW.sol';
 import {ERC1271Forwarder} from 'composable-cow/ERC1271Forwarder.sol';
 import {IConditionalOrder} from 'composable-cow/interfaces/IConditionalOrder.sol';
 
+import {IAaveSwapper} from './interfaces/IAaveSwapper.sol';
 import {IPriceChecker} from './interfaces/IExpectedOutCalculator.sol';
 import {IMilkman} from './interfaces/IMilkman.sol';
 import {IAggregatorV3Interface} from './interfaces/IAggregatorV3Interface.sol';
 
-struct TWAPData {
-  IERC20 sellToken;
-  IERC20 buyToken;
-  address receiver;
-  uint256 partSellAmount; // amount of sellToken to sell in each part
-  uint256 minPartLimit; // max price to pay for a unit of buyToken denominated in sellToken
-  uint256 t0;
-  uint256 n;
-  uint256 t;
-  uint256 span;
-  bytes32 appData;
-}
+
 
 /// @title AaveSwapper
 /// @author efecarranza.eth
@@ -36,49 +27,7 @@ struct TWAPData {
 contract AaveSwapper is Initializable, OwnableWithGuardian, Rescuable, ERC1271Forwarder {
   using SafeERC20 for IERC20;
 
-  event LimitSwapRequested(
-    address milkman,
-    address indexed fromToken,
-    address indexed toToken,
-    uint256 amount,
-    address indexed recipient,
-    uint256 minAmountOut
-  );
-  event SwapCanceled(address indexed fromToken, address indexed toToken, uint256 amount);
-  event SwapRequested(
-    address milkman,
-    address indexed fromToken,
-    address indexed toToken,
-    address fromOracle,
-    address toOracle,
-    uint256 amount,
-    address indexed recipient,
-    uint256 slippage
-  );
-  event TWAPSwapCanceled(address indexed fromToken, address indexed toToken, uint256 amount);
-  event TWAPSwapRequested(
-    address handler,
-    address indexed fromToken,
-    address indexed toToken,
-    address recipient,
-    uint256 totalAmount
-  );
-
-  /// @notice Provided address is zero address
-  error Invalid0xAddress();
-
-  /// @notice Amount needs to be greater than zero
-  error InvalidAmount();
-
-  /// @notice Oracle does not have a valid decimals() function
-  error InvalidOracle();
-
-  /// @notice Recipient cannot be the zero address
-  error InvalidRecipient();
-
-  /// @notice Oracle cannot be the zero address
-  error OracleNotSet();
-
+  /// @inheritdoc IAaveSwapper
   address public constant BAL80WETH20 = 0x5c6Ee304399DBdB9C8Ef030aB642B10820DB8F56;
 
   constructor(address _composableCoW) ERC1271Forwarder(ComposableCoW(_composableCoW)) {}
@@ -90,16 +39,7 @@ contract AaveSwapper is Initializable, OwnableWithGuardian, Rescuable, ERC1271Fo
     _updateGuardian(0xA519a7cE7B24333055781133B13532AEabfAC81b);
   }
 
-  /// @notice Function to swap one token for another within a specified slippage
-  /// @param milkman Address of the Milkman contract to submit the order
-  /// @param priceChecker Address of the price checker to validate order
-  /// @param fromToken Address of the token to swap from
-  /// @param toToken Address of the token to swap to
-  /// @param fromOracle Address of the oracle to check fromToken price
-  /// @param toOracle Address of the oracle to check toToken price
-  /// @param recipient Address of the account receiving the swapped funds
-  /// @param amount The amount of fromToken to swap
-  /// @param slippage The allowed slippage compared to the oracle price (in BPS)
+  /// @inheritdoc IAaveSwapper
   function swap(
     address milkman,
     address priceChecker,
@@ -113,7 +53,15 @@ contract AaveSwapper is Initializable, OwnableWithGuardian, Rescuable, ERC1271Fo
   ) external onlyOwner {
     bytes memory data = _getPriceCheckerAndData(toToken, fromOracle, toOracle, slippage);
 
-    _swap(milkman, priceChecker, fromToken, toToken, recipient, amount, data);
+    IMilkman(milkman).requestSwapExactTokensForTokens(
+      amount,
+      IERC20(fromToken),
+      IERC20(toToken),
+      recipient,
+      bytes32(0),
+      priceChecker,
+      data
+    );
 
     emit SwapRequested(
       milkman,
@@ -203,16 +151,7 @@ contract AaveSwapper is Initializable, OwnableWithGuardian, Rescuable, ERC1271Fo
     emit TWAPSwapRequested(handler, fromToken, toToken, recipient, sellAmount * numParts);
   }
 
-  /// @notice Function to cancel an existing swap
-  /// @param tradeMilkman Address of the Milkman contract created upon order submission
-  /// @param priceChecker Address of the price checker to validate order
-  /// @param fromToken Address of the token to swap from
-  /// @param toToken Address of the token to swap to
-  /// @param fromOracle Address of the oracle to check fromToken price
-  /// @param toOracle Address of the oracle to check toToken price
-  /// @param recipient Address of the account receiving the swapped funds
-  /// @param amount The amount of fromToken to swap
-  /// @param slippage The allowed slippage compared to the oracle price (in BPS)
+  /// @inheritdoc IAaveSwapper
   function cancelSwap(
     address tradeMilkman,
     address priceChecker,
@@ -303,13 +242,7 @@ contract AaveSwapper is Initializable, OwnableWithGuardian, Rescuable, ERC1271Fo
     emit TWAPSwapCanceled(fromToken, toToken, sellAmount * numParts);
   }
 
-  /// @notice Helper function to see how much one could expect return in a swap
-  /// @param priceChecker Address of the price checker to validate order
-  /// @param amount The amount of fromToken to swap
-  /// @param fromToken Address of the token to swap from
-  /// @param toToken Address of the token to swap to
-  /// @param fromOracle Address of the oracle to check fromToken price
-  /// @param toOracle Address of the oracle to check toToken price
+  /// @inheritdoc IAaveSwapper
   function getExpectedOut(
     address priceChecker,
     uint256 amount,

@@ -2,8 +2,8 @@
 pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
+import {Vm} from 'forge-std/Vm.sol';
 import {IVotingMachineWithProofs, GovV3Helpers, PayloadsControllerUtils, IPayloadsControllerCore, GovV3StorageHelpers, IGovernanceCore} from '../src/GovV3Helpers.sol';
-import {GovHelpers} from '../src/GovHelpers.sol';
 import {ProtocolV3TestBase} from '../src/ProtocolV3TestBase.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
@@ -18,12 +18,13 @@ interface Mock {
 
 contract GovernanceV3Test is ProtocolV3TestBase {
   event TestEvent();
-  error CannotFindPayload();
 
   PayloadWithEmit payload;
 
+  uint256 public constant BLOCK_NUMBER = 20381808;
+
   function setUp() public {
-    vm.createSelectFork('mainnet', 18993187);
+    vm.createSelectFork('mainnet', BLOCK_NUMBER);
     payload = new PayloadWithEmit();
   }
 
@@ -91,7 +92,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
     IPayloadsControllerCore.Payload memory pl = payloadsController.getPayloadById(payloadId);
     assertEq(uint256(pl.state), uint256(IPayloadsControllerCore.PayloadState.Queued));
-    assertEq(pl.queuedAt, 1705004722);
+    assertEq(pl.queuedAt, block.timestamp - pl.delay - 1);
     assertEq(uint256(pl.maximumAccessLevelRequired), 1);
     assertEq(pl.createdAt, block.timestamp);
     assertEq(pl.creator, address(this));
@@ -123,7 +124,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
 
   function test_expectRevertOnNonExistingPayload() public {
     vm.expectRevert();
-    GovV3Helpers.executePayload(vm, address(1));
+    this.selfExternalCallToExecutePayload(vm, address(1));
   }
 
   /**
@@ -150,7 +151,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     vm.stopPrank();
   }
 
-  function xtest_payloadCreationWhenPayloadAlreadyCreated() public {
+  function test_payloadCreationWhenPayloadAlreadyCreated() public {
     // 1. deploy payloads
     PayloadWithEmit pl1 = new PayloadWithEmit();
     PayloadWithEmit pl2 = new PayloadWithEmit();
@@ -164,20 +165,37 @@ contract GovernanceV3Test is ProtocolV3TestBase {
 
     // 3. create same payload
     vm.expectRevert(GovV3Helpers.PayloadAlreadyCreated.selector);
-    GovV3Helpers.createPayload(actions);
+    this.selfExternalCallToCreatePayload(actions);
   }
 
   function test_helpers() public {
     defaultTest('default', AaveV3Ethereum.POOL, address(payload));
   }
 
-  function testFail_findPayload() public {
+  function test_findPayload() public {
     IPayloadsControllerCore.ExecutionAction[]
       memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
     actions[0] = GovV3Helpers.buildAction(address(42));
 
     // should revert as payload 0x42 does not exist
-    vm.expectRevert(CannotFindPayload.selector);
+    vm.expectRevert(GovV3Helpers.CannotFindPayload.selector);
+    this.selfExternalCallToBuildMainnetPayload(vm, actions);
+  }
+
+  function selfExternalCallToBuildMainnetPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) external {
     GovV3Helpers.buildMainnetPayload(vm, actions);
+  }
+
+  function selfExternalCallToCreatePayload(
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) external {
+    GovV3Helpers.createPayload(actions);
+  }
+
+  function selfExternalCallToExecutePayload(Vm vm, address payloadAddress) external {
+    GovV3Helpers.executePayload(vm, payloadAddress);
   }
 }

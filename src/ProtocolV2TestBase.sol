@@ -8,11 +8,12 @@ import {IERC20Metadata} from 'solidity-utils/contracts/oz-common/interfaces/IERC
 import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
 import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
+import {DiffUtils} from 'aave-v3-origin/../tests/utils/DiffUtils.sol';
+import {ChainIds} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
-import {ProxyHelpers} from './ProxyHelpers.sol';
-import {ChainIds} from './ChainIds.sol';
+import {ProxyHelpers} from 'aave-v3-origin/../tests/utils/ProxyHelpers.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -48,7 +49,7 @@ struct InterestStrategyValues {
   uint256 variableRateSlope2;
 }
 
-contract ProtocolV2TestBase is CommonTestBase {
+contract ProtocolV2TestBase is CommonTestBase, DiffUtils {
   using SafeERC20 for IERC20;
 
   /**
@@ -116,11 +117,11 @@ contract ProtocolV2TestBase is CommonTestBase {
   function e2eTest(ILendingPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ReserveConfig memory collateralConfig = _getGoodCollateral(configs);
-    uint256 snapshot = vm.snapshot();
+    uint256 snapshot = vm.snapshotState();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
         e2eTestAsset(pool, collateralConfig, configs[i]);
-        vm.revertTo(snapshot);
+        vm.revertToState(snapshot);
       }
     }
   }
@@ -146,19 +147,19 @@ contract ProtocolV2TestBase is CommonTestBase {
       _getTokenAmountByEthValue(pool, collateralConfig, 100)
     );
     _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
-    uint256 snapshot = vm.snapshot();
+    uint256 snapshot = vm.snapshotState();
     // test withdrawal
     _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
     _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
-    vm.revertTo(snapshot);
+    vm.revertToState(snapshot);
     // test variable borrowing
     if (testAssetConfig.borrowingEnabled) {
       _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
-      vm.revertTo(snapshot);
+      vm.revertToState(snapshot);
       // test stable borrowing
       if (testAssetConfig.stableBorrowRateEnabled) {
         _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
-        vm.revertTo(snapshot);
+        vm.revertToState(snapshot);
       }
     }
   }
@@ -190,7 +191,7 @@ contract ProtocolV2TestBase is CommonTestBase {
     uint256 amount,
     bool stable
   ) internal {
-    uint256 snapshot = vm.snapshot();
+    uint256 snapshot = vm.snapshotState();
     this._borrow(testAssetConfig, pool, borrower, amount, stable);
     // switching back and forth between rate modes should work
     if (testAssetConfig.stableBorrowRateEnabled) {
@@ -202,7 +203,7 @@ contract ProtocolV2TestBase is CommonTestBase {
       pool.swapBorrowRateMode(testAssetConfig.underlying, stable ? 1 : 2);
     }
     _repay(testAssetConfig, pool, borrower, amount, stable);
-    vm.revertTo(snapshot);
+    vm.revertToState(snapshot);
   }
 
   /**
@@ -940,5 +941,33 @@ contract ProtocolV2TestBase is CommonTestBase {
       oracle.getSourceOfAsset(asset) == expectedSource,
       '_validateAssetSourceOnOracle() : INVALID_PRICE_SOURCE'
     );
+  }
+
+  function _isInUint256Array(
+    uint256[] memory haystack,
+    uint256 needle
+  ) internal pure returns (bool) {
+    for (uint256 i = 0; i < haystack.length; i++) {
+      if (haystack[i] == needle) return true;
+    }
+    return false;
+  }
+
+  function _isInAddressArray(
+    address[] memory haystack,
+    address needle
+  ) internal pure returns (bool) {
+    for (uint256 i = 0; i < haystack.length; i++) {
+      if (haystack[i] == needle) return true;
+    }
+    return false;
+  }
+
+  /**
+   * @dev forwards time by x blocks
+   */
+  function _skipBlocks(uint128 blocks) internal {
+    vm.roll(block.number + blocks);
+    vm.warp(block.timestamp + blocks * 12); // assuming a block is around 12seconds
   }
 }

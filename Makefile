@@ -78,3 +78,5 @@ git-diff :
 
 # Voting scripts
 vote :;  forge script scripts/VotingScripts.s.sol:VoteForProposal --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv ${proposalId} ${support}
+
+deploy-pk :; forge script ${contract} --rpc-url ${chain} $(if ${dry},--sender 0x25F2226B597E8F9514B3F68F00f494cF4f286491 -vvvv,--broadcast --private-key ${PRIVATE_KEY} --verify -vvvv --slow)
