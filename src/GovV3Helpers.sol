@@ -21,6 +21,7 @@ import {GovernanceV3Gnosis} from 'aave-address-book/GovernanceV3Gnosis.sol';
 import {GovernanceV3Scroll} from 'aave-address-book/GovernanceV3Scroll.sol';
 import {GovernanceV3PolygonZkEvm} from 'aave-address-book/GovernanceV3PolygonZkEvm.sol';
 import {GovernanceV3ZkSync} from 'aave-address-book/GovernanceV3ZkSync.sol';
+import {GovernanceV3Linea} from 'aave-address-book/GovernanceV3Linea.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
 import {Create2Utils} from 'solidity-utils/contracts/utils/ScriptUtils.sol';
@@ -697,6 +698,30 @@ library GovV3Helpers {
   }
 
   /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param actions actions array
+   */
+  function buildLineaPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.LINEA, actions);
+  }
+
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param action single action struct
+   */
+  function buildLineaPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.LINEA, action);
+  }
+
+  /**
    * @dev creates a proposal with multiple payloads
    * @param vm Vm
    * @param payloads payloads array
@@ -777,6 +802,8 @@ library GovV3Helpers {
       return GovernanceV3PolygonZkEvm.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.ZKSYNC) {
       return GovernanceV3ZkSync.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.LINEA) {
+      return GovernanceV3Linea.PAYLOADS_CONTROLLER;
     }
 
     revert CannotFindPayloadsController();
