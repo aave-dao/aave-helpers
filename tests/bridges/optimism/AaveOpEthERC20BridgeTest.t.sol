@@ -7,6 +7,7 @@ import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {GovernanceV3Optimism} from 'aave-address-book/GovernanceV3Optimism.sol';
+import {IRescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
 
 import {AaveOpEthERC20Bridge} from 'src/bridges/optimism/AaveOpEthERC20Bridge.sol';
 import {IAaveOpEthERC20Bridge} from 'src/bridges/optimism/IAaveOpEthERC20Bridge.sol';
@@ -104,7 +105,7 @@ contract TransferOwnership is AaveOpEthERC20BridgeTest {
 
 contract EmergencyTokenTransfer is AaveOpEthERC20BridgeTest {
   function test_revertsIf_invalidCaller() public {
-    vm.expectRevert('ONLY_RESCUE_GUARDIAN');
+    vm.expectRevert(IRescuable.OnlyRescueGuardian.selector);
     vm.startPrank(makeAddr('random-caller'));
     bridge.emergencyTokenTransfer(
       AaveV3OptimismAssets.USDC_UNDERLYING,

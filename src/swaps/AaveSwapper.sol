@@ -135,7 +135,7 @@ contract AaveSwapper is IAaveSwapper, Initializable, OwnableWithGuardian, Rescua
 
   /// @inheritdoc IRescuableBase
   function maxRescue(
-    address erc20Token
+    address
   ) public pure override(RescuableBase, IRescuableBase) returns (uint256) {
     return type(uint256).max;
   }
