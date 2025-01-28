@@ -17,6 +17,6 @@ contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
   }
 
   function test_helpers() public {
-    defaultTest('default', AaveV3ZkSync.POOL, address(payload));
+    defaultTest('zksync', AaveV3ZkSync.POOL, address(payload));
   }
 }
