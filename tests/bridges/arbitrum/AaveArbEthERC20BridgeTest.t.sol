@@ -264,8 +264,9 @@ contract ExitTest is AaveArbEthERC20BridgeTest {
 
 contract TransferOwnership is AaveArbEthERC20BridgeTest {
   function test_revertsIf_invalidCaller() public {
-    vm.startPrank(makeAddr('random-caller'));
-    vm.expectRevert('Ownable: caller is not the owner');
+    address addr = makeAddr('random-caller');
+    vm.startPrank(addr);
+    vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, addr));
     bridgeMainnet.transferOwnership(makeAddr('new-admin'));
     vm.stopPrank();
   }

@@ -8,7 +8,7 @@ import {Rescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
 import {RescuableBase, IRescuableBase} from 'solidity-utils/contracts/utils/RescuableBase.sol';
 import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
-import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
+import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 
 import {IAaveSwapper} from './interfaces/IAaveSwapper.sol';
 import {IPriceChecker} from './interfaces/IExpectedOutCalculator.sol';
@@ -26,7 +26,10 @@ contract AaveSwapper is IAaveSwapper, OwnableWithGuardian, Rescuable {
   address public constant BAL80WETH20 = 0x5c6Ee304399DBdB9C8Ef030aB642B10820DB8F56;
 
   constructor()
-    OwnableWithGuardian(AaveGovernanceV2.SHORT_EXECUTOR, 0xA519a7cE7B24333055781133B13532AEabfAC81b)
+    OwnableWithGuardian(
+      GovernanceV3Ethereum.EXECUTOR_LVL_1,
+      0xA519a7cE7B24333055781133B13532AEabfAC81b
+    )
   {}
 
   /// @inheritdoc IAaveSwapper

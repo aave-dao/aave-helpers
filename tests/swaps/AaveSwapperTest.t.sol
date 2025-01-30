@@ -3,11 +3,13 @@
 pragma solidity ^0.8.0;
 
 import {Test} from 'forge-std/Test.sol';
+import {Ownable} from 'openzeppelin-contracts/contracts/access/Ownable.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {IRescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
+import {IWithGuardian} from 'solidity-utils/contracts/access-control/UpgradeableOwnableWithGuardian.sol';
 
 import {AaveSwapper} from 'src/swaps/AaveSwapper.sol';
 import {IAaveSwapper} from 'src/swaps/interfaces/IAaveSwapper.sol';
@@ -47,7 +49,9 @@ contract AaveSwapperTest is Test {
 
 contract TransferOwnership is AaveSwapperTest {
   function test_revertsIf_invalidCaller() public {
-    vm.expectRevert('Ownable: caller is not the owner');
+    vm.expectRevert(
+      abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this))
+    );
     swaps.transferOwnership(makeAddr('new-admin'));
   }
 
@@ -63,7 +67,9 @@ contract TransferOwnership is AaveSwapperTest {
 
 contract UpdateGuardian is AaveSwapperTest {
   function test_revertsIf_invalidCaller() public {
-    vm.expectRevert('ONLY_BY_OWNER_OR_GUARDIAN');
+    vm.expectRevert(
+      abi.encodeWithSelector(IWithGuardian.OnlyGuardianOrOwnerInvalidCaller.selector, address(this))
+    );
     swaps.updateGuardian(makeAddr('new-admin'));
   }
 
@@ -81,7 +87,9 @@ contract UpdateGuardian is AaveSwapperTest {
 
 contract RemoveGuardian is AaveSwapperTest {
   function test_revertsIf_invalidCaller() public {
-    vm.expectRevert('ONLY_BY_OWNER_OR_GUARDIAN');
+    vm.expectRevert(
+      abi.encodeWithSelector(IWithGuardian.OnlyGuardianOrOwnerInvalidCaller.selector, address(this))
+    );
     swaps.updateGuardian(address(0));
   }
 
@@ -99,7 +107,9 @@ contract RemoveGuardian is AaveSwapperTest {
 contract AaveSwapperSwap is AaveSwapperTest {
   function test_revertsIf_invalidCaller() public {
     uint256 amount = 1_000e18;
-    vm.expectRevert('Ownable: caller is not the owner');
+    vm.expectRevert(
+      abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this))
+    );
     swaps.swap(
       MILKMAN,
       CHAINLINK_PRICE_CHECKER,
@@ -214,7 +224,9 @@ contract AaveSwapperSwap is AaveSwapperTest {
 contract CancelSwap is AaveSwapperTest {
   function test_revertsIf_invalidCaller() public {
     uint256 amount = 1_000e18;
-    vm.expectRevert('ONLY_BY_OWNER_OR_GUARDIAN');
+    vm.expectRevert(
+      abi.encodeWithSelector(IWithGuardian.OnlyGuardianOrOwnerInvalidCaller.selector, address(this))
+    );
     swaps.cancelSwap(
       makeAddr('milkman-instance'),
       CHAINLINK_PRICE_CHECKER,

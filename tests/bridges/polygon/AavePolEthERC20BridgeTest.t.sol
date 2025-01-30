@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Test} from 'forge-std/Test.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
+import {Ownable} from 'openzeppelin-contracts/contracts/access/Ownable.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV2Polygon, AaveV2PolygonAssets} from 'aave-address-book/AaveV2Polygon.sol';
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
@@ -60,7 +61,9 @@ contract BridgeTest is AavePolEthERC20BridgeTest {
 
     bridgePolygon.transferOwnership(GovernanceV3Polygon.EXECUTOR_LVL_1);
 
-    vm.expectRevert('Ownable: caller is not the owner');
+    vm.expectRevert(
+      abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this))
+    );
     bridgePolygon.bridge(AaveV3PolygonAssets.USDC_UNDERLYING, amount);
   }
 
@@ -264,8 +267,9 @@ contract ExitMultipleTest is AavePolEthERC20BridgeTest {
 
 contract TransferOwnership is AavePolEthERC20BridgeTest {
   function test_revertsIf_invalidCaller() public {
-    vm.startPrank(makeAddr('random-caller'));
-    vm.expectRevert('Ownable: caller is not the owner');
+    address addr = makeAddr('random-caller');
+    vm.startPrank(addr);
+    vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, addr));
     bridgeMainnet.transferOwnership(makeAddr('new-admin'));
     vm.stopPrank();
   }
