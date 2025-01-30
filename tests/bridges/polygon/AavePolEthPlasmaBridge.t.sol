@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 
 import {Test} from 'forge-std/Test.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
+import {Ownable} from 'openzeppelin-contracts/contracts/access/Ownable.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV2Polygon, AaveV2PolygonAssets} from 'aave-address-book/AaveV2Polygon.sol';
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
@@ -62,7 +63,9 @@ contract BridgeTest is AavePolEthPlasmaBridgeTest {
 
     bridgePolygon.transferOwnership(GovernanceV3Polygon.EXECUTOR_LVL_1);
 
-    vm.expectRevert('Ownable: caller is not the owner');
+    vm.expectRevert(
+      abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this))
+    );
     bridgePolygon.bridge(amount);
   }
 

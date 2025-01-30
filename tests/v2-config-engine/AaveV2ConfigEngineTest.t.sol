@@ -16,7 +16,7 @@ contract AaveV2ConfigEngineTest is ProtocolV2TestBase {
   using stdStorage for StdStorage;
 
   function testV2RateStrategiesUpdates() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 20720392);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 21737040);
     (address ratesFactory, ) = DeployV2RatesFactoryEthLib.deploy();
     IAaveV2ConfigEngine engine = IAaveV2ConfigEngine(DeployV2EngineEthLib.deploy(ratesFactory));
 

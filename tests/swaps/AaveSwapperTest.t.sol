@@ -45,13 +45,6 @@ contract AaveSwapperTest is Test {
   }
 }
 
-contract Initialize is AaveSwapperTest {
-  function test_revertsIf_alreadyInitialized() public {
-    vm.expectRevert('Initializable: contract is already initialized');
-    swaps.initialize();
-  }
-}
-
 contract TransferOwnership is AaveSwapperTest {
   function test_revertsIf_invalidCaller() public {
     vm.expectRevert('Ownable: caller is not the owner');

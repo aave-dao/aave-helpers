@@ -44,9 +44,6 @@ interface IAaveSwapper {
   /// @notice Returns the address of the 80-BAL-20-WETH Balancer LP
   function BAL80WETH20() external view returns (address);
 
-  /// @notice Initializes contract
-  function initialize() external;
-
   /// @notice Performs a swap via Cow Swap
   /// @param milkman Address of Milkman (Cow Swap) contract
   /// @param priceChecker Address of price checker to use for swap

@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
-import {Initializable} from 'openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol';
 import {Rescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
 import {RescuableBase, IRescuableBase} from 'solidity-utils/contracts/utils/RescuableBase.sol';
 import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
@@ -20,7 +19,7 @@ import {IMilkman} from './interfaces/IMilkman.sol';
  * @author efecarranza.eth
  * @notice Helper contract to swap assets using milkman
  */
-contract AaveSwapper is IAaveSwapper, Initializable, OwnableWithGuardian, Rescuable {
+contract AaveSwapper is IAaveSwapper, OwnableWithGuardian, Rescuable {
   using SafeERC20 for IERC20;
 
   /// @inheritdoc IAaveSwapper
@@ -29,9 +28,6 @@ contract AaveSwapper is IAaveSwapper, Initializable, OwnableWithGuardian, Rescua
   constructor()
     OwnableWithGuardian(AaveGovernanceV2.SHORT_EXECUTOR, 0xA519a7cE7B24333055781133B13532AEabfAC81b)
   {}
-
-  /// @inheritdoc IAaveSwapper
-  function initialize() external initializer {}
 
   /// @inheritdoc IAaveSwapper
   function swap(
