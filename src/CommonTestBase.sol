@@ -4,7 +4,7 @@ pragma solidity >=0.7.5 <0.9.0;
 import 'forge-std/StdJson.sol';
 import 'forge-std/Test.sol';
 import {VmSafe} from 'forge-std/Vm.sol';
-import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
@@ -102,7 +102,7 @@ contract CommonTestBase is Test {
         return true;
       }
     }
-    if(block.chainid == ChainIds.AVALANCHE) {
+    if (block.chainid == ChainIds.AVALANCHE) {
       // AUSD
       if (asset == 0x00000000eFE302BEAA2b3e6e1b18d08D69a9012a) {
         vm.prank(0x2CD78aD719a8c74898c5283f5Bc70920D8A061fd);

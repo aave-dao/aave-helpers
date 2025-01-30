@@ -7,7 +7,7 @@ import {IReserveInterestRateStrategy} from './IReserveInterestRateStrategy.sol';
 import {WadRayMath} from '../dependencies/WadRayMath.sol';
 import {PercentageMath} from '../dependencies/PercentageMath.sol';
 import {ILendingPoolAddressesProvider, ILendingRateOracle} from 'aave-address-book/AaveV2.sol';
-import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 
 /**
  * @title DefaultReserveInterestRateStrategy contract

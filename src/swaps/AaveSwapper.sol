@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.0;
 
-import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
-import {SafeERC20} from 'solidity-utils/contracts/oz-common/SafeERC20.sol';
+import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
+import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
+import {Initializable} from 'openzeppelin-contracts-upgradeable/contracts/proxy/utils/Initializable.sol';
 import {Rescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
 import {RescuableBase, IRescuableBase} from 'solidity-utils/contracts/utils/RescuableBase.sol';
 import {OwnableWithGuardian} from 'solidity-utils/contracts/access-control/OwnableWithGuardian.sol';
-import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initializable.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 
@@ -26,11 +26,12 @@ contract AaveSwapper is IAaveSwapper, Initializable, OwnableWithGuardian, Rescua
   /// @inheritdoc IAaveSwapper
   address public constant BAL80WETH20 = 0x5c6Ee304399DBdB9C8Ef030aB642B10820DB8F56;
 
+  constructor()
+    OwnableWithGuardian(AaveGovernanceV2.SHORT_EXECUTOR, 0xA519a7cE7B24333055781133B13532AEabfAC81b)
+  {}
+
   /// @inheritdoc IAaveSwapper
-  function initialize() external initializer {
-    _transferOwnership(AaveGovernanceV2.SHORT_EXECUTOR);
-    _updateGuardian(0xA519a7cE7B24333055781133B13532AEabfAC81b);
-  }
+  function initialize() external initializer {}
 
   /// @inheritdoc IAaveSwapper
   function swap(

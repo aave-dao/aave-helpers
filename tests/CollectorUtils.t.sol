@@ -107,7 +107,7 @@ contract CollectorUtilsTest is Test {
     uint256 actualAmount = CollectorUtils.stream(
       COLLECTOR,
       CollectorUtils.CreateStreamInput({
-	underlying: address(UNDERLYING),
+        underlying: address(UNDERLYING),
         receiver: testReceiver,
         amount: amount,
         start: block.timestamp,

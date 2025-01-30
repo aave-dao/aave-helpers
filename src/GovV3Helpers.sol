@@ -23,7 +23,6 @@ import {GovernanceV3PolygonZkEvm} from 'aave-address-book/GovernanceV3PolygonZkE
 import {GovernanceV3ZkSync} from 'aave-address-book/GovernanceV3ZkSync.sol';
 import {GovernanceV3Linea} from 'aave-address-book/GovernanceV3Linea.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
-import {Address} from 'solidity-utils/contracts/oz-common/Address.sol';
 import {Create2Utils} from 'solidity-utils/contracts/utils/ScriptUtils.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 import {Create2UtilsZkSync} from 'solidity-utils/../zksync/src/contracts/utils/ScriptUtilsZkSync.sol';
@@ -399,7 +398,7 @@ library GovV3Helpers {
    * @param payloadAddress address of the payload to execute
    */
   function readyPayload(Vm vm, address payloadAddress) internal returns (uint40) {
-    require(Address.isContract(payloadAddress), 'PAYLOAD_ADDRESS_HAS_NO_CODE');
+    require(payloadAddress.code.length > 0, 'PAYLOAD_ADDRESS_HAS_NO_CODE');
     IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
     IPayloadsControllerCore.ExecutionAction[]
       memory actions = new IPayloadsControllerCore.ExecutionAction[](1);

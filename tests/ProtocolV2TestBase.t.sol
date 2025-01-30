@@ -5,7 +5,7 @@ import 'forge-std/Test.sol';
 import {ProtocolV2TestBase, ReserveConfig} from '../src/ProtocolV2TestBase.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
-import {IERC20} from 'solidity-utils/contracts/oz-common/interfaces/IERC20.sol';
+import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 
 contract ProtocolV2TestBaseTest is ProtocolV2TestBase {

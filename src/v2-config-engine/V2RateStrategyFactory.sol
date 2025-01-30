@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {ILendingPool} from 'aave-address-book/AaveV2.sol';
-import {Initializable} from 'solidity-utils/contracts/transparent-proxy/Initializable.sol';
+import {Initializable} from 'openzeppelin-contracts/contracts/proxy/utils/Initializable.sol';
 import {IV2RateStrategyFactory} from './IV2RateStrategyFactory.sol';
 import {DefaultReserveInterestRateStrategy} from '../dependencies/DefaultReserveInterestRateStrategy.sol';
 import {IDefaultInterestRateStrategy, ILendingPoolAddressesProvider} from 'aave-address-book/AaveV2.sol';
