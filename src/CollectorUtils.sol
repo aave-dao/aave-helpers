@@ -97,10 +97,8 @@ library CollectorUtils {
     IOInput memory input,
     address receiver
   ) internal returns (uint256) {
-    DataTypes.ReserveDataLegacy memory reserveData = IPool(input.pool).getReserveData(
-      input.underlying
-    );
-    return __withdraw(collector, input, reserveData.aTokenAddress, receiver);
+    address aTokenAddress = IPool(input.pool).getReserveAToken(input.underlying);
+    return __withdraw(collector, input, aTokenAddress, receiver);
   }
 
   /**
