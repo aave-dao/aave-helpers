@@ -192,7 +192,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
         variableDebtTokenTotalSupply / 10 ** testAssetConfig.decimals + 1
       );
 
-      vm.expectRevert();
+      vm.expectRevert(bytes(Errors.SUPPLY_CAP_EXCEEDED));
       vm.prank(testAssetSupplier);
       pool.deposit({
         asset: testAssetConfig.underlying,
@@ -200,15 +200,17 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
         onBehalfOf: testAssetSupplier,
         referralCode: 0
       });
-      vm.expectRevert();
-      vm.prank(testAssetSupplier);
-      pool.borrow({
-        asset: testAssetConfig.underlying,
-        amount: 10 ** testAssetConfig.decimals,
-        interestRateMode: 2,
-        referralCode: 0,
-        onBehalfOf: testAssetSupplier
-      });
+      if (testAssetConfig.borrowingEnabled) {
+        vm.expectRevert(bytes(Errors.BORROW_CAP_EXCEEDED));
+        vm.prank(testAssetSupplier);
+        pool.borrow({
+          asset: testAssetConfig.underlying,
+          amount: 10 ** testAssetConfig.decimals,
+          interestRateMode: 2,
+          referralCode: 0,
+          onBehalfOf: testAssetSupplier
+        });
+      }
 
       vm.revertToState(snapshotAfterDeposits);
 
