@@ -217,7 +217,7 @@ contract ProtocolV2TestBase is CommonTestBase, DiffUtils {
         _includeInE2e(configs[i]) &&
         configs[i].usageAsCollateralEnabled &&
         !configs[i].stableBorrowRateEnabled &&
-	configs[i].ltv != 0
+        configs[i].ltv != 0
       ) return configs[i];
     }
     revert('ERROR: No usable collateral found');
@@ -661,7 +661,7 @@ contract ProtocolV2TestBase is CommonTestBase, DiffUtils {
     revert('RESERVE_CONFIG_NOT_FOUND');
   }
 
-  function _logReserveConfig(ReserveConfig memory config) internal view {
+  function _logReserveConfig(ReserveConfig memory config) internal pure {
     console.log('Symbol ', config.symbol);
     console.log('Underlying address ', config.underlying);
     console.log('AToken address ', config.aToken);

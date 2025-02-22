@@ -10,7 +10,7 @@ contract ProxyHelpersTest is Test {
     vm.createSelectFork('mainnet', 15816947);
   }
 
-  function testAdmin() public {
+  function testAdmin() public view {
     address admin = ProxyHelpers.getInitializableAdminUpgradeabilityProxyAdmin(
       vm,
       0x41A08648C3766F9F9d85598fF102a08f4ef84F84
@@ -18,7 +18,7 @@ contract ProxyHelpersTest is Test {
     assertEq(admin, AaveGovernanceV2.SHORT_EXECUTOR);
   }
 
-  function testImplementation() public {
+  function testImplementation() public view {
     address implementation = ProxyHelpers.getInitializableAdminUpgradeabilityProxyImplementation(
       vm,
       0x41A08648C3766F9F9d85598fF102a08f4ef84F84

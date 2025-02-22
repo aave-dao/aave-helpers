@@ -12,3 +12,5 @@ yarn-error.log
 
 # snapshot artifacts
 reports/
+
+.vscode/
