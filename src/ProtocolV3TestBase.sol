@@ -273,7 +273,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
         });
       }
 
-      address payer = vm.addr(5);
+      address liquidator = vm.addr(5);
 
       uint256 snapshotBeforeLiquidation = vm.snapshotState();
 
@@ -282,7 +282,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
         collateralConfig: collateralConfig,
         debtConfig: testAssetConfig,
         pool: pool,
-        payer: payer,
+        liquidator: liquidator,
         borrower: collateralSupplier,
         debtToCover: type(uint256).max,
         receiveAToken: false
@@ -295,7 +295,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
         collateralConfig: collateralConfig,
         debtConfig: testAssetConfig,
         pool: pool,
-        payer: payer,
+        liquidator: liquidator,
         borrower: collateralSupplier,
         debtToCover: type(uint256).max,
         receiveAToken: true
@@ -482,17 +482,17 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     ReserveConfig memory collateralConfig,
     ReserveConfig memory debtConfig,
     IPool pool,
-    address payer,
+    address liquidator,
     address borrower,
     uint256 debtToCover,
     bool receiveAToken
   ) internal {
-    vm.startPrank(payer);
+    vm.startPrank(liquidator);
 
     uint256 debtBefore = IERC20(debtConfig.variableDebtToken).balanceOf(borrower);
     assertGt(debtBefore, 0);
 
-    deal2(debtConfig.underlying, payer, debtToCover > debtBefore ? debtBefore : debtToCover);
+    deal2(debtConfig.underlying, liquidator, debtToCover > debtBefore ? debtBefore : debtToCover);
     IERC20(debtConfig.underlying).forceApprove(address(pool), debtToCover);
 
     console.log(
