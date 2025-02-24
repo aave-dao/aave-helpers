@@ -14,7 +14,7 @@ import {ProtocolV3TestBase as RawProtocolV3TestBase, ReserveConfig} from 'aave-v
 import {MockAggregator} from 'aave-v3-origin/contracts/mocks/oracle/CLAggregators/MockAggregator.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
-import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
+import {CommonTestBase, ReserveTokens, ChainIds} from './CommonTestBase.sol';
 import {ILegacyDefaultInterestRateStrategy} from './dependencies/ILegacyDefaultInterestRateStrategy.sol';
 
 struct LocalVars {
@@ -421,6 +421,10 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
   ) internal returns (uint256) {
     vm.startPrank(user);
     uint256 aTokenBefore = IERC20(config.aToken).balanceOf(user);
+    if (block.chainid == ChainIds.CELO && config.underlying == 0x471EcE3750Da237f93B8E339c536989b8978a438) {
+      vm.deal(config.aToken, aTokenBefore);
+    }
+
     uint256 amountOut = pool.withdraw(config.underlying, amount, user);
     console.log('WITHDRAW: %s, Amount: %s', config.symbol, amountOut);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);

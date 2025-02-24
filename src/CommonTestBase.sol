@@ -110,6 +110,13 @@ contract CommonTestBase is Test {
         return true;
       }
     }
+    if (block.chainid == ChainIds.CELO) {
+      // CELO
+      if (asset == 0x471EcE3750Da237f93B8E339c536989b8978a438) {
+        vm.deal(user, amount);
+        return true;
+      }
+    }
     return false;
   }
 
