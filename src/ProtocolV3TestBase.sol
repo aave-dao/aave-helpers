@@ -421,7 +421,10 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
   ) internal returns (uint256) {
     vm.startPrank(user);
     uint256 aTokenBefore = IERC20(config.aToken).balanceOf(user);
-    if (block.chainid == ChainIds.CELO && config.underlying == 0x471EcE3750Da237f93B8E339c536989b8978a438) {
+    if (
+      block.chainid == ChainIds.CELO &&
+      config.underlying == 0x471EcE3750Da237f93B8E339c536989b8978a438
+    ) {
       vm.deal(config.aToken, aTokenBefore);
     }
 
