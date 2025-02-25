@@ -7,8 +7,6 @@ import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/Safe
 contract MockFlashLoanReceiver {
   using SafeERC20 for IERC20;
 
-  error TestError(uint256 x, uint256 y);
-
   function executeOperation(
     address[] calldata assets,
     uint256[] calldata amounts,
