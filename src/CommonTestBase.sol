@@ -90,7 +90,13 @@ contract CommonTestBase is Test {
     if (block.chainid == ChainIds.OPTIMISM) {
       // sUSD
       if (asset == AaveV3OptimismAssets.sUSD_UNDERLYING) {
-        vm.prank(AaveV3OptimismAssets.sUSD_A_TOKEN);
+        deal(
+          0x92bAc115d89cA17fd02Ed9357CEcA32842ACB4c2,
+          0xf2107A85d8b79CBd2c5b2Bb63CA73Fd068040b67,
+          amount
+        );
+
+        vm.prank(0xf2107A85d8b79CBd2c5b2Bb63CA73Fd068040b67);
         IERC20(asset).transfer(user, amount);
         return true;
       }

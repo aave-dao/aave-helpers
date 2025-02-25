@@ -10,7 +10,6 @@ import {ReserveConfiguration} from 'aave-v3-origin/contracts/protocol/libraries/
 import {PercentageMath} from 'aave-v3-origin/contracts/protocol/libraries/math/PercentageMath.sol';
 import {IDefaultInterestRateStrategyV2} from 'aave-v3-origin/contracts/interfaces/IDefaultInterestRateStrategyV2.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
-import {AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {DiffUtils} from 'aave-v3-origin-tests/utils/DiffUtils.sol';
 import {ProtocolV3TestBase as RawProtocolV3TestBase, ReserveConfig} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
 import {MockAggregator} from 'aave-v3-origin/contracts/mocks/oracle/CLAggregators/MockAggregator.sol';
@@ -608,14 +607,10 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     uint256 debtTokenBalanceOfUserAfter = IERC20(config.variableDebtToken).balanceOf(user);
 
     if (interestRateMode == 0) {
-      if (config.underlying == AaveV3OptimismAssets.sUSD_UNDERLYING) {
-        assertEq(underlyingTokenBalanceOfATokenBefore, underlyingTokenBalanceOfATokenAfter);
-      } else {
-        assertEq(
-          underlyingTokenBalanceOfATokenBefore + totalPremium,
-          underlyingTokenBalanceOfATokenAfter
-        );
-      }
+      assertEq(
+        underlyingTokenBalanceOfATokenBefore + totalPremium,
+        underlyingTokenBalanceOfATokenAfter
+      );
 
       assertEq(debtTokenBalanceOfUserAfter, debtTokenBalanceOfUserBefore);
     } else {
