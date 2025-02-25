@@ -7,8 +7,10 @@ import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {IERC20Metadata} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
 import {ReserveConfiguration} from 'aave-v3-origin/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {PercentageMath} from 'aave-v3-origin/contracts/protocol/libraries/math/PercentageMath.sol';
 import {IDefaultInterestRateStrategyV2} from 'aave-v3-origin/contracts/interfaces/IDefaultInterestRateStrategyV2.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
+import {AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {DiffUtils} from 'aave-v3-origin-tests/utils/DiffUtils.sol';
 import {ProtocolV3TestBase as RawProtocolV3TestBase, ReserveConfig} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
 import {MockAggregator} from 'aave-v3-origin/contracts/mocks/oracle/CLAggregators/MockAggregator.sol';
@@ -16,6 +18,7 @@ import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializabl
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ILegacyDefaultInterestRateStrategy} from './dependencies/ILegacyDefaultInterestRateStrategy.sol';
+import {MockFlashLoanReceiver} from './mocks/MockFlashLoanReceiver.sol';
 
 struct LocalVars {
   IPoolDataProvider.TokenData[] reserves;
@@ -39,6 +42,7 @@ struct InterestStrategyValues {
  */
 contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
+  using PercentageMath for uint256;
   using SafeERC20 for IERC20;
 
   /**
@@ -304,6 +308,31 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
 
       vm.revertToState(snapshotAfterDeposits);
     }
+
+    // test flashloans
+    if (testAssetConfig.isFlashloanable) {
+      MockFlashLoanReceiver flashLoanReceiver = new MockFlashLoanReceiver();
+
+      _flashLoan({
+        config: testAssetConfig,
+        pool: pool,
+        user: collateralSupplier,
+        receiverAddress: address(flashLoanReceiver),
+        amount: testAssetAmount,
+        interestRateMode: 0
+      });
+
+      if (testAssetConfig.borrowingEnabled) {
+        _flashLoan({
+          config: testAssetConfig,
+          pool: pool,
+          user: collateralSupplier,
+          receiverAddress: address(flashLoanReceiver),
+          amount: testAssetAmount,
+          interestRateMode: 2
+        });
+      }
+    }
   }
 
   /**
@@ -514,6 +543,80 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     uint256 debtAfter = IERC20(debtConfig.variableDebtToken).balanceOf(borrower);
 
     assertLt(debtAfter, debtBefore);
+
+    vm.stopPrank();
+  }
+
+  function _flashLoan(
+    ReserveConfig memory config,
+    IPool pool,
+    address user,
+    address receiverAddress,
+    uint256 amount,
+    uint256 interestRateMode
+  ) internal {
+    vm.startPrank(user);
+
+    uint256 underlyingTokenBalanceOfATokenBefore = IERC20(config.underlying).balanceOf(
+      config.aToken
+    );
+    uint256 debtTokenBalanceOfUserBefore = IERC20(config.variableDebtToken).balanceOf(user);
+
+    uint256 totalPremium;
+    if (interestRateMode == 0) {
+      uint256 flashLoanPremiumTotal = pool.FLASHLOAN_PREMIUM_TOTAL();
+
+      totalPremium = amount.percentMul(flashLoanPremiumTotal);
+
+      deal2(config.underlying, receiverAddress, totalPremium);
+    }
+
+    console.log('FLASH LOAN: %s, Amount: %s', config.symbol, amount);
+
+    {
+      address[] memory assets = new address[](1);
+      assets[0] = config.underlying;
+
+      uint256[] memory amounts = new uint256[](1);
+      amounts[0] = amount;
+
+      uint256[] memory interestRateModes = new uint256[](1);
+      interestRateModes[0] = interestRateMode;
+
+      pool.flashLoan({
+        receiverAddress: receiverAddress,
+        assets: assets,
+        amounts: amounts,
+        interestRateModes: interestRateModes,
+        onBehalfOf: user,
+        params: '0x',
+        referralCode: 0
+      });
+    }
+
+    uint256 underlyingTokenBalanceOfATokenAfter = IERC20(config.underlying).balanceOf(
+      config.aToken
+    );
+    uint256 debtTokenBalanceOfUserAfter = IERC20(config.variableDebtToken).balanceOf(user);
+
+    if (interestRateMode == 0) {
+      if (config.underlying == AaveV3OptimismAssets.sUSD_UNDERLYING) {
+        assertEq(underlyingTokenBalanceOfATokenBefore, underlyingTokenBalanceOfATokenAfter);
+      } else {
+        assertEq(
+          underlyingTokenBalanceOfATokenBefore + totalPremium,
+          underlyingTokenBalanceOfATokenAfter
+        );
+      }
+
+      assertEq(debtTokenBalanceOfUserAfter, debtTokenBalanceOfUserBefore);
+    } else {
+      assertGt(underlyingTokenBalanceOfATokenBefore, underlyingTokenBalanceOfATokenAfter);
+      assertEq(underlyingTokenBalanceOfATokenBefore - amount, underlyingTokenBalanceOfATokenAfter);
+
+      assertGt(debtTokenBalanceOfUserAfter, debtTokenBalanceOfUserBefore);
+      assertApproxEqAbs(debtTokenBalanceOfUserAfter, debtTokenBalanceOfUserBefore + amount, 1);
+    }
 
     vm.stopPrank();
   }
