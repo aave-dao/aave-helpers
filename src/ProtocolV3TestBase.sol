@@ -45,6 +45,8 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
   using PercentageMath for uint256;
   using SafeERC20 for IERC20;
 
+  MockFlashLoanReceiver internal flashLoanReceiver;
+
   /**
    * @dev runs the default test suite that should run on any proposal touching the aave protocol which includes:
    * - diffing the config
@@ -131,6 +133,10 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
    * @param pool the pool that should be tested
    */
   function e2eTest(IPool pool) public {
+    if (address(flashLoanReceiver) == address(0)) {
+      flashLoanReceiver = new MockFlashLoanReceiver();
+    }
+
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ReserveConfig memory collateralConfig = _getGoodCollateral(configs);
     uint256 snapshot = vm.snapshotState();
@@ -311,7 +317,9 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
 
     // test flashloans
     if (testAssetConfig.isFlashloanable) {
-      MockFlashLoanReceiver flashLoanReceiver = new MockFlashLoanReceiver();
+      if (address(flashLoanReceiver) == address(0)) {
+        flashLoanReceiver = new MockFlashLoanReceiver();
+      }
 
       _flashLoan({
         config: testAssetConfig,
