@@ -15,7 +15,6 @@ import {AaveV3Gnosis} from 'aave-address-book/AaveV3Gnosis.sol';
 import {IPoolAddressesProvider, IPool, IPoolConfigurator, IAaveOracle, IPoolDataProvider, IACLManager} from 'aave-address-book//AaveV3.sol';
 import {AaveV3BNB} from 'aave-address-book/AaveV3BNB.sol';
 import {AaveV3Scroll} from 'aave-address-book/AaveV3Scroll.sol';
-import {AaveV3PolygonZkEvm} from 'aave-address-book/AaveV3PolygonZkEvm.sol';
 import {AaveV3EthereumLido} from 'aave-address-book/AaveV3EthereumLido.sol';
 import {AaveV3EthereumEtherFi} from 'aave-address-book/AaveV3EthereumEtherFi.sol';
 
@@ -124,17 +123,6 @@ contract DeployScroll is ScrollScript {
       AaveV3Scroll.AAVE_PROTOCOL_DATA_PROVIDER,
       IAaveV3ConfigEngine(AaveV3Scroll.CONFIG_ENGINE),
       0x611439a74546888c3535B4dd119A5Cbb9f5332EA,
-      5 days
-    );
-  }
-}
-
-contract DeployZkEvm is PolygonZkEvmScript {
-  function run() external broadcast {
-    new CapsPlusRiskSteward(
-      AaveV3PolygonZkEvm.AAVE_PROTOCOL_DATA_PROVIDER,
-      IAaveV3ConfigEngine(AaveV3PolygonZkEvm.CONFIG_ENGINE),
-      0xC165b4ae0dfB650E0123d4A70D260029Cb6e2C0f,
       5 days
     );
   }

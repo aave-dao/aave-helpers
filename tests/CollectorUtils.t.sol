@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
 
+import {IAccessControl} from 'openzeppelin-contracts/contracts/access/IAccessControl.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets, ICollector, IPool} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets, ILendingPool} from 'aave-address-book/AaveV2Ethereum.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
@@ -24,10 +25,10 @@ contract CollectorUtilsTest is Test {
   address testReceiver = address(0xB0B);
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 20420006);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 21922962);
 
-    vm.prank(COLLECTOR.getFundsAdmin());
-    COLLECTOR.setFundsAdmin(address(this));
+    vm.prank(AaveV3Ethereum.ACL_ADMIN);
+    IAccessControl(address(COLLECTOR)).grantRole('FUNDS_ADMIN', address(this));
   }
 
   function testDepositCollectorFundsToV3(uint128 amount) public {

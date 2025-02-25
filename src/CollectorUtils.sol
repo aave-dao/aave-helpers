@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {IPool, DataTypes} from 'aave-address-book/AaveV3.sol';
-import {ICollector} from 'aave-address-book/common/ICollector.sol';
+import {IPool, DataTypes, ICollector} from 'aave-address-book/AaveV3.sol';
 import {ILendingPool, DataTypes as V2DataTypes} from 'aave-address-book/AaveV2.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
@@ -80,7 +79,7 @@ library CollectorUtils {
     if (input.amount == type(uint256).max) {
       input.amount = IERC20(input.underlying).balanceOf(address(collector));
     }
-    collector.transfer(input.underlying, address(this), input.amount);
+    collector.transfer(IERC20(input.underlying), address(this), input.amount);
     IERC20(input.underlying).forceApprove(input.pool, input.amount);
     IPool(input.pool).supply(input.underlying, input.amount, address(collector), 0);
   }
@@ -163,7 +162,7 @@ library CollectorUtils {
       input.amount = IERC20(input.fromUnderlying).balanceOf(address(collector));
     }
 
-    collector.transfer(input.fromUnderlying, swapper, input.amount);
+    collector.transfer(IERC20(input.fromUnderlying), swapper, input.amount);
     uint256 swapperBalance = IERC20(input.fromUnderlying).balanceOf(swapper);
 
     // some tokens, like stETH, can loose 1-2wei on transfer
@@ -204,7 +203,7 @@ library CollectorUtils {
       revert InvalidZeroAmount();
     }
 
-    collector.transfer(aTokenAddress, address(this), input.amount);
+    collector.transfer(IERC20(aTokenAddress), address(this), input.amount);
 
     // in case of imprecision during the aTokenTransfer withdraw a bit less
     uint256 balanceAfterTransfer = IERC20(aTokenAddress).balanceOf(address(this));
