@@ -162,8 +162,12 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     address collateralSupplier = vm.addr(3);
     address testAssetSupplier = vm.addr(4);
     require(collateralConfig.usageAsCollateralEnabled, 'COLLATERAL_CONFIG_MUST_BE_COLLATERAL');
-    uint256 collateralAssetAmount = _getTokenAmountByDollarValue(pool, collateralConfig, 100000);
-    uint256 testAssetAmount = _getTokenAmountByDollarValue(pool, testAssetConfig, 10000);
+    uint256 collateralAssetAmount = _getTokenAmountByDollarValue(pool, collateralConfig, 100_000);
+    uint256 testAssetAmount = _getTokenAmountByDollarValue(pool, testAssetConfig, 10_000);
+
+    if (address(flashLoanReceiver) == address(0)) {
+      flashLoanReceiver = new MockFlashLoanReceiver();
+    }
 
     // remove caps as they should not prevent testing
     IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
@@ -211,11 +215,30 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
         referralCode: 0
       });
       if (testAssetConfig.borrowingEnabled) {
+        uint256 borrowAmount = 11 ** testAssetConfig.decimals;
+
+        if (aTokenTotalSupply < borrowAmount) {
+          // aTokenTotalSupply == 10'000$
+          // borrowAmount > 10'000$
+          // need to add more test asset in order to be able to borrow it
+          // right now there is not enough underlying tokens in the aToken
+          _deposit(testAssetConfig, pool, testAssetSupplier, borrowAmount - aTokenTotalSupply);
+
+          // need to add more collateral in order to be able to borrow
+          // collateralAssetAmount == 100'000$
+          _deposit(
+            collateralConfig,
+            pool,
+            collateralSupplier,
+            (collateralAssetAmount * borrowAmount) / aTokenTotalSupply
+          );
+        }
+
         vm.expectRevert(bytes(Errors.BORROW_CAP_EXCEEDED));
         vm.prank(collateralSupplier);
         pool.borrow({
           asset: testAssetConfig.underlying,
-          amount: 11 ** testAssetConfig.decimals,
+          amount: borrowAmount,
           interestRateMode: 2,
           referralCode: 0,
           onBehalfOf: collateralSupplier

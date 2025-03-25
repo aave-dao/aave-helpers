@@ -26,6 +26,23 @@ contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
     );
   }
 
+  function test_e2eTestWithBigTestAssetPrice() public {
+    ReserveConfig[] memory configs = _getReservesConfigs(AaveV3Optimism.POOL);
+
+    ReserveConfig memory collateralConfig = _findReserveConfig(
+      configs,
+      AaveV3PolygonAssets.WETH_UNDERLYING
+    );
+    ReserveConfig memory testAssetConfig = _findReserveConfig(
+      configs,
+      AaveV3PolygonAssets.WETH_UNDERLYING
+    );
+
+    _changeAssetPrice(AaveV3Optimism.POOL, testAssetConfig, 1000_00); // price increases to 1'000%
+
+    e2eTestAsset(AaveV3Optimism.POOL, collateralConfig, testAssetConfig);
+  }
+
   // function testSnpashot() public {
   //   this.createConfigurationSnapshot('pre-x', AaveV3Polygon.POOL);
   //   // do sth
