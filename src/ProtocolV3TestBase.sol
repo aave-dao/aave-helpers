@@ -218,6 +218,9 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
         uint256 borrowAmount = 11 ** testAssetConfig.decimals;
 
         if (aTokenTotalSupply < borrowAmount) {
+          vm.prank(addressesProvider.getACLAdmin());
+          poolConfigurator.setSupplyCap(testAssetConfig.underlying, 0);
+
           // aTokenTotalSupply == 10'000$
           // borrowAmount > 10'000$
           // need to add more test asset in order to be able to borrow it
