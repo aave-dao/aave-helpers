@@ -7,6 +7,7 @@ import {Ownable} from 'openzeppelin-contracts/contracts/access/Ownable.sol';
 import {GovernanceV3Ethereum} from 'aave-address-book/GovernanceV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
+import {ChainlinkEthereum} from 'aave-address-book/ChainlinkEthereum.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {IRescuable} from 'solidity-utils/contracts/utils/Rescuable.sol';
 import {IWithGuardian} from 'solidity-utils/contracts/access-control/UpgradeableOwnableWithGuardian.sol';
@@ -413,8 +414,8 @@ contract GetExpectedOut is AaveSwapperTest {
       amount,
       AaveV3EthereumAssets.AAVE_UNDERLYING,
       AaveV3EthereumAssets.USDC_UNDERLYING,
-      AaveV3EthereumAssets.AAVE_ORACLE,
-      AaveV3EthereumAssets.USDC_ORACLE
+      ChainlinkEthereum.AAVE_USD,
+      ChainlinkEthereum.USDC_USD
     );
 
     // November 14, 2024 AAVE/USD is around $170
