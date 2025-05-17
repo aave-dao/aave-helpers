@@ -25,6 +25,7 @@ import {GovernanceV3Linea} from 'aave-address-book/GovernanceV3Linea.sol';
 import {GovernanceV3Sonic} from 'aave-address-book/GovernanceV3Sonic.sol';
 import {GovernanceV3Celo} from 'aave-address-book/GovernanceV3Celo.sol';
 import {GovernanceV3Mantle} from 'aave-address-book/GovernanceV3Mantle.sol';
+import {GovernanceV3Soneium} from 'aave-address-book/GovernanceV3Soneium.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {Create2Utils} from 'solidity-utils/contracts/utils/ScriptUtils.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
@@ -796,6 +797,32 @@ library GovV3Helpers {
   }
 
   /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param actions actions array
+   */
+  function buildSoneiumPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    // TODO: update chainId when origin is updated with latest solidity-utils
+    return _buildPayload(vm, 1868, actions);
+  }
+
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param action single action struct
+   */
+  function buildSoneiumPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    // TODO: update chainId when origin is updated with latest solidity-utils
+    return _buildPayload(vm, 1868, action);
+  }
+
+  /**
    * @dev creates a proposal with multiple payloads
    * @param vm Vm
    * @param payloads payloads array
@@ -884,6 +911,8 @@ library GovV3Helpers {
       return GovernanceV3Celo.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.MANTLE) {
       return GovernanceV3Mantle.PAYLOADS_CONTROLLER;
+    } else if (chainId == 1868) { // TODO: update when origin is updated with latest solidity-utils
+      return GovernanceV3Soneium.PAYLOADS_CONTROLLER;
     }
 
     revert CannotFindPayloadsController();
