@@ -911,7 +911,8 @@ library GovV3Helpers {
       return GovernanceV3Celo.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.MANTLE) {
       return GovernanceV3Mantle.PAYLOADS_CONTROLLER;
-    } else if (chainId == 1868) { // TODO: update when origin is updated with latest solidity-utils
+    } else if (chainId == 1868) {
+      // TODO: update when origin is updated with latest solidity-utils
       return GovernanceV3Soneium.PAYLOADS_CONTROLLER;
     }
 
