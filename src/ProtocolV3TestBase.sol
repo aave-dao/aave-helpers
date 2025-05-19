@@ -18,6 +18,7 @@ import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2
 import {CommonTestBase, ReserveTokens, ChainIds} from './CommonTestBase.sol';
 import {ILegacyDefaultInterestRateStrategy} from './dependencies/ILegacyDefaultInterestRateStrategy.sol';
 import {MockFlashLoanReceiver} from './mocks/MockFlashLoanReceiver.sol';
+import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
 
 struct LocalVars {
   IPoolDataProvider.TokenData[] reserves;
@@ -43,6 +44,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
   using PercentageMath for uint256;
   using SafeERC20 for IERC20;
+  using Strings for string;
 
   MockFlashLoanReceiver internal flashLoanReceiver;
 
@@ -368,7 +370,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
    * Reserves that are frozen or not active should not be included in e2e test suite
    */
   function _includeInE2e(ReserveConfig memory config) internal pure returns (bool) {
-    return !config.isFrozen && config.isActive && !config.isPaused;
+    return !config.isFrozen && config.isActive && !config.isPaused && !config.symbol.equal('CELO');
   }
 
   function _getTokenAmountByDollarValue(
