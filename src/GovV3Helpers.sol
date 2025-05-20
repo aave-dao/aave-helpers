@@ -805,8 +805,7 @@ library GovV3Helpers {
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (PayloadsControllerUtils.Payload memory) {
-    // TODO: update chainId when origin is updated with latest solidity-utils
-    return _buildPayload(vm, 1868, actions);
+    return _buildPayload(vm, ChainIds.SONEIUM, actions);
   }
 
   /**
@@ -818,8 +817,7 @@ library GovV3Helpers {
     Vm vm,
     IPayloadsControllerCore.ExecutionAction memory action
   ) internal returns (PayloadsControllerUtils.Payload memory) {
-    // TODO: update chainId when origin is updated with latest solidity-utils
-    return _buildPayload(vm, 1868, action);
+    return _buildPayload(vm, ChainIds.SONEIUM, action);
   }
 
   /**
@@ -911,8 +909,7 @@ library GovV3Helpers {
       return GovernanceV3Celo.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.MANTLE) {
       return GovernanceV3Mantle.PAYLOADS_CONTROLLER;
-    } else if (chainId == 1868) {
-      // TODO: update when origin is updated with latest solidity-utils
+    } else if (chainId == ChainIds.SONEIUM) {
       return GovernanceV3Soneium.PAYLOADS_CONTROLLER;
     }
 
