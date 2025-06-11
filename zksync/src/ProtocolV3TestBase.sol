@@ -3,13 +3,14 @@ pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
 import {IPool} from 'aave-address-book/AaveV3.sol';
-import {ProtocolV3TestBase as RawProtocolV3TestBase, ReserveConfig} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
+import {ReserveConfig} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
 import {SnapshotHelpersV3} from './SnapshotHelpersV3.sol';
+import {ProtocolV3TestBase as BaseProtocolV3TestBase} from '../../src/ProtocolV3TestBase.sol';
 
 /**
  * only applicable to harmony at this point
  */
-contract ProtocolV3TestBase is RawProtocolV3TestBase {
+contract ProtocolV3TestBase is BaseProtocolV3TestBase {
   SnapshotHelpersV3 public snapshotHelper;
 
   function setUp() public virtual {
