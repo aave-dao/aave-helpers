@@ -49,7 +49,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     uint256[] calldata premiums,
     address /* initiator */,
     bytes calldata /* params */
-  ) external returns (bool) {
+  ) external virtual returns (bool) {
     for (uint256 i = 0; i < assets.length; i++) {
       IERC20(assets[i]).forceApprove(msg.sender, amounts[i] + premiums[i]);
     }
