@@ -277,7 +277,6 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
         }
       }
 
-      vm.serializeBool(key, 'virtualAccountingActive', config.virtualAccActive);
       vm.serializeString(key, 'virtualBalance', vm.toString(config.virtualBalance));
       vm.serializeString(
         key,
