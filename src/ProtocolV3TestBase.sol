@@ -596,7 +596,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     address receiverAddress,
     uint256 amount,
     uint256 interestRateMode
-  ) internal {
+  ) internal virtual {
     FlashLoanVars memory vars;
 
     vm.startPrank(user);
