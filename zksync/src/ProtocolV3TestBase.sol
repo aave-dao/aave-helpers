@@ -2,10 +2,29 @@
 pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
-import {IPool} from 'aave-address-book/AaveV3.sol';
+import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IReserveInterestRateStrategy, DataTypes, IPoolConfigurator, Errors} from 'aave-address-book/AaveV3.sol';
 import {ReserveConfig} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
 import {SnapshotHelpersV3} from './SnapshotHelpersV3.sol';
 import {ProtocolV3TestBase as BaseProtocolV3TestBase} from '../../src/ProtocolV3TestBase.sol';
+import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
+import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
+
+contract MockFlashReceiver {
+  using SafeERC20 for IERC20;
+
+  function executeOperation(
+    address[] calldata assets,
+    uint256[] calldata amounts,
+    uint256[] calldata premiums,
+    address,
+    bytes calldata
+  ) external returns (bool) {
+    for (uint256 i; i < assets.length; ++i) {
+      IERC20(assets[i]).forceApprove(msg.sender, amounts[i] + premiums[i]);
+    }
+    return true;
+  }
+}
 
 /**
  * only applicable to harmony at this point
@@ -17,6 +36,104 @@ contract ProtocolV3TestBase is BaseProtocolV3TestBase {
     snapshotHelper = new SnapshotHelpersV3();
     vm.makePersistent(address(snapshotHelper));
     vm.allowCheatcodes(address(snapshotHelper));
+  }
+
+  // workaround for https://github.com/matter-labs/foundry-zksync/issues/1073#issuecomment-2982866755
+  function _flashLoan(
+    ReserveConfig memory config,
+    IPool pool,
+    address user,
+    address receiverAddress,
+    uint256 amount,
+    uint256 interestRateMode
+  ) internal override {
+    FlashLoanVars memory vars;
+
+    vm.startPrank(user);
+
+    DataTypes.ReserveDataLegacy memory reserveDataBefore = pool.getReserveData(config.underlying);
+
+    vars.underlyingTokenBalanceOfATokenBefore = IERC20(config.underlying).balanceOf(config.aToken);
+    vars.debtTokenBalanceOfUserBefore = IERC20(config.variableDebtToken).balanceOf(user);
+
+    // @dev lazy way to initialize `FlashReceiver` address
+    address receiverAddress2 = address(new MockFlashReceiver());
+
+    if (interestRateMode == 0) {
+      vars.flashLoanPremiumTotal = pool.FLASHLOAN_PREMIUM_TOTAL();
+      vars.flashLoanPremiumToProtocol = pool.FLASHLOAN_PREMIUM_TO_PROTOCOL();
+
+      vars.flashLoanPremiumTotal = amount.percentMul(vars.flashLoanPremiumTotal);
+      vars.flashLoanPremiumToProtocol = vars.flashLoanPremiumTotal.percentMul(
+        vars.flashLoanPremiumToProtocol
+      );
+
+      // @dev funds the FlashReceiver address
+      deal2(config.underlying, receiverAddress2, vars.flashLoanPremiumTotal);
+    }
+
+    console.log('FLASH LOAN: %s, Amount: %s', config.symbol, amount);
+
+    vars.assets = new address[](1);
+    vars.assets[0] = config.underlying;
+
+    vars.amounts = new uint256[](1);
+    vars.amounts[0] = amount;
+
+    vars.interestRateModes = new uint256[](1);
+    vars.interestRateModes[0] = interestRateMode;
+
+    console.log('fails next call');
+    pool.flashLoan({
+      receiverAddress: receiverAddress2, // @dev FlashReceiver address initialized above
+      assets: vars.assets,
+      amounts: vars.amounts,
+      interestRateModes: vars.interestRateModes,
+      onBehalfOf: user,
+      params: '',
+      referralCode: 0
+    });
+
+    vars.underlyingTokenBalanceOfATokenAfter = IERC20(config.underlying).balanceOf(config.aToken);
+    vars.debtTokenBalanceOfUserAfter = IERC20(config.variableDebtToken).balanceOf(user);
+    DataTypes.ReserveDataLegacy memory reserveDataAfter = pool.getReserveData(config.underlying);
+
+    if (interestRateMode == 0) {
+      assertEq(
+        vars.underlyingTokenBalanceOfATokenBefore + vars.flashLoanPremiumToProtocol,
+        vars.underlyingTokenBalanceOfATokenAfter,
+        '11'
+      );
+      assertEq(
+        reserveDataBefore.accruedToTreasury +
+          vars.flashLoanPremiumToProtocol.rayDiv(reserveDataAfter.liquidityIndex),
+        reserveDataAfter.accruedToTreasury,
+        '12'
+      );
+
+      assertEq(vars.debtTokenBalanceOfUserAfter, vars.debtTokenBalanceOfUserBefore, '2');
+    } else {
+      assertGt(
+        vars.underlyingTokenBalanceOfATokenBefore,
+        vars.underlyingTokenBalanceOfATokenAfter,
+        '3'
+      );
+      assertEq(
+        vars.underlyingTokenBalanceOfATokenBefore - amount,
+        vars.underlyingTokenBalanceOfATokenAfter,
+        '4'
+      );
+
+      assertGt(vars.debtTokenBalanceOfUserAfter, vars.debtTokenBalanceOfUserBefore, '5');
+      assertApproxEqAbs(
+        vars.debtTokenBalanceOfUserAfter,
+        vars.debtTokenBalanceOfUserBefore + amount,
+        1,
+        '6'
+      );
+    }
+
+    vm.stopPrank();
   }
 
   /**
