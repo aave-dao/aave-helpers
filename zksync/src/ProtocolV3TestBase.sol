@@ -5,6 +5,7 @@ import 'forge-std/Test.sol';
 import {IAaveOracle, IPool, IPoolAddressesProvider, IPoolDataProvider, IReserveInterestRateStrategy, DataTypes, IPoolConfigurator, Errors} from 'aave-address-book/AaveV3.sol';
 import {ReserveConfig} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
 import {PercentageMath} from 'aave-v3-origin/contracts/protocol/libraries/math/PercentageMath.sol';
+import {WadRayMath} from 'aave-v3-origin/contracts/protocol/libraries/math/WadRayMath.sol';
 import {SnapshotHelpersV3} from './SnapshotHelpersV3.sol';
 import {ProtocolV3TestBase as BaseProtocolV3TestBase} from '../../src/ProtocolV3TestBase.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
@@ -33,7 +34,7 @@ contract MockFlashReceiver {
 contract ProtocolV3TestBase is BaseProtocolV3TestBase {
   SnapshotHelpersV3 public snapshotHelper;
   using PercentageMath for uint256;
-
+  using WadRayMath for uint256;
 
   function setUp() public virtual {
     snapshotHelper = new SnapshotHelpersV3();
