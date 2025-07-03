@@ -7,7 +7,7 @@ libs = ['lib']
 remappings = []
 fs_permissions = [{ access = "read-write", path = "./reports" }]
 ffi = true
-evm_version = 'shanghai'
+evm_version = 'cancun'
 
 [profile.zksync]
 src = 'zksync/src'
