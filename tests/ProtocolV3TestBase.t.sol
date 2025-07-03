@@ -14,7 +14,7 @@ import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 
 contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('polygon', 47135218);
+    vm.createSelectFork('polygon', 73533436);
   }
 
   function test_e2eTestDPI() public {
@@ -22,7 +22,7 @@ contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
     e2eTestAsset(
       AaveV3Optimism.POOL,
       _findReserveConfig(configs, AaveV3PolygonAssets.WPOL_UNDERLYING),
-      _findReserveConfig(configs, AaveV3PolygonAssets.DPI_UNDERLYING)
+      _findReserveConfig(configs, AaveV3PolygonAssets.WETH_UNDERLYING)
     );
   }
 
@@ -115,7 +115,7 @@ contract ProtocolV3TestE2ETestAvalancheAll is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestArbitrumAll is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('arbitrum', 164285417);
+    vm.createSelectFork('arbitrum', 353872767);
   }
 
   function test_e2e() public {
