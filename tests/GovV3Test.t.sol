@@ -21,7 +21,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
 
   PayloadWithEmit payload;
 
-  uint256 public constant BLOCK_NUMBER = 22423466;
+  uint256 public constant BLOCK_NUMBER = 22840005;
 
   function setUp() public {
     vm.createSelectFork('mainnet', BLOCK_NUMBER);
@@ -178,7 +178,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     actions[0] = GovV3Helpers.buildAction(address(42));
 
     // should revert as payload 0x42 does not exist
-    vm.expectRevert(GovV3Helpers.CannotFindPayload.selector);
+    vm.expectRevert(abi.encodePacked(GovV3Helpers.CannotFindPayload.selector, block.chainid));
     this.selfExternalCallToBuildMainnetPayload(vm, actions);
   }
 

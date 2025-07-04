@@ -14,7 +14,7 @@ import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 
 contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('polygon', 47135218);
+    vm.createSelectFork('polygon', 73533436);
   }
 
   function test_e2eTestDPI() public {
@@ -22,7 +22,7 @@ contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
     e2eTestAsset(
       AaveV3Optimism.POOL,
       _findReserveConfig(configs, AaveV3PolygonAssets.WPOL_UNDERLYING),
-      _findReserveConfig(configs, AaveV3PolygonAssets.DPI_UNDERLYING)
+      _findReserveConfig(configs, AaveV3PolygonAssets.WETH_UNDERLYING)
     );
   }
 
@@ -57,7 +57,7 @@ contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestAsset is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('optimism', 105565839);
+    vm.createSelectFork('optimism', 137983088);
   }
 
   function test_e2eTestAssetMAI() public {
@@ -65,7 +65,7 @@ contract ProtocolV3TestE2ETestAsset is ProtocolV3TestBase {
     e2eTestAsset(
       AaveV3Optimism.POOL,
       _findReserveConfig(configs, AaveV3OptimismAssets.DAI_UNDERLYING),
-      _findReserveConfig(configs, AaveV3OptimismAssets.MAI_UNDERLYING)
+      _findReserveConfig(configs, AaveV3OptimismAssets.LINK_UNDERLYING)
     );
   }
 
@@ -81,7 +81,7 @@ contract ProtocolV3TestE2ETestAsset is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestOptimismAll is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('optimism', 123145540);
+    vm.createSelectFork('optimism', 137982949);
   }
 
   function test_e2e() public {
@@ -91,7 +91,7 @@ contract ProtocolV3TestE2ETestOptimismAll is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestMetisAll is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('metis', 10115177);
+    vm.createSelectFork('metis', 20765978);
   }
 
   function test_e2e() public {
@@ -101,7 +101,7 @@ contract ProtocolV3TestE2ETestMetisAll is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestAvalancheAll is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('avalanche', 38700698);
+    vm.createSelectFork('avalanche', 64894390);
   }
 
   function test_e2e() public {
@@ -115,7 +115,7 @@ contract ProtocolV3TestE2ETestAvalancheAll is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestArbitrumAll is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('arbitrum', 164285417);
+    vm.createSelectFork('arbitrum', 353872767);
   }
 
   function test_e2e() public {
@@ -129,7 +129,7 @@ contract ProtocolV3TestE2ETestArbitrumAll is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestAllMainnet is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('mainnet', 19477376);
+    vm.createSelectFork('mainnet', 22840005);
   }
 
   function test_e2e() public {
@@ -139,7 +139,7 @@ contract ProtocolV3TestE2ETestAllMainnet is ProtocolV3TestBase {
 
 contract ProtocolV3TestOptimismSnapshot is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('optimism', 117408311);
+    vm.createSelectFork('optimism', 137983047);
   }
 
   function test_snapshotState() public {
