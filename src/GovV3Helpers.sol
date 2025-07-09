@@ -30,6 +30,7 @@ import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {Create2Utils} from 'solidity-utils/contracts/utils/ScriptUtils.sol';
 import {StorageHelpers} from './StorageHelpers.sol';
 import {Create2UtilsZkSync} from 'solidity-utils/../zksync/src/contracts/utils/ScriptUtilsZkSync.sol';
+import {IPermissionedPayloadsController} from './dependencies/IPermissionedPayloadsController.sol';
 
 interface IGovernance_V2_5 {
   /**
@@ -357,6 +358,35 @@ library GovV3Helpers {
     }
   }
 
+  /**
+   * Logs the calldata for creating a payload from the permissioned-payloads-controller
+   * @param permissionedPayloadsController address of the permissioned payloads controller
+   * @param actions actions
+   */
+  function createPermissionedPayloadCalldata(
+    address permissionedPayloadsController,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal view {
+    require(actions.length > 0, 'INVALID ACTIONS');
+
+    (, IPayloadsControllerCore.Payload memory payload, bool payloadCreated) = _findCreatedPayload(
+      IPayloadsControllerCore(permissionedPayloadsController),
+      actions
+    );
+    if (payloadCreated && payload.createdAt > block.timestamp - 7 days) {
+      revert PayloadAlreadyCreated();
+    } else {
+      console2.log('target contract: ', IPermissionedPayloadsController(permissionedPayloadsController).payloadsManager());
+      console2.log('calldata: ');
+      console2.logBytes(
+        abi.encodeCall(
+          IPayloadsControllerCore.createPayload,
+          actions
+        )
+      );
+    }
+  }
+
   function createPayload(
     IPayloadsControllerCore.ExecutionAction memory action
   ) internal returns (uint40) {
@@ -394,6 +424,12 @@ library GovV3Helpers {
     payloadsController.executePayload(readyPayload(vm, payloadAddress));
   }
 
+  function executePayload(Vm vm, address payloadAddress, address payloadsController) internal {
+    IPayloadsControllerCore(payloadsController).executePayload(
+      readyPayload(vm, payloadAddress, payloadsController)
+    );
+  }
+
   /**
    * @dev prepares a payloadAddress for execution via payloadsController by injecting it into storage and changing state to ReadyForExecution afterwards.
    * Injecting into storage is a convenience method to reduce the txs executed from 2 to 1, this allows awaiting emitted events on the payloadsController.
@@ -409,6 +445,16 @@ library GovV3Helpers {
     actions[0] = buildAction(payloadAddress);
     uint40 payloadId = GovV3StorageHelpers.injectPayload(vm, payloadsController, actions);
     GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
+    return payloadId;
+  }
+
+  function readyPayload(Vm vm, address payloadAddress, address payloadsController) internal returns (uint40) {
+    require(payloadAddress.code.length > 0, 'PAYLOAD_ADDRESS_HAS_NO_CODE');
+    IPayloadsControllerCore.ExecutionAction[]
+      memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
+    actions[0] = buildAction(payloadAddress);
+    uint40 payloadId = GovV3StorageHelpers.injectPayload(vm, IPayloadsControllerCore(payloadsController), actions);
+    GovV3StorageHelpers.readyPayloadId(vm, IPayloadsControllerCore(payloadsController), payloadId);
     return payloadId;
   }
 
