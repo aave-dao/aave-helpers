@@ -34,6 +34,14 @@ contract CommonTestBase is Test {
     GovV3Helpers.executePayload(vm, payload);
   }
 
+  function executePayload(Vm vm, address payload, address payloadsController) internal {
+    GovV3Helpers.executePayload(vm, payload, payloadsController);
+  }
+
+  function getPayloadsController() internal view returns (address) {
+    return address(GovV3Helpers.getPayloadsController(block.chainid));
+  }
+
   /**
    * @notice deal doesn't support amounts stored in a script right now.
    * This function patches deal to mock and transfer funds instead.

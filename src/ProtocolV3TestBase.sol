@@ -68,7 +68,22 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     IPool pool,
     address payload
   ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
-    return defaultTest(reportName, pool, payload, true);
+    return defaultTest(
+      reportName,
+      pool,
+      payload,
+      getPayloadsController(),
+      true
+    );
+  }
+
+  function defaultTest(
+    string memory reportName,
+    IPool pool,
+    address payload,
+    address payloadsController
+  ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
+    return defaultTest(reportName, pool, payload, payloadsController, true);
   }
 
   function defaultTest(
@@ -77,13 +92,23 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     address payload,
     bool runE2E
   ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
+    return defaultTest(reportName, pool, payload, getPayloadsController(), runE2E);
+  }
+
+  function defaultTest(
+    string memory reportName,
+    IPool pool,
+    address payload,
+    address payloadsController,
+    bool runE2E
+  ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
     string memory beforeString = string(abi.encodePacked(reportName, '_before'));
     ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
 
     uint256 startGas = gasleft();
 
     vm.startStateDiffRecording();
-    executePayload(vm, payload);
+    executePayload(vm, payload, payloadsController);
     string memory rawDiff = vm.getStateDiffJson();
 
     uint256 gasUsed = startGas - gasleft();
