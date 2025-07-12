@@ -367,7 +367,7 @@ library GovV3Helpers {
    * @param actions actions
    */
   function createPermissionedPayloadCalldata(
-    address permissionedPayloadsController,
+    IPayloadsControllerCore permissionedPayloadsController,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal view {
     require(actions.length > 0, 'INVALID ACTIONS');
@@ -379,7 +379,10 @@ library GovV3Helpers {
     if (payloadCreated && payload.createdAt > block.timestamp - 7 days) {
       revert PayloadAlreadyCreated();
     } else {
-      console2.log('target contract: ', IPermissionedPayloadsController(permissionedPayloadsController).payloadsManager());
+      console2.log('safe: ', IPermissionedPayloadsController(
+        address(permissionedPayloadsController)
+        ).payloadsManager());
+      console2.log('target address: ', address(permissionedPayloadsController));
       console2.log('calldata: ');
       console2.logBytes(
         abi.encodeCall(
