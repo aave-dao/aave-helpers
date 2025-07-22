@@ -65,13 +65,8 @@ contract ProtocolV3TestBase is BaseProtocolV3TestBase {
 
     if (interestRateMode == 0) {
       vars.flashLoanPremiumTotal = pool.FLASHLOAN_PREMIUM_TOTAL();
-      vars.flashLoanPremiumToProtocol = pool.FLASHLOAN_PREMIUM_TO_PROTOCOL();
 
-      vars.flashLoanPremiumTotal = amount.percentMul(vars.flashLoanPremiumTotal);
-      vars.flashLoanPremiumToProtocol = vars.flashLoanPremiumTotal.percentMul(
-        vars.flashLoanPremiumToProtocol
-      );
-
+      vars.flashLoanPremiumTotal = amount.percentMulCeil(vars.flashLoanPremiumTotal);
       // @dev funds the FlashReceiver address
       deal2(config.underlying, receiverAddress2, vars.flashLoanPremiumTotal);
     }
@@ -104,13 +99,13 @@ contract ProtocolV3TestBase is BaseProtocolV3TestBase {
 
     if (interestRateMode == 0) {
       assertEq(
-        vars.underlyingTokenBalanceOfATokenBefore + vars.flashLoanPremiumToProtocol,
+        vars.underlyingTokenBalanceOfATokenBefore + vars.flashLoanPremiumTotal,
         vars.underlyingTokenBalanceOfATokenAfter,
         '11'
       );
       assertEq(
         reserveDataBefore.accruedToTreasury +
-          vars.flashLoanPremiumToProtocol.rayDiv(reserveDataAfter.liquidityIndex),
+          vars.flashLoanPremiumTotal.rayDivFloor(reserveDataAfter.liquidityIndex),
         reserveDataAfter.accruedToTreasury,
         '12'
       );
@@ -132,7 +127,7 @@ contract ProtocolV3TestBase is BaseProtocolV3TestBase {
       assertApproxEqAbs(
         vars.debtTokenBalanceOfUserAfter,
         vars.debtTokenBalanceOfUserBefore + amount,
-        1,
+        2,
         '6'
       );
     }
