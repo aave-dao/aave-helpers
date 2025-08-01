@@ -7,7 +7,11 @@ import {console2} from 'forge-std/console2.sol';
 contract SeatbeltUtils is Test {
   error FfiFailed();
 
-  function generateSeatbeltReport(string memory name, address payloadsController, bytes memory payloadBytecode) internal {
+  function generateSeatbeltReport(
+    string memory name,
+    address payloadsController,
+    bytes memory payloadBytecode
+  ) internal {
     string[] memory inputs = new string[](11);
     inputs[0] = 'npx';
     inputs[1] = '@bgd-labs/cli@^0.0.41';
