@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-import {Vm} from 'forge-std/Vm.sol';
+import {Test, Vm} from 'forge-std/Test.sol';
 import {console2} from 'forge-std/console2.sol';
 
-library SeatbeltUtils {
+contract SeatbeltUtils is Test {
   error FfiFailed();
 
-  function generateReport(Vm vm, address payloadsController, bytes memory payloadBytecode, string memory name) internal {
+  function generateSeatbeltReport(string memory name, address payloadsController, bytes memory payloadBytecode) internal {
     string[] memory inputs = new string[](11);
     inputs[0] = 'npx';
     inputs[1] = '@bgd-labs/cli@^0.0.41';

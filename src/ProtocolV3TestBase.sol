@@ -19,6 +19,8 @@ import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2
 import {CommonTestBase, ReserveTokens, ChainIds} from './CommonTestBase.sol';
 import {ILegacyDefaultInterestRateStrategy} from './dependencies/ILegacyDefaultInterestRateStrategy.sol';
 import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
+import {SeatbeltUtils} from './SeatbeltUtils.sol';
+import {GovV3Helpers} from './GovV3Helpers.sol';
 
 struct InterestStrategyValues {
   address addressesProvider;
@@ -35,7 +37,7 @@ struct InterestStrategyValues {
 /**
  * only applicable to harmony at this point
  */
-contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
+contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestBase {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
   using PercentageMath for uint256;
   using WadRayMath for uint256;
@@ -95,6 +97,11 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     vm.writeJson(output, string(abi.encodePacked('./reports/', afterString, '.json')));
 
     diffReports(beforeString, afterString);
+    generateSeatbeltReport(
+      reportName,
+      address(GovV3Helpers.getPayloadsController(block.chainid)),
+      payload.code
+    );
 
     configChangePlausibilityTest(configBefore, configAfter);
 
