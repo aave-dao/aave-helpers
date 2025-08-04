@@ -95,7 +95,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
     string memory output = vm.serializeString('root', 'raw', rawDiff);
     vm.writeJson(output, string(abi.encodePacked('./reports/', afterString, '.json')));
-
+    console.log('profile:', vm.envString('FOUNDRY_PROFILE'));
     // skip generating reports for ci
     if (!vm.envString('FOUNDRY_PROFILE').equal('ci')) {
       diffReports(beforeString, afterString);
