@@ -381,17 +381,13 @@ library GovV3Helpers {
     if (payloadCreated && payload.createdAt > block.timestamp - 7 days) {
       revert PayloadAlreadyCreated();
     } else {
-      console2.log('safe: ', IPermissionedPayloadsController(
-        address(permissionedPayloadsController)
-        ).payloadsManager());
+      console2.log(
+        'safe: ',
+        IPermissionedPayloadsController(address(permissionedPayloadsController)).payloadsManager()
+      );
       console2.log('target address: ', address(permissionedPayloadsController));
       console2.log('calldata: ');
-      console2.logBytes(
-        abi.encodeCall(
-          IPayloadsControllerCore.createPayload,
-          actions
-        )
-      );
+      console2.logBytes(abi.encodeCall(IPayloadsControllerCore.createPayload, actions));
     }
   }
 
@@ -456,12 +452,20 @@ library GovV3Helpers {
     return payloadId;
   }
 
-  function readyPayload(Vm vm, address payloadAddress, address payloadsController) internal returns (uint40) {
+  function readyPayload(
+    Vm vm,
+    address payloadAddress,
+    address payloadsController
+  ) internal returns (uint40) {
     require(payloadAddress.code.length > 0, 'PAYLOAD_ADDRESS_HAS_NO_CODE');
     IPayloadsControllerCore.ExecutionAction[]
       memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
     actions[0] = buildAction(payloadAddress);
-    uint40 payloadId = GovV3StorageHelpers.injectPayload(vm, IPayloadsControllerCore(payloadsController), actions);
+    uint40 payloadId = GovV3StorageHelpers.injectPayload(
+      vm,
+      IPayloadsControllerCore(payloadsController),
+      actions
+    );
     GovV3StorageHelpers.readyPayloadId(vm, IPayloadsControllerCore(payloadsController), payloadId);
     return payloadId;
   }
@@ -930,7 +934,10 @@ library GovV3Helpers {
     return _createProposal(vm, payloads, ipfsHash, votingPortal);
   }
 
-  function getPayloadsController(IPool pool, uint256 chainId) internal pure returns (IPayloadsControllerCore) {
+  function getPayloadsController(
+    IPool pool,
+    uint256 chainId
+  ) internal pure returns (IPayloadsControllerCore) {
     // if (pool == AaveV3ScrollEtherFi.POOL) {
     //   return GovernanceV3ScrollEtherFi.PERMISSIONED_PAYLOADS_CONTROLLER;
     // }

@@ -37,8 +37,8 @@ contract CommonTestBase is Test {
 
   function executePayload(Vm vm, address payload, IPool pool) internal {
     GovV3Helpers.executePayload(
-      vm, 
-      payload, 
+      vm,
+      payload,
       address(GovV3Helpers.getPayloadsController(pool, block.chainid))
     );
   }

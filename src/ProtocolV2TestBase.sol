@@ -14,6 +14,8 @@ import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializabl
 import {ExtendedAggregatorV2V3Interface} from './interfaces/ExtendedAggregatorV2V3Interface.sol';
 import {CommonTestBase, ReserveTokens} from './CommonTestBase.sol';
 import {ProxyHelpers} from 'aave-v3-origin/../tests/utils/ProxyHelpers.sol';
+import {SeatbeltUtils} from './SeatbeltUtils.sol';
+import {GovV3Helpers} from './GovV3Helpers.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -49,7 +51,7 @@ struct InterestStrategyValues {
   uint256 variableRateSlope2;
 }
 
-contract ProtocolV2TestBase is CommonTestBase, DiffUtils {
+contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
   using SafeERC20 for IERC20;
 
   /**
@@ -80,6 +82,11 @@ contract ProtocolV2TestBase is CommonTestBase, DiffUtils {
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
 
     diffReports(beforeString, afterString);
+    generateSeatbeltReport(
+      reportName,
+      address(GovV3Helpers.getPayloadsController(block.chainid)),
+      payload.code
+    );
 
     if (runE2E) e2eTest(pool);
     return (configBefore, configAfter);
