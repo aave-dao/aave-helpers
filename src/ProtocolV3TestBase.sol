@@ -96,12 +96,15 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     string memory output = vm.serializeString('root', 'raw', rawDiff);
     vm.writeJson(output, string(abi.encodePacked('./reports/', afterString, '.json')));
 
-    diffReports(beforeString, afterString);
-    generateSeatbeltReport(
-      reportName,
-      address(GovV3Helpers.getPayloadsController(block.chainid)),
-      payload.code
-    );
+    // skip generating reports for ci
+    if (!vm.envString('FOUNDRY_PROFILE').equal('ci')) {
+      diffReports(beforeString, afterString);
+      generateSeatbeltReport(
+        reportName,
+        address(GovV3Helpers.getPayloadsController(block.chainid)),
+        payload.code
+      );
+    }
 
     configChangePlausibilityTest(configBefore, configAfter);
 
