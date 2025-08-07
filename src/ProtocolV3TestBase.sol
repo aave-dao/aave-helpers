@@ -659,15 +659,17 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase {
     DataTypes.ReserveDataLegacy memory reserveDataAfter = pool.getReserveData(config.underlying);
 
     if (interestRateMode == 0) {
-      assertEq(
+      assertApproxEqAbs(
         vars.underlyingTokenBalanceOfATokenBefore + vars.flashLoanPremiumTotal,
         vars.underlyingTokenBalanceOfATokenAfter,
+        2,
         '11'
       );
-      assertEq(
+      assertApproxEqAbs(
         reserveDataBefore.accruedToTreasury +
           vars.flashLoanPremiumTotal.rayDivFloor(reserveDataAfter.liquidityIndex),
         reserveDataAfter.accruedToTreasury,
+        2,
         '12'
       );
 

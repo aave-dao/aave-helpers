@@ -14,7 +14,7 @@ import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 
 contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('polygon', 73533436);
+    vm.createSelectFork('polygon', 74909955);
   }
 
   function test_e2eTestDPI() public {
@@ -57,7 +57,7 @@ contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestAsset is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('optimism', 137983088);
+    vm.createSelectFork('optimism', 139484866);
   }
 
   function test_e2eTestAssetMAI() public {
@@ -81,7 +81,7 @@ contract ProtocolV3TestE2ETestAsset is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestOptimismAll is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('optimism', 137982949);
+    vm.createSelectFork('optimism', 139484866);
   }
 
   function test_e2e() public {
@@ -91,7 +91,7 @@ contract ProtocolV3TestE2ETestOptimismAll is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestMetisAll is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('metis', 20765978);
+    vm.createSelectFork('metis', 20957736);
   }
 
   function test_e2e() public {
@@ -101,7 +101,7 @@ contract ProtocolV3TestE2ETestMetisAll is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestAvalancheAll is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('avalanche', 64894390);
+    vm.createSelectFork('avalanche', 66702537);
   }
 
   function test_e2e() public {
@@ -115,7 +115,7 @@ contract ProtocolV3TestE2ETestAvalancheAll is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestArbitrumAll is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('arbitrum', 353872767);
+    vm.createSelectFork('arbitrum', 365906782);
   }
 
   function test_e2e() public {
@@ -129,7 +129,7 @@ contract ProtocolV3TestE2ETestArbitrumAll is ProtocolV3TestBase {
 
 contract ProtocolV3TestE2ETestAllMainnet is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('mainnet', 22840005);
+    vm.createSelectFork('mainnet', 23089053);
   }
 
   function test_e2e() public {
@@ -139,7 +139,7 @@ contract ProtocolV3TestE2ETestAllMainnet is ProtocolV3TestBase {
 
 contract ProtocolV3TestOptimismSnapshot is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('optimism', 137983047);
+    vm.createSelectFork('optimism', 139484866);
   }
 
   function test_snapshotState() public {
