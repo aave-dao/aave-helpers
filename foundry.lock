@@ -1,8 +1,8 @@
 {
   "lib/forge-std": {
-    "rev": "60acb7aaadcce2d68e52986a0a66fe79f07d138f"
+    "rev": "c7be2a3481f9e51230880bb0949072c7e3a4da82"
   },
   "lib/aave-address-book": {
-    "rev": "3931d72e0ecd4374f0af8bc5ddc418c75672ccae"
+    "rev": "1a3c41b8b267fe9ef994df6427f767c8d4f08900"
   }
 }
