@@ -25,7 +25,7 @@ contract CollectorUtilsTest is Test {
   address testReceiver = address(0xB0B);
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 21922962);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 23089053);
 
     vm.prank(AaveV3Ethereum.ACL_ADMIN);
     IAccessControl(address(COLLECTOR)).grantRole('FUNDS_ADMIN', address(this));
@@ -33,7 +33,8 @@ contract CollectorUtilsTest is Test {
 
   function testDepositCollectorFundsToV3(uint128 amount) public {
     uint256 underlyingBalanceOfCollectorBefore = UNDERLYING.balanceOf(address(COLLECTOR));
-    vm.assume(amount <= underlyingBalanceOfCollectorBefore && amount != 0);
+    // @note due to roundings 1 can be rounded to 0 => revert
+    vm.assume(amount <= underlyingBalanceOfCollectorBefore && amount > 1);
     uint256 aTokenBalanceOfCollectorBefore = A_TOKEN_V3.balanceOf(address(COLLECTOR));
 
     COLLECTOR.depositToV3(

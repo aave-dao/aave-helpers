@@ -279,25 +279,32 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
 
       uint256 snapshotBeforeRepay = vm.snapshotState();
 
-      _repay({
-        config: testAssetConfig,
-        pool: pool,
-        user: collateralSupplier,
-        amount: testAssetAmount,
-        withATokens: false
-      });
+      {
+        // @note `actualBorrowAmount` can be bigger than `testAssetAmount` because of rounding
+        uint256 actualBorrowAmount = IERC20(testAssetConfig.variableDebtToken).balanceOf(
+          collateralSupplier
+        );
 
-      vm.revertToState(snapshotBeforeRepay);
+        _repay({
+          config: testAssetConfig,
+          pool: pool,
+          user: collateralSupplier,
+          amount: actualBorrowAmount,
+          withATokens: false
+        });
 
-      _repay({
-        config: testAssetConfig,
-        pool: pool,
-        user: collateralSupplier,
-        amount: testAssetAmount,
-        withATokens: true
-      });
+        vm.revertToState(snapshotBeforeRepay);
 
-      vm.revertToState(snapshotBeforeRepay);
+        _repay({
+          config: testAssetConfig,
+          pool: pool,
+          user: collateralSupplier,
+          amount: actualBorrowAmount,
+          withATokens: true
+        });
+
+        vm.revertToState(snapshotBeforeRepay);
+      }
 
       if (testAssetConfig.underlying != collateralConfig.underlying) {
         _changeAssetPrice(pool, testAssetConfig, 1000_00); // price increases to 1'000%
@@ -467,7 +474,9 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
 
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
 
-    assertApproxEqAbs(aTokenAfter, aTokenBefore + amount, 1);
+    // @note supply/borrow and other operations with a/v tokens
+    // can generate +-2 wei roundings
+    assertApproxEqAbs(aTokenAfter, aTokenBefore + amount, 2);
 
     vm.stopPrank();
   }
@@ -493,7 +502,9 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     if (aTokenBefore < amount) {
       require(aTokenAfter == 0, '_withdraw(): DUST_AFTER_WITHDRAW_ALL');
     } else {
-      assertApproxEqAbs(aTokenAfter, aTokenBefore - amount, 1);
+      // @note supply/borrow and other operations with a/v tokens
+      // can generate +-2 wei roundings
+      assertApproxEqAbs(aTokenAfter, aTokenBefore - amount, 2);
     }
     vm.stopPrank();
     return amountOut;
@@ -506,7 +517,9 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     console.log('BORROW: %s, Amount %s', config.symbol, amount);
     pool.borrow(config.underlying, amount, 2, 0, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
-    assertApproxEqAbs(debtAfter, debtBefore + amount, 1);
+    // @note supply/borrow and other operations with a/v tokens
+    // can generate +-2 wei roundings
+    assertApproxEqAbs(debtAfter, debtBefore + amount, 2);
     vm.stopPrank();
   }
 
@@ -521,13 +534,20 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
 
     uint256 debtBefore = IERC20(config.variableDebtToken).balanceOf(user);
 
-    deal2(config.underlying, user, amount);
-    IERC20(config.underlying).forceApprove(address(pool), amount);
+    deal2(config.underlying, user, amount + 2);
+    IERC20(config.underlying).forceApprove(address(pool), amount + 2);
 
     console.log('REPAY: %s, Amount: %s', config.symbol, amount);
 
     if (withATokens) {
-      pool.supply({asset: config.underlying, amount: amount, onBehalfOf: user, referralCode: 0});
+      // @note `+ 2` is required because the user's balance can be lower
+      // than `amount` because of rounding .
+      pool.supply({
+        asset: config.underlying,
+        amount: amount + 2,
+        onBehalfOf: user,
+        referralCode: 0
+      });
 
       pool.repayWithATokens({asset: config.underlying, amount: amount, interestRateMode: 2});
     } else {
@@ -588,7 +608,6 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     uint256 underlyingTokenBalanceOfATokenBefore;
     uint256 debtTokenBalanceOfUserBefore;
     uint256 flashLoanPremiumTotal;
-    uint256 flashLoanPremiumToProtocol;
     uint256 underlyingTokenBalanceOfATokenAfter;
     uint256 debtTokenBalanceOfUserAfter;
     uint256[] interestRateModes;
@@ -615,12 +634,8 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
 
     if (interestRateMode == 0) {
       vars.flashLoanPremiumTotal = pool.FLASHLOAN_PREMIUM_TOTAL();
-      vars.flashLoanPremiumToProtocol = pool.FLASHLOAN_PREMIUM_TO_PROTOCOL();
 
-      vars.flashLoanPremiumTotal = amount.percentMul(vars.flashLoanPremiumTotal);
-      vars.flashLoanPremiumToProtocol = vars.flashLoanPremiumTotal.percentMul(
-        vars.flashLoanPremiumToProtocol
-      );
+      vars.flashLoanPremiumTotal = amount.percentMulCeil(vars.flashLoanPremiumTotal);
 
       deal2(config.underlying, receiverAddress, vars.flashLoanPremiumTotal);
     }
@@ -651,15 +666,17 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     DataTypes.ReserveDataLegacy memory reserveDataAfter = pool.getReserveData(config.underlying);
 
     if (interestRateMode == 0) {
-      assertEq(
-        vars.underlyingTokenBalanceOfATokenBefore + vars.flashLoanPremiumToProtocol,
+      assertApproxEqAbs(
+        vars.underlyingTokenBalanceOfATokenBefore + vars.flashLoanPremiumTotal,
         vars.underlyingTokenBalanceOfATokenAfter,
+        2,
         '11'
       );
-      assertEq(
+      assertApproxEqAbs(
         reserveDataBefore.accruedToTreasury +
-          vars.flashLoanPremiumToProtocol.rayDiv(reserveDataAfter.liquidityIndex),
+          vars.flashLoanPremiumTotal.rayDivFloor(reserveDataAfter.liquidityIndex),
         reserveDataAfter.accruedToTreasury,
+        2,
         '12'
       );
 
@@ -677,10 +694,12 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
       );
 
       assertGt(vars.debtTokenBalanceOfUserAfter, vars.debtTokenBalanceOfUserBefore, '5');
+      // @note supply/borrow and other operations with a/v tokens
+      // can generate +-2 wei roundings
       assertApproxEqAbs(
         vars.debtTokenBalanceOfUserAfter,
         vars.debtTokenBalanceOfUserBefore + amount,
-        1,
+        2,
         '6'
       );
     }
