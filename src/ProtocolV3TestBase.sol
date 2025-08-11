@@ -70,14 +70,15 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     IPool pool,
     address payload
   ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
-    return defaultTest(reportName, pool, payload, true);
+    return defaultTest(reportName, pool, payload, true, false);
   }
 
   function defaultTest(
     string memory reportName,
     IPool pool,
     address payload,
-    bool runE2E
+    bool runE2E,
+    bool runSeatbelt
   ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
     string memory beforeString = string(abi.encodePacked(reportName, '_before'));
     ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
@@ -93,15 +94,19 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
 
     string memory afterString = string(abi.encodePacked(reportName, '_after'));
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
-    string memory output = vm.serializeString('root', 'raw', rawDiff);
-    vm.writeJson(output, string(abi.encodePacked('./reports/', afterString, '.json')));
+    vm.writeJson(
+      vm.serializeString('root', 'raw', rawDiff), // output
+      string(abi.encodePacked('./reports/', afterString, '.json'))
+    );
 
     diffReports(beforeString, afterString);
-    generateSeatbeltReport(
-      reportName,
-      address(GovV3Helpers.getPayloadsController(pool, block.chainid)),
-      payload.code
-    );
+    if (runSeatbelt) {
+      generateSeatbeltReport(
+        reportName,
+        address(GovV3Helpers.getPayloadsController(pool, block.chainid)),
+        payload.code
+      );
+    }
 
     configChangePlausibilityTest(configBefore, configAfter);
 
