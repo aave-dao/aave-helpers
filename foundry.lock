@@ -1,11 +1,11 @@
 {
+  "lib/forge-std": {
+    "rev": "c7be2a3481f9e51230880bb0949072c7e3a4da82"
+  },
   "lib/aave-address-book": {
     "branch": {
       "name": "feat/ink",
-      "rev": "ef86878abeeb257055cbdaba00ec85365d9afbc1"
+      "rev": "f6631273059bf1ab7d74d506ed18b9aca69c5070"
     }
-  },
-  "lib/forge-std": {
-    "rev": "c7be2a3481f9e51230880bb0949072c7e3a4da82"
   }
 }
