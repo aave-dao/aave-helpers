@@ -116,7 +116,11 @@ contract ProtocolV2TestBase is CommonTestBase, DiffUtils {
    */
   function e2eTest(ILendingPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    ReserveConfig memory collateralConfig = _getGoodCollateral(configs);
+    (bool found, ReserveConfig memory collateralConfig) = _getGoodCollateral(configs);
+    if (!found) {
+      console.log('E2E: There is no good collateral to test');
+      return;
+    }
     uint256 snapshot = vm.snapshotState();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
@@ -211,16 +215,16 @@ contract ProtocolV2TestBase is CommonTestBase, DiffUtils {
    */
   function _getGoodCollateral(
     ReserveConfig[] memory configs
-  ) private pure returns (ReserveConfig memory config) {
+  ) private pure returns (bool found, ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
       if (
         _includeInE2e(configs[i]) &&
         configs[i].usageAsCollateralEnabled &&
         !configs[i].stableBorrowRateEnabled &&
         configs[i].ltv != 0
-      ) return configs[i];
+      ) return (true, configs[i]);
     }
-    revert('ERROR: No usable collateral found');
+    return (false, config);
   }
 
   function _deposit(
