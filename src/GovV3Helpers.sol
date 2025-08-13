@@ -10,8 +10,7 @@ import {IPool} from 'aave-address-book/AaveV3.sol';
 import {PayloadsControllerUtils, IGovernancePowerStrategy, IPayloadsControllerCore, IGovernanceCore} from 'aave-address-book/GovernanceV3.sol';
 import {IVotingMachineWithProofs} from 'aave-address-book/governance-v3/IVotingMachineWithProofs.sol';
 import {IVotingPortal} from 'aave-address-book/governance-v3/IVotingPortal.sol';
-// import {AaveV3ScrollEtherFi} from 'aave-address-book/AaveV3ScrollEtherFi.sol';
-import {AaveV3Ink} from 'aave-address-book/AaveV3Ink.sol';
+import {AaveV3InkWhitelabel} from 'aave-address-book/AaveV3InkWhitelabel.sol';
 import {GovernanceV3Arbitrum} from 'aave-address-book/GovernanceV3Arbitrum.sol';
 import {GovernanceV3Avalanche} from 'aave-address-book/GovernanceV3Avalanche.sol';
 import {GovernanceV3Polygon} from 'aave-address-book/GovernanceV3Polygon.sol';
@@ -22,8 +21,7 @@ import {GovernanceV3Base} from 'aave-address-book/GovernanceV3Base.sol';
 import {GovernanceV3BNB} from 'aave-address-book/GovernanceV3BNB.sol';
 import {GovernanceV3Gnosis} from 'aave-address-book/GovernanceV3Gnosis.sol';
 import {GovernanceV3Scroll} from 'aave-address-book/GovernanceV3Scroll.sol';
-// import {GovernanceV3ScrollEtherFi} from 'aave-address-book/GovernanceV3ScrollEtherFi.sol';
-import {GovernanceV3Ink} from 'aave-address-book/GovernanceV3Ink.sol';
+import {GovernanceV3InkWhitelabel} from 'aave-address-book/GovernanceV3InkWhitelabel.sol';
 import {GovernanceV3PolygonZkEvm} from 'aave-address-book/GovernanceV3PolygonZkEvm.sol';
 import {GovernanceV3ZkSync} from 'aave-address-book/GovernanceV3ZkSync.sol';
 import {GovernanceV3Linea} from 'aave-address-book/GovernanceV3Linea.sol';
@@ -938,11 +936,8 @@ library GovV3Helpers {
     IPool pool,
     uint256 chainId
   ) internal pure returns (IPayloadsControllerCore) {
-    // if (pool == AaveV3ScrollEtherFi.POOL) {
-    //   return GovernanceV3ScrollEtherFi.PERMISSIONED_PAYLOADS_CONTROLLER;
-    // }
-    if (pool == AaveV3Ink.POOL) {
-      return GovernanceV3Ink.PERMISSIONED_PAYLOADS_CONTROLLER;
+    if (pool == AaveV3InkWhitelabel.POOL) {
+      return GovernanceV3InkWhitelabel.PERMISSIONED_PAYLOADS_CONTROLLER;
     }
     return getPayloadsController(chainId);
   }
