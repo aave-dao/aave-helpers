@@ -25,6 +25,9 @@ contract SeatbeltUtils is Test {
     inputs[9] = '--output';
     inputs[10] = string.concat('./reports/seatbelt/', name);
 
-    vm.ffi(inputs);
+    Vm.FfiResult memory f = vm.tryFfi(inputs);
+    if (f.exitCode != 0) {
+      console2.logString(string(f.stderr));
+    }
   }
 }
