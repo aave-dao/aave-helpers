@@ -422,10 +422,16 @@ library GovV3Helpers {
    * @param payloadAddress address of the payload to execute
    */
   function executePayload(Vm vm, address payloadAddress) internal {
-    IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
-    payloadsController.executePayload(readyPayload(vm, payloadAddress));
+    executePayload(vm, payloadAddress, address(getPayloadsController(block.chainid)));
   }
 
+  /**
+   * @dev executes a payloadAddress via custom payloadsController by injecting it into storage and executing it afterwards.
+   * @notice This method is for test purposes only.
+   * @param vm Vm
+   * @param payloadAddress address of the payload to execute
+   * @param payloadsController address of the payloadsController
+   */
   function executePayload(Vm vm, address payloadAddress, address payloadsController) internal {
     IPayloadsControllerCore(payloadsController).executePayload(
       readyPayload(vm, payloadAddress, payloadsController)
@@ -440,16 +446,16 @@ library GovV3Helpers {
    * @param payloadAddress address of the payload to execute
    */
   function readyPayload(Vm vm, address payloadAddress) internal returns (uint40) {
-    require(payloadAddress.code.length > 0, 'PAYLOAD_ADDRESS_HAS_NO_CODE');
-    IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
-    IPayloadsControllerCore.ExecutionAction[]
-      memory actions = new IPayloadsControllerCore.ExecutionAction[](1);
-    actions[0] = buildAction(payloadAddress);
-    uint40 payloadId = GovV3StorageHelpers.injectPayload(vm, payloadsController, actions);
-    GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
-    return payloadId;
+    return readyPayload(vm, payloadAddress, address(getPayloadsController(block.chainid)));
   }
 
+  /**
+   * @dev prepares a payloadAddress for execution via specific payloadsController.
+   * @notice This method is for test purposes only.
+   * @param vm Vm
+   * @param payloadAddress address of the payload to execute
+   * @param payloadsController address of the payloadsController
+   */
   function readyPayload(
     Vm vm,
     address payloadAddress,
@@ -932,6 +938,10 @@ library GovV3Helpers {
     return _createProposal(vm, payloads, ipfsHash, votingPortal);
   }
 
+  /**
+   * @dev method to get pool specific payloads controller. 
+   *      useful for whitelabel instances where a chain can have different payloadsController based on the pool.
+   */
   function getPayloadsController(
     IPool pool,
     uint256 chainId
