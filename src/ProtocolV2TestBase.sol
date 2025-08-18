@@ -3,6 +3,7 @@ pragma solidity >=0.7.5 <0.9.0;
 
 import 'forge-std/Test.sol';
 import {IAaveOracle, ILendingPool, ILendingPoolAddressesProvider, ILendingPoolConfigurator, IAaveProtocolDataProvider, DataTypes, TokenData, ILendingRateOracle, IDefaultInterestRateStrategy} from 'aave-address-book/AaveV2.sol';
+import {ReserveConfiguration} from 'aave-v3-origin/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {IERC20Metadata} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
@@ -53,6 +54,7 @@ struct InterestStrategyValues {
 
 contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
   using SafeERC20 for IERC20;
+  using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
 
   /**
    * @dev runs the default test suite that should run on any proposal touching the aave protocol which includes:
@@ -123,11 +125,7 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
    */
   function e2eTest(ILendingPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    (bool found, ReserveConfig memory collateralConfig) = _getGoodCollateral(configs);
-    if (!found) {
-      console.log('E2E: There is no good collateral to test');
-      return;
-    }
+    ReserveConfig memory collateralConfig = _getGoodCollateral(configs, pool);
     uint256 snapshot = vm.snapshotState();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
@@ -221,17 +219,48 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
    * @dev returns a "good" collateral in the list that cannot be borrowed in stable mode
    */
   function _getGoodCollateral(
-    ReserveConfig[] memory configs
-  ) private pure returns (bool found, ReserveConfig memory config) {
+    ReserveConfig[] memory configs,
+    ILendingPool pool
+  ) private returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
       if (
         _includeInE2e(configs[i]) &&
         configs[i].usageAsCollateralEnabled &&
         !configs[i].stableBorrowRateEnabled &&
         configs[i].ltv != 0
-      ) return (true, configs[i]);
+      ) return configs[i];
     }
-    return (false, config);
+    // no active reserve => need to activate one for tests
+    _activateReserveForE2E(configs[0], pool);
+
+    return configs[0];
+  }
+
+  function _activateReserveForE2E(ReserveConfig memory config, ILendingPool pool) internal {
+    ILendingPoolAddressesProvider addressesProvider = pool.getAddressesProvider();
+    address poolAdmin = addressesProvider.getPoolAdmin();
+
+    vm.startPrank(poolAdmin);
+
+    ILendingPoolConfigurator poolConfigurator = ILendingPoolConfigurator(
+      addressesProvider.getLendingPoolConfigurator()
+    );
+
+    poolConfigurator.enableBorrowingOnReserve({
+      asset: config.underlying,
+      stableBorrowRateEnabled: false
+    });
+    poolConfigurator.configureReserveAsCollateral({
+      asset: config.underlying,
+      ltv: 75_00,
+      liquidationThreshold: 78_00,
+      liquidationBonus: 105_00
+    });
+
+    poolConfigurator.activateReserve(config.underlying);
+    poolConfigurator.unfreezeReserve(config.underlying);
+
+    vm.stopPrank();
   }
 
   function _deposit(
