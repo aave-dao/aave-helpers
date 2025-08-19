@@ -78,10 +78,16 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
     string memory beforeString = string(abi.encodePacked(reportName, '_before'));
     ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
 
+    vm.startStateDiffRecording();
     executePayload(vm, payload);
+    string memory rawDiff = vm.getStateDiffJson();
 
     string memory afterString = string(abi.encodePacked(reportName, '_after'));
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
+    vm.writeJson(
+      vm.serializeString('root', 'raw', rawDiff), // output
+      string(abi.encodePacked('./reports/', afterString, '.json'))
+    );
 
     diffReports(beforeString, afterString);
     generateSeatbeltReport(
