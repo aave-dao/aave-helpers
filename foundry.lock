@@ -5,7 +5,7 @@
   "lib/aave-address-book": {
     "branch": {
       "name": "feat/ink",
-      "rev": "f6631273059bf1ab7d74d506ed18b9aca69c5070"
+      "rev": "339cc225839edf623d083deaf7ee21ae53c372bf"
     }
   }
 }
