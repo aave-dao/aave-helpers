@@ -14,7 +14,7 @@ contract SeatbeltUtils is Test {
   ) internal {
     string[] memory inputs = new string[](11);
     inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/cli@^0.0.47';
+    inputs[1] = '@bgd-labs/cli@^0.0.50';
     inputs[2] = 'seatbelt-report';
     inputs[3] = '--chainId';
     inputs[4] = vm.toString(block.chainid);
