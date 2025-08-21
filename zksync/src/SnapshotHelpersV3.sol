@@ -15,7 +15,7 @@ import {IDefaultInterestRateStrategyV2} from 'aave-v3-origin/contracts/interface
 import {ReserveConfig, ReserveTokens, DataTypes} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
 import {ProtocolV3TestBase as TestBase} from './ProtocolV3TestBase.sol';
 import {ILegacyDefaultInterestRateStrategy} from '../../src/dependencies/ILegacyDefaultInterestRateStrategy.sol';
-import {DiffUtils} from 'aave-v3-origin-tests/utils/DiffUtils.sol';
+import {DiffUtils} from '../../src/DiffUtils.sol';
 
 contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
