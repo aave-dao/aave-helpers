@@ -11,7 +11,7 @@ import {PercentageMath} from 'aave-v3-origin/contracts/protocol/libraries/math/P
 import {WadRayMath} from 'aave-v3-origin/contracts/protocol/libraries/math/WadRayMath.sol';
 import {IDefaultInterestRateStrategyV2} from 'aave-v3-origin/contracts/interfaces/IDefaultInterestRateStrategyV2.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
-import {DiffUtils} from 'aave-v3-origin-tests/utils/DiffUtils.sol';
+import {DiffUtils} from './DiffUtils.sol';
 import {ProtocolV3TestBase as RawProtocolV3TestBase, ReserveConfig} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
 import {MockAggregator} from 'aave-v3-origin/contracts/mocks/oracle/CLAggregators/MockAggregator.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
@@ -37,7 +37,7 @@ struct InterestStrategyValues {
 /**
  * only applicable to harmony at this point
  */
-contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestBase {
+contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestBase, DiffUtils {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
   using PercentageMath for uint256;
   using WadRayMath for uint256;
