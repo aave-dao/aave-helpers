@@ -7,7 +7,7 @@ import {ReserveConfig} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
 import {PercentageMath} from 'aave-v3-origin/contracts/protocol/libraries/math/PercentageMath.sol';
 import {WadRayMath} from 'aave-v3-origin/contracts/protocol/libraries/math/WadRayMath.sol';
 import {SnapshotHelpersV3} from './SnapshotHelpersV3.sol';
-import {ProtocolV3TestBase as BaseProtocolV3TestBase} from '../../src/ProtocolV3TestBase.sol';
+import {BaseProtocolV3TestBase} from '../../src/BaseProtocolV3TestBase.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 
@@ -200,5 +200,9 @@ contract ProtocolV3TestBase is BaseProtocolV3TestBase {
   function _switchOffZkVm() internal {
     (bool success, ) = address(vm).call(abi.encodeWithSignature('zkVm(bool)', false));
     require(success, 'ERROR SWITCHING OFF ZKVM');
+  }
+
+  function _getBytecode(address contractAddress) internal override view returns (bytes memory) {
+    revert('EXTCODECOPY opcode not supported in zksync');
   }
 }
