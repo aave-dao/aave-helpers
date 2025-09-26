@@ -26,6 +26,7 @@
     "prettier-plugin-solidity": "1.4.3"
   },
   "dependencies": {
-    "@bgd-labs/aave-cli": "1.4.0"
+    "@bgd-labs/aave-cli": "1.4.0",
+    "@bgd-labs/cli": "^0.0.56"
   }
 }
