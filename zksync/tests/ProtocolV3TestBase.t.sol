@@ -10,7 +10,7 @@ contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
   PayloadWithEmit payload;
 
   function setUp() public override {
-    vm.createSelectFork('zksync', 50675012);
+    vm.createSelectFork('zksync', 64899746);
     payload = new PayloadWithEmit();
 
     super.setUp();
