@@ -66,14 +66,15 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
     ILendingPool pool,
     address payload
   ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
-    return defaultTest(reportName, pool, payload, true);
+    return defaultTest(reportName, pool, payload, true, false);
   }
 
   function defaultTest(
     string memory reportName,
     ILendingPool pool,
     address payload,
-    bool runE2E
+    bool runE2E,
+    bool runSeatbelt
   ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
     string memory beforeString = string(abi.encodePacked(reportName, '_before'));
     ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
@@ -90,11 +91,13 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
     );
 
     diffReports(beforeString, afterString);
-    generateSeatbeltReport(
-      reportName,
-      address(GovV3Helpers.getPayloadsController(block.chainid)),
-      payload.code
-    );
+    if (runSeatbelt) { 
+      generateSeatbeltReport(
+        reportName,
+        address(GovV3Helpers.getPayloadsController(block.chainid)),
+        payload.code
+      );
+    }
 
     if (runE2E) e2eTest(pool);
     return (configBefore, configAfter);

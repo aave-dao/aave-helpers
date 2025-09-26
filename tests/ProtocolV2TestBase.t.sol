@@ -37,6 +37,6 @@ contract ProtocolV2TestE2ETestAsset is ProtocolV2TestBase {
   }
 
   function test_defaultTest() public {
-    defaultTest('AMMTEST', AaveV2EthereumAMM.POOL, address(new PayloadWithEmit()), false);
+    defaultTest('AMMTEST', AaveV2EthereumAMM.POOL, address(new PayloadWithEmit()), false, false);
   }
 }
