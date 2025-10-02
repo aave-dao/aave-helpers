@@ -112,7 +112,9 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
 
     diffReports(beforeString, afterString);
     if (runSeatbelt) {
-      revert('Seabelt report not supported for zksync, due to missing support for EXTCODECOPY opcode');
+      revert(
+        'Seabelt report not supported for zksync, due to missing support for EXTCODECOPY opcode'
+      );
     }
 
     configChangePlausibilityTest(configBefore, configAfter);
@@ -248,7 +250,8 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
           // borrowAmount > 10'000$
           // need to add more test asset in order to be able to borrow it
           // right now there is not enough underlying tokens in the aToken
-          _deposit(testAssetConfig, pool, testAssetSupplier, borrowAmount - aTokenTotalSupply);
+          // need to add 10 weis more in order to be safe from rounding errors
+          _deposit(testAssetConfig, pool, testAssetSupplier, borrowAmount - aTokenTotalSupply + 10);
 
           // need to add more collateral in order to be able to borrow
           // collateralAssetAmount == 100'000$
