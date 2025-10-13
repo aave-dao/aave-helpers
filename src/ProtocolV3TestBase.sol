@@ -184,6 +184,15 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     uint256 collateralAssetAmount = _getTokenAmountByDollarValue(pool, collateralConfig, 100_000);
     uint256 testAssetAmount = _getTokenAmountByDollarValue(pool, testAssetConfig, 10_000);
 
+    {
+      uint256 aTokenTotalSupply = IERC20(testAssetConfig.aToken).totalSupply();
+      uint256 minimumAmountOfTotalSupply = _getTokenAmountByDollarValue(pool, testAssetConfig, 1);
+
+      if (aTokenTotalSupply < minimumAmountOfTotalSupply) {
+        revert('AToken total supply is lower than minimum amount');
+      }
+    }
+
     // remove caps as they should not prevent testing
     IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
     IPoolConfigurator poolConfigurator = IPoolConfigurator(addressesProvider.getPoolConfigurator());
