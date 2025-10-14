@@ -1,7 +1,7 @@
 {
   "lib/aave-address-book": {
-    "branch": {
-      "name": "main",
+    "tag": {
+      "name": "v4.33.0",
       "rev": "e411ea90268730acc1c0dea37c83543dadad1f68"
     }
   },
