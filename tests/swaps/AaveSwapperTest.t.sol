@@ -414,8 +414,8 @@ contract GetExpectedOut is AaveSwapperTest {
       amount,
       AaveV3EthereumAssets.AAVE_UNDERLYING,
       AaveV3EthereumAssets.USDC_UNDERLYING,
-      ChainlinkEthereum.AAVE_USD,
-      ChainlinkEthereum.USDC_USD
+      ChainlinkEthereum.AAVE__USD,
+      ChainlinkEthereum.USDC__USD
     );
 
     // July 3, 2025 AAVE/USD is around $276
