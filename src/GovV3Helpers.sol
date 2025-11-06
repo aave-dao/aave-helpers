@@ -262,6 +262,25 @@ library GovV3Helpers {
   }
 
   /**
+   * @notice method to deploy the payload contracts and register them on payloads controller for a given network
+   * @param chainId the chain id for the network where payload will be deployed and registered
+   * @param payloadBytecode list of payload creation bytecode which will be deployed and registered
+   */
+  function deployRegisterPayload(Vm vm, uint256 chainId, bytes[] memory payloadBytecode) internal {
+    ChainHelpers.selectChain(vm, chainId);
+    vm.startBroadcast();
+
+    IPayloadsControllerCore.ExecutionAction[] memory actions = new IPayloadsControllerCore.ExecutionAction[](payloadBytecode.length);
+    for (uint256 i = 0; i < payloadBytecode.length; i++) {
+      address payload = deployDeterministic(payloadBytecode[i]);
+      actions[i] = buildAction(payload);
+    }
+
+    createPayload(actions);
+    vm.stopBroadcast();
+  }
+
+  /**
    * @dev builds a action to be registered on a payloadsController
    * - assumes accesscontrol level 1
    * - assumes delegateCall true
