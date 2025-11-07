@@ -203,11 +203,12 @@ library CollectorUtils {
       revert InvalidZeroAmount();
     }
 
+    uint256 balanceBeforeTransfer = IERC20(aTokenAddress).balanceOf(address(this));
+
     collector.transfer(IERC20(aTokenAddress), address(this), input.amount);
 
-    // in case of imprecision during the aTokenTransfer withdraw a bit less
     uint256 balanceAfterTransfer = IERC20(aTokenAddress).balanceOf(address(this));
-    input.amount = balanceAfterTransfer >= input.amount ? input.amount : balanceAfterTransfer;
+    input.amount = balanceAfterTransfer - balanceBeforeTransfer;
 
     // @dev withdrawal interfaces of v2 and v3 is the same, so we use any
     return IPool(input.pool).withdraw(input.underlying, input.amount, address(receiver));
