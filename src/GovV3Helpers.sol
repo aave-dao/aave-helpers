@@ -402,7 +402,7 @@ library GovV3Helpers {
       revert PayloadAlreadyCreated();
     } else {
       for (uint256 i = 0; i < actions.length; i++) {
-        require(actions[i].target.code.length > 0, 'Target Payload Not Deployed')
+        require(actions[i].target.code.length > 0, 'Target Payload Not Deployed');
       }
       console2.log(
         'safe: ',
