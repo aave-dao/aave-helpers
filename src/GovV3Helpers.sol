@@ -401,6 +401,9 @@ library GovV3Helpers {
     if (payloadCreated && payload.createdAt > block.timestamp - 7 days) {
       revert PayloadAlreadyCreated();
     } else {
+      for (uint256 i = 0; i < actions.length; i++) {
+        require(actions[i].target.code.length > 0, 'Target Payload Not Deployed')
+      }
       console2.log(
         'safe: ',
         IPermissionedPayloadsController(address(permissionedPayloadsController)).payloadsManager()
