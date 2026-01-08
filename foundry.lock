@@ -1,8 +1,8 @@
 {
   "lib/aave-address-book": {
     "branch": {
-      "name": "main",
-      "rev": "a31803177d717939ba8eceba54fee069235bd9c5"
+      "name": "fix/config-engine",
+      "rev": "fc84fad40018688fa74d6d5a6feda29d6b597f18"
     }
   },
   "lib/forge-std": {
