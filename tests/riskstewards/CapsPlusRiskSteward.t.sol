@@ -14,7 +14,7 @@ contract CapsPlusRiskSteward_Test is Test {
   CapsPlusRiskSteward public steward;
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 23089053);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 24196890);
     steward = new CapsPlusRiskSteward(
       AaveV3Ethereum.AAVE_PROTOCOL_DATA_PROVIDER,
       IAaveV3ConfigEngine(AaveV3Ethereum.CONFIG_ENGINE),
