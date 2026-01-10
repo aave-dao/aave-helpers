@@ -11,6 +11,4 @@ import './AaveV2Payload.sol';
 // TODO: Add rates factory address after deploying
 abstract contract AaveV2PayloadEthereumAMM is
   AaveV2Payload(IEngine(AaveV2EthereumAMM.CONFIG_ENGINE))
-{
-
-}
+{}

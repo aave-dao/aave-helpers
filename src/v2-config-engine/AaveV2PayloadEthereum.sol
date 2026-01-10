@@ -9,6 +9,4 @@ import './AaveV2Payload.sol';
  * @author BGD Labs
  */
 // TODO: Add rates factory address after deploying
-abstract contract AaveV2PayloadEthereum is AaveV2Payload(IEngine(AaveV2Ethereum.CONFIG_ENGINE)) {
-
-}
+abstract contract AaveV2PayloadEthereum is AaveV2Payload(IEngine(AaveV2Ethereum.CONFIG_ENGINE)) {}

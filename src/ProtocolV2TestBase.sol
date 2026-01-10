@@ -91,7 +91,7 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
     );
 
     diffReports(beforeString, afterString);
-    if (runSeatbelt) { 
+    if (runSeatbelt) {
       generateSeatbeltReport(
         reportName,
         address(GovV3Helpers.getPayloadsController(block.chainid)),
