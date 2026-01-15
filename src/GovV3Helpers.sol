@@ -1227,7 +1227,10 @@ library GovV3Helpers {
       payload.state == IPayloadsControllerCore.PayloadState.Created,
       MustBeInCreatedState(chainId, payloadId)
     );
-    require(payload.expirationTime >= block.timestamp + 7 days, ExpirationMustBeInTheFuture(chainId, payloadId));
+    require(
+      payload.expirationTime >= block.timestamp + 7 days,
+      ExpirationMustBeInTheFuture(chainId, payloadId)
+    );
     if (prevFork != currentFork) {
       ChainHelpers.selectChain(vm, ChainIds.MAINNET);
     }
