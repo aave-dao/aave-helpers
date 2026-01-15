@@ -83,6 +83,8 @@ library GovV3Helpers {
   error LongBytesNotSupportedYet();
   error FfiFailed();
   error PayloadAlreadyCreated();
+  error ExpirationMustBeInTheFuture(uint256 chainId, uint40 payloadId);
+  error MustBeInCreatedState(uint256 chainId, uint40 payloadId);
 
   struct StorageRootResponse {
     address account;
@@ -1215,7 +1217,7 @@ library GovV3Helpers {
     uint256 chainId,
     IPayloadsControllerCore payloadsController,
     IPayloadsControllerCore.ExecutionAction[] memory actions
-  ) private returns (PayloadsControllerUtils.AccessControl, uint40) {
+  ) internal returns (PayloadsControllerUtils.AccessControl, uint40) {
     (uint256 prevFork, uint256 currentFork) = ChainHelpers.selectChain(vm, chainId);
     (uint40 payloadId, IPayloadsControllerCore.Payload memory payload) = _findPayloadId(
       payloadsController,
@@ -1223,9 +1225,9 @@ library GovV3Helpers {
     );
     require(
       payload.state == IPayloadsControllerCore.PayloadState.Created,
-      'MUST_BE_IN_CREATED_STATE'
+      MustBeInCreatedState(chainId, payloadId)
     );
-    require(payload.expirationTime >= block.timestamp, 'EXPIRATION_MUST_BE_IN_THE_FUTURE');
+    require(payload.expirationTime >= block.timestamp + 7 days, ExpirationMustBeInTheFuture(chainId, payloadId));
     if (prevFork != currentFork) {
       ChainHelpers.selectChain(vm, ChainIds.MAINNET);
     }
