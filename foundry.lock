@@ -1,8 +1,8 @@
 {
   "lib/aave-address-book": {
     "branch": {
-      "name": "feat/megaeth",
-      "rev": "8c43667d2ff48ef235f6342bb98560127c5cd73d"
+      "name": "main",
+      "rev": "00fb5ecbc93bf5c690f63fad84da5da653daf43a"
     }
   },
   "lib/forge-std": {
