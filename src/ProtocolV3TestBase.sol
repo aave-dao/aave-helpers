@@ -82,22 +82,30 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
   ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
     string memory beforeString = string(abi.encodePacked(reportName, '_before'));
     ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
+    string memory afterString = string(abi.encodePacked(reportName, '_after'));
 
     uint256 startGas = gasleft();
 
     vm.startStateDiffRecording();
+    vm.recordLogs();
+
     executePayload(vm, payload, pool);
-    string memory rawDiff = vm.getStateDiffJson();
 
     uint256 gasUsed = startGas - gasleft();
     assertLt(gasUsed, (block.gaslimit * 95) / 100, 'BLOCK_GAS_LIMIT_EXCEEDED'); // 5% is kept as a buffer
 
-    string memory afterString = string(abi.encodePacked(reportName, '_after'));
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
-    vm.writeJson(
-      vm.serializeString('root', 'raw', rawDiff), // output
-      string(abi.encodePacked('./reports/', afterString, '.json'))
-    );
+
+    {
+      string memory rawDiff = vm.getStateDiffJson();
+      vm.writeJson(rawDiff, string(abi.encodePacked('./reports/', afterString, '.json')), '$.raw');
+      string memory logsJson = vm.getRecordedLogsJson();
+      vm.writeJson(
+        logsJson,
+        string(abi.encodePacked('./reports/', afterString, '.json')),
+        '$.logs'
+      );
+    }
 
     diffReports(beforeString, afterString);
     if (runSeatbelt) {
