@@ -59,7 +59,7 @@ export function renderStrategyDiff(diff: StrategyDiff) {
 
   (Object.keys(diff) as (keyof AaveV3Strategy)[])
     .filter((key) => !OMIT_KEYS.includes(key))
-    .filter((key) => diff[key].hasOwnProperty('from'))
+    .filter((key) => typeof diff[key] === 'object' && diff[key] !== null && 'from' in diff[key])
     .sort(sortStrategyKeys)
     .map((key) => {
       content += `| ${key} | ${renderStrategyValue(key, {

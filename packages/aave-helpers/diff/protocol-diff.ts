@@ -59,8 +59,6 @@ export async function diffReports<A extends AaveV3Snapshot, B extends AaveV3Snap
         if ((diffResult.reserves[reserveKey] as any).to) {
           let report = renderReserve((diffResult.reserves[reserveKey] as any).to, chainId);
           report += renderStrategy(post.strategies[reserveKey]);
-          report += `| interestRate | ![ir](${getStrategyImageUrl(post.strategies[reserveKey])}) |\n`;
-
           return report;
         }
       })
@@ -75,8 +73,9 @@ export async function diffReports<A extends AaveV3Snapshot, B extends AaveV3Snap
       .filter((i) => i);
     const reservesAltered = Object.keys(diffResult.reserves)
       .map((reserveKey) => {
-        // "from" being present on reserses key means reserve was removed
-        if (!(diffResult.reserves[reserveKey] as any).hasOwnProperty('from')) {
+        // Check if this is not an added/removed reserve (no 'from' property at reserve level)
+        const reserveDiff = diffResult.reserves[reserveKey] as any;
+        if (!(typeof reserveDiff === 'object' && reserveDiff !== null && 'from' in reserveDiff)) {
           const hasChangedReserveProperties = hasDiff(diffResult.reserves[reserveKey]);
           const preIr = getStrategyImageUrl(pre.strategies[reserveKey]);
           const postIr = getStrategyImageUrl(post.strategies[reserveKey]);

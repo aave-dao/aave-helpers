@@ -1,0 +1,32 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`diff utility > complex scenarios > should create snapshot for complex diff 1`] = `
+{
+  "poolConfig": {
+    "flashLoanPremiumTotal": {
+      "from": 9,
+      "to": 10,
+    },
+  },
+  "reserves": {
+    "DAI": {
+      "from": null,
+      "to": {
+        "liquidationThreshold": 8000,
+        "ltv": 7500,
+      },
+    },
+    "USDC": {
+      "liquidationThreshold": 8000,
+      "ltv": 7500,
+    },
+    "WETH": {
+      "liquidationThreshold": 8500,
+      "ltv": {
+        "from": 8000,
+        "to": 8100,
+      },
+    },
+  },
+}
+`;

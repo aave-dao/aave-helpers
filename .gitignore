@@ -10,7 +10,4 @@ yarn.lock
 
 yarn-error.log
 
-# snapshot artifacts
-reports/
-
 .vscode/

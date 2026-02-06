@@ -1,0 +1,12 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`emode rendering > renderEmodeDiff > should match snapshot 1`] = `
+"| description | value before | value after |
+| --- | --- | --- |
+| eMode.borrowableBitmap | WETH | WETH, wstETH |
+| eMode.label (unchanged) | ETH correlated | ETH correlated |
+| eMode.ltv | 93 % | 94 % |
+| eMode.liquidationThreshold | 95 % | 96 % |
+| eMode.liquidationBonus | 1 % | 2 % |
+"
+`;

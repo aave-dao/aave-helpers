@@ -7,7 +7,7 @@ export function renderEModeValue<T extends keyof AaveV3Emode>(
   emode: AaveV3Emode,
   snapshot: AaveV3Snapshot
 ) {
-  if (!emode[key]) return '-';
+  if (emode[key] === undefined || emode[key] === null || emode[key] === '') return '-';
   if (['reserveFactor', 'liquidationProtocolFee', 'liquidationThreshold', 'ltv'].includes(key))
     return `${formatUnits(BigInt(emode[key]), 2)} %`;
   if (key === 'liquidationBonus')
@@ -65,7 +65,7 @@ export function renderEmodeDiff(diff: EmodeDiff, pre: AaveV3Snapshot, post: Aave
     .filter((key) => !OMIT_KEYS.includes(key))
     .sort(sortEmodeKeys)
     .map((key) => {
-      if (typeof diff[key] === 'object' && diff[key].hasOwnProperty('from'))
+      if (typeof diff[key] === 'object' && diff[key] !== null && 'from' in diff[key])
         content += `| eMode.${key} | ${renderEModeValue(
           key,
           {

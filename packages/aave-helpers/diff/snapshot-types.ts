@@ -7,8 +7,7 @@ export const aaveV3ConfigSchema = z.object({
   pool: z.string(),
   poolAddressesProvider: z.string(),
   poolConfigurator: z.string(),
-  poolConfiguratorImpl: z.string(),
-  poolImpl: z.string(),
+  priceOracleSentinel: z.string(),
   protocolDataProvider: z.string(),
 });
 
@@ -21,8 +20,10 @@ export const aaveV3ReserveSchema = z.object({
   liquidationBonus: z.number(),
   underlying: z.string(),
   isFrozen: z.boolean(),
-  stableDebtToken: z.string(),
+  isPaused: z.boolean(),
   variableDebtToken: z.string(),
+  variableDebtTokenName: z.string(),
+  variableDebtTokenSymbol: z.string(),
   reserveFactor: z.number(),
   liquidationProtocolFee: z.number(),
   usageAsCollateralEnabled: z.boolean(),
@@ -31,29 +32,21 @@ export const aaveV3ReserveSchema = z.object({
   debtCeiling: z.number(),
   borrowingEnabled: z.boolean(),
   isActive: z.boolean(),
-  eModeCategory: z.number(),
   symbol: z.string(),
-  stableBorrowRateEnabled: z.boolean(),
   isFlashloanable: z.boolean(),
   aToken: z.string(),
+  aTokenName: z.string(),
+  aTokenSymbol: z.string(),
   liquidationThreshold: z.number(),
-  aTokenImpl: z.string(),
-  stableDebtTokenImpl: z.string(),
   interestRateStrategy: z.string(),
-  variableDebtTokenImpl: z.string(),
   oracleLatestAnswer: z.string(),
   oracle: z.string(),
   oracleDecimals: z.number(),
-  oracleName: z.string(),
+  oracleName: z.string().optional(),
   oracleDescription: z.string(),
   decimals: z.number(),
   isSiloed: z.boolean(),
-  liquidityIndex: z.number(),
-  variableBorrowIndex: z.number(),
-  currentLiquidityRate: z.number(),
-  currentVariableBorrowRate: z.number(),
   aTokenUnderlyingBalance: z.string(),
-  virtualAccountingActive: z.boolean(),
   virtualBalance: z.string(),
 });
 
@@ -113,7 +106,9 @@ export const rawStorageSchema = z.record(
   z.string() as z.ZodType<Address>,
   z.object({
     label: z.string().nullable(),
+    contract: z.string().nullable(),
     balanceDiff: z.string().nullable(),
+    nonceDiff: z.string().nullable(),
     stateDiff: z.record(z.string(), slotDiff),
   })
 );
@@ -122,6 +117,12 @@ export type RawStorage = z.infer<typeof rawStorageSchema>;
 
 export type SlotDiff = z.infer<typeof slotDiff>;
 
+export const logSchema = z.object({
+  topics: z.array(z.string()),
+  data: z.string(),
+  emitter: z.string(),
+});
+
 export const aaveV3SnapshotSchema = z.object({
   reserves: z.record(z.string(), aaveV3ReserveSchema),
   strategies: z.record(z.string(), aaveV3StrategySchema),
@@ -129,6 +130,7 @@ export const aaveV3SnapshotSchema = z.object({
   poolConfig: aaveV3ConfigSchema,
   chainId: zodChainId,
   raw: rawStorageSchema.optional(),
+  logs: z.array(logSchema).optional(),
 });
 
 export const aDIReceiverConfigSchema = z.object({
