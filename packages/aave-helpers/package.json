@@ -1,9 +1,7 @@
 {
   "name": "aave-helpers",
   "version": "1.0.0",
-  "description": "",
   "license": "MIT",
-  "author": "",
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
