@@ -2,13 +2,19 @@ import type { Hex } from 'viem';
 import { getClient } from '@bgd-labs/toolbox';
 import { isChange, hasChanges, diff, type DiffResult, type Change } from '../diff';
 import { formatValue, type FormatterContext } from '../formatters';
-import type { AaveV3Reserve, AaveV3Snapshot, AaveV3Strategy, CHAIN_ID } from '../snapshot-types';
+import type { AaveV3Reserve, AaveV3Snapshot, CHAIN_ID } from '../snapshot-types';
 import { toAddressLink } from '../utils/markdown';
-import { renderStrategyDiff, renderStrategy } from './strategies';
+import {
+  renderStrategyDiff,
+  renderStrategy,
+  renderIrImage,
+  renderIrDiffImages,
+} from './strategies';
 
 // --- Field display order ---
 
 const RESERVE_KEY_ORDER: (keyof AaveV3Reserve)[] = [
+  'id',
   'symbol',
   'decimals',
   'isActive',
@@ -138,6 +144,7 @@ export function renderReservesSection(
       let report = renderReserveTable(entry.to, pre.chainId);
       if (post.strategies[key]) {
         report += renderStrategy(post.strategies[key], pre.chainId);
+        report += renderIrImage(post.strategies[key]);
       }
       added.push(report);
       continue;
@@ -167,6 +174,7 @@ export function renderReservesSection(
       if (strategyChanged) {
         const stratDiff = diff(preStrategy, postStrategy);
         report += renderStrategyDiff(stratDiff, pre.chainId);
+        report += renderIrDiffImages(preStrategy, postStrategy);
       }
       if (report) altered.push(report);
     }

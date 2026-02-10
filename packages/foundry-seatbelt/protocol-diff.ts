@@ -36,13 +36,11 @@ export function diffSnapshots(before: AaveV3Snapshot, after: AaveV3Snapshot): st
   md += renderReservesSection(diffResult, before, after);
   md += renderEmodesSection(diffResult, before, after);
   md += renderPoolConfigSection(diffResult, after.chainId);
-  md += renderRawSection(raw, after.chainId);
   md += renderLogsSection(logs);
+  md += renderRawSection(raw, after.chainId);
 
-  // Append raw JSON diff as fallback
-  const diffWithoutUnchanged = diff(before, postCopy, true) as Record<string, unknown>;
-  if (raw) diffWithoutUnchanged.raw = raw;
-  if (logs) diffWithoutUnchanged.logs = logs;
+  // Append raw JSON diff as fallback (without raw/logs which have their own sections)
+  const diffWithoutUnchanged = diff(before, postCopy, true);
   md += `## Raw diff\n\n\`\`\`json\n${JSON.stringify(diffWithoutUnchanged, null, 2)}\n\`\`\`\n`;
 
   return md;

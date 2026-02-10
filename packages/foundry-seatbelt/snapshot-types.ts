@@ -115,13 +115,20 @@ export const slotDiffSchema = z.object({
 
 export type SlotDiff = z.infer<typeof slotDiffSchema>;
 
+export const valueDiffSchema = z.object({
+  previousValue: z.union([z.string(), z.number()]),
+  newValue: z.union([z.string(), z.number()]),
+});
+
+export type ValueDiff = z.infer<typeof valueDiffSchema>;
+
 export const rawStorageSchema = z.record(
   z.string() as z.ZodType<Address>,
   z.object({
     label: z.string().nullable(),
     contract: z.string().nullable(),
-    balanceDiff: z.string().nullable(),
-    nonceDiff: z.string().nullable(),
+    balanceDiff: valueDiffSchema.nullable(),
+    nonceDiff: valueDiffSchema.nullable(),
     stateDiff: z.record(z.string(), slotDiffSchema),
   })
 );

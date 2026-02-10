@@ -2,6 +2,32 @@ import { isChange, type DiffResult, type Change } from '../diff';
 import { formatValue, type FormatterContext } from '../formatters';
 import type { AaveV3Strategy, CHAIN_ID } from '../snapshot-types';
 
+const IR_CHART_BASE = 'https://dash.onaave.com/api/static';
+
+const IR_CHART_PARAMS: (keyof AaveV3Strategy)[] = [
+  'variableRateSlope1',
+  'variableRateSlope2',
+  'optimalUsageRatio',
+  'baseVariableBorrowRate',
+  'maxVariableBorrowRate',
+];
+
+function irChartUrl(strategy: Partial<AaveV3Strategy>): string {
+  const params = IR_CHART_PARAMS.map((k) => `${k}=${strategy[k] ?? '0'}`).join('&');
+  return `${IR_CHART_BASE}?${params}`;
+}
+
+export function renderIrImage(strategy: Partial<AaveV3Strategy>): string {
+  return `| interestRate | ![ir](${irChartUrl(strategy)}) |\n`;
+}
+
+export function renderIrDiffImages(
+  from: Partial<AaveV3Strategy>,
+  to: Partial<AaveV3Strategy>
+): string {
+  return `| interestRate | ![before](${irChartUrl(from)}) | ![after](${irChartUrl(to)}) |\n`;
+}
+
 const STRATEGY_KEY_ORDER: (keyof AaveV3Strategy)[] = [
   'optimalUsageRatio',
   'maxVariableBorrowRate',

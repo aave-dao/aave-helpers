@@ -56,7 +56,7 @@ export function toMarkdownLink(link: string, title?: any) {
 }
 
 export function boolToMarkdown(value: boolean) {
-  return value ? ':white_check_mark:' : ':sos:';
+  return value ? ':white_check_mark:' : ':x:';
 }
 
 export function renderUnixTime(time: number) {

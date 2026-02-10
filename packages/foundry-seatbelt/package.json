@@ -1,0 +1,43 @@
+{
+  "name": "@bgd-labs/foundry-seatbelt",
+  "version": "1.0.0",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "foundry-seatbelt": "./dist/cli.mjs",
+    "diff-snapshots": "./dist/cli.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@bgd-labs/aave-address-book": "^4.44.6",
+    "@bgd-labs/toolbox": "^0.2.14",
+    "commander": "^13.1.0",
+    "find-object-paths": "^1.1.0",
+    "viem": "catalog:",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "tsdown": "^0.20.3",
+    "typescript": "^5.8.3",
+    "vitest": "^4.0.18"
+  }
+}

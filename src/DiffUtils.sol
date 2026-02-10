@@ -21,8 +21,8 @@ contract DiffUtils is Test {
     string memory afterPath = string(abi.encodePacked('./reports/', reportAfter, '.json'));
 
     string[] memory inputs = new string[](7);
-    inputs[0] = 'npx';
-    inputs[1] = '@bgd-labs/aave-cli@^1.4.6';
+    inputs[0] = 'node';
+    inputs[1] = 'packages/foundry-seatbelt/dist/cli.mjs';
     inputs[2] = 'diff-snapshots';
     inputs[3] = beforePath;
     inputs[4] = afterPath;

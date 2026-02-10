@@ -20,10 +20,10 @@ export function renderRawSection(raw: RawStorage | undefined, chainId: CHAIN_ID)
     md += `### ${heading}\n\n`;
 
     if (entry.balanceDiff) {
-      md += `**Balance diff**: ${entry.balanceDiff}\n\n`;
+      md += `**Balance diff**: ${entry.balanceDiff.previousValue} → ${entry.balanceDiff.newValue}\n\n`;
     }
     if (entry.nonceDiff) {
-      md += `**Nonce diff**: ${entry.nonceDiff}\n\n`;
+      md += `**Nonce diff**: ${entry.nonceDiff.previousValue} → ${entry.nonceDiff.newValue}\n\n`;
     }
 
     const slots = Object.keys(entry.stateDiff);
