@@ -5,4 +5,4 @@ catalog:
   '@types/node': ^22.15.21
   tsup: 8.4.0
   typescript: ^5.8.3
-  viem: ^2.45.1
+  viem: ^2.45.2

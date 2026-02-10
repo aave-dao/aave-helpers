@@ -78,7 +78,7 @@ for (const field of RESERVE_PERCENTAGE_FIELDS) {
 }
 
 reserveFormatters['liquidationBonus'] = (value) =>
-  value === 0 ? '0 %' : `${((value as number) - 10000) / 100} %`;
+  value === 0 ? '0 %' : `${((value as number) - 10000) / 100} % [${value}]`;
 
 reserveFormatters['supplyCap'] = (value, ctx) =>
   `${(value as number).toLocaleString('en-US')} ${ctx.reserve?.symbol ?? ''}`;
@@ -99,7 +99,7 @@ for (const field of RESERVE_BALANCE_FIELDS) {
 
 reserveFormatters['oracleLatestAnswer'] = (value, ctx) => {
   const decimals = ctx.reserve?.oracleDecimals ?? 8;
-  return formatUnits(BigInt(value), decimals);
+  return formatUnits(BigInt(value), decimals) + ' $';
 };
 
 for (const field of RESERVE_ADDRESS_FIELDS) {
@@ -139,7 +139,7 @@ export const emodeFormatters: Partial<Record<EmodeKey, FieldFormatter>> = {};
 emodeFormatters['ltv'] = (value) => `${formatUnits(BigInt(value), 2)} %`;
 emodeFormatters['liquidationThreshold'] = (value) => `${formatUnits(BigInt(value), 2)} %`;
 emodeFormatters['liquidationBonus'] = (value) =>
-  value === 0 ? '0 %' : `${((value as number) - 10000) / 100} %`;
+  value === 0 ? '0 %' : `${((value as number) - 10000) / 100} % [${value}]`;
 
 emodeFormatters['borrowableBitmap'] = (value, ctx) => {
   const indexes = bitmapToIndexes(BigInt(value));

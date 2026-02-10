@@ -28,7 +28,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@bgd-labs/aave-address-book": "^4.44.6",
+    "@bgd-labs/aave-address-book": "^4.44.11",
     "@bgd-labs/toolbox": "^0.2.14",
     "commander": "^13.1.0",
     "find-object-paths": "^1.1.0",

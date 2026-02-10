@@ -1,9 +1,10 @@
-import type { Log } from '../snapshot-types';
+import type { Log, CHAIN_ID } from '../snapshot-types';
 import type { Abi, Hex, Address } from 'viem';
 import { parseLogs } from '@bgd-labs/toolbox';
+import { isKnownAddress } from '../utils/address';
 import eventDb from '../utils/eventDb.json';
 
-export function renderLogsSection(logs: Log[] | undefined): string {
+export function renderLogsSection(logs: Log[] | undefined, chainId: CHAIN_ID): string {
   if (!logs || !logs.length) return '';
 
   // Map our Log format to parseLogs format (emitter -> address)
@@ -15,24 +16,52 @@ export function renderLogsSection(logs: Log[] | undefined): string {
 
   const parsed = parseLogs({ logs: toolboxLogs, eventDb: eventDb as unknown as Abi });
 
-  let md = '## Event logs\n\n';
-  md += '| index | emitter | event |\n| --- | --- | --- |\n';
-
-  for (let i = 0; i < parsed.length; i++) {
-    const log = parsed[i];
+  // Build parsed entries with their original index
+  const entries = parsed.map((log, i) => {
     const emitter = logs[i].emitter;
+    let event: string;
 
     if (log.eventName) {
       const args = log.args ? formatArgs(log.args) : '';
-      md += `| ${i} | ${emitter} | ${log.eventName}(${args}) |\n`;
+      event = `${log.eventName}(${args})`;
     } else {
       const topics = logs[i].topics.map((t) => `\`${t}\``).join(', ');
       const data = logs[i].data.length > 66 ? `${logs[i].data.slice(0, 66)}...` : logs[i].data;
-      md += `| ${i} | ${emitter} | topics: ${topics}, data: \`${data}\` |\n`;
+      event = `topics: ${topics}, data: \`${data}\``;
     }
+
+    return { emitter, event, index: i };
+  });
+
+  // Group by emitter, preserving order of first appearance
+  const grouped = new Map<
+    string,
+    { emitter: string; events: { index: number; event: string }[] }
+  >();
+  for (const entry of entries) {
+    let group = grouped.get(entry.emitter);
+    if (!group) {
+      group = { emitter: entry.emitter, events: [] };
+      grouped.set(entry.emitter, group);
+    }
+    group.events.push({ index: entry.index, event: entry.event });
   }
 
-  md += '\n';
+  let md = '## Event logs\n\n';
+
+  for (const group of grouped.values()) {
+    const knownName = isKnownAddress(group.emitter as Address, chainId);
+    const label = knownName ? knownName.join(', ') : null;
+    const heading = label ? `${group.emitter} (${label})` : group.emitter;
+
+    md += `#### ${heading}\n\n`;
+    md += '| index | event |\n| --- | --- |\n';
+    for (const entry of group.events) {
+      md += `| ${entry.index} | ${entry.event} |\n`;
+    }
+    md += '\n';
+  }
+
   return md;
 }
 
