@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { t as diffSnapshots } from "./protocol-diff-BclAac4F.mjs";
+import { t as diffSnapshots } from "./protocol-diff-CW6T4gs9.mjs";
 import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname } from "path";
 import { Command } from "commander";

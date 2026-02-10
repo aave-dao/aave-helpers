@@ -126,7 +126,7 @@ describe('formatters', () => {
   });
 
   it('formats emode liquidationBonus', () => {
-    expect(formatValue('emode', 'liquidationBonus', 10100, { chainId: 1 })).toBe('1 %');
+    expect(formatValue('emode', 'liquidationBonus', 10100, { chainId: 1 })).toBe('1 % [10100]');
   });
 });
 
@@ -206,7 +206,7 @@ describe('diffSnapshots', () => {
 
       ### Reserves added
 
-      #### ezETH ([0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57](https://megaeth.blockscout.com/address/0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57))
+      #### ezETH ([0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57](https://mega.etherscan.io/address/0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57))
 
       | description | value |
       | --- | --- |
@@ -220,7 +220,7 @@ describe('diffSnapshots', () => {
       | debtCeiling | 0 $ [0] |
       | isSiloed | :x: |
       | isFlashloanable | :white_check_mark: |
-      | oracle | [0xd7Da71D3acf07C604A925799B0b48E2Ec607584D](https://megaeth.blockscout.com/address/0xd7Da71D3acf07C604A925799B0b48E2Ec607584D) |
+      | oracle | [0xd7Da71D3acf07C604A925799B0b48E2Ec607584D](https://mega.etherscan.io/address/0xd7Da71D3acf07C604A925799B0b48E2Ec607584D) |
       | oracleDecimals | 8 |
       | oracleDescription | Capped ezETH / ETH / USD |
       | oracleLatestAnswer | 2282.74433677 $ |
@@ -230,15 +230,15 @@ describe('diffSnapshots', () => {
       | liquidationBonus | 0 % |
       | liquidationProtocolFee | 10 % [1000] |
       | reserveFactor | 20 % [2000] |
-      | aToken | [0x03C99Cce547b1c2E74442b73E6f588A66D19597e](https://megaeth.blockscout.com/address/0x03C99Cce547b1c2E74442b73E6f588A66D19597e) |
+      | aToken | [0x03C99Cce547b1c2E74442b73E6f588A66D19597e](https://mega.etherscan.io/address/0x03C99Cce547b1c2E74442b73E6f588A66D19597e) |
       | aTokenName | Aave MegaEth ezETH |
       | aTokenSymbol | aMegezETH |
-      | variableDebtToken | [0x1505f48Bd4db0fF8B28817D2C0Fb95Abcb8eEbbc](https://megaeth.blockscout.com/address/0x1505f48Bd4db0fF8B28817D2C0Fb95Abcb8eEbbc) |
+      | variableDebtToken | [0x1505f48Bd4db0fF8B28817D2C0Fb95Abcb8eEbbc](https://mega.etherscan.io/address/0x1505f48Bd4db0fF8B28817D2C0Fb95Abcb8eEbbc) |
       | variableDebtTokenName | Aave MegaEth Variable Debt ezETH |
       | variableDebtTokenSymbol | variableDebtMegezETH |
       | borrowingEnabled | :x: |
       | isBorrowableInIsolation | :x: |
-      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://megaeth.blockscout.com/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
       | aTokenUnderlyingBalance | 0.0025 ezETH [2500000000000000] |
       | virtualBalance | 0.0025 ezETH [2500000000000000] |
       | optimalUsageRatio | 90 % |
@@ -249,7 +249,7 @@ describe('diffSnapshots', () => {
       | interestRate | ![ir](https://dash.onaave.com/api/static?variableRateSlope1=50000000000000000000000000&variableRateSlope2=200000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=250000000000000000000000000) |
 
 
-      #### WETH ([0x4200000000000000000000000000000000000006](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000006))
+      #### WETH ([0x4200000000000000000000000000000000000006](https://mega.etherscan.io/address/0x4200000000000000000000000000000000000006))
 
       | description | value |
       | --- | --- |
@@ -263,7 +263,7 @@ describe('diffSnapshots', () => {
       | debtCeiling | 0 $ [0] |
       | isSiloed | :x: |
       | isFlashloanable | :white_check_mark: |
-      | oracle | [0xcA4e254D95637DE95E2a2F79244b03380d697feD](https://megaeth.blockscout.com/address/0xcA4e254D95637DE95E2a2F79244b03380d697feD) |
+      | oracle | [0xcA4e254D95637DE95E2a2F79244b03380d697feD](https://mega.etherscan.io/address/0xcA4e254D95637DE95E2a2F79244b03380d697feD) |
       | oracleDecimals | 8 |
       | oracleDescription | ETH / USD |
       | oracleLatestAnswer | 2130.504188 $ |
@@ -273,15 +273,15 @@ describe('diffSnapshots', () => {
       | liquidationBonus | 0 % |
       | liquidationProtocolFee | 10 % [1000] |
       | reserveFactor | 15 % [1500] |
-      | aToken | [0xa31E6b433382062e8A1dA41485f7b234D97c3f4d](https://megaeth.blockscout.com/address/0xa31E6b433382062e8A1dA41485f7b234D97c3f4d) |
+      | aToken | [0xa31E6b433382062e8A1dA41485f7b234D97c3f4d](https://mega.etherscan.io/address/0xa31E6b433382062e8A1dA41485f7b234D97c3f4d) |
       | aTokenName | Aave MegaEth WETH |
       | aTokenSymbol | aMegWETH |
-      | variableDebtToken | [0x09ADCCC7AF2aBD356c18A4CadF2e5cC250f300E9](https://megaeth.blockscout.com/address/0x09ADCCC7AF2aBD356c18A4CadF2e5cC250f300E9) |
+      | variableDebtToken | [0x09ADCCC7AF2aBD356c18A4CadF2e5cC250f300E9](https://mega.etherscan.io/address/0x09ADCCC7AF2aBD356c18A4CadF2e5cC250f300E9) |
       | variableDebtTokenName | Aave MegaEth Variable Debt WETH |
       | variableDebtTokenSymbol | variableDebtMegWETH |
       | borrowingEnabled | :x: |
       | isBorrowableInIsolation | :x: |
-      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://megaeth.blockscout.com/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
       | aTokenUnderlyingBalance | 0.0025 WETH [2500000000000000] |
       | virtualBalance | 0.0025 WETH [2500000000000000] |
       | optimalUsageRatio | 90 % |
@@ -292,7 +292,7 @@ describe('diffSnapshots', () => {
       | interestRate | ![ir](https://dash.onaave.com/api/static?variableRateSlope1=25000000000000000000000000&variableRateSlope2=80000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=105000000000000000000000000) |
 
 
-      #### wrsETH ([0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F](https://megaeth.blockscout.com/address/0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F))
+      #### wrsETH ([0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F](https://mega.etherscan.io/address/0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F))
 
       | description | value |
       | --- | --- |
@@ -306,7 +306,7 @@ describe('diffSnapshots', () => {
       | debtCeiling | 0 $ [0] |
       | isSiloed | :x: |
       | isFlashloanable | :white_check_mark: |
-      | oracle | [0x6356b92Bc636CCe722e0F53DDc24a86baE64216E](https://megaeth.blockscout.com/address/0x6356b92Bc636CCe722e0F53DDc24a86baE64216E) |
+      | oracle | [0x6356b92Bc636CCe722e0F53DDc24a86baE64216E](https://mega.etherscan.io/address/0x6356b92Bc636CCe722e0F53DDc24a86baE64216E) |
       | oracleDecimals | 8 |
       | oracleDescription | Capped wrsETH / ETH / USD |
       | oracleLatestAnswer | 2268.21838195 $ |
@@ -316,15 +316,15 @@ describe('diffSnapshots', () => {
       | liquidationBonus | 0 % |
       | liquidationProtocolFee | 10 % [1000] |
       | reserveFactor | 20 % [2000] |
-      | aToken | [0xb8578af311353b44B14bb4480EBB4DE608EC7e1B](https://megaeth.blockscout.com/address/0xb8578af311353b44B14bb4480EBB4DE608EC7e1B) |
+      | aToken | [0xb8578af311353b44B14bb4480EBB4DE608EC7e1B](https://mega.etherscan.io/address/0xb8578af311353b44B14bb4480EBB4DE608EC7e1B) |
       | aTokenName | Aave MegaEth wrsETH |
       | aTokenSymbol | aMegwrsETH |
-      | variableDebtToken | [0xd7B71D855bBAcd3f11F623400bc870AB3448AfF7](https://megaeth.blockscout.com/address/0xd7B71D855bBAcd3f11F623400bc870AB3448AfF7) |
+      | variableDebtToken | [0xd7B71D855bBAcd3f11F623400bc870AB3448AfF7](https://mega.etherscan.io/address/0xd7B71D855bBAcd3f11F623400bc870AB3448AfF7) |
       | variableDebtTokenName | Aave MegaEth Variable Debt wrsETH |
       | variableDebtTokenSymbol | variableDebtMegwrsETH |
       | borrowingEnabled | :x: |
       | isBorrowableInIsolation | :x: |
-      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://megaeth.blockscout.com/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
       | aTokenUnderlyingBalance | 0.0025 wrsETH [2500000000000000] |
       | virtualBalance | 0.0025 wrsETH [2500000000000000] |
       | optimalUsageRatio | 90 % |
@@ -335,7 +335,7 @@ describe('diffSnapshots', () => {
       | interestRate | ![ir](https://dash.onaave.com/api/static?variableRateSlope1=50000000000000000000000000&variableRateSlope2=200000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=250000000000000000000000000) |
 
 
-      #### wstETH ([0x601aC63637933D88285A025C685AC4e9a92a98dA](https://megaeth.blockscout.com/address/0x601aC63637933D88285A025C685AC4e9a92a98dA))
+      #### wstETH ([0x601aC63637933D88285A025C685AC4e9a92a98dA](https://mega.etherscan.io/address/0x601aC63637933D88285A025C685AC4e9a92a98dA))
 
       | description | value |
       | --- | --- |
@@ -349,7 +349,7 @@ describe('diffSnapshots', () => {
       | debtCeiling | 0 $ [0] |
       | isSiloed | :x: |
       | isFlashloanable | :white_check_mark: |
-      | oracle | [0x376397e34eA968e79DC6F629E6210ba25311a3ce](https://megaeth.blockscout.com/address/0x376397e34eA968e79DC6F629E6210ba25311a3ce) |
+      | oracle | [0x376397e34eA968e79DC6F629E6210ba25311a3ce](https://mega.etherscan.io/address/0x376397e34eA968e79DC6F629E6210ba25311a3ce) |
       | oracleDecimals | 8 |
       | oracleDescription | Capped wstETH / stETH(ETH) / USD |
       | oracleLatestAnswer | 2613.17687457 $ |
@@ -359,15 +359,15 @@ describe('diffSnapshots', () => {
       | liquidationBonus | 0 % |
       | liquidationProtocolFee | 10 % [1000] |
       | reserveFactor | 20 % [2000] |
-      | aToken | [0xaD2de503b5c723371d6B38A5224A2E12E103DfB8](https://megaeth.blockscout.com/address/0xaD2de503b5c723371d6B38A5224A2E12E103DfB8) |
+      | aToken | [0xaD2de503b5c723371d6B38A5224A2E12E103DfB8](https://mega.etherscan.io/address/0xaD2de503b5c723371d6B38A5224A2E12E103DfB8) |
       | aTokenName | Aave MegaEth wstETH |
       | aTokenSymbol | aMegwstETH |
-      | variableDebtToken | [0x259A9Cd7628f6D15ef384887dd90bb7A0283fEf9](https://megaeth.blockscout.com/address/0x259A9Cd7628f6D15ef384887dd90bb7A0283fEf9) |
+      | variableDebtToken | [0x259A9Cd7628f6D15ef384887dd90bb7A0283fEf9](https://mega.etherscan.io/address/0x259A9Cd7628f6D15ef384887dd90bb7A0283fEf9) |
       | variableDebtTokenName | Aave MegaEth Variable Debt wstETH |
       | variableDebtTokenSymbol | variableDebtMegwstETH |
       | borrowingEnabled | :x: |
       | isBorrowableInIsolation | :x: |
-      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://megaeth.blockscout.com/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
       | aTokenUnderlyingBalance | 0.0025 wstETH [2500000000000000] |
       | virtualBalance | 0.0025 wstETH [2500000000000000] |
       | optimalUsageRatio | 90 % |
@@ -378,7 +378,7 @@ describe('diffSnapshots', () => {
       | interestRate | ![ir](https://dash.onaave.com/api/static?variableRateSlope1=50000000000000000000000000&variableRateSlope2=200000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=250000000000000000000000000) |
 
 
-      #### BTC.b ([0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072](https://megaeth.blockscout.com/address/0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072))
+      #### BTC.b ([0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072](https://mega.etherscan.io/address/0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072))
 
       | description | value |
       | --- | --- |
@@ -392,7 +392,7 @@ describe('diffSnapshots', () => {
       | debtCeiling | 0 $ [0] |
       | isSiloed | :x: |
       | isFlashloanable | :white_check_mark: |
-      | oracle | [0xc6E3007B597f6F5a6330d43053D1EF73cCbbE721](https://megaeth.blockscout.com/address/0xc6E3007B597f6F5a6330d43053D1EF73cCbbE721) |
+      | oracle | [0xc6E3007B597f6F5a6330d43053D1EF73cCbbE721](https://mega.etherscan.io/address/0xc6E3007B597f6F5a6330d43053D1EF73cCbbE721) |
       | oracleDecimals | 8 |
       | oracleDescription | BTC / USD |
       | oracleLatestAnswer | 70815.89948 $ |
@@ -402,15 +402,15 @@ describe('diffSnapshots', () => {
       | liquidationBonus | 0 % |
       | liquidationProtocolFee | 10 % [1000] |
       | reserveFactor | 20 % [2000] |
-      | aToken | [0x0889d59eA7178ee5B71DA01949a5cB42aaFBe337](https://megaeth.blockscout.com/address/0x0889d59eA7178ee5B71DA01949a5cB42aaFBe337) |
+      | aToken | [0x0889d59eA7178ee5B71DA01949a5cB42aaFBe337](https://mega.etherscan.io/address/0x0889d59eA7178ee5B71DA01949a5cB42aaFBe337) |
       | aTokenName | Aave MegaEth BTCb |
       | aTokenSymbol | aMegBTCb |
-      | variableDebtToken | [0x15B550784928C5b1A93849CA5d6caA18B2545B6d](https://megaeth.blockscout.com/address/0x15B550784928C5b1A93849CA5d6caA18B2545B6d) |
+      | variableDebtToken | [0x15B550784928C5b1A93849CA5d6caA18B2545B6d](https://mega.etherscan.io/address/0x15B550784928C5b1A93849CA5d6caA18B2545B6d) |
       | variableDebtTokenName | Aave MegaEth Variable Debt BTCb |
       | variableDebtTokenSymbol | variableDebtMegBTCb |
       | borrowingEnabled | :x: |
       | isBorrowableInIsolation | :x: |
-      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://megaeth.blockscout.com/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
       | aTokenUnderlyingBalance | 0.0005 BTC.b [50000] |
       | virtualBalance | 0.0005 BTC.b [50000] |
       | optimalUsageRatio | 90 % |
@@ -421,7 +421,7 @@ describe('diffSnapshots', () => {
       | interestRate | ![ir](https://dash.onaave.com/api/static?variableRateSlope1=50000000000000000000000000&variableRateSlope2=200000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=250000000000000000000000000) |
 
 
-      #### USDT0 ([0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb](https://megaeth.blockscout.com/address/0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb))
+      #### USDT0 ([0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb](https://mega.etherscan.io/address/0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb))
 
       | description | value |
       | --- | --- |
@@ -435,7 +435,7 @@ describe('diffSnapshots', () => {
       | debtCeiling | 0 $ [0] |
       | isSiloed | :x: |
       | isFlashloanable | :white_check_mark: |
-      | oracle | [0xAe95ff42e16468AB1DfD405c9533C9b67d87d66A](https://megaeth.blockscout.com/address/0xAe95ff42e16468AB1DfD405c9533C9b67d87d66A) |
+      | oracle | [0xAe95ff42e16468AB1DfD405c9533C9b67d87d66A](https://mega.etherscan.io/address/0xAe95ff42e16468AB1DfD405c9533C9b67d87d66A) |
       | oracleDecimals | 8 |
       | oracleDescription | Capped USDT/USD |
       | oracleLatestAnswer | 0.99931 $ |
@@ -445,15 +445,15 @@ describe('diffSnapshots', () => {
       | liquidationBonus | 0 % |
       | liquidationProtocolFee | 10 % [1000] |
       | reserveFactor | 10 % [1000] |
-      | aToken | [0xE2283E01a667b512c340f19B499d86fbc885D5Ef](https://megaeth.blockscout.com/address/0xE2283E01a667b512c340f19B499d86fbc885D5Ef) |
+      | aToken | [0xE2283E01a667b512c340f19B499d86fbc885D5Ef](https://mega.etherscan.io/address/0xE2283E01a667b512c340f19B499d86fbc885D5Ef) |
       | aTokenName | Aave MegaEth USDT0 |
       | aTokenSymbol | aMegUSDT0 |
-      | variableDebtToken | [0xB951225133b5eed3D88645E4Bb1360136FF70D9a](https://megaeth.blockscout.com/address/0xB951225133b5eed3D88645E4Bb1360136FF70D9a) |
+      | variableDebtToken | [0xB951225133b5eed3D88645E4Bb1360136FF70D9a](https://mega.etherscan.io/address/0xB951225133b5eed3D88645E4Bb1360136FF70D9a) |
       | variableDebtTokenName | Aave MegaEth Variable Debt USDT0 |
       | variableDebtTokenSymbol | variableDebtMegUSDT0 |
       | borrowingEnabled | :white_check_mark: |
       | isBorrowableInIsolation | :white_check_mark: |
-      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://megaeth.blockscout.com/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
       | aTokenUnderlyingBalance | 10 USDT0 [10000000] |
       | virtualBalance | 10 USDT0 [10000000] |
       | optimalUsageRatio | 90 % |
@@ -464,7 +464,7 @@ describe('diffSnapshots', () => {
       | interestRate | ![ir](https://dash.onaave.com/api/static?variableRateSlope1=50000000000000000000000000&variableRateSlope2=100000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=150000000000000000000000000) |
 
 
-      #### USDm ([0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7](https://megaeth.blockscout.com/address/0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7))
+      #### USDm ([0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7](https://mega.etherscan.io/address/0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7))
 
       | description | value |
       | --- | --- |
@@ -478,7 +478,7 @@ describe('diffSnapshots', () => {
       | debtCeiling | 0 $ [0] |
       | isSiloed | :x: |
       | isFlashloanable | :white_check_mark: |
-      | oracle | [0xe5448B8318493c6e3F72E21e8BDB8242d3299FB5](https://megaeth.blockscout.com/address/0xe5448B8318493c6e3F72E21e8BDB8242d3299FB5) |
+      | oracle | [0xe5448B8318493c6e3F72E21e8BDB8242d3299FB5](https://mega.etherscan.io/address/0xe5448B8318493c6e3F72E21e8BDB8242d3299FB5) |
       | oracleDecimals | 8 |
       | oracleDescription | ONE USD |
       | oracleLatestAnswer | 1 $ |
@@ -488,15 +488,15 @@ describe('diffSnapshots', () => {
       | liquidationBonus | 0 % |
       | liquidationProtocolFee | 10 % [1000] |
       | reserveFactor | 10 % [1000] |
-      | aToken | [0x5dF82810CB4B8f3e0Da3c031cCc9208ee9cF9500](https://megaeth.blockscout.com/address/0x5dF82810CB4B8f3e0Da3c031cCc9208ee9cF9500) |
+      | aToken | [0x5dF82810CB4B8f3e0Da3c031cCc9208ee9cF9500](https://mega.etherscan.io/address/0x5dF82810CB4B8f3e0Da3c031cCc9208ee9cF9500) |
       | aTokenName | Aave MegaEth USDm |
       | aTokenSymbol | aMegUSDm |
-      | variableDebtToken | [0x6B408d6c479C304794abC60a4693A3AD2D3c2D0D](https://megaeth.blockscout.com/address/0x6B408d6c479C304794abC60a4693A3AD2D3c2D0D) |
+      | variableDebtToken | [0x6B408d6c479C304794abC60a4693A3AD2D3c2D0D](https://mega.etherscan.io/address/0x6B408d6c479C304794abC60a4693A3AD2D3c2D0D) |
       | variableDebtTokenName | Aave MegaEth Variable Debt USDm |
       | variableDebtTokenSymbol | variableDebtMegUSDm |
       | borrowingEnabled | :white_check_mark: |
       | isBorrowableInIsolation | :white_check_mark: |
-      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://megaeth.blockscout.com/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+      | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
       | aTokenUnderlyingBalance | 10 USDm [10000000000000000000] |
       | virtualBalance | 10 USDm [10000000000000000000] |
       | optimalUsageRatio | 90 % |
@@ -585,7 +585,7 @@ describe('diffSnapshots', () => {
 
       | description | value before | value after |
       | --- | --- | --- |
-      | priceOracleSentinel | [0x0000000000000000000000000000000000000000](https://megaeth.blockscout.com/address/0x0000000000000000000000000000000000000000) | [0x98F756B77D6Fde14E08bb064b248ec7512F9f8ba](https://megaeth.blockscout.com/address/0x98F756B77D6Fde14E08bb064b248ec7512F9f8ba) |
+      | priceOracleSentinel | [0x0000000000000000000000000000000000000000](https://mega.etherscan.io/address/0x0000000000000000000000000000000000000000) | [0x98F756B77D6Fde14E08bb064b248ec7512F9f8ba](https://mega.etherscan.io/address/0x98F756B77D6Fde14E08bb064b248ec7512F9f8ba) |
 
 
       ## Event logs
@@ -602,7 +602,7 @@ describe('diffSnapshots', () => {
       | 5 | AssetSourceUpdated(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, source: 0x6356b92Bc636CCe722e0F53DDc24a86baE64216E) |
       | 6 | AssetSourceUpdated(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, source: 0xd7Da71D3acf07C604A925799B0b48E2Ec607584D) |
 
-      #### 0xa31E6b433382062e8A1dA41485f7b234D97c3f4d
+      #### 0xa31E6b433382062e8A1dA41485f7b234D97c3f4d (AaveV3MegaEth.ASSETS.WETH.A_TOKEN)
 
       | index | event |
       | --- | --- |
@@ -610,13 +610,13 @@ describe('diffSnapshots', () => {
       | 129 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000) |
       | 130 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000, balanceIncrease: 0, index: 1000000000000000000000000000) |
 
-      #### 0x09ADCCC7AF2aBD356c18A4CadF2e5cC250f300E9
+      #### 0x09ADCCC7AF2aBD356c18A4CadF2e5cC250f300E9 (AaveV3MegaEth.ASSETS.WETH.V_TOKEN)
 
       | index | event |
       | --- | --- |
       | 8 | Initialized(underlyingAsset: 0x4200000000000000000000000000000000000006, pool: 0x7e324AbC5De01d112AfC03a584966ff199741C28, incentivesController: 0x3691FF69e22c1353df9F8b2c0B1B16aA5fEEc389, debtTokenDecimals: 18, debtTokenName: Aave MegaEth Variable Debt WETH, debtTokenSymbol: variableDebtMegWETH, params: 0x) |
 
-      #### 0x5cC4f782cFe249286476A7eFfD9D7bd215768194
+      #### 0x5cC4f782cFe249286476A7eFfD9D7bd215768194 (AaveV3MegaEth.ASSETS.WETH.INTEREST_RATE_STRATEGY, AaveV3MegaEth.ASSETS.BTCb.INTEREST_RATE_STRATEGY, AaveV3MegaEth.ASSETS.USDT0.INTEREST_RATE_STRATEGY, AaveV3MegaEth.ASSETS.USDm.INTEREST_RATE_STRATEGY, AaveV3MegaEth.ASSETS.wstETH.INTEREST_RATE_STRATEGY, AaveV3MegaEth.ASSETS.wrsETH.INTEREST_RATE_STRATEGY, AaveV3MegaEth.ASSETS.ezETH.INTEREST_RATE_STRATEGY)
 
       | index | event |
       | --- | --- |
@@ -724,7 +724,7 @@ describe('diffSnapshots', () => {
       | 124 | AssetCollateralInEModeChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, categoryId: 6, collateral: true) |
       | 125 | AssetBorrowableInEModeChanged(asset: 0x4200000000000000000000000000000000000006, categoryId: 6, borrowable: true) |
 
-      #### 0x0889d59eA7178ee5B71DA01949a5cB42aaFBe337
+      #### 0x0889d59eA7178ee5B71DA01949a5cB42aaFBe337 (AaveV3MegaEth.ASSETS.BTCb.A_TOKEN)
 
       | index | event |
       | --- | --- |
@@ -732,13 +732,13 @@ describe('diffSnapshots', () => {
       | 137 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 50000) |
       | 138 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 50000, balanceIncrease: 0, index: 1000000000000000000000000000) |
 
-      #### 0x15B550784928C5b1A93849CA5d6caA18B2545B6d
+      #### 0x15B550784928C5b1A93849CA5d6caA18B2545B6d (AaveV3MegaEth.ASSETS.BTCb.V_TOKEN)
 
       | index | event |
       | --- | --- |
       | 13 | Initialized(underlyingAsset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, pool: 0x7e324AbC5De01d112AfC03a584966ff199741C28, incentivesController: 0x3691FF69e22c1353df9F8b2c0B1B16aA5fEEc389, debtTokenDecimals: 8, debtTokenName: Aave MegaEth Variable Debt BTCb, debtTokenSymbol: variableDebtMegBTCb, params: 0x) |
 
-      #### 0xE2283E01a667b512c340f19B499d86fbc885D5Ef
+      #### 0xE2283E01a667b512c340f19B499d86fbc885D5Ef (AaveV3MegaEth.ASSETS.USDT0.A_TOKEN)
 
       | index | event |
       | --- | --- |
@@ -746,13 +746,13 @@ describe('diffSnapshots', () => {
       | 146 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 10000000) |
       | 147 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 10000000, balanceIncrease: 0, index: 1000000000000000000000000000) |
 
-      #### 0xB951225133b5eed3D88645E4Bb1360136FF70D9a
+      #### 0xB951225133b5eed3D88645E4Bb1360136FF70D9a (AaveV3MegaEth.ASSETS.USDT0.V_TOKEN)
 
       | index | event |
       | --- | --- |
       | 18 | Initialized(underlyingAsset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, pool: 0x7e324AbC5De01d112AfC03a584966ff199741C28, incentivesController: 0x3691FF69e22c1353df9F8b2c0B1B16aA5fEEc389, debtTokenDecimals: 6, debtTokenName: Aave MegaEth Variable Debt USDT0, debtTokenSymbol: variableDebtMegUSDT0, params: 0x) |
 
-      #### 0x5dF82810CB4B8f3e0Da3c031cCc9208ee9cF9500
+      #### 0x5dF82810CB4B8f3e0Da3c031cCc9208ee9cF9500 (AaveV3MegaEth.ASSETS.USDm.A_TOKEN)
 
       | index | event |
       | --- | --- |
@@ -760,13 +760,13 @@ describe('diffSnapshots', () => {
       | 154 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 10000000000000000000) |
       | 155 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 10000000000000000000, balanceIncrease: 0, index: 1000000000000000000000000000) |
 
-      #### 0x6B408d6c479C304794abC60a4693A3AD2D3c2D0D
+      #### 0x6B408d6c479C304794abC60a4693A3AD2D3c2D0D (AaveV3MegaEth.ASSETS.USDm.V_TOKEN)
 
       | index | event |
       | --- | --- |
       | 23 | Initialized(underlyingAsset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, pool: 0x7e324AbC5De01d112AfC03a584966ff199741C28, incentivesController: 0x3691FF69e22c1353df9F8b2c0B1B16aA5fEEc389, debtTokenDecimals: 18, debtTokenName: Aave MegaEth Variable Debt USDm, debtTokenSymbol: variableDebtMegUSDm, params: 0x) |
 
-      #### 0xaD2de503b5c723371d6B38A5224A2E12E103DfB8
+      #### 0xaD2de503b5c723371d6B38A5224A2E12E103DfB8 (AaveV3MegaEth.ASSETS.wstETH.A_TOKEN)
 
       | index | event |
       | --- | --- |
@@ -774,13 +774,13 @@ describe('diffSnapshots', () => {
       | 162 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000) |
       | 163 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000, balanceIncrease: 0, index: 1000000000000000000000000000) |
 
-      #### 0x259A9Cd7628f6D15ef384887dd90bb7A0283fEf9
+      #### 0x259A9Cd7628f6D15ef384887dd90bb7A0283fEf9 (AaveV3MegaEth.ASSETS.wstETH.V_TOKEN)
 
       | index | event |
       | --- | --- |
       | 28 | Initialized(underlyingAsset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, pool: 0x7e324AbC5De01d112AfC03a584966ff199741C28, incentivesController: 0x3691FF69e22c1353df9F8b2c0B1B16aA5fEEc389, debtTokenDecimals: 18, debtTokenName: Aave MegaEth Variable Debt wstETH, debtTokenSymbol: variableDebtMegwstETH, params: 0x) |
 
-      #### 0xb8578af311353b44B14bb4480EBB4DE608EC7e1B
+      #### 0xb8578af311353b44B14bb4480EBB4DE608EC7e1B (AaveV3MegaEth.ASSETS.wrsETH.A_TOKEN)
 
       | index | event |
       | --- | --- |
@@ -788,13 +788,13 @@ describe('diffSnapshots', () => {
       | 171 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000) |
       | 172 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000, balanceIncrease: 0, index: 1000000000000000000000000000) |
 
-      #### 0xd7B71D855bBAcd3f11F623400bc870AB3448AfF7
+      #### 0xd7B71D855bBAcd3f11F623400bc870AB3448AfF7 (AaveV3MegaEth.ASSETS.wrsETH.V_TOKEN)
 
       | index | event |
       | --- | --- |
       | 33 | Initialized(underlyingAsset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, pool: 0x7e324AbC5De01d112AfC03a584966ff199741C28, incentivesController: 0x3691FF69e22c1353df9F8b2c0B1B16aA5fEEc389, debtTokenDecimals: 18, debtTokenName: Aave MegaEth Variable Debt wrsETH, debtTokenSymbol: variableDebtMegwrsETH, params: 0x) |
 
-      #### 0x03C99Cce547b1c2E74442b73E6f588A66D19597e
+      #### 0x03C99Cce547b1c2E74442b73E6f588A66D19597e (AaveV3MegaEth.ASSETS.ezETH.A_TOKEN)
 
       | index | event |
       | --- | --- |
@@ -802,7 +802,7 @@ describe('diffSnapshots', () => {
       | 180 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000) |
       | 181 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000, balanceIncrease: 0, index: 1000000000000000000000000000) |
 
-      #### 0x1505f48Bd4db0fF8B28817D2C0Fb95Abcb8eEbbc
+      #### 0x1505f48Bd4db0fF8B28817D2C0Fb95Abcb8eEbbc (AaveV3MegaEth.ASSETS.ezETH.V_TOKEN)
 
       | index | event |
       | --- | --- |
@@ -834,7 +834,7 @@ describe('diffSnapshots', () => {
       | 177 | ReserveDataUpdated(reserve: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
       | 182 | Supply(reserve: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 2500000000000000) |
 
-      #### 0x4200000000000000000000000000000000000006
+      #### 0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)
 
       | index | event |
       | --- | --- |
@@ -860,14 +860,14 @@ describe('diffSnapshots', () => {
       | 183 | EmissionAdminUpdated(reward: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, oldAdmin: 0x0000000000000000000000000000000000000000, newAdmin: 0xac140648435d03f784879cd789130F22Ef588Fcd) |
       | 184 | EmissionAdminUpdated(reward: 0x03C99Cce547b1c2E74442b73E6f588A66D19597e, oldAdmin: 0x0000000000000000000000000000000000000000, newAdmin: 0xac140648435d03f784879cd789130F22Ef588Fcd) |
 
-      #### 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072
+      #### 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)
 
       | index | event |
       | --- | --- |
       | 134 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 50000) |
       | 136 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0x0889d59eA7178ee5B71DA01949a5cB42aaFBe337, value: 50000) |
 
-      #### 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb
+      #### 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)
 
       | index | event |
       | --- | --- |
@@ -875,21 +875,21 @@ describe('diffSnapshots', () => {
       | 144 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0xE2283E01a667b512c340f19B499d86fbc885D5Ef, value: 10000000) |
       | 145 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 0) |
 
-      #### 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7
+      #### 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)
 
       | index | event |
       | --- | --- |
       | 151 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 10000000000000000000) |
       | 153 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0x5dF82810CB4B8f3e0Da3c031cCc9208ee9cF9500, value: 10000000000000000000) |
 
-      #### 0x601aC63637933D88285A025C685AC4e9a92a98dA
+      #### 0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)
 
       | index | event |
       | --- | --- |
       | 159 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 2500000000000000) |
       | 161 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0xaD2de503b5c723371d6B38A5224A2E12E103DfB8, value: 2500000000000000) |
 
-      #### 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F
+      #### 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)
 
       | index | event |
       | --- | --- |
@@ -897,7 +897,7 @@ describe('diffSnapshots', () => {
       | 169 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 0) |
       | 170 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0xb8578af311353b44B14bb4480EBB4DE608EC7e1B, value: 2500000000000000) |
 
-      #### 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57
+      #### 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)
 
       | index | event |
       | --- | --- |
@@ -932,7 +932,7 @@ describe('diffSnapshots', () => {
 
       ## Raw storage changes
 
-      ### 0x03c99cce547b1c2e74442b73e6f588a66d19597e
+      ### 0x03c99cce547b1c2e74442b73e6f588a66d19597e (AaveV3MegaEth.ASSETS.ezETH.A_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -949,7 +949,7 @@ describe('diffSnapshots', () => {
       | 0x00178004c8b5e6a4bdf613a65a4d1115faeef8496f92c9b852322c440ecd85b1 | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000033b2e3c9fd0803ce800000000000000000000000008e1bc9bf04000 |
       | 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000000000000000000034ca0a24e0b7cbceb77088ae539f57ba0650fc05 |
 
-      ### 0x0889d59ea7178ee5b71da01949a5cb42aafbe337
+      ### 0x0889d59ea7178ee5b71da01949a5cb42aafbe337 (AaveV3MegaEth.ASSETS.BTCb.A_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -966,7 +966,7 @@ describe('diffSnapshots', () => {
       | 0x00178004c8b5e6a4bdf613a65a4d1115faeef8496f92c9b852322c440ecd85b1 | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000033b2e3c9fd0803ce80000000000000000000000000000000000c350 |
       | 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000000000000000000034ca0a24e0b7cbceb77088ae539f57ba0650fc05 |
 
-      ### 0x09601a65e7de7bc8a19813d263dd9e98bfdc3c57
+      ### 0x09601a65e7de7bc8a19813d263dd9e98bfdc3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)
 
       | slot | previous value | new value |
       | --- | --- | --- |
@@ -974,7 +974,7 @@ describe('diffSnapshots', () => {
       | 0x36bfa44cf947ee302f4afd595aee5c8f16493d90642fea969179ba9ea55bca0c | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x0000000000000000000000000000000000000000000000000008e1bc9bf04000 |
       | 0xce693b0befa09013aa348b2de6dfacddecacae2c838457c156fcf2d9e1b26771 | 0x0000000000000000000000000000000000000000000000000008e1bc9bf04000 | 0x0000000000000000000000000000000000000000000000000000000000000000 |
 
-      ### 0x09adccc7af2abd356c18a4cadf2e5cc250f300e9
+      ### 0x09adccc7af2abd356c18a4cadf2e5cc250f300e9 (AaveV3MegaEth.ASSETS.WETH.V_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -989,7 +989,7 @@ describe('diffSnapshots', () => {
       | 0x000000000000000000000000000000000000000000000000000000000000003d | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x0000000000000000000000000000000000000000000000000000000000000012 |
       | 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x000000000000000000000000ff01493c22208de3a89fe9cafbdae103acc72af8 |
 
-      ### 0x1505f48bd4db0ff8b28817d2c0fb95abcb8eebbc
+      ### 0x1505f48bd4db0ff8b28817d2c0fb95abcb8eebbc (AaveV3MegaEth.ASSETS.ezETH.V_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -1005,7 +1005,7 @@ describe('diffSnapshots', () => {
       | 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x000000000000000000000000ff01493c22208de3a89fe9cafbdae103acc72af8 |
       | 0xbbe3212124853f8b0084a66a2d057c2966e251e132af3691db153ab65f0d1a4d | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x41617665204d656761457468205661726961626c65204465627420657a455448 |
 
-      ### 0x15b550784928c5b1a93849ca5d6caa18b2545b6d
+      ### 0x15b550784928c5b1a93849ca5d6caa18b2545b6d (AaveV3MegaEth.ASSETS.BTCb.V_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -1024,7 +1024,7 @@ describe('diffSnapshots', () => {
 
       **Nonce diff**: 1 → 15
 
-      ### 0x259a9cd7628f6d15ef384887dd90bb7a0283fef9
+      ### 0x259a9cd7628f6d15ef384887dd90bb7a0283fef9 (AaveV3MegaEth.ASSETS.wstETH.V_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -1052,7 +1052,7 @@ describe('diffSnapshots', () => {
 
       **Nonce diff**: 1 → 15
 
-      ### 0x4200000000000000000000000000000000000006
+      ### 0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)
 
       | slot | previous value | new value |
       | --- | --- | --- |
@@ -1078,7 +1078,7 @@ describe('diffSnapshots', () => {
       | --- | --- | --- |
       | 0x0d2c1bcee56447b4f46248272f34207a580a5c40f666a31f4e2fbb470ea53ab8 | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000000000000000000098f756b77d6fde14e08bb064b248ec7512f9f8ba |
 
-      ### 0x4fc44be15e9b6e30c1e774e2c87a21d3e8b5403f
+      ### 0x4fc44be15e9b6e30c1e774e2c87a21d3e8b5403f (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)
 
       | slot | previous value | new value |
       | --- | --- | --- |
@@ -1086,7 +1086,7 @@ describe('diffSnapshots', () => {
       | 0x16ca11a1f6f7473ca0434162515ad20750ada68476513902cb0a61bdde8b39b0 | 0x0000000000000000000000000000000000000000000000000008e1bc9bf04000 | 0x0000000000000000000000000000000000000000000000000000000000000000 |
       | 0xa085589e50594358e6df87719528ac207c811c9816ac1f6fabe3cb3e82ebbf1f | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x0000000000000000000000000000000000000000000000000000000000000000 |
 
-      ### 0x5cc4f782cfe249286476a7effd9d7bd215768194
+      ### 0x5cc4f782cfe249286476a7effd9d7bd215768194 (AaveV3MegaEth.ASSETS.WETH.INTEREST_RATE_STRATEGY, AaveV3MegaEth.ASSETS.BTCb.INTEREST_RATE_STRATEGY, AaveV3MegaEth.ASSETS.USDT0.INTEREST_RATE_STRATEGY, AaveV3MegaEth.ASSETS.USDm.INTEREST_RATE_STRATEGY, AaveV3MegaEth.ASSETS.wstETH.INTEREST_RATE_STRATEGY, AaveV3MegaEth.ASSETS.wrsETH.INTEREST_RATE_STRATEGY, AaveV3MegaEth.ASSETS.ezETH.INTEREST_RATE_STRATEGY)
 
       | slot | previous value | new value |
       | --- | --- | --- |
@@ -1098,7 +1098,7 @@ describe('diffSnapshots', () => {
       | 0x8a77a10b79a4965383d78e05a40792574f44064054990505e6247afecfae2b1b | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x000000000000000000000000000000000000000007d0000001f4000000002328 |
       | 0xaa544f6996e1da4967517881576aedff824813d40fbf84798b92a9de03a071fe | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000000000000000000000000000000000000320000000fa000000002328 |
 
-      ### 0x5df82810cb4b8f3e0da3c031ccc9208ee9cf9500
+      ### 0x5df82810cb4b8f3e0da3c031ccc9208ee9cf9500 (AaveV3MegaEth.ASSETS.USDm.A_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -1115,7 +1115,7 @@ describe('diffSnapshots', () => {
       | 0x00178004c8b5e6a4bdf613a65a4d1115faeef8496f92c9b852322c440ecd85b1 | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000033b2e3c9fd0803ce800000000000000000000008ac7230489e80000 |
       | 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000000000000000000034ca0a24e0b7cbceb77088ae539f57ba0650fc05 |
 
-      ### 0x601ac63637933d88285a025c685ac4e9a92a98da
+      ### 0x601ac63637933d88285a025c685ac4e9a92a98da (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)
 
       | slot | previous value | new value |
       | --- | --- | --- |
@@ -1123,7 +1123,7 @@ describe('diffSnapshots', () => {
       | 0x4ad958461d38e50759ecd2d67cb1a2afbffab25bae32fd33026cf7bbf0f0da07 | 0x0000000000000000000000000000000000000000000000000008e1bc9bf04000 | 0x0000000000000000000000000000000000000000000000000000000000000000 |
       | 0x5d6747c86b1c081bb00df65b4be0a48ac12eb92eacca7bc2f5ba6afdb3b971d8 | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x0000000000000000000000000000000000000000000000000000000000000000 |
 
-      ### 0x6b408d6c479c304794abc60a4693a3ad2d3c2d0d
+      ### 0x6b408d6c479c304794abc60a4693a3ad2d3c2d0d (AaveV3MegaEth.ASSETS.USDm.V_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -1225,7 +1225,7 @@ describe('diffSnapshots', () => {
       | 0xa15bc60c955c405d20d9149c709e2460f1c2d9a497496a7f46004d1772c3054c | 0x00698a207d000000000002000000000000000000000000000000000000000000 | 0x00698a207d000000000003000000000000000000000000000000000000000000 |
       | 0xa15bc60c955c405d20d9149c709e2460f1c2d9a497496a7f46004d1772c3054d | 0x000000000000000000093a8000000000000069b844fe00000000000000000000 | 0x000000000000000000093a8000000000000069b844fe000000000000698a207e |
 
-      ### 0xa31e6b433382062e8a1da41485f7b234d97c3f4d
+      ### 0xa31e6b433382062e8a1da41485f7b234d97c3f4d (AaveV3MegaEth.ASSETS.WETH.A_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -1242,7 +1242,7 @@ describe('diffSnapshots', () => {
       | 0x00178004c8b5e6a4bdf613a65a4d1115faeef8496f92c9b852322c440ecd85b1 | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000033b2e3c9fd0803ce800000000000000000000000008e1bc9bf04000 |
       | 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000000000000000000034ca0a24e0b7cbceb77088ae539f57ba0650fc05 |
 
-      ### 0xad2de503b5c723371d6b38a5224a2e12e103dfb8
+      ### 0xad2de503b5c723371d6b38a5224a2e12e103dfb8 (AaveV3MegaEth.ASSETS.wstETH.A_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -1259,7 +1259,7 @@ describe('diffSnapshots', () => {
       | 0x00178004c8b5e6a4bdf613a65a4d1115faeef8496f92c9b852322c440ecd85b1 | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000033b2e3c9fd0803ce800000000000000000000000008e1bc9bf04000 |
       | 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000000000000000000034ca0a24e0b7cbceb77088ae539f57ba0650fc05 |
 
-      ### 0xb0f70c0bd6fd87dbeb7c10dc692a2a6106817072
+      ### 0xb0f70c0bd6fd87dbeb7c10dc692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)
 
       | slot | previous value | new value |
       | --- | --- | --- |
@@ -1267,7 +1267,7 @@ describe('diffSnapshots', () => {
       | 0x5d6747c86b1c081bb00df65b4be0a48ac12eb92eacca7bc2f5ba6afdb3b971d8 | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x0000000000000000000000000000000000000000000000000000000000000000 |
       | 0xb4b547208411cd7bf42e5baa224c56ba18cc430f78a68ec4195db75e9d4ab83e | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x000000000000000000000000000000000000000000000000000000000000c350 |
 
-      ### 0xb8578af311353b44b14bb4480ebb4de608ec7e1b
+      ### 0xb8578af311353b44b14bb4480ebb4de608ec7e1b (AaveV3MegaEth.ASSETS.wrsETH.A_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -1284,7 +1284,7 @@ describe('diffSnapshots', () => {
       | 0x00178004c8b5e6a4bdf613a65a4d1115faeef8496f92c9b852322c440ecd85b1 | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000033b2e3c9fd0803ce800000000000000000000000008e1bc9bf04000 |
       | 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x00000000000000000000000034ca0a24e0b7cbceb77088ae539f57ba0650fc05 |
 
-      ### 0xb8ce59fc3717ada4c02eadf9682a9e934f625ebb
+      ### 0xb8ce59fc3717ada4c02eadf9682a9e934f625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)
 
       | slot | previous value | new value |
       | --- | --- | --- |
@@ -1292,7 +1292,7 @@ describe('diffSnapshots', () => {
       | 0xa5e17f7c4ac04daf02066e2ede19bc9b5191ba392924be2761dc2d5b9f92a203 | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x0000000000000000000000000000000000000000000000000000000000989680 |
       | 0xce693b0befa09013aa348b2de6dfacddecacae2c838457c156fcf2d9e1b26771 | 0x0000000000000000000000000000000000000000000000000000000000989680 | 0x0000000000000000000000000000000000000000000000000000000000000000 |
 
-      ### 0xb951225133b5eed3d88645e4bb1360136ff70d9a
+      ### 0xb951225133b5eed3d88645e4bb1360136ff70d9a (AaveV3MegaEth.ASSETS.USDT0.V_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -1327,7 +1327,7 @@ describe('diffSnapshots', () => {
       | 0xd1b7595d12b8038d6433c29d38b7d3ee22f9f1b0dbfb3a6680ed4cc0f8e9665e | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x000000000000000000000000ac140648435d03f784879cd789130f22ef588fcd |
       | 0xe1ad0b1ed5dc2c7bd3c9fbb23c7d5b32b233953cbe1b27174b7f53e78b9a9877 | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x000000000000000000000000ac140648435d03f784879cd789130f22ef588fcd |
 
-      ### 0xd7b71d855bbacd3f11f623400bc870ab3448aff7
+      ### 0xd7b71d855bbacd3f11f623400bc870ab3448aff7 (AaveV3MegaEth.ASSETS.wrsETH.V_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -1344,7 +1344,7 @@ describe('diffSnapshots', () => {
       | 0xbbe3212124853f8b0084a66a2d057c2966e251e132af3691db153ab65f0d1a4d | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x41617665204d656761457468205661726961626c652044656274207772734554 |
       | 0xbbe3212124853f8b0084a66a2d057c2966e251e132af3691db153ab65f0d1a4e | 0x0000000000000000000000000000000000000000000000000000000000000000 | 0x4800000000000000000000000000000000000000000000000000000000000000 |
 
-      ### 0xe2283e01a667b512c340f19b499d86fbc885d5ef
+      ### 0xe2283e01a667b512c340f19b499d86fbc885d5ef (AaveV3MegaEth.ASSETS.USDT0.A_TOKEN)
 
       **Nonce diff**: 0 → 1
 
@@ -1365,7 +1365,7 @@ describe('diffSnapshots', () => {
 
       **Nonce diff**: 1 → 15
 
-      ### 0xfafddbb3fc7688494971a79cc65dca3ef82079e7
+      ### 0xfafddbb3fc7688494971a79cc65dca3ef82079e7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)
 
       | slot | previous value | new value |
       | --- | --- | --- |

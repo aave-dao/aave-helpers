@@ -110,7 +110,7 @@ for (const field of RESERVE_PERCENTAGE_FIELDS) reserveFormatters[field] = (value
 	decimals: 2,
 	suffix: "%"
 });
-reserveFormatters["liquidationBonus"] = (value) => value === 0 ? "0 %" : `${(value - 1e4) / 100} %`;
+reserveFormatters["liquidationBonus"] = (value) => value === 0 ? "0 %" : `${(value - 1e4) / 100} % [${value}]`;
 reserveFormatters["supplyCap"] = (value, ctx) => `${value.toLocaleString("en-US")} ${ctx.reserve?.symbol ?? ""}`;
 reserveFormatters["borrowCap"] = (value, ctx) => `${value.toLocaleString("en-US")} ${ctx.reserve?.symbol ?? ""}`;
 reserveFormatters["debtCeiling"] = (value) => prettifyNumber({
@@ -125,7 +125,7 @@ for (const field of RESERVE_BALANCE_FIELDS) reserveFormatters[field] = (value, c
 });
 reserveFormatters["oracleLatestAnswer"] = (value, ctx) => {
 	const decimals = ctx.reserve?.oracleDecimals ?? 8;
-	return formatUnits(BigInt(value), decimals);
+	return formatUnits(BigInt(value), decimals) + " $";
 };
 for (const field of RESERVE_ADDRESS_FIELDS) reserveFormatters[field] = (value, ctx) => addressLink(value, ctx.chainId);
 for (const field of RESERVE_BOOL_FIELDS) reserveFormatters[field] = (value) => boolToMarkdown(value);
@@ -142,7 +142,7 @@ strategyFormatters["address"] = (value, ctx) => addressLink(value, ctx.chainId);
 const emodeFormatters = {};
 emodeFormatters["ltv"] = (value) => `${formatUnits(BigInt(value), 2)} %`;
 emodeFormatters["liquidationThreshold"] = (value) => `${formatUnits(BigInt(value), 2)} %`;
-emodeFormatters["liquidationBonus"] = (value) => value === 0 ? "0 %" : `${(value - 1e4) / 100} %`;
+emodeFormatters["liquidationBonus"] = (value) => value === 0 ? "0 %" : `${(value - 1e4) / 100} % [${value}]`;
 emodeFormatters["borrowableBitmap"] = (value, ctx) => {
 	const indexes = bitmapToIndexes(BigInt(value));
 	if (!ctx.snapshot) return indexes.join(", ");
@@ -1722,31 +1722,53 @@ var eventDb_default = [
 
 //#endregion
 //#region sections/logs.ts
-function renderLogsSection(logs) {
+function renderLogsSection(logs, chainId) {
 	if (!logs || !logs.length) return "";
-	const parsed = parseLogs({
+	const entries = parseLogs({
 		logs: logs.map((log) => ({
 			topics: log.topics,
 			data: log.data,
 			address: log.emitter
 		})),
 		eventDb: eventDb_default
-	});
-	let md = "## Event logs\n\n";
-	md += "| index | emitter | event |\n| --- | --- | --- |\n";
-	for (let i = 0; i < parsed.length; i++) {
-		const log = parsed[i];
+	}).map((log, i) => {
 		const emitter = logs[i].emitter;
+		let event;
 		if (log.eventName) {
 			const args = log.args ? formatArgs(log.args) : "";
-			md += `| ${i} | ${emitter} | ${log.eventName}(${args}) |\n`;
-		} else {
-			const topics = logs[i].topics.map((t) => `\`${t}\``).join(", ");
-			const data = logs[i].data.length > 66 ? `${logs[i].data.slice(0, 66)}...` : logs[i].data;
-			md += `| ${i} | ${emitter} | topics: ${topics}, data: \`${data}\` |\n`;
+			event = `${log.eventName}(${args})`;
+		} else event = `topics: ${logs[i].topics.map((t) => `\`${t}\``).join(", ")}, data: \`${logs[i].data.length > 66 ? `${logs[i].data.slice(0, 66)}...` : logs[i].data}\``;
+		return {
+			emitter,
+			event,
+			index: i
+		};
+	});
+	const grouped = /* @__PURE__ */ new Map();
+	for (const entry of entries) {
+		let group = grouped.get(entry.emitter);
+		if (!group) {
+			group = {
+				emitter: entry.emitter,
+				events: []
+			};
+			grouped.set(entry.emitter, group);
 		}
+		group.events.push({
+			index: entry.index,
+			event: entry.event
+		});
 	}
-	md += "\n";
+	let md = "## Event logs\n\n";
+	for (const group of grouped.values()) {
+		const knownName = isKnownAddress(group.emitter, chainId);
+		const label = knownName ? knownName.join(", ") : null;
+		const heading = label ? `${group.emitter} (${label})` : group.emitter;
+		md += `#### ${heading}\n\n`;
+		md += "| index | event |\n| --- | --- |\n";
+		for (const entry of group.events) md += `| ${entry.index} | ${entry.event} |\n`;
+		md += "\n";
+	}
 	return md;
 }
 function formatArgs(args) {
@@ -1788,7 +1810,7 @@ function diffSnapshots(before, after) {
 	md += renderReservesSection(diffResult, before, after);
 	md += renderEmodesSection(diffResult, before, after);
 	md += renderPoolConfigSection(diffResult, after.chainId);
-	md += renderLogsSection(logs);
+	md += renderLogsSection(logs, after.chainId);
 	md += renderRawSection(raw, after.chainId);
 	const diffWithoutUnchanged = diff(before, postCopy, true);
 	md += `## Raw diff\n\n\`\`\`json\n${JSON.stringify(diffWithoutUnchanged, null, 2)}\n\`\`\`\n`;
