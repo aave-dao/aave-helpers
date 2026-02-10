@@ -12,7 +12,10 @@ import { renderLogsSection } from './sections/logs';
  * The `raw` and `logs` sections only exist in the "after" snapshot and are
  * rendered as-is (they already represent the diff / changes).
  */
-export function diffSnapshots(before: AaveV3Snapshot, after: AaveV3Snapshot): string {
+export async function diffSnapshots(
+  before: AaveV3Snapshot,
+  after: AaveV3Snapshot
+): Promise<string> {
   // Extract raw & logs from "after" - they don't participate in the structural diff
   let raw: RawStorage | undefined;
   let logs: Log[] | undefined;
@@ -36,7 +39,7 @@ export function diffSnapshots(before: AaveV3Snapshot, after: AaveV3Snapshot): st
   md += renderReservesSection(diffResult, before, after);
   md += renderEmodesSection(diffResult, before, after);
   md += renderPoolConfigSection(diffResult, after.chainId);
-  md += renderLogsSection(logs, after.chainId);
+  md += await renderLogsSection(logs, after.chainId);
   md += renderRawSection(raw, after.chainId);
 
   // Append raw JSON diff as fallback (without raw/logs which have their own sections)

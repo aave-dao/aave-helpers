@@ -1,10 +1,13 @@
 import type { Log, CHAIN_ID } from '../snapshot-types';
 import type { Abi, Hex, Address } from 'viem';
-import { parseLogs } from '@bgd-labs/toolbox';
+import { parseLogs, enhanceLogs, getClient } from '@bgd-labs/toolbox';
 import { isKnownAddress } from '../utils/address';
 import eventDb from '../utils/eventDb.json';
 
-export function renderLogsSection(logs: Log[] | undefined, chainId: CHAIN_ID): string {
+export async function renderLogsSection(
+  logs: Log[] | undefined,
+  chainId: CHAIN_ID
+): Promise<string> {
   if (!logs || !logs.length) return '';
 
   // Map our Log format to parseLogs format (emitter -> address)
@@ -15,9 +18,11 @@ export function renderLogsSection(logs: Log[] | undefined, chainId: CHAIN_ID): s
   }));
 
   const parsed = parseLogs({ logs: toolboxLogs, eventDb: eventDb as unknown as Abi });
+  const client = getClient(chainId, {});
+  const enhanced = await enhanceLogs(client, parsed);
 
   // Build parsed entries with their original index
-  const entries = parsed.map((log, i) => {
+  const entries = enhanced.map((log, i) => {
     const emitter = logs[i].emitter;
     let event: string;
 

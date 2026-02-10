@@ -14,11 +14,11 @@ program
   .argument('<before>', 'path to the before snapshot JSON')
   .argument('<after>', 'path to the after snapshot JSON')
   .requiredOption('-o, --out <path>', 'output path for the markdown report')
-  .action((beforePath: string, afterPath: string, opts: { out: string }) => {
+  .action(async (beforePath: string, afterPath: string, opts: { out: string }) => {
     const before = JSON.parse(readFileSync(beforePath, 'utf-8'));
     const after = JSON.parse(readFileSync(afterPath, 'utf-8'));
 
-    const md = diffSnapshots(before, after);
+    const md = await diffSnapshots(before, after);
 
     mkdirSync(dirname(opts.out), { recursive: true });
     writeFileSync(opts.out, md, 'utf-8');

@@ -390,21 +390,21 @@
 
 | index | event |
 | --- | --- |
-| 0 | AssetSourceUpdated(asset: 0x4200000000000000000000000000000000000006, source: 0xcA4e254D95637DE95E2a2F79244b03380d697feD) |
-| 1 | AssetSourceUpdated(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, source: 0xc6E3007B597f6F5a6330d43053D1EF73cCbbE721) |
-| 2 | AssetSourceUpdated(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, source: 0xAe95ff42e16468AB1DfD405c9533C9b67d87d66A) |
-| 3 | AssetSourceUpdated(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, source: 0xe5448B8318493c6e3F72E21e8BDB8242d3299FB5) |
-| 4 | AssetSourceUpdated(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, source: 0x376397e34eA968e79DC6F629E6210ba25311a3ce) |
-| 5 | AssetSourceUpdated(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, source: 0x6356b92Bc636CCe722e0F53DDc24a86baE64216E) |
-| 6 | AssetSourceUpdated(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, source: 0xd7Da71D3acf07C604A925799B0b48E2Ec607584D) |
+| 0 | AssetSourceUpdated(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), source: 0xcA4e254D95637DE95E2a2F79244b03380d697feD) |
+| 1 | AssetSourceUpdated(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), source: 0xc6E3007B597f6F5a6330d43053D1EF73cCbbE721) |
+| 2 | AssetSourceUpdated(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), source: 0xAe95ff42e16468AB1DfD405c9533C9b67d87d66A) |
+| 3 | AssetSourceUpdated(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), source: 0xe5448B8318493c6e3F72E21e8BDB8242d3299FB5) |
+| 4 | AssetSourceUpdated(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), source: 0x376397e34eA968e79DC6F629E6210ba25311a3ce) |
+| 5 | AssetSourceUpdated(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), source: 0x6356b92Bc636CCe722e0F53DDc24a86baE64216E) |
+| 6 | AssetSourceUpdated(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), source: 0xd7Da71D3acf07C604A925799B0b48E2Ec607584D) |
 
 #### 0xa31E6b433382062e8A1dA41485f7b234D97c3f4d (AaveV3MegaEth.ASSETS.WETH.A_TOKEN)
 
 | index | event |
 | --- | --- |
 | 7 | Initialized(underlyingAsset: 0x4200000000000000000000000000000000000006, pool: 0x7e324AbC5De01d112AfC03a584966ff199741C28, treasury: 0x7E195b3fc91fDd51A9CD5070cC044602212Ac983, incentivesController: 0x3691FF69e22c1353df9F8b2c0B1B16aA5fEEc389, aTokenDecimals: 18, aTokenName: Aave MegaEth WETH, aTokenSymbol: aMegWETH, params: 0x) |
-| 129 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000) |
-| 130 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000, balanceIncrease: 0, index: 1000000000000000000000000000) |
+| 129 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 0.0025 [2500000000000000, 18 decimals]) |
+| 130 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 0.0025 [2500000000000000, 18 decimals], balanceIncrease: 0, index: 1 [1000000000000000000000000000, 27 decimals]) |
 
 #### 0x09ADCCC7AF2aBD356c18A4CadF2e5cC250f300E9 (AaveV3MegaEth.ASSETS.WETH.V_TOKEN)
 
@@ -416,117 +416,117 @@
 
 | index | event |
 | --- | --- |
-| 9 | RateDataUpdate(reserve: 0x4200000000000000000000000000000000000006, optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 250, variableRateSlope2: 800) |
-| 14 | RateDataUpdate(reserve: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 500, variableRateSlope2: 2000) |
-| 19 | RateDataUpdate(reserve: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 500, variableRateSlope2: 1000) |
-| 24 | RateDataUpdate(reserve: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 500, variableRateSlope2: 1000) |
-| 29 | RateDataUpdate(reserve: 0x601aC63637933D88285A025C685AC4e9a92a98dA, optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 500, variableRateSlope2: 2000) |
-| 34 | RateDataUpdate(reserve: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 500, variableRateSlope2: 2000) |
-| 39 | RateDataUpdate(reserve: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 500, variableRateSlope2: 2000) |
+| 9 | RateDataUpdate(reserve: 0x4200000000000000000000000000000000000006 (symbol: WETH), optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 250, variableRateSlope2: 800) |
+| 14 | RateDataUpdate(reserve: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 500, variableRateSlope2: 2000) |
+| 19 | RateDataUpdate(reserve: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 500, variableRateSlope2: 1000) |
+| 24 | RateDataUpdate(reserve: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 500, variableRateSlope2: 1000) |
+| 29 | RateDataUpdate(reserve: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 500, variableRateSlope2: 2000) |
+| 34 | RateDataUpdate(reserve: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 500, variableRateSlope2: 2000) |
+| 39 | RateDataUpdate(reserve: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), optimalUsageRatio: 9000, baseVariableBorrowRate: 0, variableRateSlope1: 500, variableRateSlope2: 2000) |
 
 #### 0xF15D31Bc839A853C9068686043cEc6EC5995DAbB (AaveV3MegaEth.POOL_CONFIGURATOR)
 
 | index | event |
 | --- | --- |
-| 10 | ReserveInitialized(asset: 0x4200000000000000000000000000000000000006, aToken: 0xa31E6b433382062e8A1dA41485f7b234D97c3f4d, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0x09ADCCC7AF2aBD356c18A4CadF2e5cC250f300E9, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
-| 11 | ReserveInterestRateDataChanged(asset: 0x4200000000000000000000000000000000000006, strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000fa0000000000000000000000000000000000000000000000000000000000000320) |
-| 15 | ReserveInitialized(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, aToken: 0x0889d59eA7178ee5B71DA01949a5cB42aaFBe337, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0x15B550784928C5b1A93849CA5d6caA18B2545B6d, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
-| 16 | ReserveInterestRateDataChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000007d0) |
-| 20 | ReserveInitialized(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, aToken: 0xE2283E01a667b512c340f19B499d86fbc885D5Ef, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0xB951225133b5eed3D88645E4Bb1360136FF70D9a, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
-| 21 | ReserveInterestRateDataChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000003e8) |
-| 25 | ReserveInitialized(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, aToken: 0x5dF82810CB4B8f3e0Da3c031cCc9208ee9cF9500, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0x6B408d6c479C304794abC60a4693A3AD2D3c2D0D, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
-| 26 | ReserveInterestRateDataChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000003e8) |
-| 30 | ReserveInitialized(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, aToken: 0xaD2de503b5c723371d6B38A5224A2E12E103DfB8, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0x259A9Cd7628f6D15ef384887dd90bb7A0283fEf9, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
-| 31 | ReserveInterestRateDataChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000007d0) |
-| 35 | ReserveInitialized(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, aToken: 0xb8578af311353b44B14bb4480EBB4DE608EC7e1B, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0xd7B71D855bBAcd3f11F623400bc870AB3448AfF7, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
-| 36 | ReserveInterestRateDataChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000007d0) |
-| 40 | ReserveInitialized(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, aToken: 0x03C99Cce547b1c2E74442b73E6f588A66D19597e, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0x1505f48Bd4db0fF8B28817D2C0Fb95Abcb8eEbbc, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
-| 41 | ReserveInterestRateDataChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000007d0) |
-| 42 | SupplyCapChanged(asset: 0x4200000000000000000000000000000000000006, oldSupplyCap: 0, newSupplyCap: 20) |
-| 43 | BorrowCapChanged(asset: 0x4200000000000000000000000000000000000006, oldBorrowCap: 0, newBorrowCap: 10) |
-| 44 | SupplyCapChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, oldSupplyCap: 0, newSupplyCap: 2) |
-| 45 | BorrowCapChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, oldBorrowCap: 0, newBorrowCap: 1) |
-| 46 | SupplyCapChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, oldSupplyCap: 0, newSupplyCap: 50000) |
-| 47 | BorrowCapChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, oldBorrowCap: 0, newBorrowCap: 20000) |
-| 48 | SupplyCapChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, oldSupplyCap: 0, newSupplyCap: 50000) |
-| 49 | BorrowCapChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, oldBorrowCap: 0, newBorrowCap: 20000) |
-| 50 | SupplyCapChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, oldSupplyCap: 0, newSupplyCap: 20) |
-| 51 | BorrowCapChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, oldBorrowCap: 0, newBorrowCap: 1) |
-| 52 | SupplyCapChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, oldSupplyCap: 0, newSupplyCap: 20) |
-| 53 | BorrowCapChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, oldBorrowCap: 0, newBorrowCap: 1) |
-| 54 | SupplyCapChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, oldSupplyCap: 0, newSupplyCap: 20) |
-| 55 | BorrowCapChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, oldBorrowCap: 0, newBorrowCap: 1) |
-| 56 | ReserveBorrowing(asset: 0x4200000000000000000000000000000000000006, enabled: false) |
-| 57 | BorrowableInIsolationChanged(asset: 0x4200000000000000000000000000000000000006, borrowable: false) |
-| 58 | SiloedBorrowingChanged(asset: 0x4200000000000000000000000000000000000006, oldState: false, newState: false) |
-| 59 | ReserveFactorChanged(asset: 0x4200000000000000000000000000000000000006, oldReserveFactor: 0, newReserveFactor: 1500) |
-| 61 | ReserveFlashLoaning(asset: 0x4200000000000000000000000000000000000006, enabled: true) |
-| 62 | ReserveBorrowing(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, enabled: false) |
-| 63 | BorrowableInIsolationChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, borrowable: false) |
-| 64 | SiloedBorrowingChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, oldState: false, newState: false) |
-| 65 | ReserveFactorChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, oldReserveFactor: 0, newReserveFactor: 2000) |
-| 67 | ReserveFlashLoaning(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, enabled: true) |
-| 68 | ReserveBorrowing(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, enabled: true) |
-| 69 | BorrowableInIsolationChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, borrowable: true) |
-| 70 | SiloedBorrowingChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, oldState: false, newState: false) |
-| 71 | ReserveFactorChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, oldReserveFactor: 0, newReserveFactor: 1000) |
-| 73 | ReserveFlashLoaning(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, enabled: true) |
-| 74 | ReserveBorrowing(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, enabled: true) |
-| 75 | BorrowableInIsolationChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, borrowable: true) |
-| 76 | SiloedBorrowingChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, oldState: false, newState: false) |
-| 77 | ReserveFactorChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, oldReserveFactor: 0, newReserveFactor: 1000) |
-| 79 | ReserveFlashLoaning(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, enabled: true) |
-| 80 | ReserveBorrowing(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, enabled: false) |
-| 81 | BorrowableInIsolationChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, borrowable: false) |
-| 82 | SiloedBorrowingChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, oldState: false, newState: false) |
-| 83 | ReserveFactorChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, oldReserveFactor: 0, newReserveFactor: 2000) |
-| 85 | ReserveFlashLoaning(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, enabled: true) |
-| 86 | ReserveBorrowing(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, enabled: false) |
-| 87 | BorrowableInIsolationChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, borrowable: false) |
-| 88 | SiloedBorrowingChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, oldState: false, newState: false) |
-| 89 | ReserveFactorChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, oldReserveFactor: 0, newReserveFactor: 2000) |
-| 91 | ReserveFlashLoaning(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, enabled: true) |
-| 92 | ReserveBorrowing(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, enabled: false) |
-| 93 | BorrowableInIsolationChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, borrowable: false) |
-| 94 | SiloedBorrowingChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, oldState: false, newState: false) |
-| 95 | ReserveFactorChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, oldReserveFactor: 0, newReserveFactor: 2000) |
-| 97 | ReserveFlashLoaning(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, enabled: true) |
-| 98 | LiquidationProtocolFeeChanged(asset: 0x4200000000000000000000000000000000000006, oldFee: 0, newFee: 1000) |
-| 99 | LiquidationProtocolFeeChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, oldFee: 0, newFee: 1000) |
-| 100 | LiquidationProtocolFeeChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, oldFee: 0, newFee: 1000) |
-| 101 | LiquidationProtocolFeeChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, oldFee: 0, newFee: 1000) |
-| 102 | LiquidationProtocolFeeChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, oldFee: 0, newFee: 1000) |
-| 103 | LiquidationProtocolFeeChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, oldFee: 0, newFee: 1000) |
-| 104 | LiquidationProtocolFeeChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, oldFee: 0, newFee: 1000) |
+| 10 | ReserveInitialized(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), aToken: 0xa31E6b433382062e8A1dA41485f7b234D97c3f4d, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0x09ADCCC7AF2aBD356c18A4CadF2e5cC250f300E9, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+| 11 | ReserveInterestRateDataChanged(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000fa0000000000000000000000000000000000000000000000000000000000000320) |
+| 15 | ReserveInitialized(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), aToken: 0x0889d59eA7178ee5B71DA01949a5cB42aaFBe337, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0x15B550784928C5b1A93849CA5d6caA18B2545B6d, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+| 16 | ReserveInterestRateDataChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000007d0) |
+| 20 | ReserveInitialized(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), aToken: 0xE2283E01a667b512c340f19B499d86fbc885D5Ef, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0xB951225133b5eed3D88645E4Bb1360136FF70D9a, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+| 21 | ReserveInterestRateDataChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000003e8) |
+| 25 | ReserveInitialized(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), aToken: 0x5dF82810CB4B8f3e0Da3c031cCc9208ee9cF9500, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0x6B408d6c479C304794abC60a4693A3AD2D3c2D0D, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+| 26 | ReserveInterestRateDataChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000003e8) |
+| 30 | ReserveInitialized(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), aToken: 0xaD2de503b5c723371d6B38A5224A2E12E103DfB8, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0x259A9Cd7628f6D15ef384887dd90bb7A0283fEf9, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+| 31 | ReserveInterestRateDataChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000007d0) |
+| 35 | ReserveInitialized(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), aToken: 0xb8578af311353b44B14bb4480EBB4DE608EC7e1B, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0xd7B71D855bBAcd3f11F623400bc870AB3448AfF7, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+| 36 | ReserveInterestRateDataChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000007d0) |
+| 40 | ReserveInitialized(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), aToken: 0x03C99Cce547b1c2E74442b73E6f588A66D19597e, stableDebtToken: 0x0000000000000000000000000000000000000000, variableDebtToken: 0x1505f48Bd4db0fF8B28817D2C0Fb95Abcb8eEbbc, interestRateStrategyAddress: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
+| 41 | ReserveInterestRateDataChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), strategy: 0x5cC4f782cFe249286476A7eFfD9D7bd215768194, data: 0x0000000000000000000000000000000000000000000000000000000000002328000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f400000000000000000000000000000000000000000000000000000000000007d0) |
+| 42 | SupplyCapChanged(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), oldSupplyCap: 0, newSupplyCap: 20) |
+| 43 | BorrowCapChanged(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), oldBorrowCap: 0, newBorrowCap: 10) |
+| 44 | SupplyCapChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), oldSupplyCap: 0, newSupplyCap: 2) |
+| 45 | BorrowCapChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), oldBorrowCap: 0, newBorrowCap: 1) |
+| 46 | SupplyCapChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), oldSupplyCap: 0, newSupplyCap: 50000) |
+| 47 | BorrowCapChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), oldBorrowCap: 0, newBorrowCap: 20000) |
+| 48 | SupplyCapChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), oldSupplyCap: 0, newSupplyCap: 50000) |
+| 49 | BorrowCapChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), oldBorrowCap: 0, newBorrowCap: 20000) |
+| 50 | SupplyCapChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), oldSupplyCap: 0, newSupplyCap: 20) |
+| 51 | BorrowCapChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), oldBorrowCap: 0, newBorrowCap: 1) |
+| 52 | SupplyCapChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), oldSupplyCap: 0, newSupplyCap: 20) |
+| 53 | BorrowCapChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), oldBorrowCap: 0, newBorrowCap: 1) |
+| 54 | SupplyCapChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), oldSupplyCap: 0, newSupplyCap: 20) |
+| 55 | BorrowCapChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), oldBorrowCap: 0, newBorrowCap: 1) |
+| 56 | ReserveBorrowing(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), enabled: false) |
+| 57 | BorrowableInIsolationChanged(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), borrowable: false) |
+| 58 | SiloedBorrowingChanged(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), oldState: false, newState: false) |
+| 59 | ReserveFactorChanged(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), oldReserveFactor: 0, newReserveFactor: 1500) |
+| 61 | ReserveFlashLoaning(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), enabled: true) |
+| 62 | ReserveBorrowing(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), enabled: false) |
+| 63 | BorrowableInIsolationChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), borrowable: false) |
+| 64 | SiloedBorrowingChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), oldState: false, newState: false) |
+| 65 | ReserveFactorChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), oldReserveFactor: 0, newReserveFactor: 2000) |
+| 67 | ReserveFlashLoaning(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), enabled: true) |
+| 68 | ReserveBorrowing(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), enabled: true) |
+| 69 | BorrowableInIsolationChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), borrowable: true) |
+| 70 | SiloedBorrowingChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), oldState: false, newState: false) |
+| 71 | ReserveFactorChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), oldReserveFactor: 0, newReserveFactor: 1000) |
+| 73 | ReserveFlashLoaning(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), enabled: true) |
+| 74 | ReserveBorrowing(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), enabled: true) |
+| 75 | BorrowableInIsolationChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), borrowable: true) |
+| 76 | SiloedBorrowingChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), oldState: false, newState: false) |
+| 77 | ReserveFactorChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), oldReserveFactor: 0, newReserveFactor: 1000) |
+| 79 | ReserveFlashLoaning(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), enabled: true) |
+| 80 | ReserveBorrowing(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), enabled: false) |
+| 81 | BorrowableInIsolationChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), borrowable: false) |
+| 82 | SiloedBorrowingChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), oldState: false, newState: false) |
+| 83 | ReserveFactorChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), oldReserveFactor: 0, newReserveFactor: 2000) |
+| 85 | ReserveFlashLoaning(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), enabled: true) |
+| 86 | ReserveBorrowing(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), enabled: false) |
+| 87 | BorrowableInIsolationChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), borrowable: false) |
+| 88 | SiloedBorrowingChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), oldState: false, newState: false) |
+| 89 | ReserveFactorChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), oldReserveFactor: 0, newReserveFactor: 2000) |
+| 91 | ReserveFlashLoaning(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), enabled: true) |
+| 92 | ReserveBorrowing(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), enabled: false) |
+| 93 | BorrowableInIsolationChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), borrowable: false) |
+| 94 | SiloedBorrowingChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), oldState: false, newState: false) |
+| 95 | ReserveFactorChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), oldReserveFactor: 0, newReserveFactor: 2000) |
+| 97 | ReserveFlashLoaning(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), enabled: true) |
+| 98 | LiquidationProtocolFeeChanged(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), oldFee: 0, newFee: 1000) |
+| 99 | LiquidationProtocolFeeChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), oldFee: 0, newFee: 1000) |
+| 100 | LiquidationProtocolFeeChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), oldFee: 0, newFee: 1000) |
+| 101 | LiquidationProtocolFeeChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), oldFee: 0, newFee: 1000) |
+| 102 | LiquidationProtocolFeeChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), oldFee: 0, newFee: 1000) |
+| 103 | LiquidationProtocolFeeChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), oldFee: 0, newFee: 1000) |
+| 104 | LiquidationProtocolFeeChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), oldFee: 0, newFee: 1000) |
 | 105 | EModeCategoryAdded(categoryId: 1, ltv: 8050, liquidationThreshold: 8300, liquidationBonus: 10550, oracle: 0x0000000000000000000000000000000000000000, label: WETH Stablecoins) |
-| 106 | AssetCollateralInEModeChanged(asset: 0x4200000000000000000000000000000000000006, categoryId: 1, collateral: true) |
-| 107 | AssetBorrowableInEModeChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, categoryId: 1, borrowable: true) |
-| 108 | AssetBorrowableInEModeChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, categoryId: 1, borrowable: true) |
+| 106 | AssetCollateralInEModeChanged(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), categoryId: 1, collateral: true) |
+| 107 | AssetBorrowableInEModeChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), categoryId: 1, borrowable: true) |
+| 108 | AssetBorrowableInEModeChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), categoryId: 1, borrowable: true) |
 | 109 | EModeCategoryAdded(categoryId: 2, ltv: 7000, liquidationThreshold: 7500, liquidationBonus: 10650, oracle: 0x0000000000000000000000000000000000000000, label: BTCb Stablecoins) |
-| 110 | AssetCollateralInEModeChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, categoryId: 2, collateral: true) |
-| 111 | AssetBorrowableInEModeChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, categoryId: 2, borrowable: true) |
-| 112 | AssetBorrowableInEModeChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, categoryId: 2, borrowable: true) |
+| 110 | AssetCollateralInEModeChanged(asset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), categoryId: 2, collateral: true) |
+| 111 | AssetBorrowableInEModeChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), categoryId: 2, borrowable: true) |
+| 112 | AssetBorrowableInEModeChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), categoryId: 2, borrowable: true) |
 | 113 | EModeCategoryAdded(categoryId: 3, ltv: 7500, liquidationThreshold: 7900, liquidationBonus: 10650, oracle: 0x0000000000000000000000000000000000000000, label: wstETH Stablecoins) |
-| 114 | AssetCollateralInEModeChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, categoryId: 3, collateral: true) |
-| 115 | AssetBorrowableInEModeChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, categoryId: 3, borrowable: true) |
-| 116 | AssetBorrowableInEModeChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, categoryId: 3, borrowable: true) |
+| 114 | AssetCollateralInEModeChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), categoryId: 3, collateral: true) |
+| 115 | AssetBorrowableInEModeChanged(asset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), categoryId: 3, borrowable: true) |
+| 116 | AssetBorrowableInEModeChanged(asset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), categoryId: 3, borrowable: true) |
 | 117 | EModeCategoryAdded(categoryId: 4, ltv: 9400, liquidationThreshold: 9600, liquidationBonus: 10100, oracle: 0x0000000000000000000000000000000000000000, label: wstETH Correlated) |
-| 118 | AssetCollateralInEModeChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, categoryId: 4, collateral: true) |
-| 119 | AssetBorrowableInEModeChanged(asset: 0x4200000000000000000000000000000000000006, categoryId: 4, borrowable: true) |
+| 118 | AssetCollateralInEModeChanged(asset: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), categoryId: 4, collateral: true) |
+| 119 | AssetBorrowableInEModeChanged(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), categoryId: 4, borrowable: true) |
 | 120 | EModeCategoryAdded(categoryId: 5, ltv: 9300, liquidationThreshold: 9500, liquidationBonus: 10100, oracle: 0x0000000000000000000000000000000000000000, label: wrsETH Correlated) |
-| 121 | AssetCollateralInEModeChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, categoryId: 5, collateral: true) |
-| 122 | AssetBorrowableInEModeChanged(asset: 0x4200000000000000000000000000000000000006, categoryId: 5, borrowable: true) |
+| 121 | AssetCollateralInEModeChanged(asset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), categoryId: 5, collateral: true) |
+| 122 | AssetBorrowableInEModeChanged(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), categoryId: 5, borrowable: true) |
 | 123 | EModeCategoryAdded(categoryId: 6, ltv: 9300, liquidationThreshold: 9500, liquidationBonus: 10100, oracle: 0x0000000000000000000000000000000000000000, label: ezETH Correlated) |
-| 124 | AssetCollateralInEModeChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, categoryId: 6, collateral: true) |
-| 125 | AssetBorrowableInEModeChanged(asset: 0x4200000000000000000000000000000000000006, categoryId: 6, borrowable: true) |
+| 124 | AssetCollateralInEModeChanged(asset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), categoryId: 6, collateral: true) |
+| 125 | AssetBorrowableInEModeChanged(asset: 0x4200000000000000000000000000000000000006 (symbol: WETH), categoryId: 6, borrowable: true) |
 
 #### 0x0889d59eA7178ee5B71DA01949a5cB42aaFBe337 (AaveV3MegaEth.ASSETS.BTCb.A_TOKEN)
 
 | index | event |
 | --- | --- |
 | 12 | Initialized(underlyingAsset: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, pool: 0x7e324AbC5De01d112AfC03a584966ff199741C28, treasury: 0x7E195b3fc91fDd51A9CD5070cC044602212Ac983, incentivesController: 0x3691FF69e22c1353df9F8b2c0B1B16aA5fEEc389, aTokenDecimals: 8, aTokenName: Aave MegaEth BTCb, aTokenSymbol: aMegBTCb, params: 0x) |
-| 137 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 50000) |
-| 138 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 50000, balanceIncrease: 0, index: 1000000000000000000000000000) |
+| 137 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 0.0005 [50000, 8 decimals]) |
+| 138 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 0.0005 [50000, 8 decimals], balanceIncrease: 0, index: 1 [1000000000000000000000000000, 27 decimals]) |
 
 #### 0x15B550784928C5b1A93849CA5d6caA18B2545B6d (AaveV3MegaEth.ASSETS.BTCb.V_TOKEN)
 
@@ -539,8 +539,8 @@
 | index | event |
 | --- | --- |
 | 17 | Initialized(underlyingAsset: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, pool: 0x7e324AbC5De01d112AfC03a584966ff199741C28, treasury: 0x7E195b3fc91fDd51A9CD5070cC044602212Ac983, incentivesController: 0x3691FF69e22c1353df9F8b2c0B1B16aA5fEEc389, aTokenDecimals: 6, aTokenName: Aave MegaEth USDT0, aTokenSymbol: aMegUSDT0, params: 0x) |
-| 146 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 10000000) |
-| 147 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 10000000, balanceIncrease: 0, index: 1000000000000000000000000000) |
+| 146 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 10 [10000000, 6 decimals]) |
+| 147 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 10 [10000000, 6 decimals], balanceIncrease: 0, index: 1 [1000000000000000000000000000, 27 decimals]) |
 
 #### 0xB951225133b5eed3D88645E4Bb1360136FF70D9a (AaveV3MegaEth.ASSETS.USDT0.V_TOKEN)
 
@@ -553,8 +553,8 @@
 | index | event |
 | --- | --- |
 | 22 | Initialized(underlyingAsset: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, pool: 0x7e324AbC5De01d112AfC03a584966ff199741C28, treasury: 0x7E195b3fc91fDd51A9CD5070cC044602212Ac983, incentivesController: 0x3691FF69e22c1353df9F8b2c0B1B16aA5fEEc389, aTokenDecimals: 18, aTokenName: Aave MegaEth USDm, aTokenSymbol: aMegUSDm, params: 0x) |
-| 154 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 10000000000000000000) |
-| 155 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 10000000000000000000, balanceIncrease: 0, index: 1000000000000000000000000000) |
+| 154 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 10 [10000000000000000000, 18 decimals]) |
+| 155 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 10 [10000000000000000000, 18 decimals], balanceIncrease: 0, index: 1 [1000000000000000000000000000, 27 decimals]) |
 
 #### 0x6B408d6c479C304794abC60a4693A3AD2D3c2D0D (AaveV3MegaEth.ASSETS.USDm.V_TOKEN)
 
@@ -567,8 +567,8 @@
 | index | event |
 | --- | --- |
 | 27 | Initialized(underlyingAsset: 0x601aC63637933D88285A025C685AC4e9a92a98dA, pool: 0x7e324AbC5De01d112AfC03a584966ff199741C28, treasury: 0x7E195b3fc91fDd51A9CD5070cC044602212Ac983, incentivesController: 0x3691FF69e22c1353df9F8b2c0B1B16aA5fEEc389, aTokenDecimals: 18, aTokenName: Aave MegaEth wstETH, aTokenSymbol: aMegwstETH, params: 0x) |
-| 162 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000) |
-| 163 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000, balanceIncrease: 0, index: 1000000000000000000000000000) |
+| 162 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 0.0025 [2500000000000000, 18 decimals]) |
+| 163 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 0.0025 [2500000000000000, 18 decimals], balanceIncrease: 0, index: 1 [1000000000000000000000000000, 27 decimals]) |
 
 #### 0x259A9Cd7628f6D15ef384887dd90bb7A0283fEf9 (AaveV3MegaEth.ASSETS.wstETH.V_TOKEN)
 
@@ -581,8 +581,8 @@
 | index | event |
 | --- | --- |
 | 32 | Initialized(underlyingAsset: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, pool: 0x7e324AbC5De01d112AfC03a584966ff199741C28, treasury: 0x7E195b3fc91fDd51A9CD5070cC044602212Ac983, incentivesController: 0x3691FF69e22c1353df9F8b2c0B1B16aA5fEEc389, aTokenDecimals: 18, aTokenName: Aave MegaEth wrsETH, aTokenSymbol: aMegwrsETH, params: 0x) |
-| 171 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000) |
-| 172 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000, balanceIncrease: 0, index: 1000000000000000000000000000) |
+| 171 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 0.0025 [2500000000000000, 18 decimals]) |
+| 172 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 0.0025 [2500000000000000, 18 decimals], balanceIncrease: 0, index: 1 [1000000000000000000000000000, 27 decimals]) |
 
 #### 0xd7B71D855bBAcd3f11F623400bc870AB3448AfF7 (AaveV3MegaEth.ASSETS.wrsETH.V_TOKEN)
 
@@ -595,8 +595,8 @@
 | index | event |
 | --- | --- |
 | 37 | Initialized(underlyingAsset: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, pool: 0x7e324AbC5De01d112AfC03a584966ff199741C28, treasury: 0x7E195b3fc91fDd51A9CD5070cC044602212Ac983, incentivesController: 0x3691FF69e22c1353df9F8b2c0B1B16aA5fEEc389, aTokenDecimals: 18, aTokenName: Aave MegaEth ezETH, aTokenSymbol: aMegezETH, params: 0x) |
-| 180 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000) |
-| 181 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 2500000000000000, balanceIncrease: 0, index: 1000000000000000000000000000) |
+| 180 | Transfer(from: 0x0000000000000000000000000000000000000000, to: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 0.0025 [2500000000000000, 18 decimals]) |
+| 181 | Mint(caller: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, value: 0.0025 [2500000000000000, 18 decimals], balanceIncrease: 0, index: 1 [1000000000000000000000000000, 27 decimals]) |
 
 #### 0x1505f48Bd4db0fF8B28817D2C0Fb95Abcb8eEbbc (AaveV3MegaEth.ASSETS.ezETH.V_TOKEN)
 
@@ -608,34 +608,34 @@
 
 | index | event |
 | --- | --- |
-| 60 | ReserveDataUpdated(reserve: 0x4200000000000000000000000000000000000006, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 66 | ReserveDataUpdated(reserve: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 72 | ReserveDataUpdated(reserve: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 78 | ReserveDataUpdated(reserve: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 84 | ReserveDataUpdated(reserve: 0x601aC63637933D88285A025C685AC4e9a92a98dA, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 90 | ReserveDataUpdated(reserve: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 96 | ReserveDataUpdated(reserve: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 127 | ReserveDataUpdated(reserve: 0x4200000000000000000000000000000000000006, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 131 | Supply(reserve: 0x4200000000000000000000000000000000000006, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 2500000000000000) |
-| 135 | ReserveDataUpdated(reserve: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 139 | Supply(reserve: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 50000) |
-| 143 | ReserveDataUpdated(reserve: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 148 | Supply(reserve: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 10000000) |
-| 152 | ReserveDataUpdated(reserve: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 156 | Supply(reserve: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 10000000000000000000) |
-| 160 | ReserveDataUpdated(reserve: 0x601aC63637933D88285A025C685AC4e9a92a98dA, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 164 | Supply(reserve: 0x601aC63637933D88285A025C685AC4e9a92a98dA, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 2500000000000000) |
-| 168 | ReserveDataUpdated(reserve: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 173 | Supply(reserve: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 2500000000000000) |
-| 177 | ReserveDataUpdated(reserve: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1000000000000000000000000000, variableBorrowIndex: 1000000000000000000000000000) |
-| 182 | Supply(reserve: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57, onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 2500000000000000) |
+| 60 | ReserveDataUpdated(reserve: 0x4200000000000000000000000000000000000006 (symbol: WETH), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 66 | ReserveDataUpdated(reserve: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 72 | ReserveDataUpdated(reserve: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 78 | ReserveDataUpdated(reserve: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 84 | ReserveDataUpdated(reserve: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 90 | ReserveDataUpdated(reserve: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 96 | ReserveDataUpdated(reserve: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 127 | ReserveDataUpdated(reserve: 0x4200000000000000000000000000000000000006 (symbol: WETH), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 131 | Supply(reserve: 0x4200000000000000000000000000000000000006 (symbol: WETH), onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 0.0025 [2500000000000000, 18 decimals]) |
+| 135 | ReserveDataUpdated(reserve: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 139 | Supply(reserve: 0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (symbol: BTC.b), onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 0.0005 [50000, 8 decimals]) |
+| 143 | ReserveDataUpdated(reserve: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 148 | Supply(reserve: 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (symbol: USDT0), onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 10 [10000000, 6 decimals]) |
+| 152 | ReserveDataUpdated(reserve: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 156 | Supply(reserve: 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (symbol: USDm), onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 10 [10000000000000000000, 18 decimals]) |
+| 160 | ReserveDataUpdated(reserve: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 164 | Supply(reserve: 0x601aC63637933D88285A025C685AC4e9a92a98dA (symbol: wstETH), onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 0.0025 [2500000000000000, 18 decimals]) |
+| 168 | ReserveDataUpdated(reserve: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 173 | Supply(reserve: 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (symbol: wrsETH), onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 0.0025 [2500000000000000, 18 decimals]) |
+| 177 | ReserveDataUpdated(reserve: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), liquidityRate: 0, stableBorrowRate: 0, variableBorrowRate: 0, liquidityIndex: 1 [1000000000000000000000000000, 27 decimals], variableBorrowIndex: 1 [1000000000000000000000000000, 27 decimals]) |
+| 182 | Supply(reserve: 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (symbol: ezETH), onBehalfOf: 0x8d1dac82259FdE48D8086CC42cAa98E825C5B643, referralCode: 0, user: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, amount: 0.0025 [2500000000000000, 18 decimals]) |
 
 #### 0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)
 
 | index | event |
 | --- | --- |
-| 126 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 2500000000000000) |
-| 128 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0xa31E6b433382062e8A1dA41485f7b234D97c3f4d, value: 2500000000000000) |
+| 126 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 0.0025 [2500000000000000, 18 decimals]) |
+| 128 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0xa31E6b433382062e8A1dA41485f7b234D97c3f4d, value: 0.0025 [2500000000000000, 18 decimals]) |
 
 #### 0xCfC61568b91414DBf7Bb1a4344C633E1aB214bC9 (AaveV3MegaEth.EMISSION_MANAGER)
 
@@ -660,46 +660,46 @@
 
 | index | event |
 | --- | --- |
-| 134 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 50000) |
-| 136 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0x0889d59eA7178ee5B71DA01949a5cB42aaFBe337, value: 50000) |
+| 134 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 0.0005 [50000, 8 decimals]) |
+| 136 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0x0889d59eA7178ee5B71DA01949a5cB42aaFBe337, value: 0.0005 [50000, 8 decimals]) |
 
 #### 0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)
 
 | index | event |
 | --- | --- |
-| 142 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 10000000) |
-| 144 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0xE2283E01a667b512c340f19B499d86fbc885D5Ef, value: 10000000) |
-| 145 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 0) |
+| 142 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 10 [10000000, 6 decimals]) |
+| 144 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0xE2283E01a667b512c340f19B499d86fbc885D5Ef, value: 10 [10000000, 6 decimals]) |
+| 145 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 0 [0, 6 decimals]) |
 
 #### 0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)
 
 | index | event |
 | --- | --- |
-| 151 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 10000000000000000000) |
-| 153 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0x5dF82810CB4B8f3e0Da3c031cCc9208ee9cF9500, value: 10000000000000000000) |
+| 151 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 10 [10000000000000000000, 18 decimals]) |
+| 153 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0x5dF82810CB4B8f3e0Da3c031cCc9208ee9cF9500, value: 10 [10000000000000000000, 18 decimals]) |
 
 #### 0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)
 
 | index | event |
 | --- | --- |
-| 159 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 2500000000000000) |
-| 161 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0xaD2de503b5c723371d6B38A5224A2E12E103DfB8, value: 2500000000000000) |
+| 159 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 0.0025 [2500000000000000, 18 decimals]) |
+| 161 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0xaD2de503b5c723371d6B38A5224A2E12E103DfB8, value: 0.0025 [2500000000000000, 18 decimals]) |
 
 #### 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)
 
 | index | event |
 | --- | --- |
-| 167 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 2500000000000000) |
-| 169 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 0) |
-| 170 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0xb8578af311353b44B14bb4480EBB4DE608EC7e1B, value: 2500000000000000) |
+| 167 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 0.0025 [2500000000000000, 18 decimals]) |
+| 169 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 0 [0, 18 decimals]) |
+| 170 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0xb8578af311353b44B14bb4480EBB4DE608EC7e1B, value: 0.0025 [2500000000000000, 18 decimals]) |
 
 #### 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)
 
 | index | event |
 | --- | --- |
-| 176 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 2500000000000000) |
-| 178 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 0) |
-| 179 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0x03C99Cce547b1c2E74442b73E6f588A66D19597e, value: 2500000000000000) |
+| 176 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 0.0025 [2500000000000000, 18 decimals]) |
+| 178 | Approval(owner: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, spender: 0x7e324AbC5De01d112AfC03a584966ff199741C28, value: 0 [0, 18 decimals]) |
+| 179 | Transfer(from: 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19, to: 0x03C99Cce547b1c2E74442b73E6f588A66D19597e, value: 0.0025 [2500000000000000, 18 decimals]) |
 
 #### 0x390D369C3878F2C5205CFb6Ec7154FfA65491c3D (AaveV3MegaEth.ACL_MANAGER)
 

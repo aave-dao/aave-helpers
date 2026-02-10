@@ -1,35 +1,7 @@
-//#region \0rolldown/runtime.js
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __copyProps = (to, from, except, desc) => {
-	if (from && typeof from === "object" || typeof from === "function") {
-		for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
-			key = keys[i];
-			if (!__hasOwnProp.call(to, key) && key !== except) {
-				__defProp(to, key, {
-					get: ((k) => from[k]).bind(null, key),
-					enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
-				});
-			}
-		}
-	}
-	return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
-	value: mod,
-	enumerable: true
-}) : target, mod));
-
-//#endregion
-let _bgd_labs_toolbox = require("@bgd-labs/toolbox");
-let viem = require("viem");
-let _bgd_labs_aave_address_book = require("@bgd-labs/aave-address-book");
-_bgd_labs_aave_address_book = __toESM(_bgd_labs_aave_address_book);
-let find_object_paths = require("find-object-paths");
+import { bitmapToIndexes, enhanceLogs, getClient, parseLogs } from "@bgd-labs/toolbox";
+import { formatUnits, getAddress } from "viem";
+import * as addresses from "@bgd-labs/aave-address-book";
+import { findObjectPaths } from "find-object-paths";
 
 //#region diff.ts
 function diff(a, b, removeUnchanged) {
@@ -81,7 +53,7 @@ function limitDecimalsWithoutRounding(val, decimals) {
 	return parts[0] + "." + parts[1].substring(0, decimals);
 }
 function prettifyNumber({ value, decimals, prefix, suffix, showDecimals, patchedValue }) {
-	const formattedNumber = limitDecimalsWithoutRounding(formatNumberString((0, viem.formatUnits)(BigInt(patchedValue || value), decimals)), 4);
+	const formattedNumber = limitDecimalsWithoutRounding(formatNumberString(formatUnits(BigInt(patchedValue || value), decimals)), 4);
 	return `${prefix ? `${prefix} ` : ""}${formattedNumber}${suffix ? ` ${suffix}` : ""} [${value}${showDecimals ? `, ${decimals} decimals` : ""}]`;
 }
 function toAddressLink(address, md, client) {
@@ -100,7 +72,7 @@ function boolToMarkdown(value) {
 //#endregion
 //#region formatters.ts
 function getExplorerClient(chainId) {
-	return (0, _bgd_labs_toolbox.getClient)(chainId, {});
+	return getClient(chainId, {});
 }
 function addressLink(value, chainId) {
 	return toAddressLink(value, true, getExplorerClient(chainId));
@@ -153,7 +125,7 @@ for (const field of RESERVE_BALANCE_FIELDS) reserveFormatters[field] = (value, c
 });
 reserveFormatters["oracleLatestAnswer"] = (value, ctx) => {
 	const decimals = ctx.reserve?.oracleDecimals ?? 8;
-	return (0, viem.formatUnits)(BigInt(value), decimals) + " $";
+	return formatUnits(BigInt(value), decimals) + " $";
 };
 for (const field of RESERVE_ADDRESS_FIELDS) reserveFormatters[field] = (value, ctx) => addressLink(value, ctx.chainId);
 for (const field of RESERVE_BOOL_FIELDS) reserveFormatters[field] = (value) => boolToMarkdown(value);
@@ -165,14 +137,14 @@ const STRATEGY_RATE_FIELDS = [
 	"maxVariableBorrowRate"
 ];
 const strategyFormatters = {};
-for (const field of STRATEGY_RATE_FIELDS) strategyFormatters[field] = (value) => `${(0, viem.formatUnits)(BigInt(value), 25)} %`;
+for (const field of STRATEGY_RATE_FIELDS) strategyFormatters[field] = (value) => `${formatUnits(BigInt(value), 25)} %`;
 strategyFormatters["address"] = (value, ctx) => addressLink(value, ctx.chainId);
 const emodeFormatters = {};
-emodeFormatters["ltv"] = (value) => `${(0, viem.formatUnits)(BigInt(value), 2)} %`;
-emodeFormatters["liquidationThreshold"] = (value) => `${(0, viem.formatUnits)(BigInt(value), 2)} %`;
+emodeFormatters["ltv"] = (value) => `${formatUnits(BigInt(value), 2)} %`;
+emodeFormatters["liquidationThreshold"] = (value) => `${formatUnits(BigInt(value), 2)} %`;
 emodeFormatters["liquidationBonus"] = (value) => value === 0 ? "0 %" : `${(value - 1e4) / 100} % [${value}]`;
 emodeFormatters["borrowableBitmap"] = (value, ctx) => {
-	const indexes = (0, _bgd_labs_toolbox.bitmapToIndexes)(BigInt(value));
+	const indexes = bitmapToIndexes(BigInt(value));
 	if (!ctx.snapshot) return indexes.join(", ");
 	const reserveKeys = Object.keys(ctx.snapshot.reserves);
 	return indexes.map((i) => {
@@ -322,7 +294,7 @@ function sortKeys$1(keys) {
 	});
 }
 function reserveHeadline(reserve, chainId) {
-	const client = (0, _bgd_labs_toolbox.getClient)(chainId, {});
+	const client = getClient(chainId, {});
 	const link = toAddressLink(reserve.underlying, true, client);
 	return `#### ${reserve.symbol} (${link})\n\n`;
 }
@@ -503,7 +475,7 @@ function renderPoolConfigSection(diffResult, chainId) {
 	const configDiff = diffResult.poolConfig;
 	const changedKeys = Object.keys(configDiff).filter((key) => isChange(configDiff[key]));
 	if (!changedKeys.length) return "";
-	const client = (0, _bgd_labs_toolbox.getClient)(chainId, {});
+	const client = getClient(chainId, {});
 	let md = "## Pool config changes\n\n";
 	md += "| description | value before | value after |\n| --- | --- | --- |\n";
 	for (const key of changedKeys) {
@@ -523,14 +495,14 @@ function renderPoolConfigSection(diffResult, chainId) {
 * Returns found paths or undefined.
 */
 function isKnownAddress(value, chainId) {
-	const results = (0, find_object_paths.findObjectPaths)(Object.keys(_bgd_labs_aave_address_book).reduce((acc, key) => {
-		if (_bgd_labs_aave_address_book[key].CHAIN_ID === chainId) {
-			const chainAddresses = { ..._bgd_labs_aave_address_book[key] };
+	const results = findObjectPaths(Object.keys(addresses).reduce((acc, key) => {
+		if (addresses[key].CHAIN_ID === chainId) {
+			const chainAddresses = { ...addresses[key] };
 			if (chainAddresses.E_MODES) delete chainAddresses.E_MODES;
 			acc[key] = chainAddresses;
 		}
 		return acc;
-	}, {}), { value: (0, viem.getAddress)(value) });
+	}, {}), { value: getAddress(value) });
 	if (typeof results === "string") return [results];
 	return results;
 }
@@ -1750,16 +1722,17 @@ var eventDb_default = [
 
 //#endregion
 //#region sections/logs.ts
-function renderLogsSection(logs, chainId) {
+async function renderLogsSection(logs, chainId) {
 	if (!logs || !logs.length) return "";
-	const entries = (0, _bgd_labs_toolbox.parseLogs)({
+	const parsed = parseLogs({
 		logs: logs.map((log) => ({
 			topics: log.topics,
 			data: log.data,
 			address: log.emitter
 		})),
 		eventDb: eventDb_default
-	}).map((log, i) => {
+	});
+	const entries = (await enhanceLogs(getClient(chainId, {}), parsed)).map((log, i) => {
 		const emitter = logs[i].emitter;
 		let event;
 		if (log.eventName) {
@@ -1821,7 +1794,7 @@ function formatValue(v) {
 * The `raw` and `logs` sections only exist in the "after" snapshot and are
 * rendered as-is (they already represent the diff / changes).
 */
-function diffSnapshots(before, after) {
+async function diffSnapshots(before, after) {
 	let raw;
 	let logs;
 	const postCopy = { ...after };
@@ -1838,7 +1811,7 @@ function diffSnapshots(before, after) {
 	md += renderReservesSection(diffResult, before, after);
 	md += renderEmodesSection(diffResult, before, after);
 	md += renderPoolConfigSection(diffResult, after.chainId);
-	md += renderLogsSection(logs, after.chainId);
+	md += await renderLogsSection(logs, after.chainId);
 	md += renderRawSection(raw, after.chainId);
 	const diffWithoutUnchanged = diff(before, postCopy, true);
 	md += `## Raw diff\n\n\`\`\`json\n${JSON.stringify(diffWithoutUnchanged, null, 2)}\n\`\`\`\n`;
@@ -1846,33 +1819,4 @@ function diffSnapshots(before, after) {
 }
 
 //#endregion
-Object.defineProperty(exports, '__toESM', {
-  enumerable: true,
-  get: function () {
-    return __toESM;
-  }
-});
-Object.defineProperty(exports, 'diff', {
-  enumerable: true,
-  get: function () {
-    return diff;
-  }
-});
-Object.defineProperty(exports, 'diffSnapshots', {
-  enumerable: true,
-  get: function () {
-    return diffSnapshots;
-  }
-});
-Object.defineProperty(exports, 'hasChanges', {
-  enumerable: true,
-  get: function () {
-    return hasChanges;
-  }
-});
-Object.defineProperty(exports, 'isChange', {
-  enumerable: true,
-  get: function () {
-    return isChange;
-  }
-});
+export { isChange as i, diff as n, hasChanges as r, diffSnapshots as t };

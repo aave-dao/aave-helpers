@@ -244,7 +244,7 @@ type AaveV3Snapshot = z.infer<typeof aaveV3SnapshotSchema>;
  * The `raw` and `logs` sections only exist in the "after" snapshot and are
  * rendered as-is (they already represent the diff / changes).
  */
-declare function diffSnapshots(before: AaveV3Snapshot, after: AaveV3Snapshot): string;
+declare function diffSnapshots(before: AaveV3Snapshot, after: AaveV3Snapshot): Promise<string>;
 //#endregion
 //#region diff.d.ts
 /**
