@@ -20,7 +20,7 @@ export interface FormatterContext {
   snapshot?: AaveV3Snapshot;
 }
 
-export type FieldFormatter = (value: any, ctx: FormatterContext) => string;
+export type FieldFormatter<T = unknown> = (value: T, ctx: FormatterContext) => string;
 
 // --- Helper to get a viem client for address links ---
 
@@ -38,24 +38,29 @@ function isAddress(value: any): boolean {
 
 // --- Reserve formatters ---
 
-const RESERVE_PERCENTAGE_FIELDS = [
+type ReserveKey = keyof AaveV3Reserve;
+
+const RESERVE_PERCENTAGE_FIELDS: readonly ReserveKey[] = [
   'ltv',
   'liquidationThreshold',
   'reserveFactor',
   'liquidationProtocolFee',
-];
+] as const;
 
-const RESERVE_BALANCE_FIELDS = ['aTokenUnderlyingBalance', 'virtualBalance'];
+const RESERVE_BALANCE_FIELDS: readonly ReserveKey[] = [
+  'aTokenUnderlyingBalance',
+  'virtualBalance',
+] as const;
 
-const RESERVE_ADDRESS_FIELDS = [
+const RESERVE_ADDRESS_FIELDS: readonly ReserveKey[] = [
   'interestRateStrategy',
   'oracle',
   'aToken',
   'variableDebtToken',
   'underlying',
-];
+] as const;
 
-const RESERVE_BOOL_FIELDS = [
+const RESERVE_BOOL_FIELDS: readonly ReserveKey[] = [
   'isActive',
   'isFrozen',
   'isPaused',
@@ -64,9 +69,9 @@ const RESERVE_BOOL_FIELDS = [
   'isBorrowableInIsolation',
   'borrowingEnabled',
   'usageAsCollateralEnabled',
-];
+] as const;
 
-export const reserveFormatters: Record<string, FieldFormatter> = {};
+export const reserveFormatters: Partial<Record<ReserveKey, FieldFormatter>> = {};
 
 for (const field of RESERVE_PERCENTAGE_FIELDS) {
   reserveFormatters[field] = (value, ctx) => prettifyNumber({ value, decimals: 2, suffix: '%' });
@@ -107,15 +112,17 @@ for (const field of RESERVE_BOOL_FIELDS) {
 
 // --- Strategy formatters ---
 
-const STRATEGY_RATE_FIELDS = [
+type StrategyKey = keyof AaveV3Strategy;
+
+const STRATEGY_RATE_FIELDS: readonly StrategyKey[] = [
   'baseVariableBorrowRate',
   'optimalUsageRatio',
   'variableRateSlope1',
   'variableRateSlope2',
   'maxVariableBorrowRate',
-];
+] as const;
 
-export const strategyFormatters: Record<string, FieldFormatter> = {};
+export const strategyFormatters: Partial<Record<StrategyKey, FieldFormatter>> = {};
 
 for (const field of STRATEGY_RATE_FIELDS) {
   strategyFormatters[field] = (value) => `${formatUnits(BigInt(value), 25)} %`;
@@ -125,7 +132,9 @@ strategyFormatters['address'] = (value, ctx) => addressLink(value, ctx.chainId);
 
 // --- EMode formatters ---
 
-export const emodeFormatters: Record<string, FieldFormatter> = {};
+type EmodeKey = keyof AaveV3Emode;
+
+export const emodeFormatters: Partial<Record<EmodeKey, FieldFormatter>> = {};
 
 emodeFormatters['ltv'] = (value) => `${formatUnits(BigInt(value), 2)} %`;
 emodeFormatters['liquidationThreshold'] = (value) => `${formatUnits(BigInt(value), 2)} %`;
@@ -150,24 +159,30 @@ emodeFormatters['priceSource'] = (value, ctx) => addressLink(value, ctx.chainId)
 
 // --- Generic format function ---
 
-export function formatValue(
-  section: 'reserve' | 'strategy' | 'emode',
+type SectionKey = {
+  reserve: ReserveKey;
+  strategy: StrategyKey;
+  emode: EmodeKey;
+};
+
+const formattersMap = {
+  reserve: reserveFormatters,
+  strategy: strategyFormatters,
+  emode: emodeFormatters,
+} as const;
+
+export function formatValue<S extends keyof SectionKey>(
+  section: S,
   key: string,
-  value: any,
+  value: unknown,
   ctx: FormatterContext
 ): string {
-  const formattersMap = {
-    reserve: reserveFormatters,
-    strategy: strategyFormatters,
-    emode: emodeFormatters,
-  };
-
-  const formatter = formattersMap[section][key];
+  const formatter = (formattersMap[section] as Record<string, FieldFormatter | undefined>)[key];
   if (formatter) return formatter(value, ctx);
 
   // Default formatting
   if (typeof value === 'boolean') return boolToMarkdown(value);
   if (typeof value === 'number') return value.toLocaleString('en-US');
-  if (isAddress(value)) return addressLink(value, ctx.chainId);
+  if (isAddress(value)) return addressLink(value as string, ctx.chainId);
   return String(value);
 }

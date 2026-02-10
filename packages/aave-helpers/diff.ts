@@ -65,7 +65,9 @@ export function isChange<T = any>(value: any): value is Change<T> {
 /**
  * Check if any direct child of the diff object has changes.
  */
-export function hasChanges(diffObj: Record<string, any>): boolean {
+export function hasChanges<T extends Record<string, any>>(
+  diffObj: DiffResult<T> | Record<string, unknown> | null | undefined
+): boolean {
   if (!diffObj) return false;
   return Object.values(diffObj).some(isChange);
 }

@@ -1,4 +1,4 @@
-import { diff } from './diff';
+import { diff, type DiffResult } from './diff';
 import type { AaveV3Snapshot, RawStorage, Log } from './snapshot-types';
 import { renderReservesSection } from './sections/reserves';
 import { renderEmodesSection } from './sections/emodes';
@@ -17,7 +17,7 @@ export function diffSnapshots(before: AaveV3Snapshot, after: AaveV3Snapshot): st
   let raw: RawStorage | undefined;
   let logs: Log[] | undefined;
 
-  const postCopy = { ...after };
+  const postCopy: AaveV3Snapshot = { ...after };
   if (postCopy.raw) {
     raw = postCopy.raw;
     delete postCopy.raw;
@@ -28,7 +28,7 @@ export function diffSnapshots(before: AaveV3Snapshot, after: AaveV3Snapshot): st
   }
 
   // Run the structural diff on the remaining data
-  const diffResult = diff(before, postCopy);
+  const diffResult: DiffResult<AaveV3Snapshot> = diff(before, postCopy);
 
   // Assemble the markdown report
   let md = '';
@@ -40,7 +40,7 @@ export function diffSnapshots(before: AaveV3Snapshot, after: AaveV3Snapshot): st
   md += renderLogsSection(logs);
 
   // Append raw JSON diff as fallback
-  const diffWithoutUnchanged = diff(before, postCopy, true);
+  const diffWithoutUnchanged = diff(before, postCopy, true) as Record<string, unknown>;
   if (raw) diffWithoutUnchanged.raw = raw;
   if (logs) diffWithoutUnchanged.logs = logs;
   md += `## Raw diff\n\n\`\`\`json\n${JSON.stringify(diffWithoutUnchanged, null, 2)}\n\`\`\`\n`;

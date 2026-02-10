@@ -1,4 +1,4 @@
-import { isChange, hasChanges, diff } from '../diff';
+import { isChange, hasChanges, diff, type DiffResult } from '../diff';
 import { formatValue, type FormatterContext } from '../formatters';
 import type { AaveV3Emode, AaveV3Snapshot, CHAIN_ID } from '../snapshot-types';
 
@@ -27,7 +27,7 @@ function sortKeys(keys: string[]): string[] {
 }
 
 function renderEmodeDiffTable(
-  diffObj: Record<string, any>,
+  emodeDiff: DiffResult<AaveV3Emode>,
   pre: AaveV3Snapshot,
   post: AaveV3Snapshot
 ): string {
@@ -35,19 +35,24 @@ function renderEmodeDiffTable(
   let md = '| description | value before | value after |\n| --- | --- | --- |\n';
 
   const keys = sortKeys(
-    Object.keys(diffObj).filter((k) => !OMIT_KEYS.includes(k as keyof AaveV3Emode))
+    Object.keys(emodeDiff).filter((k) => !OMIT_KEYS.includes(k as keyof AaveV3Emode))
   );
 
   for (const key of keys) {
-    if (isChange(diffObj[key])) {
-      const ctxPre: FormatterContext = { chainId, emode: diffObj as AaveV3Emode, snapshot: pre };
-      const ctxPost: FormatterContext = { chainId, emode: diffObj as AaveV3Emode, snapshot: post };
-      const fromVal = diffObj[key].from != null
-        ? formatValue('emode', key, diffObj[key].from, ctxPre)
-        : '-';
-      const toVal = diffObj[key].to != null
-        ? formatValue('emode', key, diffObj[key].to, ctxPost)
-        : '-';
+    const val = emodeDiff[key as keyof AaveV3Emode];
+    if (isChange(val)) {
+      const ctxPre: FormatterContext = {
+        chainId,
+        emode: emodeDiff as unknown as AaveV3Emode,
+        snapshot: pre,
+      };
+      const ctxPost: FormatterContext = {
+        chainId,
+        emode: emodeDiff as unknown as AaveV3Emode,
+        snapshot: post,
+      };
+      const fromVal = val.from != null ? formatValue('emode', key, val.from, ctxPre) : '-';
+      const toVal = val.to != null ? formatValue('emode', key, val.to, ctxPost) : '-';
       md += `| ${key} | ${fromVal} | ${toVal} |\n`;
     }
   }
@@ -56,7 +61,7 @@ function renderEmodeDiffTable(
 }
 
 export function renderEmodesSection(
-  diffResult: Record<string, any>,
+  diffResult: DiffResult<AaveV3Snapshot>,
   pre: AaveV3Snapshot,
   post: AaveV3Snapshot
 ): string {
@@ -66,13 +71,12 @@ export function renderEmodesSection(
   let md = '';
 
   for (const emodeId of Object.keys(emodesDiff)) {
-    const emodeDiff = emodesDiff[emodeId];
     const postEmode = post.eModes[emodeId];
     const preEmode = pre.eModes[emodeId];
 
     // Only render if there are actual changes
-    const emodeFullDiff = diff(preEmode || {}, postEmode || {});
-    if (!hasChanges(emodeFullDiff)) continue;
+    const emodeFullDiff = diff(preEmode || ({} as AaveV3Emode), postEmode || ({} as AaveV3Emode));
+    if (!hasChanges(emodeFullDiff as Record<string, unknown>)) continue;
 
     const label = postEmode?.label || preEmode?.label || 'Unknown';
     const category = postEmode?.eModeCategory ?? preEmode?.eModeCategory ?? emodeId;

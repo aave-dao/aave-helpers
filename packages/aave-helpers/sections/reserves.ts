@@ -1,8 +1,8 @@
 import type { Hex } from 'viem';
 import { getClient } from '@bgd-labs/toolbox';
-import { isChange, hasChanges, diff } from '../diff';
+import { isChange, hasChanges, diff, type DiffResult, type Change } from '../diff';
 import { formatValue, type FormatterContext } from '../formatters';
-import type { AaveV3Reserve, AaveV3Snapshot, CHAIN_ID } from '../snapshot-types';
+import type { AaveV3Reserve, AaveV3Snapshot, AaveV3Strategy, CHAIN_ID } from '../snapshot-types';
 import { toAddressLink } from '../utils/markdown';
 import { renderStrategyDiff, renderStrategy } from './strategies';
 
@@ -80,17 +80,18 @@ function renderReserveTable(reserve: AaveV3Reserve, chainId: CHAIN_ID): string {
 
 // --- Render a reserve diff table (for altered reserves) ---
 
-function renderReserveDiffTable(diffObj: Record<string, any>, chainId: CHAIN_ID): string {
+function renderReserveDiffTable(reserveDiff: DiffResult<AaveV3Reserve>, chainId: CHAIN_ID): string {
   // Reconstruct "before" and "after" reserves from the diff
-  const from = {} as Record<string, any>;
-  const to = {} as Record<string, any>;
-  for (const key of Object.keys(diffObj)) {
-    if (isChange(diffObj[key])) {
-      from[key] = diffObj[key].from;
-      to[key] = diffObj[key].to;
+  const from: Record<string, unknown> = {};
+  const to: Record<string, unknown> = {};
+  for (const key of Object.keys(reserveDiff)) {
+    const val = reserveDiff[key as keyof AaveV3Reserve];
+    if (isChange(val)) {
+      from[key] = val.from;
+      to[key] = val.to;
     } else {
-      from[key] = diffObj[key];
-      to[key] = diffObj[key];
+      from[key] = val;
+      to[key] = val;
     }
   }
 
@@ -100,10 +101,13 @@ function renderReserveDiffTable(diffObj: Record<string, any>, chainId: CHAIN_ID)
   let md = reserveHeadline(from as AaveV3Reserve, chainId);
   md += '| description | value before | value after |\n| --- | --- | --- |\n';
 
-  const changedKeys = sortKeys(Object.keys(diffObj).filter((key) => isChange(diffObj[key])));
+  const changedKeys = sortKeys(
+    Object.keys(reserveDiff).filter((key) => isChange(reserveDiff[key as keyof AaveV3Reserve]))
+  );
   for (const key of changedKeys) {
-    const fromVal = formatValue('reserve', key, diffObj[key].from, ctxFrom);
-    const toVal = formatValue('reserve', key, diffObj[key].to, ctxTo);
+    const change = reserveDiff[key as keyof AaveV3Reserve] as Change<unknown>;
+    const fromVal = formatValue('reserve', key, change.from, ctxFrom);
+    const toVal = formatValue('reserve', key, change.to, ctxTo);
     md += `| ${key} | ${fromVal} | ${toVal} |\n`;
   }
   return md;
@@ -112,13 +116,16 @@ function renderReserveDiffTable(diffObj: Record<string, any>, chainId: CHAIN_ID)
 // --- Main reserves section renderer ---
 
 export function renderReservesSection(
-  diffResult: Record<string, any>,
+  diffResult: DiffResult<AaveV3Snapshot>,
   pre: AaveV3Snapshot,
   post: AaveV3Snapshot
 ): string {
   if (!diffResult.reserves) return '';
 
-  const reservesDiff = diffResult.reserves;
+  const reservesDiff = diffResult.reserves as Record<
+    string,
+    DiffResult<AaveV3Reserve> | Change<AaveV3Reserve>
+  >;
   const added: string[] = [];
   const removed: string[] = [];
   const altered: string[] = [];
@@ -127,7 +134,7 @@ export function renderReservesSection(
     const entry = reservesDiff[key];
 
     // Added reserve: the whole entry is { from: null, to: {...} }
-    if (isChange(entry) && entry.from === null && entry.to !== null) {
+    if (isChange<AaveV3Reserve>(entry) && entry.from === null && entry.to !== null) {
       let report = renderReserveTable(entry.to, pre.chainId);
       if (post.strategies[key]) {
         report += renderStrategy(post.strategies[key], pre.chainId);
@@ -137,14 +144,15 @@ export function renderReservesSection(
     }
 
     // Removed reserve: { from: {...}, to: null }
-    if (isChange(entry) && entry.from !== null && entry.to === null) {
+    if (isChange<AaveV3Reserve>(entry) && entry.from !== null && entry.to === null) {
       removed.push(renderReserveTable(entry.from, pre.chainId));
       continue;
     }
 
     // Altered reserve: nested diff object
     if (typeof entry === 'object' && !isChange(entry)) {
-      const hasReserveChanges = hasChanges(entry);
+      const reserveDiff = entry as DiffResult<AaveV3Reserve>;
+      const hasReserveChanges = hasChanges(reserveDiff as Record<string, unknown>);
       const preStrategy = pre.strategies[key];
       const postStrategy = post.strategies[key];
       const strategyChanged =
@@ -154,7 +162,7 @@ export function renderReservesSection(
 
       let report = '';
       if (hasReserveChanges) {
-        report += renderReserveDiffTable(entry, pre.chainId);
+        report += renderReserveDiffTable(reserveDiff, pre.chainId);
       }
       if (strategyChanged) {
         const stratDiff = diff(preStrategy, postStrategy);
