@@ -35,10 +35,7 @@ export function renderStrategy(strategy: AaveV3Strategy, chainId: CHAIN_ID): str
   return md;
 }
 
-export function renderStrategyDiff(
-  diffObj: Record<string, any>,
-  chainId: CHAIN_ID
-): string {
+export function renderStrategyDiff(diffObj: Record<string, any>, chainId: CHAIN_ID): string {
   const from = {} as Record<string, any>;
   const to = {} as Record<string, any>;
   for (const key of Object.keys(diffObj)) {

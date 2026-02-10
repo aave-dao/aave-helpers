@@ -1,7 +1,7 @@
 import { type Hex, formatUnits } from 'viem';
 import { getClient } from '@bgd-labs/toolbox';
 import { prettifyNumber, toAddressLink, boolToMarkdown } from './utils/markdown';
-import { bitMapToIndexes } from './utils/storageSlots';
+import { bitmapToIndexes } from '@bgd-labs/toolbox';
 import type {
   AaveV3Reserve,
   AaveV3Strategy,
@@ -69,8 +69,7 @@ const RESERVE_BOOL_FIELDS = [
 export const reserveFormatters: Record<string, FieldFormatter> = {};
 
 for (const field of RESERVE_PERCENTAGE_FIELDS) {
-  reserveFormatters[field] = (value, ctx) =>
-    prettifyNumber({ value, decimals: 2, suffix: '%' });
+  reserveFormatters[field] = (value, ctx) => prettifyNumber({ value, decimals: 2, suffix: '%' });
 }
 
 reserveFormatters['liquidationBonus'] = (value) =>
@@ -82,8 +81,7 @@ reserveFormatters['supplyCap'] = (value, ctx) =>
 reserveFormatters['borrowCap'] = (value, ctx) =>
   `${(value as number).toLocaleString('en-US')} ${ctx.reserve?.symbol ?? ''}`;
 
-reserveFormatters['debtCeiling'] = (value) =>
-  prettifyNumber({ value, decimals: 2, suffix: '$' });
+reserveFormatters['debtCeiling'] = (value) => prettifyNumber({ value, decimals: 2, suffix: '$' });
 
 for (const field of RESERVE_BALANCE_FIELDS) {
   reserveFormatters[field] = (value, ctx) =>
@@ -120,8 +118,7 @@ const STRATEGY_RATE_FIELDS = [
 export const strategyFormatters: Record<string, FieldFormatter> = {};
 
 for (const field of STRATEGY_RATE_FIELDS) {
-  strategyFormatters[field] = (value) =>
-    `${formatUnits(BigInt(value), 25)} %`;
+  strategyFormatters[field] = (value) => `${formatUnits(BigInt(value), 25)} %`;
 }
 
 strategyFormatters['address'] = (value, ctx) => addressLink(value, ctx.chainId);
@@ -136,7 +133,7 @@ emodeFormatters['liquidationBonus'] = (value) =>
   value === 0 ? '0 %' : `${((value as number) - 10000) / 100} %`;
 
 emodeFormatters['borrowableBitmap'] = (value, ctx) => {
-  const indexes = bitMapToIndexes(BigInt(value));
+  const indexes = bitmapToIndexes(BigInt(value));
   if (!ctx.snapshot) return indexes.join(', ');
   const reserveKeys = Object.keys(ctx.snapshot.reserves);
   return indexes

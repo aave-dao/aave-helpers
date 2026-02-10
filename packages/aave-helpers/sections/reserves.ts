@@ -1,9 +1,9 @@
-import { type Hex } from 'viem';
+import type { Hex } from 'viem';
+import { getClient } from '@bgd-labs/toolbox';
 import { isChange, hasChanges, diff } from '../diff';
 import { formatValue, type FormatterContext } from '../formatters';
 import type { AaveV3Reserve, AaveV3Snapshot, CHAIN_ID } from '../snapshot-types';
 import { toAddressLink } from '../utils/markdown';
-import { getClient } from '@bgd-labs/toolbox';
 import { renderStrategyDiff, renderStrategy } from './strategies';
 
 // --- Field display order ---
@@ -80,10 +80,7 @@ function renderReserveTable(reserve: AaveV3Reserve, chainId: CHAIN_ID): string {
 
 // --- Render a reserve diff table (for altered reserves) ---
 
-function renderReserveDiffTable(
-  diffObj: Record<string, any>,
-  chainId: CHAIN_ID
-): string {
+function renderReserveDiffTable(diffObj: Record<string, any>, chainId: CHAIN_ID): string {
   // Reconstruct "before" and "after" reserves from the diff
   const from = {} as Record<string, any>;
   const to = {} as Record<string, any>;
@@ -103,9 +100,7 @@ function renderReserveDiffTable(
   let md = reserveHeadline(from as AaveV3Reserve, chainId);
   md += '| description | value before | value after |\n| --- | --- | --- |\n';
 
-  const changedKeys = sortKeys(
-    Object.keys(diffObj).filter((key) => isChange(diffObj[key]))
-  );
+  const changedKeys = sortKeys(Object.keys(diffObj).filter((key) => isChange(diffObj[key])));
   for (const key of changedKeys) {
     const fromVal = formatValue('reserve', key, diffObj[key].from, ctxFrom);
     const toVal = formatValue('reserve', key, diffObj[key].to, ctxTo);
