@@ -17,7 +17,3 @@ jobs:
     uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@main
     secrets:
       ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
-  test-zk:
-    uses: bgd-labs/github-workflows/.github/workflows/foundry-test-zk.yml@main
-    secrets:
-      ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
