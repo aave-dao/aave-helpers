@@ -8,6 +8,7 @@ remappings = []
 fs_permissions = [{ access = "read-write", path = "./reports" }]
 ffi = true
 evm_version = 'cancun'
+decode_external_storage = true
 
 [profile.zksync]
 src = 'zksync/src'
@@ -51,6 +52,7 @@ celo = "${RPC_CELO}"
 zksync = "${RPC_ZKSYNC}"
 linea = "${RPC_LINEA}"
 megaeth = "${RPC_MEGAETH}"
+mantle = "${RPC_MANTLE}"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY_MAINNET}", chainId = 1 }

@@ -10,6 +10,7 @@ import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbi
 import {AaveV3Avalanche, AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
 import {AaveV3MegaEth} from 'aave-address-book/AaveV3MegaEth.sol';
+import {AaveV3Mantle} from 'aave-address-book/AaveV3Mantle.sol';
 import {AaveV3Fantom} from 'aave-address-book/AaveV3Fantom.sol';
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 
@@ -158,6 +159,22 @@ contract ProtocolV3TestMegaEthSnapshot is ProtocolV3TestBase {
       'megaeth',
       AaveV3MegaEth.POOL,
       0x3a0A755D940283cD96D69F88645BeaA2bAfBC0bb,
+      false,
+      false
+    );
+  }
+}
+
+contract ProtocolV3TestMantleSnapshot is ProtocolV3TestBase {
+  function setUp() public {
+    vm.createSelectFork('mantle', 91335553);
+  }
+
+  function test_snapshotState() public {
+    defaultTest(
+      'mantle',
+      AaveV3Mantle.POOL,
+      0x6F5b52c16886775395129dB05117D65420863250,
       false,
       false
     );

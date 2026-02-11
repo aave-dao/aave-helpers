@@ -1,0 +1,14 @@
+{
+  "chainId": 5000,
+  "eModes": {},
+  "poolConfig": {
+    "oracle": "0x47a063CfDa980532267970d478EC340C0F80E8df",
+    "pool": "0x458F293454fE0d67EC0655f3672301301DD51422",
+    "poolAddressesProvider": "0xba50Cd2A20f6DA35D788639E581bca8d0B5d4D5f",
+    "poolConfigurator": "0x719755fC1ACf2f9079B0Cbc56e23712c09Ab8626",
+    "priceOracleSentinel": "0x64df9D4302e1ff3516Dc744A19e992D27CAC252E",
+    "protocolDataProvider": "0x487c5c669D9eee6057C44973207101276cf73b68"
+  },
+  "reserves": {},
+  "strategies": {}
+}
