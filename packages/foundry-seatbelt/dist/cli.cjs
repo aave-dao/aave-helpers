@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const require_protocol_diff = require('./protocol-diff-CWjs5Ndy.cjs');
+const require_protocol_diff = require('./protocol-diff-BpwrHdvJ.cjs');
 let fs = require("fs");
 let path = require("path");
 let commander = require("commander");

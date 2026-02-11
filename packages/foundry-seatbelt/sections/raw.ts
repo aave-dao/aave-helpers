@@ -28,11 +28,35 @@ export function renderRawSection(raw: RawStorage | undefined, chainId: CHAIN_ID)
 
     const slots = Object.keys(entry.stateDiff);
     if (slots.length) {
-      md += '| slot | previous value | new value |\n| --- | --- | --- |\n';
-      for (const slot of slots) {
-        const slotDiff = entry.stateDiff[slot];
-        const slotLabel = slotDiff.label ? ` (${slotDiff.label})` : '';
-        md += `| ${slot}${slotLabel} | ${slotDiff.previousValue} | ${slotDiff.newValue} |\n`;
+      // Check if any slot has decoded info
+      const hasDecoded = slots.some((s) => {
+        const d = entry.stateDiff[s];
+        return (
+          d.label && d.decoded && (d.decoded.previousValue !== '0x' || d.decoded.newValue !== '0x')
+        );
+      });
+
+      if (hasDecoded) {
+        md +=
+          '| label | type | decoded previous value | decoded new value |\n| --- | --- | --- | --- |\n';
+        for (const slot of slots) {
+          const slotDiff = entry.stateDiff[slot];
+          const label = slotDiff.label || slot;
+          const type = slotDiff.type || '-';
+          const useDecoded =
+            slotDiff.decoded &&
+            (slotDiff.decoded.previousValue !== '0x' || slotDiff.decoded.newValue !== '0x');
+          const prev = useDecoded ? slotDiff.decoded!.previousValue : slotDiff.previousValue;
+          const next = useDecoded ? slotDiff.decoded!.newValue : slotDiff.newValue;
+          md += `| ${label} | ${type} | ${prev} | ${next} |\n`;
+        }
+      } else {
+        md += '| slot | previous value | new value |\n| --- | --- | --- |\n';
+        for (const slot of slots) {
+          const slotDiff = entry.stateDiff[slot];
+          const slotLabel = slotDiff.label ? ` (${slotDiff.label})` : '';
+          md += `| ${slot}${slotLabel} | ${slotDiff.previousValue} | ${slotDiff.newValue} |\n`;
+        }
       }
       md += '\n';
     }

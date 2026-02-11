@@ -1,7 +1,35 @@
-import { bitmapToIndexes, enhanceLogs, getClient, parseLogs } from "@bgd-labs/toolbox";
-import { formatUnits, getAddress } from "viem";
-import * as addresses from "@bgd-labs/aave-address-book";
-import { findObjectPaths } from "find-object-paths";
+//#region \0rolldown/runtime.js
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __copyProps = (to, from, except, desc) => {
+	if (from && typeof from === "object" || typeof from === "function") {
+		for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+			key = keys[i];
+			if (!__hasOwnProp.call(to, key) && key !== except) {
+				__defProp(to, key, {
+					get: ((k) => from[k]).bind(null, key),
+					enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+				});
+			}
+		}
+	}
+	return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", {
+	value: mod,
+	enumerable: true
+}) : target, mod));
+
+//#endregion
+let _bgd_labs_toolbox = require("@bgd-labs/toolbox");
+let viem = require("viem");
+let _bgd_labs_aave_address_book = require("@bgd-labs/aave-address-book");
+_bgd_labs_aave_address_book = __toESM(_bgd_labs_aave_address_book);
+let find_object_paths = require("find-object-paths");
 
 //#region diff.ts
 function diff(a, b, removeUnchanged) {
@@ -53,7 +81,7 @@ function limitDecimalsWithoutRounding(val, decimals) {
 	return parts[0] + "." + parts[1].substring(0, decimals);
 }
 function prettifyNumber({ value, decimals, prefix, suffix, showDecimals, patchedValue }) {
-	const formattedNumber = limitDecimalsWithoutRounding(formatNumberString(formatUnits(BigInt(patchedValue || value), decimals)), 4);
+	const formattedNumber = limitDecimalsWithoutRounding(formatNumberString((0, viem.formatUnits)(BigInt(patchedValue || value), decimals)), 4);
 	return `${prefix ? `${prefix} ` : ""}${formattedNumber}${suffix ? ` ${suffix}` : ""} [${value}${showDecimals ? `, ${decimals} decimals` : ""}]`;
 }
 function toAddressLink(address, md, client) {
@@ -72,7 +100,7 @@ function boolToMarkdown(value) {
 //#endregion
 //#region formatters.ts
 function getExplorerClient(chainId) {
-	return getClient(chainId, {});
+	return (0, _bgd_labs_toolbox.getClient)(chainId, {});
 }
 function addressLink(value, chainId) {
 	return toAddressLink(value, true, getExplorerClient(chainId));
@@ -125,7 +153,7 @@ for (const field of RESERVE_BALANCE_FIELDS) reserveFormatters[field] = (value, c
 });
 reserveFormatters["oracleLatestAnswer"] = (value, ctx) => {
 	const decimals = ctx.reserve?.oracleDecimals ?? 8;
-	return formatUnits(BigInt(value), decimals) + " $";
+	return (0, viem.formatUnits)(BigInt(value), decimals) + " $";
 };
 for (const field of RESERVE_ADDRESS_FIELDS) reserveFormatters[field] = (value, ctx) => addressLink(value, ctx.chainId);
 for (const field of RESERVE_BOOL_FIELDS) reserveFormatters[field] = (value) => boolToMarkdown(value);
@@ -137,14 +165,14 @@ const STRATEGY_RATE_FIELDS = [
 	"maxVariableBorrowRate"
 ];
 const strategyFormatters = {};
-for (const field of STRATEGY_RATE_FIELDS) strategyFormatters[field] = (value) => `${formatUnits(BigInt(value), 25)} %`;
+for (const field of STRATEGY_RATE_FIELDS) strategyFormatters[field] = (value) => `${(0, viem.formatUnits)(BigInt(value), 25)} %`;
 strategyFormatters["address"] = (value, ctx) => addressLink(value, ctx.chainId);
 const emodeFormatters = {};
-emodeFormatters["ltv"] = (value) => `${formatUnits(BigInt(value), 2)} %`;
-emodeFormatters["liquidationThreshold"] = (value) => `${formatUnits(BigInt(value), 2)} %`;
+emodeFormatters["ltv"] = (value) => `${(0, viem.formatUnits)(BigInt(value), 2)} %`;
+emodeFormatters["liquidationThreshold"] = (value) => `${(0, viem.formatUnits)(BigInt(value), 2)} %`;
 emodeFormatters["liquidationBonus"] = (value) => value === 0 ? "0 %" : `${(value - 1e4) / 100} % [${value}]`;
 emodeFormatters["borrowableBitmap"] = (value, ctx) => {
-	const indexes = bitmapToIndexes(BigInt(value));
+	const indexes = (0, _bgd_labs_toolbox.bitmapToIndexes)(BigInt(value));
 	if (!ctx.snapshot) return indexes.join(", ");
 	const reserveKeys = Object.keys(ctx.snapshot.reserves);
 	return indexes.map((i) => {
@@ -294,7 +322,7 @@ function sortKeys$1(keys) {
 	});
 }
 function reserveHeadline(reserve, chainId) {
-	const client = getClient(chainId, {});
+	const client = (0, _bgd_labs_toolbox.getClient)(chainId, {});
 	const link = toAddressLink(reserve.underlying, true, client);
 	return `#### ${reserve.symbol} (${link})\n\n`;
 }
@@ -475,7 +503,7 @@ function renderPoolConfigSection(diffResult, chainId) {
 	const configDiff = diffResult.poolConfig;
 	const changedKeys = Object.keys(configDiff).filter((key) => isChange(configDiff[key]));
 	if (!changedKeys.length) return "";
-	const client = getClient(chainId, {});
+	const client = (0, _bgd_labs_toolbox.getClient)(chainId, {});
 	let md = "## Pool config changes\n\n";
 	md += "| description | value before | value after |\n| --- | --- | --- |\n";
 	for (const key of changedKeys) {
@@ -495,14 +523,14 @@ function renderPoolConfigSection(diffResult, chainId) {
 * Returns found paths or undefined.
 */
 function isKnownAddress(value, chainId) {
-	const results = findObjectPaths(Object.keys(addresses).reduce((acc, key) => {
-		if (addresses[key].CHAIN_ID === chainId) {
-			const chainAddresses = { ...addresses[key] };
+	const results = (0, find_object_paths.findObjectPaths)(Object.keys(_bgd_labs_aave_address_book).reduce((acc, key) => {
+		if (_bgd_labs_aave_address_book[key].CHAIN_ID === chainId) {
+			const chainAddresses = { ..._bgd_labs_aave_address_book[key] };
 			if (chainAddresses.E_MODES) delete chainAddresses.E_MODES;
 			acc[key] = chainAddresses;
 		}
 		return acc;
-	}, {}), { value: getAddress(value) });
+	}, {}), { value: (0, viem.getAddress)(value) });
 	if (typeof results === "string") return [results];
 	return results;
 }
@@ -525,11 +553,27 @@ function renderRawSection(raw, chainId) {
 		if (entry.nonceDiff) md += `**Nonce diff**: ${entry.nonceDiff.previousValue} → ${entry.nonceDiff.newValue}\n\n`;
 		const slots = Object.keys(entry.stateDiff);
 		if (slots.length) {
-			md += "| slot | previous value | new value |\n| --- | --- | --- |\n";
-			for (const slot of slots) {
-				const slotDiff = entry.stateDiff[slot];
-				const slotLabel = slotDiff.label ? ` (${slotDiff.label})` : "";
-				md += `| ${slot}${slotLabel} | ${slotDiff.previousValue} | ${slotDiff.newValue} |\n`;
+			if (slots.some((s) => {
+				const d = entry.stateDiff[s];
+				return d.label && d.decoded && (d.decoded.previousValue !== "0x" || d.decoded.newValue !== "0x");
+			})) {
+				md += "| label | type | decoded previous value | decoded new value |\n| --- | --- | --- | --- |\n";
+				for (const slot of slots) {
+					const slotDiff = entry.stateDiff[slot];
+					const label = slotDiff.label || slot;
+					const type = slotDiff.type || "-";
+					const useDecoded = slotDiff.decoded && (slotDiff.decoded.previousValue !== "0x" || slotDiff.decoded.newValue !== "0x");
+					const prev = useDecoded ? slotDiff.decoded.previousValue : slotDiff.previousValue;
+					const next = useDecoded ? slotDiff.decoded.newValue : slotDiff.newValue;
+					md += `| ${label} | ${type} | ${prev} | ${next} |\n`;
+				}
+			} else {
+				md += "| slot | previous value | new value |\n| --- | --- | --- |\n";
+				for (const slot of slots) {
+					const slotDiff = entry.stateDiff[slot];
+					const slotLabel = slotDiff.label ? ` (${slotDiff.label})` : "";
+					md += `| ${slot}${slotLabel} | ${slotDiff.previousValue} | ${slotDiff.newValue} |\n`;
+				}
 			}
 			md += "\n";
 		}
@@ -1724,7 +1768,7 @@ var eventDb_default = [
 //#region sections/logs.ts
 async function renderLogsSection(logs, chainId) {
 	if (!logs || !logs.length) return "";
-	const parsed = parseLogs({
+	const parsed = (0, _bgd_labs_toolbox.parseLogs)({
 		logs: logs.map((log) => ({
 			topics: log.topics,
 			data: log.data,
@@ -1732,7 +1776,7 @@ async function renderLogsSection(logs, chainId) {
 		})),
 		eventDb: eventDb_default
 	});
-	const entries = (await enhanceLogs(getClient(chainId, {}), parsed)).map((log, i) => {
+	const entries = (await (0, _bgd_labs_toolbox.enhanceLogs)((0, _bgd_labs_toolbox.getClient)(chainId, {}), parsed)).map((log, i) => {
 		const emitter = logs[i].emitter;
 		let event;
 		if (log.eventName) {
@@ -1819,4 +1863,33 @@ async function diffSnapshots(before, after) {
 }
 
 //#endregion
-export { isChange as i, diff as n, hasChanges as r, diffSnapshots as t };
+Object.defineProperty(exports, '__toESM', {
+  enumerable: true,
+  get: function () {
+    return __toESM;
+  }
+});
+Object.defineProperty(exports, 'diff', {
+  enumerable: true,
+  get: function () {
+    return diff;
+  }
+});
+Object.defineProperty(exports, 'diffSnapshots', {
+  enumerable: true,
+  get: function () {
+    return diffSnapshots;
+  }
+});
+Object.defineProperty(exports, 'hasChanges', {
+  enumerable: true,
+  get: function () {
+    return hasChanges;
+  }
+});
+Object.defineProperty(exports, 'isChange', {
+  enumerable: true,
+  get: function () {
+    return isChange;
+  }
+});

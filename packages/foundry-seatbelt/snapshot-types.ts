@@ -111,6 +111,16 @@ export const slotDiffSchema = z.object({
   previousValue: z.string() as z.ZodType<Hex>,
   newValue: z.string() as z.ZodType<Hex>,
   label: z.string().optional(),
+  type: z.string().optional(),
+  offset: z.number().optional(),
+  slot: z.string().optional(),
+  decoded: z
+    .object({
+      previousValue: z.string(),
+      newValue: z.string(),
+    })
+    .optional(),
+  key: z.string().optional(),
 });
 
 export type SlotDiff = z.infer<typeof slotDiffSchema>;

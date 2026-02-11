@@ -103,6 +103,14 @@ declare const slotDiffSchema: z.ZodObject<{
   previousValue: z.ZodType<Hex>;
   newValue: z.ZodType<Hex>;
   label: z.ZodOptional<z.ZodString>;
+  type: z.ZodOptional<z.ZodString>;
+  offset: z.ZodOptional<z.ZodNumber>;
+  slot: z.ZodOptional<z.ZodString>;
+  decoded: z.ZodOptional<z.ZodObject<{
+    previousValue: z.ZodString;
+    newValue: z.ZodString;
+  }, z.core.$strip>>;
+  key: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
 type SlotDiff = z.infer<typeof slotDiffSchema>;
 declare const valueDiffSchema: z.ZodObject<{
@@ -125,6 +133,14 @@ declare const rawStorageSchema: z.ZodRecord<z.ZodType<`0x${string}`, unknown, z.
     previousValue: z.ZodType<Hex>;
     newValue: z.ZodType<Hex>;
     label: z.ZodOptional<z.ZodString>;
+    type: z.ZodOptional<z.ZodString>;
+    offset: z.ZodOptional<z.ZodNumber>;
+    slot: z.ZodOptional<z.ZodString>;
+    decoded: z.ZodOptional<z.ZodObject<{
+      previousValue: z.ZodString;
+      newValue: z.ZodString;
+    }, z.core.$strip>>;
+    key: z.ZodOptional<z.ZodString>;
   }, z.core.$strip>>;
 }, z.core.$strip>>;
 type RawStorage = z.infer<typeof rawStorageSchema>;
@@ -227,6 +243,14 @@ declare const aaveV3SnapshotSchema: z.ZodObject<{
       previousValue: z.ZodType<Hex>;
       newValue: z.ZodType<Hex>;
       label: z.ZodOptional<z.ZodString>;
+      type: z.ZodOptional<z.ZodString>;
+      offset: z.ZodOptional<z.ZodNumber>;
+      slot: z.ZodOptional<z.ZodString>;
+      decoded: z.ZodOptional<z.ZodObject<{
+        previousValue: z.ZodString;
+        newValue: z.ZodString;
+      }, z.core.$strip>>;
+      key: z.ZodOptional<z.ZodString>;
     }, z.core.$strip>>;
   }, z.core.$strip>>>;
   logs: z.ZodOptional<z.ZodArray<z.ZodObject<{
