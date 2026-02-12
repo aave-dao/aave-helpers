@@ -2,7 +2,7 @@ packages:
   - packages/*
 
 catalog:
-  '@types/node': ^22.15.21
+  '@types/node': ^22.19.11
   tsup: 8.4.0
   typescript: ^5.8.3
-  viem: ^2.45.2
+  viem: ^2.45.3
