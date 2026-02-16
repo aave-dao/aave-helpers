@@ -1,31 +1,65 @@
+import { formatUnits } from 'viem';
 import { isChange, type DiffResult, type Change } from '../diff';
 import { formatValue, type FormatterContext } from '../formatters';
 import type { AaveV3Strategy, CHAIN_ID } from '../snapshot-types';
 
-const IR_CHART_BASE = 'https://dash.onaave.com/api/static';
+const RAY = 10n ** 27n;
+const NUM_POINTS = 21; // 0%, 5%, 10%, ..., 100%
 
-const IR_CHART_PARAMS: (keyof AaveV3Strategy)[] = [
-  'variableRateSlope1',
-  'variableRateSlope2',
-  'optimalUsageRatio',
-  'baseVariableBorrowRate',
-  'maxVariableBorrowRate',
-];
+function computeIrCurve(strategy: Partial<AaveV3Strategy>): number[] {
+  const baseRate = BigInt(strategy.baseVariableBorrowRate ?? '0');
+  const slope1 = BigInt(strategy.variableRateSlope1 ?? '0');
+  const slope2 = BigInt(strategy.variableRateSlope2 ?? '0');
+  const optimal = BigInt(strategy.optimalUsageRatio ?? '0');
+  const excess = RAY - optimal;
 
-function irChartUrl(strategy: Partial<AaveV3Strategy>): string {
-  const params = IR_CHART_PARAMS.map((k) => `${k}=${strategy[k] ?? '0'}`).join('&');
-  return `${IR_CHART_BASE}?${params}`;
+  const rates: number[] = [];
+  for (let i = 0; i < NUM_POINTS; i++) {
+    const utilization = (RAY * BigInt(i)) / BigInt(NUM_POINTS - 1);
+    let rate: bigint;
+    if (optimal === 0n) {
+      rate = baseRate;
+    } else if (utilization <= optimal) {
+      rate = baseRate + (slope1 * utilization) / optimal;
+    } else {
+      rate = baseRate + slope1 + (excess > 0n ? (slope2 * (utilization - optimal)) / excess : 0n);
+    }
+    rates.push(Number(formatUnits(rate, 25)));
+  }
+  return rates;
 }
 
-export function renderIrImage(strategy: Partial<AaveV3Strategy>): string {
-  return `| interestRate | ![ir](${irChartUrl(strategy)}) |\n`;
+function renderMermaidChart(lines: { name: string; data: number[] }[]): string {
+  const xLabels = Array.from({ length: NUM_POINTS }, (_, i) =>
+    ((i * 100) / (NUM_POINTS - 1)).toString()
+  );
+  let chart = '```mermaid\n';
+  chart += 'xychart-beta\n';
+  chart += '    title "Interest Rate Model"\n';
+  chart += `    x-axis "Utilization (%)" [${xLabels.join(', ')}]\n`;
+  chart += '    y-axis "Rate (%)"\n';
+  for (const line of lines) {
+    chart += `    line [${line.data.join(', ')}]\n`;
+  }
+  chart += '```\n';
+  return chart;
 }
 
-export function renderIrDiffImages(
+export function renderIrChart(strategy: Partial<AaveV3Strategy>): string {
+  const rates = computeIrCurve(strategy);
+  return renderMermaidChart([{ name: 'rate', data: rates }]);
+}
+
+export function renderIrDiffCharts(
   from: Partial<AaveV3Strategy>,
   to: Partial<AaveV3Strategy>
 ): string {
-  return `| interestRate | ![before](${irChartUrl(from)}) | ![after](${irChartUrl(to)}) |\n`;
+  const ratesFrom = computeIrCurve(from);
+  const ratesTo = computeIrCurve(to);
+  return renderMermaidChart([
+    { name: 'before', data: ratesFrom },
+    { name: 'after', data: ratesTo },
+  ]);
 }
 
 const STRATEGY_KEY_ORDER: (keyof AaveV3Strategy)[] = [

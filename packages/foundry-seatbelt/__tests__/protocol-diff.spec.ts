@@ -246,7 +246,13 @@ describe('diffSnapshots', () => {
       | baseVariableBorrowRate | 0 % |
       | variableRateSlope1 | 5 % |
       | variableRateSlope2 | 20 % |
-      | interestRate | ![ir](https://dash.onaave.com/api/static?variableRateSlope1=50000000000000000000000000&variableRateSlope2=200000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=250000000000000000000000000) |
+      \`\`\`mermaid
+      xychart-beta
+          title "Interest Rate Model"
+          x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+          y-axis "Rate (%)"
+          line [0, 0.2777777777777778, 0.5555555555555556, 0.8333333333333334, 1.1111111111111112, 1.3888888888888888, 1.6666666666666667, 1.9444444444444444, 2.2222222222222223, 2.5, 2.7777777777777777, 3.0555555555555554, 3.3333333333333335, 3.611111111111111, 3.888888888888889, 4.166666666666667, 4.444444444444445, 4.722222222222222, 5, 15, 25]
+      \`\`\`
 
 
       #### WETH ([0x4200000000000000000000000000000000000006](https://mega.etherscan.io/address/0x4200000000000000000000000000000000000006))
@@ -289,7 +295,13 @@ describe('diffSnapshots', () => {
       | baseVariableBorrowRate | 0 % |
       | variableRateSlope1 | 2.5 % |
       | variableRateSlope2 | 8 % |
-      | interestRate | ![ir](https://dash.onaave.com/api/static?variableRateSlope1=25000000000000000000000000&variableRateSlope2=80000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=105000000000000000000000000) |
+      \`\`\`mermaid
+      xychart-beta
+          title "Interest Rate Model"
+          x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+          y-axis "Rate (%)"
+          line [0, 0.1388888888888889, 0.2777777777777778, 0.4166666666666667, 0.5555555555555556, 0.6944444444444444, 0.8333333333333334, 0.9722222222222222, 1.1111111111111112, 1.25, 1.3888888888888888, 1.5277777777777777, 1.6666666666666667, 1.8055555555555556, 1.9444444444444444, 2.0833333333333335, 2.2222222222222223, 2.361111111111111, 2.5, 6.5, 10.5]
+      \`\`\`
 
 
       #### wrsETH ([0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F](https://mega.etherscan.io/address/0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F))
@@ -332,7 +344,13 @@ describe('diffSnapshots', () => {
       | baseVariableBorrowRate | 0 % |
       | variableRateSlope1 | 5 % |
       | variableRateSlope2 | 20 % |
-      | interestRate | ![ir](https://dash.onaave.com/api/static?variableRateSlope1=50000000000000000000000000&variableRateSlope2=200000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=250000000000000000000000000) |
+      \`\`\`mermaid
+      xychart-beta
+          title "Interest Rate Model"
+          x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+          y-axis "Rate (%)"
+          line [0, 0.2777777777777778, 0.5555555555555556, 0.8333333333333334, 1.1111111111111112, 1.3888888888888888, 1.6666666666666667, 1.9444444444444444, 2.2222222222222223, 2.5, 2.7777777777777777, 3.0555555555555554, 3.3333333333333335, 3.611111111111111, 3.888888888888889, 4.166666666666667, 4.444444444444445, 4.722222222222222, 5, 15, 25]
+      \`\`\`
 
 
       #### wstETH ([0x601aC63637933D88285A025C685AC4e9a92a98dA](https://mega.etherscan.io/address/0x601aC63637933D88285A025C685AC4e9a92a98dA))
@@ -375,7 +393,13 @@ describe('diffSnapshots', () => {
       | baseVariableBorrowRate | 0 % |
       | variableRateSlope1 | 5 % |
       | variableRateSlope2 | 20 % |
-      | interestRate | ![ir](https://dash.onaave.com/api/static?variableRateSlope1=50000000000000000000000000&variableRateSlope2=200000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=250000000000000000000000000) |
+      \`\`\`mermaid
+      xychart-beta
+          title "Interest Rate Model"
+          x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+          y-axis "Rate (%)"
+          line [0, 0.2777777777777778, 0.5555555555555556, 0.8333333333333334, 1.1111111111111112, 1.3888888888888888, 1.6666666666666667, 1.9444444444444444, 2.2222222222222223, 2.5, 2.7777777777777777, 3.0555555555555554, 3.3333333333333335, 3.611111111111111, 3.888888888888889, 4.166666666666667, 4.444444444444445, 4.722222222222222, 5, 15, 25]
+      \`\`\`
 
 
       #### BTC.b ([0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072](https://mega.etherscan.io/address/0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072))
@@ -418,7 +442,13 @@ describe('diffSnapshots', () => {
       | baseVariableBorrowRate | 0 % |
       | variableRateSlope1 | 5 % |
       | variableRateSlope2 | 20 % |
-      | interestRate | ![ir](https://dash.onaave.com/api/static?variableRateSlope1=50000000000000000000000000&variableRateSlope2=200000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=250000000000000000000000000) |
+      \`\`\`mermaid
+      xychart-beta
+          title "Interest Rate Model"
+          x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+          y-axis "Rate (%)"
+          line [0, 0.2777777777777778, 0.5555555555555556, 0.8333333333333334, 1.1111111111111112, 1.3888888888888888, 1.6666666666666667, 1.9444444444444444, 2.2222222222222223, 2.5, 2.7777777777777777, 3.0555555555555554, 3.3333333333333335, 3.611111111111111, 3.888888888888889, 4.166666666666667, 4.444444444444445, 4.722222222222222, 5, 15, 25]
+      \`\`\`
 
 
       #### USDT0 ([0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb](https://mega.etherscan.io/address/0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb))
@@ -461,7 +491,13 @@ describe('diffSnapshots', () => {
       | baseVariableBorrowRate | 0 % |
       | variableRateSlope1 | 5 % |
       | variableRateSlope2 | 10 % |
-      | interestRate | ![ir](https://dash.onaave.com/api/static?variableRateSlope1=50000000000000000000000000&variableRateSlope2=100000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=150000000000000000000000000) |
+      \`\`\`mermaid
+      xychart-beta
+          title "Interest Rate Model"
+          x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+          y-axis "Rate (%)"
+          line [0, 0.2777777777777778, 0.5555555555555556, 0.8333333333333334, 1.1111111111111112, 1.3888888888888888, 1.6666666666666667, 1.9444444444444444, 2.2222222222222223, 2.5, 2.7777777777777777, 3.0555555555555554, 3.3333333333333335, 3.611111111111111, 3.888888888888889, 4.166666666666667, 4.444444444444445, 4.722222222222222, 5, 10, 15]
+      \`\`\`
 
 
       #### USDm ([0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7](https://mega.etherscan.io/address/0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7))
@@ -504,7 +540,13 @@ describe('diffSnapshots', () => {
       | baseVariableBorrowRate | 0 % |
       | variableRateSlope1 | 5 % |
       | variableRateSlope2 | 10 % |
-      | interestRate | ![ir](https://dash.onaave.com/api/static?variableRateSlope1=50000000000000000000000000&variableRateSlope2=100000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=150000000000000000000000000) |
+      \`\`\`mermaid
+      xychart-beta
+          title "Interest Rate Model"
+          x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+          y-axis "Rate (%)"
+          line [0, 0.2777777777777778, 0.5555555555555556, 0.8333333333333334, 1.1111111111111112, 1.3888888888888888, 1.6666666666666667, 1.9444444444444444, 2.2222222222222223, 2.5, 2.7777777777777777, 3.0555555555555554, 3.3333333333333335, 3.611111111111111, 3.888888888888889, 4.166666666666667, 4.444444444444445, 4.722222222222222, 5, 10, 15]
+      \`\`\`
 
 
       ## EMode changes

@@ -7,11 +7,12 @@
 | description | value before | value after |
 | --- | --- | --- |
 | interestRateStrategy | [0x4e1494475048fa155F1D837B6bD51458bD170f48](https://etherscan.io/address/0x4e1494475048fa155F1D837B6bD51458bD170f48) | [0x8821c6B6cd3C45Ad8b5EF43168BBbD094b63a03c](https://etherscan.io/address/0x8821c6B6cd3C45Ad8b5EF43168BBbD094b63a03c) |
-| variableRateSlope1 | 12.5 % | 42 % |
-| stableRateSlope1 | 2 % | 69 % |
 | optimalUsageRatio | 90 % | 69 % |
-| maxExcessUsageRatio | 10 % | 31 % |
-| interestRate | ![before](https://dash.onaave.com/api/static?variableRateSlope1=125000000000000000000000000&variableRateSlope2=600000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=undefined) | ![after](https://dash.onaave.com/api/static?variableRateSlope1=420000000000000000000000000&variableRateSlope2=600000000000000000000000000&optimalUsageRatio=690000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=undefined) |
+| variableRateSlope1 | 12.5 % | 42 % |
+| maxExcessUsageRatio | 100000000000000000000000000 | 310000000000000000000000000 |
+| stableRateSlope1 | 20000000000000000000000000 | 690000000000000000000000000 |
+| interestRate | ![before](https://dash.onaave.com/api/static?variableRateSlope1=125000000000000000000000000&variableRateSlope2=600000000000000000000000000&optimalUsageRatio=900000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=0) | ![after](https://dash.onaave.com/api/static?variableRateSlope1=420000000000000000000000000&variableRateSlope2=600000000000000000000000000&optimalUsageRatio=690000000000000000000000000&baseVariableBorrowRate=0&maxVariableBorrowRate=0) |
+
 
 ## Raw diff
 

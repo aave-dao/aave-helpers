@@ -7,8 +7,8 @@ import { toAddressLink } from '../utils/markdown';
 import {
   renderStrategyDiff,
   renderStrategy,
-  renderIrImage,
-  renderIrDiffImages,
+  renderIrChart,
+  renderIrDiffCharts,
 } from './strategies';
 
 // --- Field display order ---
@@ -144,7 +144,7 @@ export function renderReservesSection(
       let report = renderReserveTable(entry.to, pre.chainId);
       if (post.strategies[key]) {
         report += renderStrategy(post.strategies[key], pre.chainId);
-        report += renderIrImage(post.strategies[key]);
+        report += renderIrChart(post.strategies[key]);
       }
       added.push(report);
       continue;
@@ -174,7 +174,7 @@ export function renderReservesSection(
       if (strategyChanged) {
         const stratDiff = diff(preStrategy, postStrategy);
         report += renderStrategyDiff(stratDiff, pre.chainId);
-        report += renderIrDiffImages(preStrategy, postStrategy);
+        report += renderIrDiffCharts(preStrategy, postStrategy);
       }
       if (report) altered.push(report);
     }
