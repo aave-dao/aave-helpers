@@ -42,13 +42,13 @@
 | baseVariableBorrowRate | 0 % |
 | variableRateSlope1 | 5 % |
 | variableRateSlope2 | 20 % |
-```mermaid
+| interestRate | <pre lang="mermaid">
 xychart-beta
     title "Interest Rate Model"
     x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
     y-axis "Rate (%)"
     line [0, 0.2777777777777778, 0.5555555555555556, 0.8333333333333334, 1.1111111111111112, 1.3888888888888888, 1.6666666666666667, 1.9444444444444444, 2.2222222222222223, 2.5, 2.7777777777777777, 3.0555555555555554, 3.3333333333333335, 3.611111111111111, 3.888888888888889, 4.166666666666667, 4.444444444444445, 4.722222222222222, 5, 15, 25]
-```
+</pre> |
 
 
 #### USDC ([0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9](https://mantlescan.xyz//address/0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9))
@@ -91,13 +91,13 @@ xychart-beta
 | baseVariableBorrowRate | 0 % |
 | variableRateSlope1 | 5 % |
 | variableRateSlope2 | 10 % |
-```mermaid
+| interestRate | <pre lang="mermaid">
 xychart-beta
     title "Interest Rate Model"
     x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
     y-axis "Rate (%)"
     line [0, 0.2777777777777778, 0.5555555555555556, 0.8333333333333334, 1.1111111111111112, 1.3888888888888888, 1.6666666666666667, 1.9444444444444444, 2.2222222222222223, 2.5, 2.7777777777777777, 3.0555555555555554, 3.3333333333333335, 3.611111111111111, 3.888888888888889, 4.166666666666667, 4.444444444444445, 4.722222222222222, 5, 10, 15]
-```
+</pre> |
 
 
 #### sUSDe ([0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2](https://mantlescan.xyz//address/0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2))
@@ -140,13 +140,13 @@ xychart-beta
 | baseVariableBorrowRate | 0 % |
 | variableRateSlope1 | 5 % |
 | variableRateSlope2 | 20 % |
-```mermaid
+| interestRate | <pre lang="mermaid">
 xychart-beta
     title "Interest Rate Model"
     x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
     y-axis "Rate (%)"
     line [0, 0.2777777777777778, 0.5555555555555556, 0.8333333333333334, 1.1111111111111112, 1.3888888888888888, 1.6666666666666667, 1.9444444444444444, 2.2222222222222223, 2.5, 2.7777777777777777, 3.0555555555555554, 3.3333333333333335, 3.611111111111111, 3.888888888888889, 4.166666666666667, 4.444444444444445, 4.722222222222222, 5, 15, 25]
-```
+</pre> |
 
 
 #### USDe ([0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34](https://mantlescan.xyz//address/0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34))
@@ -189,13 +189,13 @@ xychart-beta
 | baseVariableBorrowRate | 0 % |
 | variableRateSlope1 | 5.25 % |
 | variableRateSlope2 | 12 % |
-```mermaid
+| interestRate | <pre lang="mermaid">
 xychart-beta
     title "Interest Rate Model"
     x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
     y-axis "Rate (%)"
     line [0, 0.3088235294117647, 0.6176470588235294, 0.9264705882352942, 1.2352941176470589, 1.5441176470588236, 1.8529411764705883, 2.161764705882353, 2.4705882352941178, 2.7794117647058822, 3.088235294117647, 3.3970588235294117, 3.7058823529411766, 4.014705882352941, 4.323529411764706, 4.632352941176471, 4.9411764705882355, 5.25, 9.25, 13.25, 17.25]
-```
+</pre> |
 
 
 #### USDT0 ([0x779Ded0c9e1022225f8E0630b35a9b54bE713736](https://mantlescan.xyz//address/0x779Ded0c9e1022225f8E0630b35a9b54bE713736))
@@ -238,13 +238,13 @@ xychart-beta
 | baseVariableBorrowRate | 0 % |
 | variableRateSlope1 | 5 % |
 | variableRateSlope2 | 10 % |
-```mermaid
+| interestRate | <pre lang="mermaid">
 xychart-beta
     title "Interest Rate Model"
     x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
     y-axis "Rate (%)"
     line [0, 0.2777777777777778, 0.5555555555555556, 0.8333333333333334, 1.1111111111111112, 1.3888888888888888, 1.6666666666666667, 1.9444444444444444, 2.2222222222222223, 2.5, 2.7777777777777777, 3.0555555555555554, 3.3333333333333335, 3.611111111111111, 3.888888888888889, 4.166666666666667, 4.444444444444445, 4.722222222222222, 5, 10, 15]
-```
+</pre> |
 
 
 #### WMNT ([0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8](https://mantlescan.xyz//address/0x78c1b0C915c4FAA5FffA6CAbf0219DA63d7f4cb8))
@@ -287,13 +287,13 @@ xychart-beta
 | baseVariableBorrowRate | 0 % |
 | variableRateSlope1 | 5 % |
 | variableRateSlope2 | 20 % |
-```mermaid
+| interestRate | <pre lang="mermaid">
 xychart-beta
     title "Interest Rate Model"
     x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
     y-axis "Rate (%)"
     line [0, 0.2777777777777778, 0.5555555555555556, 0.8333333333333334, 1.1111111111111112, 1.3888888888888888, 1.6666666666666667, 1.9444444444444444, 2.2222222222222223, 2.5, 2.7777777777777777, 3.0555555555555554, 3.3333333333333335, 3.611111111111111, 3.888888888888889, 4.166666666666667, 4.444444444444445, 4.722222222222222, 5, 15, 25]
-```
+</pre> |
 
 
 #### wrsETH ([0x93e855643e940D025bE2e529272e4Dbd15a2Cf74](https://mantlescan.xyz//address/0x93e855643e940D025bE2e529272e4Dbd15a2Cf74))
@@ -336,13 +336,13 @@ xychart-beta
 | baseVariableBorrowRate | 0 % |
 | variableRateSlope1 | 5 % |
 | variableRateSlope2 | 20 % |
-```mermaid
+| interestRate | <pre lang="mermaid">
 xychart-beta
     title "Interest Rate Model"
     x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
     y-axis "Rate (%)"
     line [0, 0.2777777777777778, 0.5555555555555556, 0.8333333333333334, 1.1111111111111112, 1.3888888888888888, 1.6666666666666667, 1.9444444444444444, 2.2222222222222223, 2.5, 2.7777777777777777, 3.0555555555555554, 3.3333333333333335, 3.611111111111111, 3.888888888888889, 4.166666666666667, 4.444444444444445, 4.722222222222222, 5, 15, 25]
-```
+</pre> |
 
 
 #### FBTC ([0xC96dE26018A54D51c097160568752c4E3BD6C364](https://mantlescan.xyz//address/0xC96dE26018A54D51c097160568752c4E3BD6C364))
@@ -385,13 +385,13 @@ xychart-beta
 | baseVariableBorrowRate | 0 % |
 | variableRateSlope1 | 5 % |
 | variableRateSlope2 | 20 % |
-```mermaid
+| interestRate | <pre lang="mermaid">
 xychart-beta
     title "Interest Rate Model"
     x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
     y-axis "Rate (%)"
     line [0, 0.2777777777777778, 0.5555555555555556, 0.8333333333333334, 1.1111111111111112, 1.3888888888888888, 1.6666666666666667, 1.9444444444444444, 2.2222222222222223, 2.5, 2.7777777777777777, 3.0555555555555554, 3.3333333333333335, 3.611111111111111, 3.888888888888889, 4.166666666666667, 4.444444444444445, 4.722222222222222, 5, 15, 25]
-```
+</pre> |
 
 
 #### WETH ([0xdEAddEaDdeadDEadDEADDEAddEADDEAddead1111](https://mantlescan.xyz//address/0xdEAddEaDdeadDEadDEADDEAddEADDEAddead1111))
@@ -434,13 +434,13 @@ xychart-beta
 | baseVariableBorrowRate | 0 % |
 | variableRateSlope1 | 2.5 % |
 | variableRateSlope2 | 8 % |
-```mermaid
+| interestRate | <pre lang="mermaid">
 xychart-beta
     title "Interest Rate Model"
     x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
     y-axis "Rate (%)"
     line [0, 0.1388888888888889, 0.2777777777777778, 0.4166666666666667, 0.5555555555555556, 0.6944444444444444, 0.8333333333333334, 0.9722222222222222, 1.1111111111111112, 1.25, 1.3888888888888888, 1.5277777777777777, 1.6666666666666667, 1.8055555555555556, 1.9444444444444444, 2.0833333333333335, 2.2222222222222223, 2.361111111111111, 2.5, 6.5, 10.5]
-```
+</pre> |
 
 
 #### GHO ([0xfc421aD3C883Bf9E7C4f42dE845C4e4405799e73](https://mantlescan.xyz//address/0xfc421aD3C883Bf9E7C4f42dE845C4e4405799e73))
@@ -482,13 +482,13 @@ xychart-beta
 | baseVariableBorrowRate | 2 % |
 | variableRateSlope1 | 3 % |
 | variableRateSlope2 | 40 % |
-```mermaid
+| interestRate | <pre lang="mermaid">
 xychart-beta
     title "Interest Rate Model"
     x-axis "Utilization (%)" [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
     y-axis "Rate (%)"
     line [2, 2.1666666666666665, 2.3333333333333335, 2.5, 2.6666666666666665, 2.8333333333333335, 3, 3.1666666666666665, 3.3333333333333335, 3.5, 3.6666666666666665, 3.8333333333333335, 4, 4.166666666666667, 4.333333333333333, 4.5, 4.666666666666667, 4.833333333333333, 5, 25, 45]
-```
+</pre> |
 
 
 ## EMode changes

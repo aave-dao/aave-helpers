@@ -33,21 +33,20 @@ function renderMermaidChart(lines: { name: string; data: number[] }[]): string {
   const xLabels = Array.from({ length: NUM_POINTS }, (_, i) =>
     ((i * 100) / (NUM_POINTS - 1)).toString()
   );
-  let chart = '```mermaid\n';
-  chart += 'xychart-beta\n';
-  chart += '    title "Interest Rate Model"\n';
-  chart += `    x-axis "Utilization (%)" [${xLabels.join(', ')}]\n`;
-  chart += '    y-axis "Rate (%)"\n';
+  let mermaid = 'xychart-beta\n';
+  mermaid += '    title "Interest Rate Model"\n';
+  mermaid += `    x-axis "Utilization (%)" [${xLabels.join(', ')}]\n`;
+  mermaid += '    y-axis "Rate (%)"\n';
   for (const line of lines) {
-    chart += `    line [${line.data.join(', ')}]\n`;
+    mermaid += `    line [${line.data.join(', ')}]\n`;
   }
-  chart += '```\n';
-  return chart;
+  return `<pre lang="mermaid">\n${mermaid}</pre>`;
 }
 
 export function renderIrChart(strategy: Partial<AaveV3Strategy>): string {
   const rates = computeIrCurve(strategy);
-  return renderMermaidChart([{ name: 'rate', data: rates }]);
+  const chart = renderMermaidChart([{ name: 'rate', data: rates }]);
+  return `| interestRate | ${chart} |\n`;
 }
 
 export function renderIrDiffCharts(
@@ -56,10 +55,9 @@ export function renderIrDiffCharts(
 ): string {
   const ratesFrom = computeIrCurve(from);
   const ratesTo = computeIrCurve(to);
-  return renderMermaidChart([
-    { name: 'before', data: ratesFrom },
-    { name: 'after', data: ratesTo },
-  ]);
+  const chartFrom = renderMermaidChart([{ name: 'before', data: ratesFrom }]);
+  const chartTo = renderMermaidChart([{ name: 'after', data: ratesTo }]);
+  return `| interestRate | ${chartFrom} | ${chartTo} |\n`;
 }
 
 const STRATEGY_KEY_ORDER: (keyof AaveV3Strategy)[] = [
