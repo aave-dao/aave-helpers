@@ -33,14 +33,14 @@ function renderMermaidChart(lines: { name: string; data: number[] }[]): string {
   const xLabels = Array.from({ length: NUM_POINTS }, (_, i) =>
     ((i * 100) / (NUM_POINTS - 1)).toString()
   );
-  let mermaid = 'xychart-beta\n';
-  mermaid += '    title "Interest Rate Model"\n';
-  mermaid += `    x-axis "Utilization (%)" [${xLabels.join(', ')}]\n`;
-  mermaid += '    y-axis "Rate (%)"\n';
-  for (const line of lines) {
-    mermaid += `    line [${line.data.join(', ')}]\n`;
-  }
-  return `<pre lang="mermaid">\n${mermaid}</pre>`;
+  const parts = [
+    'xychart-beta',
+    'title "Interest Rate Model"',
+    `x-axis "Utilization (%)" [${xLabels.join(', ')}]`,
+    'y-axis "Rate (%)"',
+    ...lines.map((line) => `line [${line.data.join(', ')}]`),
+  ];
+  return `<pre lang="mermaid">${parts.join('&#13;')}&#13;</pre>`;
 }
 
 export function renderIrChart(strategy: Partial<AaveV3Strategy>): string {
