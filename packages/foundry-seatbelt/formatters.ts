@@ -71,25 +71,27 @@ const RESERVE_BOOL_FIELDS: readonly ReserveKey[] = [
   'usageAsCollateralEnabled',
 ] as const;
 
-export const reserveFormatters: Partial<Record<ReserveKey, FieldFormatter>> = {};
+export const reserveFormatters: Partial<{ [K in ReserveKey]: FieldFormatter<AaveV3Reserve[K]> }> =
+  {};
 
 for (const field of RESERVE_PERCENTAGE_FIELDS) {
-  reserveFormatters[field] = (value, ctx) => prettifyNumber({ value, decimals: 2, suffix: '%' });
+  (reserveFormatters[field] as FieldFormatter<number>) = (value, ctx) =>
+    prettifyNumber({ value, decimals: 2, suffix: '%' });
 }
 
 reserveFormatters['liquidationBonus'] = (value) =>
-  value === 0 ? '0 %' : `${((value as number) - 10000) / 100} % [${value}]`;
+  value === 0 ? '0 %' : `${(value - 10000) / 100} % [${value}]`;
 
 reserveFormatters['supplyCap'] = (value, ctx) =>
-  `${(value as number).toLocaleString('en-US')} ${ctx.reserve?.symbol ?? ''}`;
+  `${value.toLocaleString('en-US')} ${ctx.reserve?.symbol ?? ''}`;
 
 reserveFormatters['borrowCap'] = (value, ctx) =>
-  `${(value as number).toLocaleString('en-US')} ${ctx.reserve?.symbol ?? ''}`;
+  `${value.toLocaleString('en-US')} ${ctx.reserve?.symbol ?? ''}`;
 
 reserveFormatters['debtCeiling'] = (value) => prettifyNumber({ value, decimals: 2, suffix: '$' });
 
 for (const field of RESERVE_BALANCE_FIELDS) {
-  reserveFormatters[field] = (value, ctx) =>
+  (reserveFormatters[field] as FieldFormatter<string>) = (value, ctx) =>
     prettifyNumber({
       value,
       decimals: ctx.reserve?.decimals ?? 18,
@@ -103,11 +105,12 @@ reserveFormatters['oracleLatestAnswer'] = (value, ctx) => {
 };
 
 for (const field of RESERVE_ADDRESS_FIELDS) {
-  reserveFormatters[field] = (value, ctx) => addressLink(value, ctx.chainId);
+  (reserveFormatters[field] as FieldFormatter<string>) = (value, ctx) =>
+    addressLink(value, ctx.chainId);
 }
 
 for (const field of RESERVE_BOOL_FIELDS) {
-  reserveFormatters[field] = (value) => boolToMarkdown(value as boolean);
+  (reserveFormatters[field] as FieldFormatter<boolean>) = (value) => boolToMarkdown(value);
 }
 
 // --- Strategy formatters ---
@@ -122,10 +125,13 @@ const STRATEGY_RATE_FIELDS: readonly StrategyKey[] = [
   'maxVariableBorrowRate',
 ] as const;
 
-export const strategyFormatters: Partial<Record<StrategyKey, FieldFormatter>> = {};
+export const strategyFormatters: Partial<{
+  [K in StrategyKey]: FieldFormatter<AaveV3Strategy[K]>;
+}> = {};
 
 for (const field of STRATEGY_RATE_FIELDS) {
-  strategyFormatters[field] = (value) => `${formatUnits(BigInt(value), 25)} %`;
+  (strategyFormatters[field] as FieldFormatter<string>) = (value) =>
+    `${formatUnits(BigInt(value), 25)} %`;
 }
 
 strategyFormatters['address'] = (value, ctx) => addressLink(value, ctx.chainId);
@@ -134,12 +140,12 @@ strategyFormatters['address'] = (value, ctx) => addressLink(value, ctx.chainId);
 
 type EmodeKey = keyof AaveV3Emode;
 
-export const emodeFormatters: Partial<Record<EmodeKey, FieldFormatter>> = {};
+export const emodeFormatters: Partial<{ [K in EmodeKey]: FieldFormatter<AaveV3Emode[K]> }> = {};
 
 emodeFormatters['ltv'] = (value) => `${formatUnits(BigInt(value), 2)} %`;
 emodeFormatters['liquidationThreshold'] = (value) => `${formatUnits(BigInt(value), 2)} %`;
 emodeFormatters['liquidationBonus'] = (value) =>
-  value === 0 ? '0 %' : `${((value as number) - 10000) / 100} % [${value}]`;
+  value === 0 ? '0 %' : `${(value - 10000) / 100} % [${value}]`;
 
 emodeFormatters['borrowableBitmap'] = (value, ctx) => {
   const indexes = bitmapToIndexes(BigInt(value));
@@ -155,7 +161,7 @@ emodeFormatters['borrowableBitmap'] = (value, ctx) => {
 
 emodeFormatters['collateralBitmap'] = emodeFormatters['borrowableBitmap'];
 
-emodeFormatters['priceSource'] = (value, ctx) => addressLink(value, ctx.chainId);
+emodeFormatters['priceSource'] = (value, ctx) => addressLink(value!, ctx.chainId);
 
 // --- Generic format function ---
 
