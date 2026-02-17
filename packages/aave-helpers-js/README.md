@@ -46,9 +46,7 @@ To add a missing event, append its ABI entry to the JSON array:
   "type": "event",
   "name": "MyEvent",
   "anonymous": false,
-  "inputs": [
-    { "name": "param", "type": "uint256", "indexed": false, "internalType": "uint256" }
-  ]
+  "inputs": [{ "name": "param", "type": "uint256", "indexed": false, "internalType": "uint256" }]
 }
 ```
 
