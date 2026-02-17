@@ -1,7 +1,7 @@
 import { type Hex, formatUnits } from 'viem';
-import { getClient } from '@aave-dao/toolbox';
+import { getClient } from '@bgd-labs/toolbox';
 import { prettifyNumber, toAddressLink, boolToMarkdown } from './utils/markdown';
-import { bitmapToIndexes } from '@aave-dao/toolbox';
+import { bitmapToIndexes } from '@bgd-labs/toolbox';
 import type {
   AaveV3Reserve,
   AaveV3Strategy,

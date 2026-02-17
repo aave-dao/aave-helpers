@@ -1,5 +1,5 @@
 import type { Hex } from 'viem';
-import { getClient } from '@aave-dao/toolbox';
+import { getClient } from '@bgd-labs/toolbox';
 import { isChange, hasChanges, diff, type DiffResult, type Change } from '../diff';
 import { formatValue, type FormatterContext } from '../formatters';
 import type { AaveV3Reserve, AaveV3Snapshot, CHAIN_ID } from '../snapshot-types';

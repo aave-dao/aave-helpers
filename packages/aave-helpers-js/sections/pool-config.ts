@@ -1,7 +1,7 @@
 import { type Hex } from 'viem';
 import { isChange, type DiffResult, type Change } from '../diff';
 import { toAddressLink } from '../utils/markdown';
-import { getClient } from '@aave-dao/toolbox';
+import { getClient } from '@bgd-labs/toolbox';
 import type { AaveV3Config, AaveV3Snapshot, CHAIN_ID } from '../snapshot-types';
 
 export function renderPoolConfigSection(
