@@ -25,5 +25,6 @@
     "@bgd-labs/aave-helpers-js": "workspace:*",
     "prettier": "3.5.3",
     "prettier-plugin-solidity": "1.4.3"
-  }
+  },
+  "packageManager": "pnpm@10.27.0"
 }
