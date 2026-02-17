@@ -53,19 +53,4 @@ zksync = "${RPC_ZKSYNC}"
 linea = "${RPC_LINEA}"
 megaeth = "${RPC_MEGAETH}"
 mantle = "${RPC_MANTLE}"
-
-[etherscan]
-mainnet = { key = "${ETHERSCAN_API_KEY_MAINNET}", chainId = 1 }
-optimism = { key = "${ETHERSCAN_API_KEY_OPTIMISM}", chainId = 10 }
-avalanche = { key = "${ETHERSCAN_API_KEY_AVALANCHE}", chainId = 43114 }
-polygon = { key = "${ETHERSCAN_API_KEY_POLYGON}", chainId = 137 }
-arbitrum = { key = "${ETHERSCAN_API_KEY_ARBITRUM}", chainId = 42161 }
-fantom = { key = "${ETHERSCAN_API_KEY_FANTOM}", chainId = 250 }
-base = { key = "${ETHERSCAN_API_KEY_BASE}", chain = 8453 }
-bnb = { key = "${ETHERSCAN_API_KEY_BNB}", chainId = 56, url = 'https://api.bscscan.com/api' }
-sepolia = { key = "${ETHERSCAN_API_KEY_MAINNET}", chainId = 11155111 }
-gnosis = { key = "${ETHERSCAN_API_KEY_GNOSIS}", chainId = 100, url = 'https://api.gnosisscan.io/api' }
-scroll = { key = "${ETHERSCAN_API_KEY_SCROLL}", chainId = 534352 }
-zkevm = { key = "${ETHERSCAN_API_KEY_ZKEVM}", chainId = 1101 }
-zksync = { key = "${ETHERSCAN_API_KEY_ZKSYNC}", chain = 324 }
 # See more config options https://github.com/gakonst/foundry/tree/master/config
