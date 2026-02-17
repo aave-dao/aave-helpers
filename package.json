@@ -8,7 +8,9 @@
   },
   "scripts": {
     "lint": "prettier . --check",
-    "lint:fix": "prettier --write ."
+    "lint:fix": "prettier --write .",
+    "changeset": "changeset",
+    "release": "changeset publish"
   },
   "repository": {
     "type": "git",
@@ -23,6 +25,7 @@
   "homepage": "https://github.com/aave-dao/aave-helpers#readme",
   "devDependencies": {
     "@aave-dao/aave-helpers-js": "workspace:*",
+    "@changesets/cli": "^2.29.8",
     "prettier": "3.5.3",
     "prettier-plugin-solidity": "1.4.3"
   },
