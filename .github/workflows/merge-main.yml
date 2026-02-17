@@ -12,8 +12,8 @@ on:
 
 jobs:
   lint:
-    uses: aave-dao/github-workflows/.github/workflows/foundry-lint-prettier.yml@main
+    uses: bgd-labs/github-workflows/.github/workflows/foundry-lint-prettier.yml@main
   test:
-    uses: aave-dao/github-workflows/.github/workflows/foundry-test.yml@main
+    uses: bgd-labs/github-workflows/.github/workflows/foundry-test.yml@main
     secrets:
       ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
