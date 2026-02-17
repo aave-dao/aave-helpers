@@ -1,6 +1,6 @@
 {
-  "name": "@bgd-labs/aave-helpers-js",
-  "version": "1.0.1",
+  "name": "@aave-dao/aave-helpers-js",
+  "version": "1.0.2",
   "license": "MIT",
   "type": "module",
   "exports": {

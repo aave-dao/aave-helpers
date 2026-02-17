@@ -8,21 +8,24 @@
   },
   "scripts": {
     "lint": "prettier . --check",
-    "lint:fix": "prettier --write ."
+    "lint:fix": "prettier --write .",
+    "changeset": "changeset",
+    "release": "changeset publish"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bgd-labs/aave-helpers.git"
+    "url": "git+https://github.com/aave-dao/aave-helpers.git"
   },
   "keywords": [],
   "author": "bgd-labs",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/bgd-labs/aave-helpers/issues"
+    "url": "https://github.com/aave-dao/aave-helpers/issues"
   },
-  "homepage": "https://github.com/bgd-labs/aave-helpers#readme",
+  "homepage": "https://github.com/aave-dao/aave-helpers#readme",
   "devDependencies": {
-    "@bgd-labs/aave-helpers-js": "workspace:*",
+    "@aave-dao/aave-helpers-js": "workspace:*",
+    "@changesets/cli": "^2.29.8",
     "prettier": "3.5.3",
     "prettier-plugin-solidity": "1.4.3"
   },

@@ -150,7 +150,7 @@ program
         {
           baseChainId: Number(chainId),
           forkChainId: 3030,
-          slug: `${Math.floor(Math.random() * 1000)}acli-bgd-labs-vnet-${chainId}`,
+          slug: `${Math.floor(Math.random() * 1000)}acli-aave-dao-vnet-${chainId}`,
           displayName: 'seatbelt',
         },
         {
