@@ -4,7 +4,7 @@ Arbitrum does offer a way to bridge directly from their network to Mainnet using
 
 The same contract exists on both chains with the same address, so this contract will receive funds from the Arbitrum Collector, then call to bridge the received tokens. After the Arbitrum rollup happens, the "burn proof" will be generated via API. At this point, the mainnet contract can be called. `exit()` will give the mainnet collector contract the tokens that were bridged over from Arbitrum.
 
-In order to generate the proof for an exit, as well as the other required data, please install the `aave-cli` tool which can be found [here](https://github.com/bgd-labs/aave-cli).
+In order to generate the proof for an exit, as well as the other required data, please install the `aave-cli` tool which can be found [here](https://github.com/aave-dao/aave-cli).
 
 In order to generate the proof, run the following command:
 

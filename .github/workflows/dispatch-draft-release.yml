@@ -9,4 +9,4 @@ on:
 
 jobs:
   draft-release:
-    uses: bgd-labs/github-workflows/.github/workflows/draft-release.yml@main
+    uses: aave-dao/github-workflows/.github/workflows/draft-release.yml@main

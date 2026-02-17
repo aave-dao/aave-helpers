@@ -1,4 +1,4 @@
-import * as addresses from '@bgd-labs/aave-address-book';
+import * as addresses from '@aave-dao/aave-address-book';
 import { findObjectPaths } from 'find-object-paths';
 import { type Address, getAddress } from 'viem';
 

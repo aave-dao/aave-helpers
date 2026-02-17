@@ -7,7 +7,7 @@ Solidity and TypeScript toolkit for building, testing, and reviewing Aave govern
 Install with Foundry:
 
 ```sh
-forge install bgd-labs/aave-helpers
+forge install aave-dao/aave-helpers
 ```
 
 ### Config Engines
@@ -28,12 +28,12 @@ Utilities for creating and executing Aave Governance V3 proposals in Foundry tes
 - **Bridges** - cross-chain ERC20 bridge implementations (Arbitrum, Optimism, Polygon, CCIP)
 - **Swaps** - Milkman-based swap payloads for treasury management
 
-## TypeScript (`@bgd-labs/aave-helpers-js`)
+## TypeScript (`@aave-dao/aave-helpers-js`)
 
 The `packages/aave-helpers-js` package provides snapshot diffing and markdown report generation for Aave V3 pool configurations.
 
 ```sh
-pnpm add @bgd-labs/aave-helpers-js
+pnpm add @aave-dao/aave-helpers-js
 ```
 
 ### CLI
@@ -46,7 +46,7 @@ aave-helpers-js --chainId 1 --pre before.json --post after.json
 ### Library
 
 ```ts
-import { diffSnapshots } from '@bgd-labs/aave-helpers-js';
+import { diffSnapshots } from '@aave-dao/aave-helpers-js';
 
 const report = diffSnapshots(preSnapshot, postSnapshot);
 ```

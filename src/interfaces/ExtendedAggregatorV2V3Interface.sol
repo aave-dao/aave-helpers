@@ -54,7 +54,7 @@ interface ExtendedAggregatorV2V3Interface {
   /**
    * @notice Returns the name identifier of the feed
    * @return string name
-   * @dev https://github.com/bgd-labs/cl-synchronicity-price-adapter compat
+   * @dev https://github.com/aave-dao/aave-price-feeds compat
    */
   function name() external view returns (string memory);
 }

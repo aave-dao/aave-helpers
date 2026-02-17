@@ -1,6 +1,6 @@
 import type { Log, CHAIN_ID } from '../snapshot-types';
 import type { Abi, Hex, Address } from 'viem';
-import { parseLogs, enhanceLogs, getClient } from '@bgd-labs/toolbox';
+import { parseLogs, enhanceLogs, getClient } from '@aave-dao/toolbox';
 import { isKnownAddress } from '../utils/address';
 import eventDb from '../utils/eventDb.json';
 
