@@ -5,3 +5,5 @@ reports
 cache
 broadcast
 diffs
+
+pnpm-lock.yaml
