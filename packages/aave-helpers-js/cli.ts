@@ -14,7 +14,7 @@ import {
   renderTenderlyReport,
   tenderly_createVnet,
 } from '@bgd-labs/toolbox';
-import { getAddressBookReferences } from '@aave-dao/aave-address-book/utils';
+import { getAddressBookReferences } from '@bgd-labs/aave-address-book/utils';
 import { diffSnapshots } from './protocol-diff';
 import { Address, encodeFunctionData, Hex, parseAbi, zeroAddress } from 'viem';
 import { readContract } from 'viem/actions';
