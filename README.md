@@ -10,11 +10,11 @@ Install with Foundry:
 forge install aave-dao/aave-helpers
 ```
 
-### Config Engines
+### Config engines
 
 Type-safe payload base contracts for Aave V2 and V3 configuration changes. Inherit from the chain-specific payload (e.g. `AaveV3PayloadEthereum`, `AaveV2PayloadPolygon`) and override the relevant listing/update methods.
 
-### Test Bases
+### Test bases
 
 `ProtocolV3TestBase` and `ProtocolV2TestBase` provide snapshot diffing and e2e testing for proposals. Inherit in your test, execute the proposal, and call the snapshot/e2e helpers.
 
@@ -22,7 +22,7 @@ Type-safe payload base contracts for Aave V2 and V3 configuration changes. Inher
 
 Utilities for creating and executing Aave Governance V3 proposals in Foundry tests and scripts. Also includes voting scripts (`make vote proposalId=n support=true/false`).
 
-### Other Utilities
+### Other utilities
 
 - **CollectorUtils** - helpers for interacting with the Aave Collector
 - **Bridges** - cross-chain ERC20 bridge implementations (Arbitrum, Optimism, Polygon, CCIP)
