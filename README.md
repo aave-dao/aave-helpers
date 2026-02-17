@@ -40,7 +40,7 @@ pnpm add @aave-dao/aave-helpers-js
 
 ```sh
 # Diff two snapshot JSON files
-aave-helpers-js --chainId 1 --pre before.json --post after.json
+aave-helpers-js diff-snapshots before.json after.json -o diff.md
 ```
 
 ### Library
@@ -48,7 +48,7 @@ aave-helpers-js --chainId 1 --pre before.json --post after.json
 ```ts
 import { diffSnapshots } from '@aave-dao/aave-helpers-js';
 
-const report = diffSnapshots(preSnapshot, postSnapshot);
+const md = await diffSnapshots(preSnapshot, postSnapshot);
 ```
 
 ## Development
