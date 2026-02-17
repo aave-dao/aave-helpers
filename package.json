@@ -22,11 +22,8 @@
   },
   "homepage": "https://github.com/bgd-labs/aave-helpers#readme",
   "devDependencies": {
+    "@bgd-labs/aave-helpers-js": "workspace:*",
     "prettier": "3.5.3",
     "prettier-plugin-solidity": "1.4.3"
-  },
-  "dependencies": {
-    "@bgd-labs/aave-cli": "^1.4.5",
-    "@bgd-labs/cli": "^0.0.63"
   }
 }

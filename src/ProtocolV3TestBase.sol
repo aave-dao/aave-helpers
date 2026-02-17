@@ -96,16 +96,17 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
 
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
 
-    {
-      string memory rawDiff = vm.getStateDiffJson();
-      vm.writeJson(rawDiff, string(abi.encodePacked('./reports/', afterString, '.json')), '$.raw');
-      string memory logsJson = vm.getRecordedLogsJson();
-      vm.writeJson(
-        logsJson,
-        string(abi.encodePacked('./reports/', afterString, '.json')),
-        '$.logs'
-      );
-    }
+    // waiting for the next release of forge std
+    // {
+    //   string memory rawDiff = vm.getStateDiffJson();
+    //   vm.writeJson(rawDiff, string(abi.encodePacked('./reports/', afterString, '.json')), '$.raw');
+    //   string memory logsJson = vm.getRecordedLogsJson();
+    //   vm.writeJson(
+    //     logsJson,
+    //     string(abi.encodePacked('./reports/', afterString, '.json')),
+    //     '$.logs'
+    //   );
+    // }
 
     diffReports(beforeString, afterString);
     if (runSeatbelt) {

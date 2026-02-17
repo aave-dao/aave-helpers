@@ -1,6 +1,6 @@
 {
   "name": "@bgd-labs/aave-helpers-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "type": "module",
   "exports": {
@@ -14,8 +14,7 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "bin": {
-    "foundry-seatbelt": "./dist/cli.mjs",
-    "diff-snapshots": "./dist/cli.mjs"
+    "aave-helpers-js": "dist/cli.mjs"
   },
   "files": [
     "dist"
@@ -30,13 +29,13 @@
   "dependencies": {
     "@bgd-labs/aave-address-book": "^4.44.14",
     "@bgd-labs/toolbox": "^0.2.18",
-    "@types/node": "catalog:",
     "commander": "^14.0.3",
     "find-object-paths": "^1.1.0",
     "viem": "catalog:",
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/node": "catalog:",
     "tsdown": "^0.20.3",
     "typescript": "^5.8.3",
     "vitest": "^4.0.18"

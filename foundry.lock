@@ -6,9 +6,9 @@
     }
   },
   "lib/forge-std": {
-    "branch": {
-      "name": "master",
-      "rev": "52c1e835e9ffcfe00bd9f8f51de204b93bc7028a"
+    "tag": {
+      "name": "v1.14.0",
+      "rev": "1801b0541f4fda118a10798fd3486bb7051c5dd6"
     }
   }
 }
