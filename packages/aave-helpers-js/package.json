@@ -20,6 +20,7 @@
     "dist"
   ],
   "scripts": {
+    "prepare": "tsdown",
     "build": "tsdown",
     "test": "vitest run",
     "test:watch": "vitest",
