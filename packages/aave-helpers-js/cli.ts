@@ -14,7 +14,7 @@ import {
   renderTenderlyReport,
   tenderly_createVnet,
 } from '@bgd-labs/toolbox';
-import { getAddressBookReferences } from '@bgd-labs/aave-address-book/utils';
+import { getAddressBookReferences } from '@aave-dao/aave-address-book/utils';
 import { diffSnapshots } from './protocol-diff';
 import { Address, encodeFunctionData, Hex, parseAbi, zeroAddress } from 'viem';
 import { readContract } from 'viem/actions';
@@ -110,7 +110,7 @@ program
   });
 
 function flagAsKnown(value: string, reference: string) {
-  return `${value} [:ghost:](https://github.com/bgd-labs/aave-address-book  "${reference}")`;
+  return `${value} [:ghost:](https://github.com/aave-dao/aave-address-book  "${reference}")`;
 }
 
 program

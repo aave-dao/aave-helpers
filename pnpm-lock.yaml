@@ -32,9 +32,9 @@ importers:
 
   packages/aave-helpers-js:
     dependencies:
-      '@bgd-labs/aave-address-book':
+      '@aave-dao/aave-address-book':
         specifier: ^4.44.14
-        version: 4.44.14(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
+        version: 4.46.0(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
       '@bgd-labs/toolbox':
         specifier: ^0.2.18
         version: 0.2.18(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
@@ -66,6 +66,11 @@ importers:
 
 packages:
 
+  '@aave-dao/aave-address-book@4.46.0':
+    resolution: {integrity: sha512-2nSmdwytTw3bB5ft0FwA9fcUBVrugXluRjQl90Wdf8WpUUucVzPmr6wr2IIoRxS1WVqR8qLYY3CejcNCXkXuBQ==}
+    peerDependencies:
+      viem: ^2.23.5
+
   '@adraffy/ens-normalize@1.11.1':
     resolution: {integrity: sha512-nhCBV3quEgesuf7c7KYfperqSS14T8bYuvJ8PcLJp6znkZpFc0AuW4qBtr8eKVyPPe/8RSr7sglCWPU5eaxwKQ==}
 
@@ -93,11 +98,6 @@ packages:
   '@babel/types@8.0.0-rc.1':
     resolution: {integrity: sha512-ubmJ6TShyaD69VE9DQrlXcdkvJbmwWPB8qYj0H2kaJi29O7vJT9ajSdBd2W8CG34pwL9pYA74fi7RHC1qbLoVQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
-
-  '@bgd-labs/aave-address-book@4.44.14':
-    resolution: {integrity: sha512-54sWe4TRkNifenxexBSF6x73fQTeGsi/mlgL+4TD+JBTg4rDCcoUWSXhzO0KEdPRRxGGLnP/Cg0ERGAaegPR0w==}
-    peerDependencies:
-      viem: ^2.23.5
 
   '@bgd-labs/toolbox@0.2.18':
     resolution: {integrity: sha512-WrXqoaCb2n5EXSDr8DdJZ7L6kmHU3Xz9aRWMnPRm7AjuiP7t5+f3EvWHEnFpVJd1IMZqkGcVvZr/diS3xhh9PA==}
@@ -1349,6 +1349,10 @@ packages:
 
 snapshots:
 
+  '@aave-dao/aave-address-book@4.46.0(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
+    dependencies:
+      viem: 2.45.3(typescript@5.9.3)(zod@4.3.6)
+
   '@adraffy/ens-normalize@1.11.1': {}
 
   '@babel/generator@8.0.0-rc.1':
@@ -1374,10 +1378,6 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 8.0.0-rc.1
       '@babel/helper-validator-identifier': 8.0.0-rc.1
-
-  '@bgd-labs/aave-address-book@4.44.14(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
-    dependencies:
-      viem: 2.45.3(typescript@5.9.3)(zod@4.3.6)
 
   '@bgd-labs/toolbox@0.2.18(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
     dependencies:
