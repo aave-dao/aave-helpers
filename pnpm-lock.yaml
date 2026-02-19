@@ -36,8 +36,8 @@ importers:
         specifier: ^4.44.14
         version: 4.46.0(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
       '@bgd-labs/toolbox':
-        specifier: ^0.2.18
-        version: 0.2.18(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
+        specifier: ^0.2.19
+        version: 0.2.19(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
       commander:
         specifier: ^14.0.3
         version: 14.0.3
@@ -99,8 +99,8 @@ packages:
     resolution: {integrity: sha512-ubmJ6TShyaD69VE9DQrlXcdkvJbmwWPB8qYj0H2kaJi29O7vJT9ajSdBd2W8CG34pwL9pYA74fi7RHC1qbLoVQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
 
-  '@bgd-labs/toolbox@0.2.18':
-    resolution: {integrity: sha512-WrXqoaCb2n5EXSDr8DdJZ7L6kmHU3Xz9aRWMnPRm7AjuiP7t5+f3EvWHEnFpVJd1IMZqkGcVvZr/diS3xhh9PA==}
+  '@bgd-labs/toolbox@0.2.19':
+    resolution: {integrity: sha512-HSEQfOVXtPZvgtaQ3q0IKVrUNV3pzejoJtJJzTNcGTQGguHENX+YkN5JoWlIU+E+m26dbH5GFCCDeOTFu0uN9A==}
     engines: {node: '>=22'}
     peerDependencies:
       prettier: ^3.5.2
@@ -1379,7 +1379,7 @@ snapshots:
       '@babel/helper-string-parser': 8.0.0-rc.1
       '@babel/helper-validator-identifier': 8.0.0-rc.1
 
-  '@bgd-labs/toolbox@0.2.18(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
+  '@bgd-labs/toolbox@0.2.19(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
     dependencies:
       bs58: 6.0.0
       diff: 8.0.3
