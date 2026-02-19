@@ -24,11 +24,11 @@ importers:
         specifier: ^2.29.8
         version: 2.29.8(@types/node@22.19.11)
       prettier:
-        specifier: 3.5.3
-        version: 3.5.3
+        specifier: 3.8.1
+        version: 3.8.1
       prettier-plugin-solidity:
         specifier: 1.4.3
-        version: 1.4.3(prettier@3.5.3)
+        version: 1.4.3(prettier@3.8.1)
 
   packages/aave-helpers-js:
     dependencies:
@@ -37,7 +37,7 @@ importers:
         version: 4.46.0(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
       '@bgd-labs/toolbox':
         specifier: ^0.2.18
-        version: 0.2.18(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
+        version: 0.2.18(prettier-plugin-solidity@1.4.3(prettier@3.8.1))(prettier@3.8.1)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
       commander:
         specifier: ^14.0.3
         version: 14.0.3
@@ -1048,8 +1048,8 @@ packages:
     engines: {node: '>=10.13.0'}
     hasBin: true
 
-  prettier@3.5.3:
-    resolution: {integrity: sha512-QQtaxnoDJeAkDvDKWCLiwIXkTgRhwYDEQCghU9Z6q03iyek/rxRh/2lC3HB7P8sWT2xC/y5JDctPLBIGzHKbhw==}
+  prettier@3.8.1:
+    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -1379,14 +1379,14 @@ snapshots:
       '@babel/helper-string-parser': 8.0.0-rc.1
       '@babel/helper-validator-identifier': 8.0.0-rc.1
 
-  '@bgd-labs/toolbox@0.2.18(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
+  '@bgd-labs/toolbox@0.2.18(prettier-plugin-solidity@1.4.3(prettier@3.8.1))(prettier@3.8.1)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
     dependencies:
       bs58: 6.0.0
       diff: 8.0.3
       eventsource: 4.1.0
       js-yaml: 4.1.1
-      prettier: 3.5.3
-      prettier-plugin-solidity: 1.4.3(prettier@3.5.3)
+      prettier: 3.8.1
+      prettier-plugin-solidity: 1.4.3(prettier@3.8.1)
       viem: 2.45.3(typescript@5.9.3)(zod@4.3.6)
 
   '@changesets/apply-release-plan@7.0.14':
@@ -2210,15 +2210,15 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  prettier-plugin-solidity@1.4.3(prettier@3.5.3):
+  prettier-plugin-solidity@1.4.3(prettier@3.8.1):
     dependencies:
       '@solidity-parser/parser': 0.20.2
-      prettier: 3.5.3
+      prettier: 3.8.1
       semver: 7.7.4
 
   prettier@2.8.8: {}
 
-  prettier@3.5.3: {}
+  prettier@3.8.1: {}
 
   quansync@0.2.11: {}
 
