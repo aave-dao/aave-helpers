@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@aave-dao/aave-address-book": "^4.44.14",
-    "@bgd-labs/toolbox": "^0.2.18",
+    "@bgd-labs/toolbox": "^0.2.19",
     "commander": "^14.0.3",
     "find-object-paths": "^1.1.0",
     "viem": "catalog:",
