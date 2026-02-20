@@ -89,7 +89,7 @@ program
     }
     const content = readFileSync(filePath, 'utf8');
     const parsed = parseFrontmatterMd(content);
-    Aip(parsed);
+    Aip(parsed.data);
 
     const cid0 = await hash(content);
     const bs58Hash = cidV0ToBs58(cid0);
