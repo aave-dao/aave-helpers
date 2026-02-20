@@ -92,7 +92,7 @@ program
     Aip(parsed.data);
 
     const cid0 = await hash(content);
-    const bs58Hash = cidV0ToBs58(cid0);
+    const bs58Hash = await cidV0ToBs58(cid0);
 
     if (upload) {
       const [pinata, thegraph] = await Promise.all([
