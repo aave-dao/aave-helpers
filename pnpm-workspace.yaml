@@ -3,6 +3,6 @@ packages:
 
 catalog:
   '@types/node': ^22.19.11
-  tsup: 8.4.0
+  tsup: 8.5.1
   typescript: ^5.8.3
   viem: ^2.45.3
