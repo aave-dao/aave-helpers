@@ -7,7 +7,7 @@ library IpfsUtils {
   error FfiFailed();
 
   function ipfsHashFile(Vm vm, string memory filePath, bool upload) internal returns (bytes32) {
-    string[] memory inputs = new string[](5);
+    string[] memory inputs = new string[](upload ? 5 : 4);
     inputs[0] = 'npx';
     inputs[1] = '@aave-dao/aave-helpers-js@^1.0.0';
     inputs[2] = 'ipfs';
