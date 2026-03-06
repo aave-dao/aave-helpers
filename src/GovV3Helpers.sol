@@ -32,6 +32,7 @@ import {GovernanceV3Soneium} from 'aave-address-book/GovernanceV3Soneium.sol';
 import {GovernanceV3Ink} from 'aave-address-book/GovernanceV3Ink.sol';
 import {GovernanceV3Plasma} from 'aave-address-book/GovernanceV3Plasma.sol';
 import {GovernanceV3MegaEth} from 'aave-address-book/GovernanceV3MegaEth.sol';
+import {GovernanceV3XLayer} from 'aave-address-book/GovernanceV3XLayer.sol';
 import {GovernanceV3Bob} from 'aave-address-book/GovernanceV3Bob.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
 import {Create2Utils} from 'solidity-utils/contracts/utils/ScriptUtils.sol';
@@ -1144,6 +1145,8 @@ library GovV3Helpers {
       return GovernanceV3MegaEth.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.BOB) {
       return GovernanceV3Bob.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.XLAYER) {
+      return GovernanceV3XLayer.PAYLOADS_CONTROLLER;
     }
 
     revert CannotFindPayloadsController();
