@@ -37,17 +37,33 @@ const md = await diffSnapshots(preSnapshot, postSnapshot);
 
 ## Event Database
 
-`utils/eventDb.json` is a static collection of Solidity event ABIs used to decode transaction logs in reports. If a report shows raw topics/data instead of a decoded event name, the event ABI is likely missing from this file.
+`utils/eventDb.ts` is a collection of Solidity event ABIs used to decode transaction logs in reports. If a report shows raw topics/data instead of a decoded event name, the event ABI is likely missing from this file.
 
-To add a missing event, append its ABI entry to the JSON array:
+### Adding events from a verified contract
 
-```json
-{
-  "type": "event",
-  "name": "MyEvent",
-  "anonymous": false,
-  "inputs": [{ "name": "param", "type": "uint256", "indexed": false, "internalType": "uint256" }]
-}
+Use the `add-events` script to automatically fetch events from a block explorer and add any missing ones to the database:
+
+```sh
+# By chain ID and address
+npx tsx scripts/add-events.ts <chainId> <address>
+
+# Examples
+npx tsx scripts/add-events.ts 1 0x5ac4182a1dd41aeef465e40b82fd326bf66ab82c
+npx tsx scripts/add-events.ts 137 0xSomePolygonAddress
 ```
 
-You can extract event ABIs from contract artifacts (`out/` / `artifacts/`) or from block explorers.
+The script will:
+- Fetch the contract ABI from the block explorer (Etherscan, etc.)
+- If the contract is a proxy, also fetch the implementation ABI
+- Compare against the existing event database and add only missing events
+- Running it twice on the same contract is safe (idempotent)
+
+Requires `ETHERSCAN_API_KEY` environment variable. Optionally set `EXPLORER_PROXY` to override the explorer API URL.
+
+### Claude Code skill
+
+If you're using Claude Code, you can ask it to add events by providing an explorer URL:
+
+> add events from https://etherscan.io/address/0x5ac4182a1dd41aeef465e40b82fd326bf66ab82c
+
+It will parse the URL, determine the chain ID, and run the script automatically.

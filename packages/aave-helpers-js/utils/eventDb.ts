@@ -1390,4 +1390,12 @@ export const eventDb: AbiEvent[] = [
       },
     ],
   },
+  {"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint8","name":"leafType","type":"uint8"},{"indexed":false,"internalType":"uint32","name":"originNetwork","type":"uint32"},{"indexed":false,"internalType":"address","name":"originAddress","type":"address"},{"indexed":false,"internalType":"uint32","name":"destinationNetwork","type":"uint32"},{"indexed":false,"internalType":"address","name":"destinationAddress","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"},{"indexed":false,"internalType":"bytes","name":"metadata","type":"bytes"},{"indexed":false,"internalType":"uint32","name":"depositCount","type":"uint32"}],"name":"BridgeEvent","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint32","name":"index","type":"uint32"},{"indexed":false,"internalType":"uint32","name":"originNetwork","type":"uint32"},{"indexed":false,"internalType":"address","name":"originAddress","type":"address"},{"indexed":false,"internalType":"address","name":"destinationAddress","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"ClaimEvent","type":"event"},
+  {"anonymous":false,"inputs":[],"name":"EmergencyStateActivated","type":"event"},
+  {"anonymous":false,"inputs":[],"name":"EmergencyStateDeactivated","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint8","name":"version","type":"uint8"}],"name":"Initialized","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint32","name":"originNetwork","type":"uint32"},{"indexed":false,"internalType":"address","name":"originTokenAddress","type":"address"},{"indexed":false,"internalType":"address","name":"wrappedTokenAddress","type":"address"},{"indexed":false,"internalType":"bytes","name":"metadata","type":"bytes"}],"name":"NewWrappedToken","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"oldGuardian","type":"address"},{"indexed":false,"internalType":"address","name":"newGuardian","type":"address"}],"name":"GuardianUpdated","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"asset","type":"address"},{"indexed":false,"internalType":"address","name":"currentOracle","type":"address"},{"indexed":false,"internalType":"address","name":"svrOracle","type":"address"}],"name":"SvrOracleConfigChanged","type":"event"},
 ];
