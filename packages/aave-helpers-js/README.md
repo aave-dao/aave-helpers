@@ -53,6 +53,7 @@ npx tsx scripts/add-events.ts 137 0xSomePolygonAddress
 ```
 
 The script will:
+
 - Fetch the contract ABI from the block explorer (Etherscan, etc.)
 - If the contract is a proxy, also fetch the implementation ABI
 - Compare against the existing event database and add only missing events

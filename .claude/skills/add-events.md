@@ -9,6 +9,7 @@ When the user wants to add events from a block explorer URL (e.g. etherscan, pol
 ## Instructions
 
 1. Parse the input to extract the **chain ID** and **contract address**:
+
    - If given an explorer URL like `https://etherscan.io/address/0x...`, extract the address and infer chain ID from the domain:
      - `etherscan.io` → chain 1
      - `polygonscan.com` → chain 137
@@ -26,6 +27,7 @@ When the user wants to add events from a block explorer URL (e.g. etherscan, pol
    - Strip any URL fragments (e.g. `#code`) and query parameters
 
 2. Run the script:
+
    ```bash
    cd /Volumes/sensitive/BGD/aave-helpers/packages/aave-helpers-js && npx tsx scripts/add-events.ts <chainId> <address>
    ```
