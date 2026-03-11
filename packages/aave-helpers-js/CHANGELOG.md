@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.0.9
+
+### Patch Changes
+
+- 39fe0f9: Add missing events
+
 ## 1.0.8
 
 ### Patch Changes
