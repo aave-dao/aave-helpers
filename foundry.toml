@@ -5,10 +5,12 @@ script = 'scripts'
 out = 'out'
 libs = ['lib']
 remappings = []
-fs_permissions = [{ access = "read-write", path = "./reports" }]
+fs_permissions = [{ access = "read-write", path = "./reports" }, { access = "read", path = "./out" }]
 ffi = true
 evm_version = 'cancun'
 decode_external_storage = true
+allow_internal_expect_revert = true
+extra_output = ["storageLayout"]
 
 [profile.zksync]
 src = 'zksync/src'

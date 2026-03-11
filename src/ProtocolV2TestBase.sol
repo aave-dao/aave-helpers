@@ -7,6 +7,7 @@ import {ReserveConfiguration} from 'aave-v3-origin/contracts/protocol/libraries/
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {IERC20Metadata} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
+import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
 import {AaveV2EthereumAMM} from 'aave-address-book/AaveV2EthereumAMM.sol';
 import {AaveV2EthereumAssets} from 'aave-address-book/AaveV2Ethereum.sol';
 import {DiffUtils} from './DiffUtils.sol';
@@ -85,6 +86,10 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
 
     string memory afterString = string(abi.encodePacked(reportName, '_after'));
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
+
+    // as executor does delegateCall to the payload, the payload should have no storage variable
+    _validateNoPayloadStorageSlots(payload);
+
     vm.writeJson(
       vm.serializeString('root', 'raw', rawDiff), // output
       string(abi.encodePacked('./reports/', afterString, '.json'))
@@ -990,6 +995,41 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
     require(
       oracle.getSourceOfAsset(asset) == expectedSource,
       '_validateAssetSourceOnOracle() : INVALID_PRICE_SOURCE'
+    );
+  }
+
+  /**
+   * @dev Validates that a payload contract declares no state variables by inspecting the
+   *      compiler-generated storage layout from the build artifact.
+   *
+   *      If the artifact cannot be resolved (e.g. the contract was not compiled locally),
+   *      you can skip this test manually by overriding this virtual method in your test
+   *
+   *      Requires foundry.toml to have:
+   *        extra_output = ["storageLayout"]
+   *        fs_permissions includes { access = "read", path = "./out" }
+   */
+  function _validateNoPayloadStorageSlots(address payload) internal view virtual {
+    string memory artifactPath = vm.getArtifactPathByDeployedCode(payload.code);
+    string memory artifact = vm.readFile(artifactPath);
+
+    // vm.parseJson ABI-encodes the JSON value at the given key.
+    // A dynamic array is encoded as [uint256 offset][uint256 length][elements...], so
+    // decoding the first two words as (uint256, uint256) yields (offset, arrayLength).
+    bytes memory storageEncoded = vm.parseJson(artifact, '.storageLayout.storage');
+    (, uint256 storageLength) = abi.decode(storageEncoded, (uint256, uint256));
+
+    require(
+      storageLength == 0,
+      string(
+        abi.encodePacked(
+          'PAYLOAD_MUST_NOT_HAVE_STORAGE_VARIABLES: ',
+          artifactPath,
+          ' declares ',
+          Strings.toString(storageLength),
+          ' storage slot(s)'
+        )
+      )
     );
   }
 
