@@ -1,3 +1,8 @@
+---
+name: add-events
+description: Adds new events to the eventDb
+---
+
 # Add Events from Explorer
 
 Adds missing ABI events from a verified contract to the event database.
