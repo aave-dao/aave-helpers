@@ -1914,4 +1914,463 @@ export const eventDb: AbiEvent[] = [
     payable: false,
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'from', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'target', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'value', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'balanceIncrease', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'index', type: 'uint256' },
+    ],
+    name: 'Burn',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'newDeficitOffset', type: 'uint256' },
+    ],
+    name: 'DeficitOffsetChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'DeficitOffsetCovered',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'token', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'to', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'ERC20Rescued',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'to', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'NativeTokensRescued',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'newPendingDeficit', type: 'uint256' },
+    ],
+    name: 'PendingDeficitChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'PendingDeficitCovered',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'ReserveDeficitCovered',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'umbrellaStake', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'liquidationFee', type: 'uint256' },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'umbrellaStakeUnderlyingOracle',
+        type: 'address',
+      },
+    ],
+    name: 'SlashingConfigurationChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'umbrellaStake', type: 'address' },
+    ],
+    name: 'SlashingConfigurationRemoved',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'umbrellaStake', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'fee', type: 'uint256' },
+    ],
+    name: 'StakeTokenSlashed',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'umbrellaStake', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'underlying', type: 'address' },
+      { indexed: false, internalType: 'string', name: 'name', type: 'string' },
+      { indexed: false, internalType: 'string', name: 'symbol', type: 'string' },
+    ],
+    name: 'UmbrellaStakeTokenCreated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'onBehalfOf', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+      {
+        indexed: false,
+        internalType: 'enum DataTypes.InterestRateMode',
+        name: 'interestRateMode',
+        type: 'uint8',
+      },
+      { indexed: false, internalType: 'uint256', name: 'borrowRate', type: 'uint256' },
+      { indexed: true, internalType: 'uint16', name: 'referralCode', type: 'uint16' },
+    ],
+    name: 'Borrow',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amountCovered', type: 'uint256' },
+    ],
+    name: 'DeficitCovered',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'debtAsset', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amountCreated', type: 'uint256' },
+    ],
+    name: 'DeficitCreated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'target', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'initiator', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+      {
+        indexed: false,
+        internalType: 'enum DataTypes.InterestRateMode',
+        name: 'interestRateMode',
+        type: 'uint8',
+      },
+      { indexed: false, internalType: 'uint256', name: 'premium', type: 'uint256' },
+      { indexed: true, internalType: 'uint16', name: 'referralCode', type: 'uint16' },
+    ],
+    name: 'FlashLoan',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'totalDebt', type: 'uint256' },
+    ],
+    name: 'IsolationModeTotalDebtUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'collateralAsset', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'debtAsset', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'debtToCover', type: 'uint256' },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'liquidatedCollateralAmount',
+        type: 'uint256',
+      },
+      { indexed: false, internalType: 'address', name: 'liquidator', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'receiveAToken', type: 'bool' },
+    ],
+    name: 'LiquidationCall',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amountMinted', type: 'uint256' },
+    ],
+    name: 'MintedToTreasury',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'positionManager', type: 'address' },
+    ],
+    name: 'PositionManagerApproved',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'positionManager', type: 'address' },
+    ],
+    name: 'PositionManagerRevoked',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'repayer', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+      { indexed: false, internalType: 'bool', name: 'useATokens', type: 'bool' },
+    ],
+    name: 'Repay',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+    ],
+    name: 'ReserveUsedAsCollateralDisabled',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+    ],
+    name: 'ReserveUsedAsCollateralEnabled',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'uint8', name: 'categoryId', type: 'uint8' },
+    ],
+    name: 'UserEModeSet',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'reserve', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'to', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'Withdraw',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'token', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'to', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'ERC20Rescued',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'address', name: 'oldAddress', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'newAddress', type: 'address' },
+    ],
+    name: 'LimitOrderPriceCheckerUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'fromToken', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'toToken', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'minAmountOut', type: 'uint256' },
+    ],
+    name: 'LimitSwapRequested',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'address', name: 'oldAddress', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'newAddress', type: 'address' },
+    ],
+    name: 'MilkmanAddressUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'to', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'NativeTokensRescued',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'address', name: 'oldAddress', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'newAddress', type: 'address' },
+    ],
+    name: 'PriceCheckerUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'address', name: 'oldAddress', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'newAddress', type: 'address' },
+    ],
+    name: 'RelayerAddressUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'fromToken', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'toToken', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'allowed', type: 'bool' },
+    ],
+    name: 'SetSwappablePair',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'token', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'oracle', type: 'address' },
+    ],
+    name: 'SetTokenOracle',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'fromToken', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'toToken', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'SwapCanceled',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'fromToken', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'toToken', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'fromOracle', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'toOracle', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'slippage', type: 'uint256' },
+    ],
+    name: 'SwapRequested',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'fromToken', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'toToken', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'totalAmount', type: 'uint256' },
+    ],
+    name: 'TWAPSwapCanceled',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'fromToken', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'toToken', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'totalAmount', type: 'uint256' },
+    ],
+    name: 'TWAPSwapRequested',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'token', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'budget', type: 'uint256' },
+    ],
+    name: 'UpdatedTokenBudget',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'address', name: 'token', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'Bridge',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'bytes', name: 'proof', type: 'bytes' },
+    ],
+    name: 'Exit',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [],
+    name: 'FailedToSendETH',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'address', name: 'token', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'WithdrawToCollector',
+    type: 'event',
+  },
 ];
