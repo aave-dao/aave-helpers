@@ -2373,4 +2373,646 @@ export const eventDb: AbiEvent[] = [
     name: 'WithdrawToCollector',
     type: 'event',
   },
+  // ============================================================
+  // Aave V4 — Hub events (IHubBase)
+  // ============================================================
+  {
+    type: 'event',
+    name: 'Add',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'shares', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'Remove',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'shares', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'Draw',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'drawnShares', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'drawnAmount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'Restore',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'drawnShares', type: 'uint256' },
+      {
+        indexed: false,
+        internalType: 'struct IHubBase.PremiumDelta',
+        name: 'premiumDelta',
+        type: 'tuple',
+        components: [
+          { internalType: 'int256', name: 'sharesDelta', type: 'int256' },
+          { internalType: 'int256', name: 'offsetRayDelta', type: 'int256' },
+          { internalType: 'uint256', name: 'restoredPremiumRay', type: 'uint256' },
+        ],
+      },
+      { indexed: false, internalType: 'uint256', name: 'drawnAmount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'premiumAmount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'RefreshPremium',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'struct IHubBase.PremiumDelta',
+        name: 'premiumDelta',
+        type: 'tuple',
+        components: [
+          { internalType: 'int256', name: 'sharesDelta', type: 'int256' },
+          { internalType: 'int256', name: 'offsetRayDelta', type: 'int256' },
+          { internalType: 'uint256', name: 'restoredPremiumRay', type: 'uint256' },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'ReportDeficit',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'drawnShares', type: 'uint256' },
+      {
+        indexed: false,
+        internalType: 'struct IHubBase.PremiumDelta',
+        name: 'premiumDelta',
+        type: 'tuple',
+        components: [
+          { internalType: 'int256', name: 'sharesDelta', type: 'int256' },
+          { internalType: 'int256', name: 'offsetRayDelta', type: 'int256' },
+          { internalType: 'uint256', name: 'restoredPremiumRay', type: 'uint256' },
+        ],
+      },
+      { indexed: false, internalType: 'uint256', name: 'deficitAmountRay', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'TransferShares',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'sender', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'receiver', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'shares', type: 'uint256' },
+    ],
+  },
+  // ============================================================
+  // Aave V4 — Hub events (IHub)
+  // ============================================================
+  {
+    type: 'event',
+    name: 'AddAsset',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'underlying', type: 'address' },
+      { indexed: false, internalType: 'uint8', name: 'decimals', type: 'uint8' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'UpdateAsset',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'drawnIndex', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'drawnRate', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'accruedFees', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'UpdateAssetConfig',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      {
+        indexed: false,
+        internalType: 'struct IHub.AssetConfig',
+        name: 'config',
+        type: 'tuple',
+        components: [
+          { internalType: 'address', name: 'feeReceiver', type: 'address' },
+          { internalType: 'uint16', name: 'liquidityFee', type: 'uint16' },
+          { internalType: 'address', name: 'irStrategy', type: 'address' },
+          { internalType: 'address', name: 'reinvestmentController', type: 'address' },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'AddSpoke',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'UpdateSpokeConfig',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'struct IHub.SpokeConfig',
+        name: 'config',
+        type: 'tuple',
+        components: [
+          { internalType: 'uint40', name: 'addCap', type: 'uint40' },
+          { internalType: 'uint40', name: 'drawCap', type: 'uint40' },
+          { internalType: 'uint24', name: 'riskPremiumThreshold', type: 'uint24' },
+          { internalType: 'bool', name: 'active', type: 'bool' },
+          { internalType: 'bool', name: 'halted', type: 'bool' },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'MintFeeShares',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'feeReceiver', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'shares', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'assets', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'Sweep',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'reinvestmentController', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'Reclaim',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'reinvestmentController', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'EliminateDeficit',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'callerSpoke', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'coveredSpoke', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'shares', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'deficitAmountRay', type: 'uint256' },
+    ],
+  },
+  // ============================================================
+  // Aave V4 — Hub events (IAssetInterestRateStrategy)
+  // ============================================================
+  {
+    type: 'event',
+    name: 'UpdateInterestRateData',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'hub', type: 'address' },
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'optimalUsageRatio', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'baseDrawnRate', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'rateGrowthBeforeOptimal', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'rateGrowthAfterOptimal', type: 'uint256' },
+    ],
+  },
+  // ============================================================
+  // Aave V4 — Spoke events (ISpoke)
+  // ============================================================
+  {
+    type: 'event',
+    name: 'SetSpokeImmutables',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'oracle', type: 'address' },
+      { indexed: false, internalType: 'uint16', name: 'maxUserReservesLimit', type: 'uint16' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'UpdateLiquidationConfig',
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'struct ISpoke.LiquidationConfig',
+        name: 'config',
+        type: 'tuple',
+        components: [
+          { internalType: 'uint128', name: 'targetHealthFactor', type: 'uint128' },
+          { internalType: 'uint64', name: 'healthFactorForMaxBonus', type: 'uint64' },
+          { internalType: 'uint16', name: 'liquidationBonusFactor', type: 'uint16' },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'AddReserve',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'hub', type: 'address' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'UpdateReserveConfig',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      {
+        indexed: false,
+        internalType: 'struct ISpoke.ReserveConfig',
+        name: 'config',
+        type: 'tuple',
+        components: [
+          { internalType: 'uint24', name: 'collateralRisk', type: 'uint24' },
+          { internalType: 'bool', name: 'paused', type: 'bool' },
+          { internalType: 'bool', name: 'frozen', type: 'bool' },
+          { internalType: 'bool', name: 'borrowable', type: 'bool' },
+          { internalType: 'bool', name: 'receiveSharesEnabled', type: 'bool' },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'UpdateReservePriceSource',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'priceSource', type: 'address' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'AddDynamicReserveConfig',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: true, internalType: 'uint32', name: 'dynamicConfigKey', type: 'uint32' },
+      {
+        indexed: false,
+        internalType: 'struct ISpoke.DynamicReserveConfig',
+        name: 'config',
+        type: 'tuple',
+        components: [
+          { internalType: 'uint16', name: 'collateralFactor', type: 'uint16' },
+          { internalType: 'uint32', name: 'maxLiquidationBonus', type: 'uint32' },
+          { internalType: 'uint16', name: 'liquidationFee', type: 'uint16' },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'UpdateDynamicReserveConfig',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: true, internalType: 'uint32', name: 'dynamicConfigKey', type: 'uint32' },
+      {
+        indexed: false,
+        internalType: 'struct ISpoke.DynamicReserveConfig',
+        name: 'config',
+        type: 'tuple',
+        components: [
+          { internalType: 'uint16', name: 'collateralFactor', type: 'uint16' },
+          { internalType: 'uint32', name: 'maxLiquidationBonus', type: 'uint32' },
+          { internalType: 'uint16', name: 'liquidationFee', type: 'uint16' },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'UpdatePositionManager',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'positionManager', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'active', type: 'bool' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'Supply',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'suppliedShares', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'suppliedAmount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'Withdraw',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'withdrawnShares', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'withdrawnAmount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'Borrow',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'drawnShares', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'drawnAmount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'Repay',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'drawnShares', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'totalAmountRepaid', type: 'uint256' },
+      {
+        indexed: false,
+        internalType: 'struct IHubBase.PremiumDelta',
+        name: 'premiumDelta',
+        type: 'tuple',
+        components: [
+          { internalType: 'int256', name: 'sharesDelta', type: 'int256' },
+          { internalType: 'int256', name: 'offsetRayDelta', type: 'int256' },
+          { internalType: 'uint256', name: 'restoredPremiumRay', type: 'uint256' },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'LiquidationCall',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'collateralReserveId', type: 'uint256' },
+      { indexed: true, internalType: 'uint256', name: 'debtReserveId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'liquidator', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'receiveShares', type: 'bool' },
+      { indexed: false, internalType: 'uint256', name: 'debtAmountRestored', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'drawnSharesLiquidated', type: 'uint256' },
+      {
+        indexed: false,
+        internalType: 'struct IHubBase.PremiumDelta',
+        name: 'premiumDelta',
+        type: 'tuple',
+        components: [
+          { internalType: 'int256', name: 'sharesDelta', type: 'int256' },
+          { internalType: 'int256', name: 'offsetRayDelta', type: 'int256' },
+          { internalType: 'uint256', name: 'restoredPremiumRay', type: 'uint256' },
+        ],
+      },
+      { indexed: false, internalType: 'uint256', name: 'collateralAmountRemoved', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'collateralSharesLiquidated', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'collateralSharesToLiquidator', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'SetUsingAsCollateral',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'usingAsCollateral', type: 'bool' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'UpdateUserRiskPremium',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'riskPremium', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'RefreshAllUserDynamicConfig',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'RefreshSingleUserDynamicConfig',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'SetUserPositionManager',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'positionManager', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'approve', type: 'bool' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'RefreshPremiumDebt',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'struct IHubBase.PremiumDelta',
+        name: 'premiumDelta',
+        type: 'tuple',
+        components: [
+          { internalType: 'int256', name: 'sharesDelta', type: 'int256' },
+          { internalType: 'int256', name: 'offsetRayDelta', type: 'int256' },
+          { internalType: 'uint256', name: 'restoredPremiumRay', type: 'uint256' },
+        ],
+      },
+    ],
+  },
+  // ============================================================
+  // Aave V4 — Spoke events (IAaveOracle)
+  // ============================================================
+  {
+    type: 'event',
+    name: 'UpdateReserveSource',
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'source', type: 'address' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'SetSpoke',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+    ],
+  },
+  // ============================================================
+  // Aave V4 — Spoke events (ITokenizationSpoke)
+  // ============================================================
+  {
+    type: 'event',
+    name: 'SetTokenizationSpokeImmutables',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'hub', type: 'address' },
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+    ],
+  },
+  // ============================================================
+  // Aave V4 — Position Manager events (IPositionManagerBase)
+  // ============================================================
+  {
+    type: 'event',
+    name: 'RegisterSpoke',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'registered', type: 'bool' },
+    ],
+  },
+  // ============================================================
+  // Aave V4 — Position Manager events (IConfigPositionManager)
+  // ============================================================
+  {
+    type: 'event',
+    name: 'UpdateConfigPermissions',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'delegator', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'delegatee', type: 'address' },
+      { indexed: false, internalType: 'uint8', name: 'oldPermissions', type: 'uint8' },
+      { indexed: false, internalType: 'uint8', name: 'newPermissions', type: 'uint8' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'SetUsingAsCollateralOnBehalfOf',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'onBehalfOf', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: false, internalType: 'bool', name: 'usingAsCollateral', type: 'bool' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'UpdateUserRiskPremiumOnBehalfOf',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'onBehalfOf', type: 'address' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'UpdateUserDynamicConfigOnBehalfOf',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'onBehalfOf', type: 'address' },
+    ],
+  },
+  // ============================================================
+  // Aave V4 — Position Manager events (IGiverPositionManager)
+  // ============================================================
+  {
+    type: 'event',
+    name: 'SupplyOnBehalfOf',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'onBehalfOf', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'suppliedShares', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'suppliedAmount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'RepayOnBehalfOf',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'onBehalfOf', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'repaidShares', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'repaidAmount', type: 'uint256' },
+    ],
+  },
+  // ============================================================
+  // Aave V4 — Position Manager events (ITakerPositionManager)
+  // ============================================================
+  {
+    type: 'event',
+    name: 'WithdrawApproval',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'owner', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'spender', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'BorrowApproval',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: true, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'owner', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'spender', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'WithdrawOnBehalfOf',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'onBehalfOf', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'withdrawnShares', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'withdrawnAmount', type: 'uint256' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'BorrowOnBehalfOf',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'spoke', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'onBehalfOf', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'reserveId', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'drawnShares', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'drawnAmount', type: 'uint256' },
+    ],
+  },
 ];
