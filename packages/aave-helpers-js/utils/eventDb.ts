@@ -3015,4 +3015,113 @@ export const eventDb: AbiEvent[] = [
       { indexed: false, internalType: 'uint256', name: 'drawnAmount', type: 'uint256' },
     ],
   },
+  // ============================================================
+  // OpenZeppelin AccessManager events (IAccessManager.sol)
+  // ============================================================
+  {
+    type: 'event',
+    name: 'OperationScheduled',
+    inputs: [
+      { indexed: true, internalType: 'bytes32', name: 'operationId', type: 'bytes32' },
+      { indexed: true, internalType: 'uint32', name: 'nonce', type: 'uint32' },
+      { indexed: false, internalType: 'uint48', name: 'schedule', type: 'uint48' },
+      { indexed: false, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'target', type: 'address' },
+      { indexed: false, internalType: 'bytes', name: 'data', type: 'bytes' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'OperationExecuted',
+    inputs: [
+      { indexed: true, internalType: 'bytes32', name: 'operationId', type: 'bytes32' },
+      { indexed: true, internalType: 'uint32', name: 'nonce', type: 'uint32' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'OperationCanceled',
+    inputs: [
+      { indexed: true, internalType: 'bytes32', name: 'operationId', type: 'bytes32' },
+      { indexed: true, internalType: 'uint32', name: 'nonce', type: 'uint32' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'RoleLabel',
+    inputs: [
+      { indexed: true, internalType: 'uint64', name: 'roleId', type: 'uint64' },
+      { indexed: false, internalType: 'string', name: 'label', type: 'string' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'RoleGranted',
+    inputs: [
+      { indexed: true, internalType: 'uint64', name: 'roleId', type: 'uint64' },
+      { indexed: true, internalType: 'address', name: 'account', type: 'address' },
+      { indexed: false, internalType: 'uint32', name: 'delay', type: 'uint32' },
+      { indexed: false, internalType: 'uint48', name: 'since', type: 'uint48' },
+      { indexed: false, internalType: 'bool', name: 'newMember', type: 'bool' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'RoleRevoked',
+    inputs: [
+      { indexed: true, internalType: 'uint64', name: 'roleId', type: 'uint64' },
+      { indexed: true, internalType: 'address', name: 'account', type: 'address' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'RoleAdminChanged',
+    inputs: [
+      { indexed: true, internalType: 'uint64', name: 'roleId', type: 'uint64' },
+      { indexed: true, internalType: 'uint64', name: 'admin', type: 'uint64' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'RoleGuardianChanged',
+    inputs: [
+      { indexed: true, internalType: 'uint64', name: 'roleId', type: 'uint64' },
+      { indexed: true, internalType: 'uint64', name: 'guardian', type: 'uint64' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'RoleGrantDelayChanged',
+    inputs: [
+      { indexed: true, internalType: 'uint64', name: 'roleId', type: 'uint64' },
+      { indexed: false, internalType: 'uint32', name: 'delay', type: 'uint32' },
+      { indexed: false, internalType: 'uint48', name: 'since', type: 'uint48' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'TargetClosed',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'target', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'closed', type: 'bool' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'TargetFunctionRoleUpdated',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'target', type: 'address' },
+      { indexed: false, internalType: 'bytes4', name: 'selector', type: 'bytes4' },
+      { indexed: true, internalType: 'uint64', name: 'roleId', type: 'uint64' },
+    ],
+  },
+  {
+    type: 'event',
+    name: 'TargetAdminDelayUpdated',
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'target', type: 'address' },
+      { indexed: false, internalType: 'uint32', name: 'delay', type: 'uint32' },
+      { indexed: false, internalType: 'uint48', name: 'since', type: 'uint48' },
+    ],
+  },
 ];
