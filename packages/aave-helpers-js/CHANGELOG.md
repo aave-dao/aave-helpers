@@ -1,5 +1,17 @@
 # @aave-dao/aave-helpers-js
 
+## 1.0.11
+
+### Patch Changes
+
+- 46cb536: Add new events from SwapSteward and Bridge
+
+## 1.0.10
+
+### Patch Changes
+
+- 53dca12: Added missing umbrella events
+
 ## 1.0.9
 
 ### Patch Changes

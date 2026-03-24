@@ -86,39 +86,34 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
     string memory afterString = string(abi.encodePacked(reportName, '_after'));
 
-    uint256 startGas = gasleft();
+    {
+      uint256 startGas = gasleft();
 
-    vm.startStateDiffRecording();
-    vm.recordLogs();
+      vm.startStateDiffRecording();
+      vm.recordLogs();
 
-    executePayload(vm, payload, pool);
+      executePayload(vm, payload, pool);
 
-    uint256 gasUsed = startGas - gasleft();
-    assertLt(gasUsed, (block.gaslimit * 95) / 100, 'BLOCK_GAS_LIMIT_EXCEEDED'); // 5% is kept as a buffer
+      uint256 gasUsed = startGas - gasleft();
+      assertLt(gasUsed, (block.gaslimit * 95) / 100, 'BLOCK_GAS_LIMIT_EXCEEDED'); // 5% is kept as a buffer
+    }
 
+    string memory rawDiff = vm.getStateDiffJson();
+    string memory logsJson = vm.getRecordedLogsJson();
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
 
+    // as executor does delegateCall to the payload, the executor should have no storage changes
     {
-      string memory rawDiff = vm.getStateDiffJson();
-
-      // as executor does delegateCall to the payload, the executor should have no storage changes
-      {
-        IPayloadsControllerCore pc = GovV3Helpers.getPayloadsController(pool, block.chainid);
-        _validateNoExecutorStorageChange(
-          rawDiff,
-          pc
-            .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
-            .executor
-        );
-      }
-      vm.writeJson(rawDiff, string(abi.encodePacked('./reports/', afterString, '.json')), '$.raw');
-      string memory logsJson = vm.getRecordedLogsJson();
-      vm.writeJson(
-        logsJson,
-        string(abi.encodePacked('./reports/', afterString, '.json')),
-        '$.logs'
+      IPayloadsControllerCore pc = GovV3Helpers.getPayloadsController(pool, block.chainid);
+      _validateNoExecutorStorageChange(
+        rawDiff,
+        pc
+          .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
+          .executor
       );
     }
+    vm.writeJson(rawDiff, string(abi.encodePacked('./reports/', afterString, '.json')), '$.raw');
+    vm.writeJson(logsJson, string(abi.encodePacked('./reports/', afterString, '.json')), '$.logs');
 
     diffReports(beforeString, afterString);
     if (runSeatbelt) {
