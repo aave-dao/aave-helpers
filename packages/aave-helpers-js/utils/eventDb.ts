@@ -2373,4 +2373,12 @@ export const eventDb: AbiEvent[] = [
     name: 'WithdrawToCollector',
     type: 'event',
   },
+  {"anonymous":false,"inputs":[],"name":"Closed","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"usr","type":"address"}],"name":"Deny","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"l1Token","type":"address"},{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"DepositFinalized","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"usr","type":"address"}],"name":"Rely","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"id","type":"uint256"},{"indexed":false,"internalType":"bytes","name":"data","type":"bytes"}],"name":"TxToL1","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"l1Token","type":"address"},{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":true,"internalType":"uint256","name":"l2ToL1Id","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"exitNum","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"WithdrawalInitiated","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"l2sender","type":"address"},{"indexed":false,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"l2block","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"l1block","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"},{"indexed":false,"internalType":"bytes","name":"data","type":"bytes"}],"name":"Exit","type":"event"},
+  {"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"l1Address","type":"address"},{"indexed":true,"internalType":"address","name":"l2Address","type":"address"}],"name":"TokenSet","type":"event"},
 ];
