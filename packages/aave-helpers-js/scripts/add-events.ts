@@ -17,8 +17,13 @@ import { eventDb } from '../utils/eventDb';
 
 const EVENT_DB_PATH = join(import.meta.dirname, '..', 'utils', 'eventDb.ts');
 
-function getEventSignatures(events: AbiEvent[]): Set<string> {
-  return new Set(events.map((e) => toEventSignature(e)));
+function eventKey(e: AbiEvent): string {
+  const inputs = (e.inputs || []).map((i) => `${i.type}:${!!i.indexed}`).join(',');
+  return `${e.name}(${inputs})`;
+}
+
+function getEventKeys(events: AbiEvent[]): Set<string> {
+  return new Set(events.map(eventKey));
 }
 
 async function fetchEvents(chainId: number, address: `0x${string}`): Promise<AbiEvent[]> {
@@ -68,15 +73,15 @@ async function main() {
   const fetchedEvents = await fetchEvents(chainId, address as `0x${string}`);
   console.log(`Found ${fetchedEvents.length} events in contract ABI`);
 
-  const existingSignatures = getEventSignatures(eventDb);
-  const newEvents = fetchedEvents.filter((e) => !existingSignatures.has(toEventSignature(e)));
+  const existingKeys = getEventKeys(eventDb);
+  const newEvents = fetchedEvents.filter((e) => !existingKeys.has(eventKey(e)));
 
   // Deduplicate within new events
   const seen = new Set<string>();
   const uniqueNewEvents = newEvents.filter((e) => {
-    const sig = toEventSignature(e);
-    if (seen.has(sig)) return false;
-    seen.add(sig);
+    const key = eventKey(e);
+    if (seen.has(key)) return false;
+    seen.add(key);
     return true;
   });
 

@@ -2432,4 +2432,13 @@ export const eventDb: AbiEvent[] = [
     name: 'Exit',
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'token', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'Bridge',
+    type: 'event',
+  },
 ];
