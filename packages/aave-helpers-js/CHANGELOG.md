@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.0.13
+
+### Patch Changes
+
+- 7638dc0: Revert partial decoding
+
 ## 1.0.12
 
 ### Patch Changes
