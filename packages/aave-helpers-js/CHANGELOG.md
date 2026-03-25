@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.0.12
+
+### Patch Changes
+
+- 8510b30: update toolbox
+
 ## 1.0.11
 
 ### Patch Changes
