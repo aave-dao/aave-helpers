@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LicenseRef-BUSL
 pragma solidity ^0.8.0;
 
-import {ISpoke} from './ISpoke.sol';
+import {ISpoke} from 'src/dependencies/v4/interfaces/ISpoke.sol';
 
 /// @title ISpokeConfigurator
 /// @author Aave Labs

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LicenseRef-BUSL
 pragma solidity ^0.8.0;
 
-import {IPriceOracle} from './IPriceOracle.sol';
+import {IPriceOracle} from 'src/dependencies/v4/interfaces/IPriceOracle.sol';
 
 /// @title IAaveOracle
 /// @author Aave Labs

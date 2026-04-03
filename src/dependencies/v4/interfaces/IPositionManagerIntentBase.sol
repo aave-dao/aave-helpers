@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: LicenseRef-BUSL
 pragma solidity ^0.8.0;
 
-import {IIntentConsumer} from './IIntentConsumer.sol';
-import {IPositionManagerBase} from './IPositionManagerBase.sol';
+import {IIntentConsumer} from 'src/dependencies/v4/interfaces/IIntentConsumer.sol';
+import {IPositionManagerBase} from 'src/dependencies/v4/interfaces/IPositionManagerBase.sol';
 
 /// @title IPositionManagerIntentBase
 /// @author Aave Labs

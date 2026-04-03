@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LicenseRef-BUSL
 pragma solidity ^0.8.0;
 
-import {INoncesKeyed} from './INoncesKeyed.sol';
+import {INoncesKeyed} from 'src/dependencies/v4/interfaces/INoncesKeyed.sol';
 
 /// @title IIntentConsumer
 /// @author Aave Labs

@@ -4,21 +4,26 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
-import {ISpoke} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/ISpoke.sol';
-import {IHub} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/IHub.sol';
-import {ITokenizationSpoke} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/ITokenizationSpoke.sol';
-import {INativeTokenGateway} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/INativeTokenGateway.sol';
-import {ISignatureGateway} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/ISignatureGateway.sol';
-import {IGiverPositionManager} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/IGiverPositionManager.sol';
-import {ITakerPositionManager} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/ITakerPositionManager.sol';
-import {IConfigPositionManager} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/IConfigPositionManager.sol';
-import {AaveV4EthereumPositionManagers, AaveV4EthereumTokenizationSpokes, AaveV4EthereumHubs} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/AaveV4EthereumAddresses.sol';
-import {GovV3Helpers, ChainIds} from 'aave-helpers/src/GovV3Helpers.sol';
-import {Types} from './Types.sol';
-import {SnapshotV4} from './SnapshotV4.sol';
-import {Scenarios} from './Scenarios.sol';
-import {TokenizationScenarios} from './TokenizationScenarios.sol';
-import {GatewayScenarios} from './GatewayScenarios.sol';
+
+import {ISpoke} from 'src/dependencies/v4/interfaces/ISpoke.sol';
+import {IHub} from 'src/dependencies/v4/interfaces/IHub.sol';
+import {ITokenizationSpoke} from 'src/dependencies/v4/interfaces/ITokenizationSpoke.sol';
+import {INativeTokenGateway} from 'src/dependencies/v4/interfaces/INativeTokenGateway.sol';
+import {ISignatureGateway} from 'src/dependencies/v4/interfaces/ISignatureGateway.sol';
+import {IGiverPositionManager} from 'src/dependencies/v4/interfaces/IGiverPositionManager.sol';
+import {ITakerPositionManager} from 'src/dependencies/v4/interfaces/ITakerPositionManager.sol';
+import {IConfigPositionManager} from 'src/dependencies/v4/interfaces/IConfigPositionManager.sol';
+import {
+  AaveV4EthereumPositionManagers,
+  AaveV4EthereumTokenizationSpokes,
+  AaveV4EthereumHubs
+} from 'src/dependencies/v4/AaveV4EthereumAddresses.sol';
+import {GovV3Helpers, ChainIds} from 'src/GovV3Helpers.sol';
+import {Types} from 'src/dependencies/v4/Types.sol';
+import {SnapshotV4} from 'src/dependencies/v4/SnapshotV4.sol';
+import {Scenarios} from 'src/dependencies/v4/Scenarios.sol';
+import {TokenizationScenarios} from 'src/dependencies/v4/TokenizationScenarios.sol';
+import {GatewayScenarios} from 'src/dependencies/v4/GatewayScenarios.sol';
 
 /// @title ProtocolV4TestBase
 /// @notice E2E test base for Aave V4 hub/spoke architecture.

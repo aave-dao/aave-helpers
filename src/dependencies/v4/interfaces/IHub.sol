@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LicenseRef-BUSL
 pragma solidity ^0.8.0;
 
-import {IHubBase} from './IHubBase.sol';
+import {IHubBase} from 'src/dependencies/v4/interfaces/IHubBase.sol';
 
 /// @title IHub
 /// @author Aave Labs

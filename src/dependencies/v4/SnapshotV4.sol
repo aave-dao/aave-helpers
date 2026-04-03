@@ -3,13 +3,13 @@ pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
 import {IERC20Metadata} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
-import {ISpoke} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/ISpoke.sol';
-import {IHub} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/IHub.sol';
-import {IAaveOracle} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/IAaveOracle.sol';
-import {IAssetInterestRateStrategy} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/IAssetInterestRateStrategy.sol';
-import {Types} from './Types.sol';
-import {V4DiffWriter} from './V4DiffWriter.sol';
-import {Helpers} from './Helpers.sol';
+import {ISpoke} from 'src/dependencies/v4/interfaces/ISpoke.sol';
+import {IHub} from 'src/dependencies/v4/interfaces/IHub.sol';
+import {IAaveOracle} from 'src/dependencies/v4/interfaces/IAaveOracle.sol';
+import {IAssetInterestRateStrategy} from 'src/dependencies/v4/interfaces/IAssetInterestRateStrategy.sol';
+import {Types} from 'src/dependencies/v4/Types.sol';
+import {V4DiffWriter} from 'src/dependencies/v4/V4DiffWriter.sol';
+import {Helpers} from 'src/dependencies/v4/Helpers.sol';
 
 /// @title SnapshotV4
 /// @notice Snapshot capture for Aave V4. JSON + markdown diff delegated to V4DiffWriter.

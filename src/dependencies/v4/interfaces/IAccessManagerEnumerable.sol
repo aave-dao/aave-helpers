@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LicenseRef-BUSL
 pragma solidity ^0.8.0;
 
-import {IAccessManager} from './IAccessManager.sol';
+import {IAccessManager} from 'src/dependencies/v4/interfaces/IAccessManager.sol';
 
 /// @title IAccessManagerEnumerable
 /// @author Aave Labs

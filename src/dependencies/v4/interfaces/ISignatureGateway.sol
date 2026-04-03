@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LicenseRef-BUSL
 pragma solidity ^0.8.0;
 
-import {IPositionManagerIntentBase} from './IPositionManagerIntentBase.sol';
+import {IPositionManagerIntentBase} from 'src/dependencies/v4/interfaces/IPositionManagerIntentBase.sol';
 
 /// @title ISignatureGateway
 /// @author Aave Labs

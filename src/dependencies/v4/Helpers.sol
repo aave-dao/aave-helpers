@@ -2,12 +2,12 @@
 pragma solidity ^0.8.0;
 
 import {IERC20Metadata} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
-import {ISpoke} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/ISpoke.sol';
-import {IHubConfigurator} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/IHubConfigurator.sol';
-import {IAaveOracle} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/IAaveOracle.sol';
-import {AaveV4EthereumAddresses} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/AaveV4EthereumAddresses.sol';
-import {Types} from './Types.sol';
-import {Actions} from './Actions.sol';
+import {ISpoke} from 'src/dependencies/v4/interfaces/ISpoke.sol';
+import {IHubConfigurator} from 'src/dependencies/v4/interfaces/IHubConfigurator.sol';
+import {IAaveOracle} from 'src/dependencies/v4/interfaces/IAaveOracle.sol';
+import {AaveV4EthereumAddresses} from 'src/dependencies/v4/AaveV4EthereumAddresses.sol';
+import {Types} from 'src/dependencies/v4/Types.sol';
+import {Actions} from 'src/dependencies/v4/Actions.sol';
 
 /// @title Helpers
 /// @notice Query and utility functions for V4 e2e tests.

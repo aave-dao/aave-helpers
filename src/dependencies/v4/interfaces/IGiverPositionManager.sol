@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LicenseRef-BUSL
 pragma solidity ^0.8.0;
 
-import {IPositionManagerBase} from './IPositionManagerBase.sol';
+import {IPositionManagerBase} from 'src/dependencies/v4/interfaces/IPositionManagerBase.sol';
 
 /// @title IGiverPositionManager
 /// @author Aave Labs

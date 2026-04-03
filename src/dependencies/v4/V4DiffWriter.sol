@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {Vm} from 'forge-std/Vm.sol';
-import {Types} from './Types.sol';
+import {Types} from 'src/dependencies/v4/Types.sol';
 
 /// @title V4DiffWriter
 /// @notice Internal library for V4 JSON serialization and markdown diff generation.

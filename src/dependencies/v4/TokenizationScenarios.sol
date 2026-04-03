@@ -4,12 +4,12 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
-import {ITokenizationSpoke} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/ITokenizationSpoke.sol';
-import {IHub} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/IHub.sol';
-import {IHubConfigurator} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/interfaces/IHubConfigurator.sol';
-import {AaveV4EthereumAddresses} from 'src/20260319_AaveV4Ethereum_ActivateV4Ethereum/AaveV4EthereumAddresses.sol';
-import {Types} from './Types.sol';
-import {TokenizationActions} from './TokenizationActions.sol';
+import {ITokenizationSpoke} from 'src/dependencies/v4/interfaces/ITokenizationSpoke.sol';
+import {IHub} from 'src/dependencies/v4/interfaces/IHub.sol';
+import {IHubConfigurator} from 'src/dependencies/v4/interfaces/IHubConfigurator.sol';
+import {AaveV4EthereumAddresses} from 'src/dependencies/v4/AaveV4EthereumAddresses.sol';
+import {Types} from 'src/dependencies/v4/Types.sol';
+import {TokenizationActions} from 'src/dependencies/v4/TokenizationActions.sol';
 
 /// @title TokenizationScenarios
 /// @notice Test scenario orchestration for tokenization spoke (ERC4626) e2e tests.

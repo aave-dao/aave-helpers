@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LicenseRef-BUSL
 pragma solidity ^0.8.0;
 
-import {IBasicInterestRateStrategy} from './IBasicInterestRateStrategy.sol';
+import {IBasicInterestRateStrategy} from 'src/dependencies/v4/interfaces/IBasicInterestRateStrategy.sol';
 
 /// @title IAssetInterestRateStrategy
 /// @author Aave Labs

@@ -3,7 +3,7 @@
 
 pragma solidity >=0.6.2;
 
-import {IERC20} from './IERC20.sol';
+import {IERC20} from 'src/dependencies/v4/interfaces/IERC20.sol';
 
 /**
  * @dev Interface for the optional metadata functions from the ERC-20 standard.

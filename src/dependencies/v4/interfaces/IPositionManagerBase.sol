@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: LicenseRef-BUSL
 pragma solidity ^0.8.0;
 
-import {IMulticall} from './IMulticall.sol';
-import {IRescuable} from './IRescuable.sol';
+import {IMulticall} from 'src/dependencies/v4/interfaces/IMulticall.sol';
+import {IRescuable} from 'src/dependencies/v4/interfaces/IRescuable.sol';
 
 /// @title IPositionManagerBase
 /// @author Aave Labs

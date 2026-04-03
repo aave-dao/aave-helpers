@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: LicenseRef-BUSL
 pragma solidity ^0.8.0;
 
-import {IERC2612, IERC20Permit} from './IERC2612.sol';
-import {IERC4626} from './IERC4626.sol';
-import {IIntentConsumer} from './IIntentConsumer.sol';
+import {IERC2612, IERC20Permit} from 'src/dependencies/v4/interfaces/IERC2612.sol';
+import {IERC4626} from 'src/dependencies/v4/interfaces/IERC4626.sol';
+import {IIntentConsumer} from 'src/dependencies/v4/interfaces/IIntentConsumer.sol';
 
 /// @title ITokenizationSpoke
 /// @author Aave Labs
