@@ -1,0 +1,79 @@
+src/dependencies/v4/interfaces/IERC20Metadata.sol
+  c52c9050306ca179 6
+src/dependencies/v4/GatewayScenarios.sol
+  c52c9050306ca179 7-13
+src/dependencies/v4/TokenizationActions.sol
+  c52c9050306ca179 7-11
+src/dependencies/v4/interfaces/IHubConfigurator.sol
+  c52c9050306ca179 4
+src/dependencies/v4/interfaces/IGiverPositionManager.sol
+  c52c9050306ca179 4
+src/dependencies/v4/interfaces/ISpokeConfigurator.sol
+  c52c9050306ca179 4
+src/dependencies/v4/interfaces/IAssetInterestRateStrategy.sol
+  c52c9050306ca179 4
+src/ProtocolV4TestBase.sol
+  c52c9050306ca179 8-26
+src/dependencies/v4/interfaces/IERC4626.sol
+  c52c9050306ca179 6-7
+src/dependencies/v4/interfaces/IERC2612.sol
+  c52c9050306ca179 6
+src/dependencies/v4/SnapshotV4.sol
+  c52c9050306ca179 6-12
+src/dependencies/v4/interfaces/ITokenizationSpoke.sol
+  c52c9050306ca179 4-6
+src/dependencies/v4/interfaces/IConfigPositionManager.sol
+  c52c9050306ca179 4
+src/dependencies/v4/interfaces/IIntentConsumer.sol
+  c52c9050306ca179 4
+src/dependencies/v4/Actions.sol
+  c52c9050306ca179 7-10
+src/dependencies/v4/interfaces/IAccessManagerEnumerable.sol
+  c52c9050306ca179 4
+src/dependencies/v4/Scenarios.sol
+  c52c9050306ca179 7-14
+src/dependencies/v4/interfaces/ISignatureGateway.sol
+  c52c9050306ca179 4
+src/dependencies/v4/Helpers.sol
+  c52c9050306ca179 5-10
+src/dependencies/v4/TokenizationScenarios.sol
+  c52c9050306ca179 7-12
+src/dependencies/v4/interfaces/IPositionManagerBase.sol
+  c52c9050306ca179 4-5
+src/dependencies/v4/V4DiffWriter.sol
+  c52c9050306ca179 5
+src/dependencies/v4/interfaces/IPositionManagerIntentBase.sol
+  c52c9050306ca179 4-5
+src/dependencies/v4/interfaces/IAaveOracle.sol
+  c52c9050306ca179 4
+src/dependencies/v4/interfaces/IHub.sol
+  c52c9050306ca179 4
+src/dependencies/v4/AaveV4EthereumAddresses.sol
+  c52c9050306ca179 1-3,6-7,14-16,24,29,73,151-153,228,264-266
+src/dependencies/v4/interfaces/INativeTokenGateway.sol
+  c52c9050306ca179 4
+src/dependencies/v4/interfaces/ISpoke.sol
+  c52c9050306ca179 4
+src/dependencies/v4/interfaces/ITakerPositionManager.sol
+  c52c9050306ca179 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "c748c345d3b120fac12e98ebee6c92e703c1dc24",
+  "prompts": {
+    "c52c9050306ca179": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eba64a46-73c7-4fd0-b2b6-6c827cc6223e",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 119,
+      "total_deletions": 83,
+      "accepted_lines": 105,
+      "overriden_lines": 12
+    }
+  }
+}
