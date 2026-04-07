@@ -107,17 +107,12 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
 
   /// @notice Test all reserves on every spoke in the array.
   function e2eTestAllSpokes(ISpoke[] memory spokes) public {
-    // for (uint256 i; i < spokes.length; i++) {
-    //   console.log('--- E2E: Testing spoke %s ---', address(spokes[i]));
-    //   console.log('--------------------------------');
-    //   e2eTestSpoke(spokes[i]);
-    //   e2eTestPositionManagers(spokes[i]);
-    // }
-    uint i = 1;
-    console.log('--- E2E: Testing spoke %s ---', address(spokes[i]));
-    console.log('--------------------------------');
-    e2eTestSpoke(spokes[i]);
-    e2eTestPositionManagers(spokes[i]);
+    for (uint256 i; i < spokes.length; i++) {
+      console.log('--- E2E: Testing spoke %s ---', address(spokes[i]));
+      console.log('--------------------------------');
+      e2eTestSpoke(spokes[i]);
+      e2eTestPositionManagers(spokes[i]);
+    }
   }
 
   /// @notice Test all reserves on one spoke, looping over ALL good collaterals, then gateway tests.

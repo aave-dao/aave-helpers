@@ -15,14 +15,7 @@ abstract contract Actions is CommonTestBase {
   using SafeERC20 for IERC20;
 
   uint256 constant HEALTH_FACTOR_LIQUIDATION_THRESHOLD = 1e18;
-
-  function _logAction(string memory action, string memory symbol, uint256 amount) internal pure {
-    if (amount == UINT256_MAX) {
-      console.log('%s: %s, Amount: UINT256_MAX', action, symbol);
-    } else {
-      console.log('%s: %s, Amount: %e', action, symbol, amount);
-    }
-  }
+  uint256 constant MAX_DEAL_UNIT = 1e12; // whole units not accounting for token decimals
 
   function _getUserAccounting(
     ISpoke spoke,
@@ -334,9 +327,10 @@ abstract contract Actions is CommonTestBase {
     );
 
     vm.startPrank(user);
-    // deal additional to ensure full repay possible
-    deal2(reserveInfo.underlying, user, amount * 2);
-    IERC20(reserveInfo.underlying).forceApprove(address(spoke), amount * 2);
+    // deal enough to cover full repay, capped to avoid overflow
+    uint256 maxDeal = _maxDealAmount(reserveInfo.decimals);
+    deal2(reserveInfo.underlying, user, maxDeal);
+    IERC20(reserveInfo.underlying).forceApprove(address(spoke), maxDeal);
     _logAction('REPAY', reserveInfo.symbol, amount);
     (uint256 returnedShares, uint256 returnedAssets) = spoke.repay({
       reserveId: reserveInfo.reserveId,
@@ -394,7 +388,7 @@ abstract contract Actions is CommonTestBase {
     assertGt(debtSnapshotBefore.user.totalDebt, 0, 'LIQUIDATE: borrower has no debt');
 
     vm.startPrank(liquidator);
-    uint256 dealAmount = debtSnapshotBefore.user.totalDebt * 2;
+    uint256 dealAmount = _maxDealAmount(debtInfo.decimals);
     deal2(debtInfo.underlying, liquidator, dealAmount);
     IERC20(debtInfo.underlying).forceApprove(address(spoke), debtToCover);
 
@@ -450,5 +444,17 @@ abstract contract Actions is CommonTestBase {
       collateralSnapshotBefore.user.collateralAssets,
       'LIQUIDATE: collateral did not decrease'
     );
+  }
+
+  function _maxDealAmount(uint8 decimals) internal pure returns (uint256) {
+    return MAX_DEAL_UNIT * 10 ** decimals;
+  }
+
+  function _logAction(string memory action, string memory symbol, uint256 amount) internal pure {
+    if (amount == UINT256_MAX) {
+      console.log('%s: %s, Amount: UINT256_MAX', action, symbol);
+    } else {
+      console.log('%s: %s, Amount: %e', action, symbol, amount);
+    }
   }
 }
