@@ -1,0 +1,38 @@
+src/dependencies/v4/Actions.sol
+  c52c9050306ca179 330-333,391,449-450
+src/ProtocolV4TestBase.sol
+  9b10e1ac8c008430 110-115
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "1e2643412b767ac431bad0c5e304dac19d21cfa6",
+  "prompts": {
+    "9b10e1ac8c008430": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "445bf424-d39e-4f34-bef5-14dcfad99464",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 6,
+      "total_deletions": 11,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    },
+    "c52c9050306ca179": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "eba64a46-73c7-4fd0-b2b6-6c827cc6223e",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 10,
+      "total_deletions": 4,
+      "accepted_lines": 8,
+      "overriden_lines": 1
+    }
+  }
+}
