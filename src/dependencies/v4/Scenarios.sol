@@ -433,6 +433,7 @@ abstract contract Scenarios is Helpers {
 
     // Skip if either debt or collateral is too small — partial liq leads to dust
     if (totalDebt <= minDebtAssets || totalCollateral <= minCollateralAssets) {
+      console.log('PARTIAL_LIQUIDATION: skipping, position too small after oracle manipulation');
       vm.revertToState(snapshot);
       return;
     }

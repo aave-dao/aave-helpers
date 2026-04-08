@@ -80,7 +80,7 @@ abstract contract TokenizationScenarios is TokenizationActions {
     // Partial withdraw
     uint256 userAssets = tokenizationSpoke.convertToAssets(tokenizationSpoke.balanceOf(user));
     uint256 snapshot = vm.snapshotState();
-    {
+    if (userAssets > 1) {
       uint256 partialWithdraw = vm.randomUint(1, userAssets - 1);
       _tokenizationWithdraw(tokenizationSpoke, reserveInfo, user, partialWithdraw);
       vm.revertToState(snapshot);
@@ -119,7 +119,7 @@ abstract contract TokenizationScenarios is TokenizationActions {
     uint256 userShares = tokenizationSpoke.balanceOf(user);
 
     // Partial redeem
-    {
+    if (userShares > 1) {
       uint256 postMintSnapshot = vm.snapshotState();
       uint256 partialRedeem = vm.randomUint(1, userShares - 1);
       _tokenizationRedeem(tokenizationSpoke, reserveInfo, user, partialRedeem);
