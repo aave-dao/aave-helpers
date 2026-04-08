@@ -6,8 +6,8 @@ import {Types} from 'src/dependencies/v4/Types.sol';
 
 /// @title V4DiffWriter
 /// @notice Internal library for V4 JSON serialization and markdown diff generation.
-///         Using an internal library means functions are inlined via delegatecall context,
-///         keeping cheatcodes working while avoiding stack-too-deep in the inheritance chain.
+/// Using an internal library means functions are inlined via delegatecall context,
+/// keeping cheatcodes working while avoiding stack-too-deep in the inheritance chain.
 library V4DiffWriter {
   Vm private constant vm = Vm(address(uint160(uint256(keccak256('hevm cheat code')))));
 

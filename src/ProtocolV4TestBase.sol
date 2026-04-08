@@ -27,10 +27,10 @@ import {GatewayScenarios} from 'src/dependencies/v4/GatewayScenarios.sol';
 
 /// @title ProtocolV4TestBase
 /// @notice E2E test base for Aave V4 hub/spoke architecture.
-///         Tests supply, withdraw, borrow, repay, and liquidation for each reserve on a spoke.
-///         Tests deposit, mint, withdraw, redeem for each tokenization spoke.
-///         Tests NativeTokenGateway and SignatureGateway for each spoke.
-///         Loops over all good collaterals and uses randomized amounts.
+/// Tests supply, withdraw, borrow, repay, and liquidation for each reserve on a spoke.
+/// Tests deposit, mint, withdraw, redeem for each tokenization spoke.
+/// Tests NativeTokenGateway and SignatureGateway for each spoke.
+/// Loops over all good collaterals and uses randomized amounts.
 contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, GatewayScenarios {
   using SafeERC20 for IERC20;
 
