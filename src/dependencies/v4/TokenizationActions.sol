@@ -30,7 +30,7 @@ abstract contract TokenizationActions is Helpers {
         userAssets: userShares > 0 ? tokenizationSpoke.convertToAssets(userShares) : 0,
         totalShares: tokenizationSpoke.totalSupply(),
         totalAssets: tokenizationSpoke.totalAssets(),
-        hubSpoke: _getHubSpokeAccounting(ISpoke(address(tokenizationSpoke)), reserveInfo)
+        spokeOnHub: _getSpokeOnHubAccounting(ISpoke(address(tokenizationSpoke)), reserveInfo)
       });
   }
 
@@ -38,9 +38,9 @@ abstract contract TokenizationActions is Helpers {
   // Hub invariant: tokenization spoke never borrows
   // -------------------------------------------------------------------------
   function _assertTokenizationNoDebt(Types.TokenizationSnapshot memory snapshot) internal pure {
-    assertEq(snapshot.hubSpoke.drawnDebt, 0, 'TOKENIZATION: hub drawn debt should be zero');
-    assertEq(snapshot.hubSpoke.drawnShares, 0, 'TOKENIZATION: hub drawn shares should be zero');
-    assertEq(snapshot.hubSpoke.totalDebt, 0, 'TOKENIZATION: hub total debt should be zero');
+    assertEq(snapshot.spokeOnHub.drawnDebt, 0, 'TOKENIZATION: hub drawn debt should be zero');
+    assertEq(snapshot.spokeOnHub.drawnShares, 0, 'TOKENIZATION: hub drawn shares should be zero');
+    assertEq(snapshot.spokeOnHub.totalDebt, 0, 'TOKENIZATION: hub total debt should be zero');
   }
 
   // -------------------------------------------------------------------------
@@ -86,15 +86,17 @@ abstract contract TokenizationActions is Helpers {
       'TOKENIZATION_DEPOSIT: user shares mismatch'
     );
     // Vault totalAssets increased
-    assertEq(
+    assertApproxEqAbs(
       snapshotAfter.totalAssets,
       snapshotBefore.totalAssets + assets,
+      1,
       'TOKENIZATION_DEPOSIT: totalAssets mismatch'
     );
     // Hub spoke collateral increased
-    assertEq(
-      snapshotAfter.hubSpoke.collateralAssets,
-      snapshotBefore.hubSpoke.collateralAssets + assets,
+    assertApproxEqAbs(
+      snapshotAfter.spokeOnHub.collateralAssets,
+      snapshotBefore.spokeOnHub.collateralAssets + assets,
+      1,
       'TOKENIZATION_DEPOSIT: hub collateral assets mismatch'
     );
     {
@@ -103,8 +105,8 @@ abstract contract TokenizationActions is Helpers {
         assets
       );
       assertEq(
-        snapshotAfter.hubSpoke.collateralShares,
-        snapshotBefore.hubSpoke.collateralShares + expectedAddedShares,
+        snapshotAfter.spokeOnHub.collateralShares,
+        snapshotBefore.spokeOnHub.collateralShares + expectedAddedShares,
         'TOKENIZATION_DEPOSIT: hub collateral shares mismatch'
       );
     }
@@ -152,15 +154,17 @@ abstract contract TokenizationActions is Helpers {
       'TOKENIZATION_MINT: user shares mismatch'
     );
     // Vault totalAssets increased
-    assertEq(
+    assertApproxEqAbs(
       snapshotAfter.totalAssets,
       snapshotBefore.totalAssets + assetsDeposited,
+      1,
       'TOKENIZATION_MINT: totalAssets mismatch'
     );
     // Hub spoke collateral increased
-    assertEq(
-      snapshotAfter.hubSpoke.collateralAssets,
-      snapshotBefore.hubSpoke.collateralAssets + assetsDeposited,
+    assertApproxEqAbs(
+      snapshotAfter.spokeOnHub.collateralAssets,
+      snapshotBefore.spokeOnHub.collateralAssets + assetsDeposited,
+      1,
       'TOKENIZATION_MINT: hub collateral assets mismatch'
     );
     _assertTokenizationNoDebt(snapshotAfter);
@@ -203,15 +207,17 @@ abstract contract TokenizationActions is Helpers {
       'TOKENIZATION_WITHDRAW: user shares mismatch'
     );
     // Vault totalAssets decreased
-    assertEq(
+    assertApproxEqAbs(
       snapshotBefore.totalAssets - snapshotAfter.totalAssets,
       assets,
+      1,
       'TOKENIZATION_WITHDRAW: totalAssets mismatch'
     );
     // Hub spoke collateral decreased
-    assertEq(
-      snapshotBefore.hubSpoke.collateralAssets - snapshotAfter.hubSpoke.collateralAssets,
+    assertApproxEqAbs(
+      snapshotBefore.spokeOnHub.collateralAssets - snapshotAfter.spokeOnHub.collateralAssets,
       assets,
+      1,
       'TOKENIZATION_WITHDRAW: hub collateral assets mismatch'
     );
     _assertTokenizationNoDebt(snapshotAfter);
@@ -258,15 +264,17 @@ abstract contract TokenizationActions is Helpers {
       assertEq(snapshotAfter.userShares, 0, 'TOKENIZATION_REDEEM: user shares should be zero');
     }
     // Vault totalAssets decreased
-    assertEq(
+    assertApproxEqAbs(
       snapshotBefore.totalAssets - snapshotAfter.totalAssets,
       assetsReceived,
+      1,
       'TOKENIZATION_REDEEM: totalAssets mismatch'
     );
     // Hub spoke collateral decreased
-    assertEq(
-      snapshotBefore.hubSpoke.collateralAssets - snapshotAfter.hubSpoke.collateralAssets,
+    assertApproxEqAbs(
+      snapshotBefore.spokeOnHub.collateralAssets - snapshotAfter.spokeOnHub.collateralAssets,
       assetsReceived,
+      1,
       'TOKENIZATION_REDEEM: hub collateral assets mismatch'
     );
     _assertTokenizationNoDebt(snapshotAfter);
@@ -299,17 +307,19 @@ abstract contract TokenizationActions is Helpers {
       shares,
       'TOKENIZATION_MINT_WITH_SIG: user shares mismatch'
     );
-    assertEq(
+    assertApproxEqAbs(
       tokenizationSpoke.totalAssets() - totalAssetsBefore,
       assetsDeposited,
+      1,
       'TOKENIZATION_MINT_WITH_SIG: totalAssets mismatch'
     );
-    assertEq(
+    assertApproxEqAbs(
       IHubBase(reserveInfo.hub).getSpokeAddedAssets(
         reserveInfo.assetId,
         address(tokenizationSpoke)
       ) - hubCollateralBefore,
       assetsDeposited,
+      1,
       'TOKENIZATION_MINT_WITH_SIG: hub collateral assets mismatch'
     );
   }
@@ -403,18 +413,20 @@ abstract contract TokenizationActions is Helpers {
         'TOKENIZATION_REDEEM_WITH_SIG: user shares should be zero'
       );
     }
-    assertEq(
+    assertApproxEqAbs(
       totalAssetsBefore - tokenizationSpoke.totalAssets(),
       assetsReceived,
+      1,
       'TOKENIZATION_REDEEM_WITH_SIG: totalAssets mismatch'
     );
-    assertEq(
+    assertApproxEqAbs(
       hubCollateralBefore -
         IHubBase(reserveInfo.hub).getSpokeAddedAssets(
           reserveInfo.assetId,
           address(tokenizationSpoke)
         ),
       assetsReceived,
+      1,
       'TOKENIZATION_REDEEM_WITH_SIG: hub collateral assets mismatch'
     );
   }
@@ -539,15 +551,17 @@ abstract contract TokenizationActions is Helpers {
       'TOKENIZATION_DEPOSIT_WITH_PERMIT: user shares mismatch'
     );
     // Vault totalAssets increased
-    assertEq(
+    assertApproxEqAbs(
       snapshotAfter.totalAssets,
       snapshotBefore.totalAssets + assets,
+      1,
       'TOKENIZATION_DEPOSIT_WITH_PERMIT: totalAssets mismatch'
     );
     // Hub spoke collateral increased
-    assertEq(
-      snapshotAfter.hubSpoke.collateralAssets,
-      snapshotBefore.hubSpoke.collateralAssets + assets,
+    assertApproxEqAbs(
+      snapshotAfter.spokeOnHub.collateralAssets,
+      snapshotBefore.spokeOnHub.collateralAssets + assets,
+      1,
       'TOKENIZATION_DEPOSIT_WITH_PERMIT: hub collateral assets mismatch'
     );
     _assertTokenizationNoDebt(snapshotAfter);

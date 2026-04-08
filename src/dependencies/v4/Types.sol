@@ -21,7 +21,7 @@ library Types {
   struct PositionSnapshot {
     Accounting user;
     Accounting reserve;
-    Accounting hubSpoke;
+    Accounting spokeOnHub;
   }
 
   /// @notice Tokenization spoke snapshot at user, vault, and hub-spoke levels.
@@ -30,7 +30,7 @@ library Types {
     uint256 userAssets;
     uint256 totalShares;
     uint256 totalAssets;
-    Accounting hubSpoke;
+    Accounting spokeOnHub;
   }
 
   /// @notice Per-reserve info struct used throughout V4 e2e tests.
@@ -101,7 +101,7 @@ library Types {
     uint256 maxDrawnRate;
   }
 
-  struct HubSpokeCapSnapshot {
+  struct SpokeCapSnapshot {
     address hubAddress;
     uint256 assetId;
     string assetSymbol;
@@ -117,6 +117,6 @@ library Types {
     SpokeReserveSnapshot[] spokeReserves;
     SpokeLiquidationSnapshot[] spokeLiquidationConfigs;
     HubAssetSnapshot[] hubAssets;
-    HubSpokeCapSnapshot[] hubSpokeCaps;
+    SpokeCapSnapshot[] spokeCaps;
   }
 }

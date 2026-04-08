@@ -15,14 +15,14 @@ library V4DiffWriter {
     string memory path = string.concat('./reports/', reportName, '.json');
     vm.writeFile(
       path,
-      '{ "spokeReserves": {}, "spokeLiquidationConfigs": {}, "hubAssets": {}, "hubSpokeCaps": {}, "raw": {} }'
+      '{ "spokeReserves": {}, "spokeLiquidationConfigs": {}, "hubAssets": {}, "spokeCaps": {}, "raw": {} }'
     );
     vm.serializeUint('root', 'chainId', block.chainid);
 
     _writeSpokeReserves(path, snapshot.spokeReserves);
     _writeSpokeLiqConfigs(path, snapshot.spokeLiquidationConfigs);
     _writeHubAssets(path, snapshot.hubAssets);
-    _writeHubSpokeCaps(path, snapshot.hubSpokeCaps);
+    _writeSpokeCaps(path, snapshot.spokeCaps);
   }
 
   function _writeSpokeReserves(
@@ -157,8 +157,8 @@ library V4DiffWriter {
     return vm.serializeString(k, 'maxDrawnRate', vm.toString(a.maxDrawnRate));
   }
 
-  function _writeHubSpokeCaps(string memory path, Types.HubSpokeCapSnapshot[] memory caps) private {
-    string memory sectionKey = 'hubSpokeCaps';
+  function _writeSpokeCaps(string memory path, Types.SpokeCapSnapshot[] memory caps) private {
+    string memory sectionKey = 'spokeCaps';
     string memory content = '{}';
     vm.serializeJson(sectionKey, '{}');
 
@@ -179,7 +179,7 @@ library V4DiffWriter {
       string memory obj = vm.serializeBool(k, 'halted', caps[i].halted);
       content = vm.serializeString(sectionKey, k, obj);
     }
-    vm.writeJson(vm.serializeString('root', 'hubSpokeCaps', content), path);
+    vm.writeJson(vm.serializeString('root', 'spokeCaps', content), path);
   }
 
   function writeDiff(
@@ -190,7 +190,7 @@ library V4DiffWriter {
     string memory md = '';
     md = string.concat(md, _diffSpokeReserves(snapBefore.spokeReserves, snapAfter.spokeReserves));
     md = string.concat(md, _diffHubAssets(snapBefore.hubAssets, snapAfter.hubAssets));
-    md = string.concat(md, _diffHubSpokeCaps(snapBefore.hubSpokeCaps, snapAfter.hubSpokeCaps));
+    md = string.concat(md, _diffSpokeCaps(snapBefore.spokeCaps, snapAfter.spokeCaps));
     md = string.concat(
       md,
       _diffSpokeLiq(snapBefore.spokeLiquidationConfigs, snapAfter.spokeLiquidationConfigs)
@@ -394,9 +394,9 @@ library V4DiffWriter {
 
   // --- hub spoke caps diff ---
 
-  function _diffHubSpokeCaps(
-    Types.HubSpokeCapSnapshot[] memory arrB,
-    Types.HubSpokeCapSnapshot[] memory arrA
+  function _diffSpokeCaps(
+    Types.SpokeCapSnapshot[] memory arrB,
+    Types.SpokeCapSnapshot[] memory arrA
   ) private pure returns (string memory section) {
     string memory body = '';
     for (uint256 i; i < arrA.length; i++) {
@@ -422,7 +422,7 @@ library V4DiffWriter {
     if (bytes(body).length > 0) section = string.concat('## Hub Spoke Cap Changes\n\n', body);
   }
 
-  function _scHdr(Types.HubSpokeCapSnapshot memory c) private pure returns (string memory) {
+  function _scHdr(Types.SpokeCapSnapshot memory c) private pure returns (string memory) {
     return
       string.concat(
         '### ',
@@ -438,8 +438,8 @@ library V4DiffWriter {
   }
 
   function _cmpSC(
-    Types.HubSpokeCapSnapshot memory b,
-    Types.HubSpokeCapSnapshot memory a
+    Types.SpokeCapSnapshot memory b,
+    Types.SpokeCapSnapshot memory a
   ) private pure returns (string memory) {
     return
       string.concat(
@@ -455,7 +455,7 @@ library V4DiffWriter {
       );
   }
 
-  function _newSC(Types.HubSpokeCapSnapshot memory c) private pure returns (string memory) {
+  function _newSC(Types.SpokeCapSnapshot memory c) private pure returns (string memory) {
     return
       string.concat(
         _scHdr(c),
@@ -471,7 +471,7 @@ library V4DiffWriter {
   }
 
   function _findSC(
-    Types.HubSpokeCapSnapshot[] memory a,
+    Types.SpokeCapSnapshot[] memory a,
     address h,
     uint256 id,
     address s

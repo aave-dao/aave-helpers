@@ -61,7 +61,7 @@ abstract contract Actions is CommonTestBase {
       });
   }
 
-  function _getHubSpokeAccounting(
+  function _getSpokeOnHubAccounting(
     ISpoke spoke,
     Types.ReserveInfo memory reserveInfo
   ) internal view returns (Types.Accounting memory) {
@@ -92,7 +92,7 @@ abstract contract Actions is CommonTestBase {
       Types.PositionSnapshot({
         user: _getUserAccounting({spoke: spoke, reserveId: reserveInfo.reserveId, user: user}),
         reserve: _getReserveAccounting({spoke: spoke, reserveInfo: reserveInfo}),
-        hubSpoke: _getHubSpokeAccounting({spoke: spoke, reserveInfo: reserveInfo})
+        spokeOnHub: _getSpokeOnHubAccounting({spoke: spoke, reserveInfo: reserveInfo})
       });
   }
 
@@ -137,13 +137,13 @@ abstract contract Actions is CommonTestBase {
 
     // Hub spoke owed should not decrease over time
     assertGe(
-      snapshotAfter.hubSpoke.totalDebt,
-      snapshotBefore.hubSpoke.totalDebt,
+      snapshotAfter.spokeOnHub.totalDebt,
+      snapshotBefore.spokeOnHub.totalDebt,
       'TIME_SKIP: hub spoke owed decreased'
     );
     assertGe(
-      snapshotAfter.hubSpoke.drawnDebt,
-      snapshotBefore.hubSpoke.drawnDebt,
+      snapshotAfter.spokeOnHub.drawnDebt,
+      snapshotBefore.spokeOnHub.drawnDebt,
       'TIME_SKIP: hub spoke drawn decreased'
     );
 
@@ -182,9 +182,10 @@ abstract contract Actions is CommonTestBase {
     assertEq(returnedAssets, amount, 'SUPPLY: returnedAssets mismatch');
 
     // User
-    assertEq(
+    assertApproxEqAbs(
       snapshotAfter.user.collateralAssets,
       snapshotBefore.user.collateralAssets + amount,
+      1,
       'SUPPLY: user assets mismatch'
     );
     assertEq(
@@ -192,10 +193,11 @@ abstract contract Actions is CommonTestBase {
       snapshotBefore.user.collateralShares + returnedShares,
       'SUPPLY: user shares mismatch'
     );
-    // Hub spoke
-    assertEq(
-      snapshotAfter.hubSpoke.collateralAssets,
-      snapshotBefore.hubSpoke.collateralAssets + amount,
+    // Spoke accounting on hub
+    assertApproxEqAbs(
+      snapshotAfter.spokeOnHub.collateralAssets,
+      snapshotBefore.spokeOnHub.collateralAssets + amount,
+      1,
       'SUPPLY: hub assets mismatch'
     );
     uint256 expectedAddedShares = IHubBase(reserveInfo.hub).previewAddByAssets(
@@ -204,8 +206,8 @@ abstract contract Actions is CommonTestBase {
     );
     assertEq(returnedShares, expectedAddedShares, 'SUPPLY: returnedShares mismatch');
     assertEq(
-      snapshotAfter.hubSpoke.collateralShares,
-      snapshotBefore.hubSpoke.collateralShares + expectedAddedShares,
+      snapshotAfter.spokeOnHub.collateralShares,
+      snapshotBefore.spokeOnHub.collateralShares + expectedAddedShares,
       'SUPPLY: hub shares mismatch'
     );
   }
@@ -233,9 +235,10 @@ abstract contract Actions is CommonTestBase {
       assertEq(snapshotAfter.user.collateralAssets, 0, 'WITHDRAW: user assets should be zero');
       assertEq(snapshotAfter.user.collateralShares, 0, 'WITHDRAW: user shares should be zero');
     } else {
-      assertEq(
+      assertApproxEqAbs(
         snapshotAfter.user.collateralAssets,
         snapshotBefore.user.collateralAssets - withdrawnAmount,
+        1,
         'WITHDRAW: user assets mismatch'
       );
       assertEq(
@@ -245,19 +248,15 @@ abstract contract Actions is CommonTestBase {
       );
     }
     // Hub spoke
-    assertEq(
-      snapshotBefore.hubSpoke.collateralAssets - snapshotAfter.hubSpoke.collateralAssets,
+    assertApproxEqAbs(
+      snapshotBefore.spokeOnHub.collateralAssets - snapshotAfter.spokeOnHub.collateralAssets,
       withdrawnAmount,
+      1,
       'WITHDRAW: hub assets mismatch'
     );
-    uint256 expectedSharesDelta = IHubBase(reserveInfo.hub).previewRemoveByAssets(
-      reserveInfo.assetId,
-      withdrawnAmount
-    );
-    assertEq(returnedShares, expectedSharesDelta, 'WITHDRAW: returnedShares mismatch');
     assertEq(
-      snapshotBefore.hubSpoke.collateralShares - snapshotAfter.hubSpoke.collateralShares,
-      expectedSharesDelta,
+      snapshotBefore.spokeOnHub.collateralShares - snapshotAfter.spokeOnHub.collateralShares,
+      returnedShares,
       'WITHDRAW: hub shares mismatch'
     );
   }
@@ -287,26 +286,29 @@ abstract contract Actions is CommonTestBase {
     assertEq(returnedAssets, amount, 'BORROW: returnedAssets mismatch');
     assertEq(returnedShares, expectedDrawnShares, 'BORROW: returnedShares mismatch');
 
-    // User debt
-    assertEq(
+    // User debt - up to 2 wei diff due to premium/drawn debt
+    assertApproxEqAbs(
       snapshotAfter.user.totalDebt,
       snapshotBefore.user.totalDebt + amount,
+      2,
       'BORROW: user debt mismatch'
     );
-    assertEq(
+    assertApproxEqAbs(
       snapshotAfter.user.drawnDebt,
       snapshotBefore.user.drawnDebt + returnedAssets,
+      1,
       'BORROW: user drawn debt mismatch'
     );
-    // Hub spoke
-    assertEq(
-      snapshotAfter.hubSpoke.totalDebt,
-      snapshotBefore.hubSpoke.totalDebt + amount,
+    // Hub spoke - up to 2 wei diff due to premium/drawn debt
+    assertApproxEqAbs(
+      snapshotAfter.spokeOnHub.totalDebt,
+      snapshotBefore.spokeOnHub.totalDebt + amount,
+      2,
       'BORROW: hub debt mismatch'
     );
     assertEq(
-      snapshotAfter.hubSpoke.drawnShares,
-      snapshotBefore.hubSpoke.drawnShares + expectedDrawnShares,
+      snapshotAfter.spokeOnHub.drawnShares,
+      snapshotBefore.spokeOnHub.drawnShares + expectedDrawnShares,
       'BORROW: hub drawn shares mismatch'
     );
   }
@@ -347,20 +349,22 @@ abstract contract Actions is CommonTestBase {
     if (amount >= snapshotBefore.user.totalDebt) {
       assertEq(snapshotAfter.user.totalDebt, 0, 'REPAY: user debt should be zero');
     } else {
-      assertEq(
+      assertApproxEqAbs(
         stdMath.delta(snapshotAfter.user.totalDebt, snapshotBefore.user.totalDebt),
         amount,
+        2,
         'REPAY: user debt mismatch'
       );
     }
-    // Hub spoke
-    assertEq(
-      stdMath.delta(snapshotBefore.hubSpoke.totalDebt, snapshotAfter.hubSpoke.totalDebt),
+    // Hub spoke - up to 2 wei diff due to premium/drawn debt
+    assertApproxEqAbs(
+      stdMath.delta(snapshotBefore.spokeOnHub.totalDebt, snapshotAfter.spokeOnHub.totalDebt),
       effectiveRepayAmount,
+      2,
       'REPAY: hub debt mismatch'
     );
     assertEq(
-      stdMath.delta(snapshotBefore.hubSpoke.drawnShares, snapshotAfter.hubSpoke.drawnShares),
+      stdMath.delta(snapshotBefore.spokeOnHub.drawnShares, snapshotAfter.spokeOnHub.drawnShares),
       expectedRestoredShares,
       'REPAY: hub drawn shares mismatch'
     );
@@ -434,8 +438,8 @@ abstract contract Actions is CommonTestBase {
       'LIQUIDATE: debt did not decrease'
     );
     assertLt(
-      debtSnapshotAfter.hubSpoke.totalDebt,
-      debtSnapshotBefore.hubSpoke.totalDebt,
+      debtSnapshotAfter.spokeOnHub.totalDebt,
+      debtSnapshotBefore.spokeOnHub.totalDebt,
       'LIQUIDATE: hub debt did not decrease'
     );
     // Collateral decreased

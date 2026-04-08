@@ -22,7 +22,7 @@ abstract contract SnapshotV4 is Helpers {
     snapshot.spokeReserves = _snapshotSpokeReserves(spokes);
     snapshot.spokeLiquidationConfigs = _snapshotSpokeLiqConfigs(spokes);
     snapshot.hubAssets = _snapshotHubAssets(hubs);
-    snapshot.hubSpokeCaps = _snapshotHubSpokeCaps(hubs);
+    snapshot.spokeCaps = _snapshotSpokeCaps(hubs);
   }
 
   /// @notice Write a V4 snapshot to JSON file.
@@ -180,16 +180,16 @@ abstract contract SnapshotV4 is Helpers {
   // Hub spoke caps
   // ---------------------------------------------------------------------------
 
-  function _snapshotHubSpokeCaps(
+  function _snapshotSpokeCaps(
     IHub[] memory hubs
-  ) private view returns (Types.HubSpokeCapSnapshot[] memory) {
+  ) private view returns (Types.SpokeCapSnapshot[] memory) {
     uint256 total;
     for (uint256 h; h < hubs.length; h++) {
       uint256 ac = hubs[h].getAssetCount();
       for (uint256 a; a < ac; a++) total += hubs[h].getSpokeCount(a);
     }
 
-    Types.HubSpokeCapSnapshot[] memory result = new Types.HubSpokeCapSnapshot[](total);
+    Types.SpokeCapSnapshot[] memory result = new Types.SpokeCapSnapshot[](total);
     uint256 idx;
     for (uint256 h; h < hubs.length; h++) {
       idx = _snapshotCapsForHub(hubs[h], result, idx);
@@ -199,7 +199,7 @@ abstract contract SnapshotV4 is Helpers {
 
   function _snapshotCapsForHub(
     IHub hub,
-    Types.HubSpokeCapSnapshot[] memory result,
+    Types.SpokeCapSnapshot[] memory result,
     uint256 idx
   ) private view returns (uint256) {
     uint256 ac = hub.getAssetCount();
@@ -210,7 +210,7 @@ abstract contract SnapshotV4 is Helpers {
       for (uint256 sp; sp < sc; sp++) {
         address spokeAddr = hub.getSpokeAddress(a, sp);
         IHub.SpokeConfig memory cfg = hub.getSpokeConfig(a, spokeAddr);
-        result[idx++] = Types.HubSpokeCapSnapshot({
+        result[idx++] = Types.SpokeCapSnapshot({
           hubAddress: address(hub),
           assetId: a,
           assetSymbol: sym,

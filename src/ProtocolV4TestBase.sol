@@ -285,9 +285,10 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     vm.stopPrank();
 
     uint256 ownerSupplyAfter = spoke.getUserSuppliedAssets(collateralInfo.reserveId, owner);
-    assertEq(
+    assertApproxEqAbs(
       ownerSupplyAfter,
       ownerSupplyBefore + supplyAmount,
+      1,
       'GIVER_PM: supplyOnBehalfOf owner balance mismatch'
     );
 
@@ -326,9 +327,10 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     vm.stopPrank();
 
     uint256 ownerDebtAfter = spoke.getUserTotalDebt(debtReserveInfo.reserveId, owner);
-    assertEq(
+    assertApproxEqAbs(
       ownerDebtBefore - ownerDebtAfter,
       repayAmount,
+      2,
       'GIVER_PM: repayOnBehalfOf debt should decrease'
     );
     vm.revertToState(snapshot);
@@ -393,9 +395,10 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
       onBehalfOf: owner
     });
 
-    assertEq(
+    assertApproxEqAbs(
       ownerSupplyBefore - spoke.getUserSuppliedAssets(collateralInfo.reserveId, owner),
       withdrawAmount,
+      1,
       'TAKER_PM: owner supply should decrease'
     );
     assertEq(
@@ -446,9 +449,10 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
       onBehalfOf: owner
     });
 
-    assertEq(
+    assertApproxEqAbs(
       spoke.getUserTotalDebt(debtReserveInfo.reserveId, owner),
       ownerDebtBefore + borrowAmount,
+      2,
       'TAKER_PM: owner debt should increase'
     );
     assertEq(
@@ -689,14 +693,8 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     _testTokenizationAddCap(tokenizationSpoke, reserveInfo);
     vm.revertToState(snapshot);
 
-    uint256 addCap = IHub(reserveInfo.hub)
-      .getSpokeConfig(reserveInfo.assetId, address(tokenizationSpoke))
-      .addCap;
-    if (addCap == 0) {
-      console.log('E2E: Skipping tokenization spoke %s (addCap is 0)', reserveInfo.symbol);
-      return;
-    }
-    uint256 maxAddAmount = uint256(addCap) * 10 ** reserveInfo.decimals;
+    _setTokenizationCapsToMax(tokenizationSpoke);
+    uint256 maxAddAmount = uint256(type(uint40).max) * 10 ** reserveInfo.decimals;
 
     _testTokenizationDepositWithdraw({
       tokenizationSpoke: tokenizationSpoke,

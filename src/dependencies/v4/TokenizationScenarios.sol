@@ -251,8 +251,8 @@ abstract contract TokenizationScenarios is TokenizationActions {
 
     // Hub spoke collateral should not decrease
     assertGe(
-      snapshotAfter.hubSpoke.collateralAssets,
-      snapshotBefore.hubSpoke.collateralAssets,
+      snapshotAfter.spokeOnHub.collateralAssets,
+      snapshotBefore.spokeOnHub.collateralAssets,
       'TIME_SKIP: hub collateral assets decreased'
     );
 
@@ -271,6 +271,8 @@ abstract contract TokenizationScenarios is TokenizationActions {
       makeAddr('TRANSFER_RECIPIENT_1'),
       makeAddr('TRANSFER_RECIPIENT_2')
     ];
+
+    uint256 totalSupplyBefore = tokenizationSpoke.totalSupply();
 
     uint256 depositAmount = vm.randomUint(3, maxAddAmount);
     _tokenizationDeposit(tokenizationSpoke, reserveInfo, depositor, depositAmount);
@@ -303,7 +305,7 @@ abstract contract TokenizationScenarios is TokenizationActions {
 
       _logAction('TOKENIZATION_REDEEM', reserveInfo.symbol, recipientShares);
       vm.prank(recipients[i]);
-      tokenizationSpoke.redeem(recipientShares, recipients[i], recipients[i]);
+      uint256 assetsRedeemed = tokenizationSpoke.redeem(recipientShares, recipients[i], recipients[i]);
 
       assertEq(
         tokenizationSpoke.balanceOf(recipients[i]),
@@ -312,15 +314,15 @@ abstract contract TokenizationScenarios is TokenizationActions {
       );
       assertEq(
         IERC20(reserveInfo.underlying).balanceOf(recipients[i]),
-        underlyingBefore + recipientShares,
+        underlyingBefore + assetsRedeemed,
         'TRANSFER: recipient should have received underlying tokens'
       );
     }
 
     assertEq(
       tokenizationSpoke.totalSupply(),
-      0,
-      'TRANSFER: totalSupply should be 0 after all redeems'
+      totalSupplyBefore,
+      'TRANSFER: totalSupply should return to pre-deposit level after all redeems'
     );
   }
 }
