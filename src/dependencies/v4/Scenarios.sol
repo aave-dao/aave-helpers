@@ -18,24 +18,26 @@ import {Helpers} from 'src/dependencies/v4/Helpers.sol';
 abstract contract Scenarios is Helpers {
   using SafeERC20 for IERC20;
 
-  /// @dev Makes a user liquidatable by manipulating oracle prices and warping time.
-  ///      1. Reduce collateral-only prices to near zero and decrease coll prices; boost debt-only prices.
-  ///      2. For same-asset positions (supply + debt on same reserve), reduce collateral factor to 1 BPS.
+  /// @dev Makes a user liquidatable by reducing collateral factors and manipulating oracle prices.
+  /// Two-passes: CF updates first, then oracle mocks
+  /// in a separate pass so clearMockedCalls doesn't wipe earlier price mocks.
   function _makeUserLiquidatable(ISpoke spoke, address user) internal virtual {
     address oracle = spoke.ORACLE();
     uint256 reserveCount = spoke.getReserveCount();
 
-    // Pass 1: manipulate prices for reserves where user has only supply or only debt
+    // Pass 1: reduce collateral factors (each call mocks ACCESS_MANAGER then clears all mocks)
+    for (uint256 i; i < reserveCount; i++) {
+      if (spoke.getUserSuppliedAssets(i, user) > 0) {
+        _updateCollateralFactor({spoke: spoke, reserveId: i, user: user, collateralFactor: 1});
+      }
+    }
+
+    // Pass 2: manipulate oracle prices (safe from clearMockedCalls now)
     for (uint256 i; i < reserveCount; i++) {
       uint256 userSupply = spoke.getUserSuppliedAssets(i, user);
       uint256 userDebt = spoke.getUserTotalDebt(i, user);
 
-      if (userSupply > 0) {
-        // Reduce CF to 1 BPS on the user's actual dynamic config key
-        _updateCollateralFactor({spoke: spoke, reserveId: i, user: user, collateralFactor: 1});
-      }
       if (userSupply > 0 && userDebt == 0) {
-        // Collateral-only: also slash price by 1000x
         uint256 currentPrice = IAaveOracle(oracle).getReservePrice(i);
         vm.mockCall(
           oracle,
@@ -43,7 +45,6 @@ abstract contract Scenarios is Helpers {
           abi.encode(currentPrice / 1000)
         );
       } else if (userDebt > 0 && userSupply == 0) {
-        // Debt-only: boost price by 1000x
         uint256 currentPrice = IAaveOracle(oracle).getReservePrice(i);
         vm.mockCall(
           oracle,
@@ -54,7 +55,6 @@ abstract contract Scenarios is Helpers {
     }
 
     ISpoke.UserAccountData memory accountData = spoke.getUserAccountData(user);
-    // Verify the user is actually liquidatable
     assertLt(
       accountData.healthFactor,
       HEALTH_FACTOR_LIQUIDATION_THRESHOLD,
