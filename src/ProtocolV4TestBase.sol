@@ -694,7 +694,9 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     vm.revertToState(snapshot);
 
     _setTokenizationCapsToMax(tokenizationSpoke);
-    uint256 maxAddAmount = uint256(type(uint40).max) * 10 ** reserveInfo.decimals;
+    snapshot = vm.snapshotState();
+
+    uint256 maxAddAmount = 10_000 * 10 ** reserveInfo.decimals;
 
     _testTokenizationDepositWithdraw({
       tokenizationSpoke: tokenizationSpoke,

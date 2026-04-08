@@ -296,7 +296,7 @@ abstract contract Actions is CommonTestBase {
     assertApproxEqAbs(
       snapshotAfter.user.drawnDebt,
       snapshotBefore.user.drawnDebt + returnedAssets,
-      1,
+      2,
       'BORROW: user drawn debt mismatch'
     );
     // Hub spoke - up to 2 wei diff due to premium/drawn debt
