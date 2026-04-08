@@ -2,10 +2,8 @@
 pragma solidity ^0.8.0;
 
 import {IERC20Metadata} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
-import {ISpoke} from 'src/dependencies/v4/interfaces/ISpoke.sol';
-import {IHubConfigurator} from 'src/dependencies/v4/interfaces/IHubConfigurator.sol';
-import {IAaveOracle} from 'src/dependencies/v4/interfaces/IAaveOracle.sol';
-import {AaveV4EthereumAddresses} from 'src/dependencies/v4/AaveV4EthereumAddresses.sol';
+import {ISpoke, IHubConfigurator, IAaveOracle} from 'aave-address-book/AaveV4.sol';
+import {AaveV4Ethereum} from 'aave-address-book/AaveV4Ethereum.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {Actions} from 'src/dependencies/v4/Actions.sol';
 
@@ -338,16 +336,16 @@ abstract contract Helpers is Actions {
 
   /// @notice Set all addCap/drawCap to max for every reserve on the spoke.
   function _setCapsToMax(ISpoke spoke) internal {
-    address hubConfigurator = AaveV4EthereumAddresses.HUB_CONFIGURATOR;
+    IHubConfigurator hubConfigurator = AaveV4Ethereum.HUB_CONFIGURATOR;
 
     Types.ReserveInfo[] memory infos = _getReserveInfo(spoke);
     vm.mockCall(
-      AaveV4EthereumAddresses.ACCESS_MANAGER,
+      address(AaveV4Ethereum.ACCESS_MANAGER),
       abi.encodeWithSelector(bytes4(keccak256('canCall(address,address,bytes4)'))),
       abi.encode(true, uint32(0))
     );
     for (uint256 i; i < infos.length; i++) {
-      IHubConfigurator(hubConfigurator).updateSpokeCaps({
+      hubConfigurator.updateSpokeCaps({
         hub: infos[i].hub,
         assetId: infos[i].assetId,
         spoke: address(spoke),
@@ -360,16 +358,16 @@ abstract contract Helpers is Actions {
 
   /// @notice Set all addCap to max for every reserve on the spoke (leaves drawCap unchanged).
   function _setAddCapsToMax(ISpoke spoke) internal {
-    address hubConfigurator = AaveV4EthereumAddresses.HUB_CONFIGURATOR;
+    IHubConfigurator hubConfigurator = AaveV4Ethereum.HUB_CONFIGURATOR;
 
     Types.ReserveInfo[] memory infos = _getReserveInfo(spoke);
     vm.mockCall(
-      AaveV4EthereumAddresses.ACCESS_MANAGER,
+      address(AaveV4Ethereum.ACCESS_MANAGER),
       abi.encodeWithSelector(bytes4(keccak256('canCall(address,address,bytes4)'))),
       abi.encode(true, uint32(0))
     );
     for (uint256 i; i < infos.length; i++) {
-      IHubConfigurator(hubConfigurator).updateSpokeAddCap({
+      hubConfigurator.updateSpokeAddCap({
         hub: infos[i].hub,
         assetId: infos[i].assetId,
         spoke: address(spoke),

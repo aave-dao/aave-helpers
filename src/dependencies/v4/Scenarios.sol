@@ -4,12 +4,9 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
-import {ISpoke} from 'src/dependencies/v4/interfaces/ISpoke.sol';
-import {IHub} from 'src/dependencies/v4/interfaces/IHub.sol';
-import {IAaveOracle} from 'src/dependencies/v4/interfaces/IAaveOracle.sol';
-import {IPriceOracle} from 'src/dependencies/v4/interfaces/IPriceOracle.sol';
-import {AaveV4EthereumAddresses} from 'src/dependencies/v4/AaveV4EthereumAddresses.sol';
-import {ISpokeConfigurator} from 'src/dependencies/v4/interfaces/ISpokeConfigurator.sol';
+import {ISpoke, IHub, IAaveOracle, ISpokeConfigurator} from 'aave-address-book/AaveV4.sol';
+import {AaveV4Ethereum} from 'aave-address-book/AaveV4Ethereum.sol';
+import {IPriceOracle} from 'aave-v4/spoke/interfaces/IPriceOracle.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {Helpers} from 'src/dependencies/v4/Helpers.sol';
 
@@ -72,11 +69,11 @@ abstract contract Scenarios is Helpers {
   ) internal {
     uint32 userConfigKey = spoke.getUserPosition(reserveId, user).dynamicConfigKey;
     vm.mockCall(
-      AaveV4EthereumAddresses.ACCESS_MANAGER,
+      address(AaveV4Ethereum.ACCESS_MANAGER),
       abi.encodeWithSelector(bytes4(keccak256('canCall(address,address,bytes4)'))),
       abi.encode(true, uint32(0))
     );
-    ISpokeConfigurator(AaveV4EthereumAddresses.SPOKE_CONFIGURATOR).updateCollateralFactor({
+    AaveV4Ethereum.SPOKE_CONFIGURATOR.updateCollateralFactor({
       spoke: address(spoke),
       reserveId: reserveId,
       dynamicConfigKey: userConfigKey,
