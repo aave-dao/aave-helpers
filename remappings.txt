@@ -1,5 +1,4 @@
 aave-address-book/=lib/aave-address-book/src/
-aave-v4/=lib/aave-address-book/lib/aave-v4/src/
 aave-v3-origin/=lib/aave-address-book/lib/aave-v3-origin/src/
 aave-v3-origin-tests/=lib/aave-address-book/lib/aave-v3-origin/tests
 forge-std/=lib/forge-std/src/

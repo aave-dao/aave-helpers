@@ -4,8 +4,9 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
-import {ITokenizationSpoke, ISpoke} from 'aave-address-book/AaveV4.sol';
-import {IHubBase} from 'aave-v4/hub/interfaces/IHubBase.sol';
+import {ITokenizationSpoke} from 'src/dependencies/v4/interfaces/ITokenizationSpoke.sol';
+import {ISpoke} from 'src/dependencies/v4/interfaces/ISpoke.sol';
+import {IHubBase} from 'src/dependencies/v4/interfaces/IHubBase.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {Helpers} from 'src/dependencies/v4/Helpers.sol';
 

@@ -3,8 +3,10 @@ pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
 import {IERC20Metadata} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
-import {ISpoke, IHub, IAaveOracle} from 'aave-address-book/AaveV4.sol';
-import {IAssetInterestRateStrategy} from 'aave-v4/hub/interfaces/IAssetInterestRateStrategy.sol';
+import {ISpoke} from 'src/dependencies/v4/interfaces/ISpoke.sol';
+import {IHub} from 'src/dependencies/v4/interfaces/IHub.sol';
+import {IAaveOracle} from 'src/dependencies/v4/interfaces/IAaveOracle.sol';
+import {IAssetInterestRateStrategy} from 'src/dependencies/v4/interfaces/IAssetInterestRateStrategy.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {V4DiffWriter} from 'src/dependencies/v4/V4DiffWriter.sol';
 import {Helpers} from 'src/dependencies/v4/Helpers.sol';
