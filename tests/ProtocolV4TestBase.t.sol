@@ -6,12 +6,7 @@ import {ProtocolV4TestBase} from '../src/ProtocolV4TestBase.sol';
 import {ISpoke} from 'src/dependencies/v4/interfaces/ISpoke.sol';
 import {ITokenizationSpoke} from 'src/dependencies/v4/interfaces/ITokenizationSpoke.sol';
 import {ISpokeConfigurator} from 'src/dependencies/v4/interfaces/ISpokeConfigurator.sol';
-import {
-  AaveV4EthereumSpokes,
-  AaveV4EthereumHubs,
-  AaveV4EthereumTokenizationSpokes,
-  AaveV4EthereumAddresses
-} from 'src/dependencies/v4/AaveV4EthereumAddresses.sol';
+import {AaveV4EthereumSpokes, AaveV4EthereumHubs, AaveV4EthereumTokenizationSpokes, AaveV4EthereumAddresses} from 'src/dependencies/v4/AaveV4EthereumAddresses.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 import {PayloadWithStorage} from './mocks/PayloadWithStorage.sol';
@@ -54,7 +49,13 @@ contract ProtocolV4TestBaseTest is ProtocolV4TestBase {
   function _cleanupArtifacts(string memory reportName) internal {
     string memory beforePath = string.concat('./reports/', reportName, '_before.json');
     string memory afterPath = string.concat('./reports/', reportName, '_after.json');
-    string memory diffPath = string.concat('./diffs/', reportName, '_before_', reportName, '_after.md');
+    string memory diffPath = string.concat(
+      './diffs/',
+      reportName,
+      '_before_',
+      reportName,
+      '_after.md'
+    );
     if (vm.exists(beforePath)) {
       vm.removeFile(beforePath);
     }

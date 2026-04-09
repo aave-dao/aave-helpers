@@ -13,11 +13,7 @@ import {ISignatureGateway} from 'src/dependencies/v4/interfaces/ISignatureGatewa
 import {IGiverPositionManager} from 'src/dependencies/v4/interfaces/IGiverPositionManager.sol';
 import {ITakerPositionManager} from 'src/dependencies/v4/interfaces/ITakerPositionManager.sol';
 import {IConfigPositionManager} from 'src/dependencies/v4/interfaces/IConfigPositionManager.sol';
-import {
-  AaveV4EthereumPositionManagers,
-  AaveV4EthereumTokenizationSpokes,
-  AaveV4EthereumHubs
-} from 'src/dependencies/v4/AaveV4EthereumAddresses.sol';
+import {AaveV4EthereumPositionManagers, AaveV4EthereumTokenizationSpokes, AaveV4EthereumHubs} from 'src/dependencies/v4/AaveV4EthereumAddresses.sol';
 import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
 import {IPayloadsControllerCore, PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
 import {GovV3Helpers, ChainIds} from 'src/GovV3Helpers.sol';

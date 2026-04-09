@@ -305,7 +305,11 @@ abstract contract TokenizationScenarios is TokenizationActions {
 
       _logAction('TOKENIZATION_REDEEM', reserveInfo.symbol, recipientShares);
       vm.prank(recipients[i]);
-      uint256 assetsRedeemed = tokenizationSpoke.redeem(recipientShares, recipients[i], recipients[i]);
+      uint256 assetsRedeemed = tokenizationSpoke.redeem(
+        recipientShares,
+        recipients[i],
+        recipients[i]
+      );
 
       assertEq(
         tokenizationSpoke.balanceOf(recipients[i]),
