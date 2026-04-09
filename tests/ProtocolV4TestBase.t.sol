@@ -14,6 +14,7 @@ import {
 } from 'src/dependencies/v4/AaveV4EthereumAddresses.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
+import {PayloadWithStorage} from './mocks/PayloadWithStorage.sol';
 
 contract ProtocolV4TestBaseTest is ProtocolV4TestBase {
   uint256 public constant BLOCK_NUMBER = 24829000;
@@ -48,6 +49,21 @@ contract ProtocolV4TestBaseTest is ProtocolV4TestBase {
       frozen: frozen
     });
     vm.clearMockedCalls();
+  }
+
+  function _cleanupArtifacts(string memory reportName) internal {
+    string memory beforePath = string.concat('./reports/', reportName, '_before.json');
+    string memory afterPath = string.concat('./reports/', reportName, '_after.json');
+    string memory diffPath = string.concat('./diffs/', reportName, '_before_', reportName, '_after.md');
+    if (vm.exists(beforePath)) {
+      vm.removeFile(beforePath);
+    }
+    if (vm.exists(afterPath)) {
+      vm.removeFile(afterPath);
+    }
+    if (vm.exists(diffPath)) {
+      vm.removeFile(diffPath);
+    }
   }
 }
 
@@ -190,10 +206,33 @@ contract ProtocolV4TestDefaultTest is ProtocolV4TestBaseTest {
     });
     _cleanupArtifacts(name);
   }
+}
 
-  function _cleanupArtifacts(string memory reportName) internal {
-    vm.removeFile(string.concat('./reports/', reportName, '_before.json'));
-    vm.removeFile(string.concat('./reports/', reportName, '_after.json'));
-    vm.removeFile(string.concat('./diffs/', reportName, '_before_', reportName, '_after.md'));
+contract ProtocolV4TestStorageValidation is ProtocolV4TestBaseTest {
+  function test_noExecutorStorageChange_passes() public {
+    string memory name = 'v4_storage_pass';
+    defaultTest({
+      reportName: name,
+      spokes: AaveV4EthereumSpokes.getUserSpokes(),
+      tokenizationSpokes: AaveV4EthereumTokenizationSpokes.getTokenizationSpokes(),
+      payload: address(new PayloadWithEmit()),
+      runE2E: false
+    });
+    _cleanupArtifacts(name);
+  }
+
+  function test_executorStorageChange_reverts() public {
+    string memory name = 'v4_storage_fail';
+    address payload = address(new PayloadWithStorage());
+    vm.expectRevert();
+    this.defaultTest({
+      reportName: name,
+      spokes: AaveV4EthereumSpokes.getUserSpokes(),
+      tokenizationSpokes: AaveV4EthereumTokenizationSpokes.getTokenizationSpokes(),
+      payload: payload,
+      runE2E: false
+    });
+    // filesystem writes persist through EVM reverts, so clean up manually
+    _cleanupArtifacts(name);
   }
 }

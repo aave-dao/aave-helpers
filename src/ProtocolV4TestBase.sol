@@ -18,6 +18,8 @@ import {
   AaveV4EthereumTokenizationSpokes,
   AaveV4EthereumHubs
 } from 'src/dependencies/v4/AaveV4EthereumAddresses.sol';
+import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
+import {IPayloadsControllerCore, PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
 import {GovV3Helpers, ChainIds} from 'src/GovV3Helpers.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {SnapshotV4} from 'src/dependencies/v4/SnapshotV4.sol';
@@ -65,7 +67,7 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     string memory reportName,
     ISpoke[] memory spokes,
     address payload
-  ) private {
+  ) internal virtual {
     IHub[] memory hubs = AaveV4EthereumHubs.getHubs();
     string memory beforeName = string.concat(reportName, '_before');
     string memory afterName = string.concat(reportName, '_after');
@@ -74,6 +76,17 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     writeV4SnapshotJson(beforeName, snapshotBefore);
 
     (string memory rawDiff, string memory logsJson) = _executePayloadWithRecording(payload);
+
+    // as executor does delegateCall to the payload, the executor should have no storage changes
+    {
+      IPayloadsControllerCore pc = GovV3Helpers.getPayloadsController(ChainIds.MAINNET);
+      _validateNoExecutorStorageChange(
+        rawDiff,
+        pc
+          .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
+          .executor
+      );
+    }
 
     Types.V4Snapshot memory snapshotAfter = createV4Snapshot(spokes, hubs);
     writeV4SnapshotJson(afterName, snapshotAfter);
@@ -566,6 +579,27 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     vm.expectRevert(ISpoke.ReservePaused.selector);
     spoke.repay({reserveId: pausedAsset.reserveId, amount: amount, onBehalfOf: user});
     vm.stopPrank();
+
+    // Liquidation should revert with ReservePaused (paused as debt asset)
+    address liquidator = vm.randomAddress();
+    vm.prank(liquidator);
+    vm.expectRevert(ISpoke.ReservePaused.selector);
+    spoke.liquidationCall({
+      collateralReserveId: pausedAsset.reserveId,
+      debtReserveId: pausedAsset.reserveId,
+      user: user,
+      debtToCover: amount,
+      receiveShares: false
+    });
+
+    // setUsingAsCollateral should revert with ReservePaused
+    vm.prank(user);
+    vm.expectRevert(ISpoke.ReservePaused.selector);
+    spoke.setUsingAsCollateral({
+      reserveId: pausedAsset.reserveId,
+      usingAsCollateral: true,
+      onBehalfOf: user
+    });
   }
 
   /// @notice Per-asset e2e test with randomized amounts and extra collaterals.
@@ -732,5 +766,26 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
       maxAddAmount: maxAddAmount
     });
     vm.revertToState(snapshot);
+  }
+
+  /// @notice Validate that the executor has no storage changes after payload execution.
+  function _validateNoExecutorStorageChange(
+    string memory stateDiffJson,
+    address executor
+  ) internal view virtual {
+    string memory executorKey = Strings.toHexString(uint160(executor), 20);
+    string memory stateDiffPath = string.concat('.', executorKey, '.stateDiff');
+    if (vm.keyExistsJson(stateDiffJson, stateDiffPath)) {
+      string[] memory slots = vm.parseJsonKeys(stateDiffJson, stateDiffPath);
+      require(
+        slots.length == 0,
+        string.concat(
+          'EXECUTOR_MUST_NOT_HAVE_STORAGE_CHANGES: ',
+          Strings.toString(slots.length),
+          ' slot(s) modified on executor ',
+          executorKey
+        )
+      );
+    }
   }
 }
