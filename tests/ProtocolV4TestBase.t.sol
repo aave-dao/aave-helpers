@@ -4,18 +4,8 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {ProtocolV4TestBase} from '../src/ProtocolV4TestBase.sol';
 import {ISpoke, ITokenizationSpoke, ISpokeConfigurator} from 'aave-address-book/AaveV4.sol';
-import {
-  AaveV4Ethereum,
-  AaveV4EthereumSpokes,
-  AaveV4EthereumHubs,
-  AaveV4EthereumTokenizationSpokes,
-  AaveV4EthereumPositionManagers
-} from 'aave-address-book/AaveV4Ethereum.sol';
-import {
-  AaveV4EthereumHubHelpers,
-  AaveV4EthereumSpokeHelpers,
-  AaveV4EthereumTokenizationSpokeHelpers
-} from 'src/dependencies/v4/AaveV4EthereumHelpers.sol';
+import {AaveV4Ethereum, AaveV4EthereumSpokes, AaveV4EthereumHubs, AaveV4EthereumTokenizationSpokes, AaveV4EthereumPositionManagers} from 'aave-address-book/AaveV4Ethereum.sol';
+import {AaveV4EthereumHubHelpers, AaveV4EthereumSpokeHelpers, AaveV4EthereumTokenizationSpokeHelpers} from 'src/dependencies/v4/AaveV4EthereumHelpers.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 import {PayloadWithStorage} from './mocks/PayloadWithStorage.sol';
