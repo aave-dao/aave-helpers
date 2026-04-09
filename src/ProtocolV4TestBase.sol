@@ -4,17 +4,11 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
-
-import {ISpoke} from 'src/dependencies/v4/interfaces/ISpoke.sol';
-import {IHub} from 'src/dependencies/v4/interfaces/IHub.sol';
-import {ITokenizationSpoke} from 'src/dependencies/v4/interfaces/ITokenizationSpoke.sol';
-import {INativeTokenGateway} from 'src/dependencies/v4/interfaces/INativeTokenGateway.sol';
-import {ISignatureGateway} from 'src/dependencies/v4/interfaces/ISignatureGateway.sol';
-import {IGiverPositionManager} from 'src/dependencies/v4/interfaces/IGiverPositionManager.sol';
-import {ITakerPositionManager} from 'src/dependencies/v4/interfaces/ITakerPositionManager.sol';
-import {IConfigPositionManager} from 'src/dependencies/v4/interfaces/IConfigPositionManager.sol';
-import {AaveV4EthereumPositionManagers, AaveV4EthereumTokenizationSpokes, AaveV4EthereumHubs} from 'src/dependencies/v4/AaveV4EthereumAddresses.sol';
 import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
+
+import {ISpoke, IHub, ITokenizationSpoke, INativeTokenGateway, ISignatureGateway, IGiverPositionManager, ITakerPositionManager, IConfigPositionManager} from 'aave-address-book/AaveV4.sol';
+import {AaveV4EthereumPositionManagers} from 'aave-address-book/AaveV4Ethereum.sol';
+import {AaveV4EthereumHubHelpers} from 'src/dependencies/v4/AaveV4EthereumHelpers.sol';
 import {IPayloadsControllerCore, PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
 import {GovV3Helpers, ChainIds} from 'src/GovV3Helpers.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
@@ -64,7 +58,7 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     ISpoke[] memory spokes,
     address payload
   ) internal virtual {
-    IHub[] memory hubs = AaveV4EthereumHubs.getHubs();
+    IHub[] memory hubs = AaveV4EthereumHubHelpers.getHubs();
     string memory beforeName = string.concat(reportName, '_before');
     string memory afterName = string.concat(reportName, '_after');
 
@@ -176,9 +170,7 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
 
     // NativeTokenGateway — only if spoke lists WETH
     {
-      INativeTokenGateway nativeGateway = INativeTokenGateway(
-        AaveV4EthereumPositionManagers.NATIVE_TOKEN_GATEWAY
-      );
+      INativeTokenGateway nativeGateway = AaveV4EthereumPositionManagers.NATIVE_TOKEN_GATEWAY;
       (bool hasWeth, Types.ReserveInfo memory wethInfo) = _findNativeTokenReserveInfo(
         nativeGateway,
         spoke
@@ -194,7 +186,7 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     if (goodCollaterals.length > 0 && goodDebtReserves.length > 0) {
       uint256 gatewaySnapshot = vm.snapshotState();
       _testSignatureGateway({
-        gateway: ISignatureGateway(AaveV4EthereumPositionManagers.SIGNATURE_GATEWAY),
+        gateway: AaveV4EthereumPositionManagers.SIGNATURE_GATEWAY,
         spoke: spoke,
         reserveInfo: goodDebtReserves[0],
         collateralInfo: goodCollaterals[0]
@@ -262,9 +254,8 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     uint256 snapshot = vm.snapshotState();
     console.log('GIVER_PM: Testing supplyOnBehalfOf and repayOnBehalfOf');
 
-    IGiverPositionManager giverPositionManager = IGiverPositionManager(
-      AaveV4EthereumPositionManagers.GIVER_POSITION_MANAGER
-    );
+    IGiverPositionManager giverPositionManager = AaveV4EthereumPositionManagers
+      .GIVER_POSITION_MANAGER;
     address oracleAddr = spoke.ORACLE();
     address owner = makeAddr('GIVER_OWNER');
     address supplier = makeAddr('GIVER_SUPPLIER');
@@ -354,9 +345,8 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     uint256 snapshot = vm.snapshotState();
     console.log('TAKER_PM: Testing withdrawOnBehalfOf and borrowOnBehalfOf');
 
-    ITakerPositionManager takerPositionManager = ITakerPositionManager(
-      AaveV4EthereumPositionManagers.TAKER_POSITION_MANAGER
-    );
+    ITakerPositionManager takerPositionManager = AaveV4EthereumPositionManagers
+      .TAKER_POSITION_MANAGER;
     address owner = makeAddr('TAKER_OWNER');
     address taker = makeAddr('TAKER_DELEGATEE');
 
@@ -479,9 +469,8 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     uint256 snapshot = vm.snapshotState();
     console.log('CONFIG_PM: Testing setUsingAsCollateralOnBehalfOf');
 
-    IConfigPositionManager configPositionManager = IConfigPositionManager(
-      AaveV4EthereumPositionManagers.CONFIG_POSITION_MANAGER
-    );
+    IConfigPositionManager configPositionManager = AaveV4EthereumPositionManagers
+      .CONFIG_POSITION_MANAGER;
     address oracleAddr = spoke.ORACLE();
     address owner = makeAddr('CONFIG_OWNER');
     address configDelegatee = makeAddr('CONFIG_DELEGATEE');

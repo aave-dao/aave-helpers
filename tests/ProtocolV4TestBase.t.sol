@@ -3,10 +3,9 @@ pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
 import {ProtocolV4TestBase} from '../src/ProtocolV4TestBase.sol';
-import {ISpoke} from 'src/dependencies/v4/interfaces/ISpoke.sol';
-import {ITokenizationSpoke} from 'src/dependencies/v4/interfaces/ITokenizationSpoke.sol';
-import {ISpokeConfigurator} from 'src/dependencies/v4/interfaces/ISpokeConfigurator.sol';
-import {AaveV4EthereumSpokes, AaveV4EthereumHubs, AaveV4EthereumTokenizationSpokes, AaveV4EthereumAddresses} from 'src/dependencies/v4/AaveV4EthereumAddresses.sol';
+import {ISpoke, ITokenizationSpoke, ISpokeConfigurator} from 'aave-address-book/AaveV4.sol';
+import {AaveV4Ethereum, AaveV4EthereumSpokes, AaveV4EthereumHubs, AaveV4EthereumTokenizationSpokes, AaveV4EthereumPositionManagers} from 'aave-address-book/AaveV4Ethereum.sol';
+import {AaveV4EthereumHubHelpers, AaveV4EthereumSpokeHelpers, AaveV4EthereumTokenizationSpokeHelpers} from 'src/dependencies/v4/AaveV4EthereumHelpers.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 import {PayloadWithStorage} from './mocks/PayloadWithStorage.sol';
@@ -20,7 +19,7 @@ contract ProtocolV4TestBaseTest is ProtocolV4TestBase {
 
   function _mockAccessManager() internal {
     vm.mockCall(
-      AaveV4EthereumAddresses.ACCESS_MANAGER,
+      address(AaveV4Ethereum.ACCESS_MANAGER),
       abi.encodeWithSelector(bytes4(keccak256('canCall(address,address,bytes4)'))),
       abi.encode(true, uint32(0))
     );
@@ -28,7 +27,7 @@ contract ProtocolV4TestBaseTest is ProtocolV4TestBase {
 
   function _updatePaused(address spoke, uint256 reserveId, bool paused) internal {
     _mockAccessManager();
-    ISpokeConfigurator(AaveV4EthereumAddresses.SPOKE_CONFIGURATOR).updatePaused({
+    AaveV4Ethereum.SPOKE_CONFIGURATOR.updatePaused({
       spoke: spoke,
       reserveId: reserveId,
       paused: paused
@@ -38,7 +37,7 @@ contract ProtocolV4TestBaseTest is ProtocolV4TestBase {
 
   function _updateFrozen(address spoke, uint256 reserveId, bool frozen) internal {
     _mockAccessManager();
-    ISpokeConfigurator(AaveV4EthereumAddresses.SPOKE_CONFIGURATOR).updateFrozen({
+    AaveV4Ethereum.SPOKE_CONFIGURATOR.updateFrozen({
       spoke: spoke,
       reserveId: reserveId,
       frozen: frozen
@@ -90,18 +89,18 @@ contract ProtocolV4TestE2EDistinctSpokes is ProtocolV4TestBaseTest {
 
 contract ProtocolV4TestE2EAllSpokes is ProtocolV4TestBaseTest {
   function test_e2eAllSpokes() public {
-    e2eTestAllSpokes({spokes: AaveV4EthereumSpokes.getUserSpokes()});
+    e2eTestAllSpokes({spokes: AaveV4EthereumSpokeHelpers.getUserSpokes()});
   }
 }
 
 contract ProtocolV4TestE2ETokenizationSpokes is ProtocolV4TestBaseTest {
   function test_e2eSingleTokenizationSpoke() public {
-    e2eTestTokenizationSpoke(ITokenizationSpoke(AaveV4EthereumTokenizationSpokes.CORE_WETH));
+    e2eTestTokenizationSpoke(AaveV4EthereumTokenizationSpokes.CORE_WETH_TOKENIZATION_SPOKE);
   }
 
   function test_e2eAllTokenizationSpokes() public {
     e2eTestAllTokenizationSpokes({
-      tokenizationSpokes: AaveV4EthereumTokenizationSpokes.getTokenizationSpokes()
+      tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes()
     });
   }
 }
@@ -176,8 +175,8 @@ contract ProtocolV4TestSnapshot is ProtocolV4TestBaseTest {
   function test_snapshotState() public {
     string memory name = 'v4_snapshot';
     Types.V4Snapshot memory snapshot = createV4Snapshot({
-      spokes: AaveV4EthereumSpokes.getUserSpokes(),
-      hubs: AaveV4EthereumHubs.getHubs()
+      spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
+      hubs: AaveV4EthereumHubHelpers.getHubs()
     });
     writeV4SnapshotJson({name: name, snap: snapshot});
     vm.removeFile(string.concat('./reports/', name, '.json'));
@@ -189,8 +188,8 @@ contract ProtocolV4TestDefaultTest is ProtocolV4TestBaseTest {
     string memory name = 'v4_emit_payload';
     defaultTest({
       reportName: name,
-      spokes: AaveV4EthereumSpokes.getUserSpokes(),
-      tokenizationSpokes: AaveV4EthereumTokenizationSpokes.getTokenizationSpokes(),
+      spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
+      tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes(),
       payload: address(new PayloadWithEmit())
     });
     _cleanupArtifacts(name);
@@ -200,8 +199,8 @@ contract ProtocolV4TestDefaultTest is ProtocolV4TestBaseTest {
     string memory name = 'v4_no_e2e';
     defaultTest({
       reportName: name,
-      spokes: AaveV4EthereumSpokes.getUserSpokes(),
-      tokenizationSpokes: AaveV4EthereumTokenizationSpokes.getTokenizationSpokes(),
+      spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
+      tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes(),
       payload: address(new PayloadWithEmit()),
       runE2E: false
     });
@@ -214,8 +213,8 @@ contract ProtocolV4TestStorageValidation is ProtocolV4TestBaseTest {
     string memory name = 'v4_storage_pass';
     defaultTest({
       reportName: name,
-      spokes: AaveV4EthereumSpokes.getUserSpokes(),
-      tokenizationSpokes: AaveV4EthereumTokenizationSpokes.getTokenizationSpokes(),
+      spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
+      tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes(),
       payload: address(new PayloadWithEmit()),
       runE2E: false
     });
@@ -228,8 +227,8 @@ contract ProtocolV4TestStorageValidation is ProtocolV4TestBaseTest {
     vm.expectRevert();
     this.defaultTest({
       reportName: name,
-      spokes: AaveV4EthereumSpokes.getUserSpokes(),
-      tokenizationSpokes: AaveV4EthereumTokenizationSpokes.getTokenizationSpokes(),
+      spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
+      tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes(),
       payload: payload,
       runE2E: false
     });
