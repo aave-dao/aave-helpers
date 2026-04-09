@@ -323,9 +323,12 @@ abstract contract Actions is CommonTestBase {
     uint256 effectiveRepayAmount = amount >= snapshotBefore.user.totalDebt
       ? snapshotBefore.user.totalDebt
       : amount;
+    uint256 drawnRepayAmount = effectiveRepayAmount > snapshotBefore.user.drawnDebt
+      ? snapshotBefore.user.drawnDebt
+      : effectiveRepayAmount;
     uint256 expectedRestoredShares = IHubBase(reserveInfo.hub).previewRestoreByAssets(
       reserveInfo.assetId,
-      effectiveRepayAmount
+      drawnRepayAmount
     );
 
     vm.startPrank(user);

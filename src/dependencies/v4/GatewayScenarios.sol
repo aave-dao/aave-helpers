@@ -710,7 +710,9 @@ abstract contract GatewayScenarios is Helpers {
     });
     (sharesWithdrawn, amountWithdrawn) = gateway.withdrawWithSig(params, sig);
 
-    assertEq(amountWithdrawn, amount, 'SIG_WITHDRAW: amount mismatch');
+    if (amount != UINT256_MAX) {
+      assertEq(amountWithdrawn, amount, 'SIG_WITHDRAW: amount mismatch');
+    }
     assertEq(gateway.nonces(user, 0), nonceBefore + 1, 'SIG_WITHDRAW: nonce not incremented');
   }
 
