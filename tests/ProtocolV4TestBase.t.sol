@@ -4,8 +4,18 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {ProtocolV4TestBase} from '../src/ProtocolV4TestBase.sol';
 import {ISpoke, ITokenizationSpoke, ISpokeConfigurator} from 'aave-address-book/AaveV4.sol';
-import {AaveV4Ethereum, AaveV4EthereumSpokes, AaveV4EthereumHubs, AaveV4EthereumTokenizationSpokes, AaveV4EthereumPositionManagers} from 'aave-address-book/AaveV4Ethereum.sol';
-import {AaveV4EthereumHubHelpers, AaveV4EthereumSpokeHelpers, AaveV4EthereumTokenizationSpokeHelpers} from 'src/dependencies/v4/AaveV4EthereumHelpers.sol';
+import {
+  AaveV4Ethereum,
+  AaveV4EthereumSpokes,
+  AaveV4EthereumHubs,
+  AaveV4EthereumTokenizationSpokes,
+  AaveV4EthereumPositionManagers
+} from 'aave-address-book/AaveV4Ethereum.sol';
+import {
+  AaveV4EthereumHubHelpers,
+  AaveV4EthereumSpokeHelpers,
+  AaveV4EthereumTokenizationSpokeHelpers
+} from 'src/dependencies/v4/AaveV4EthereumHelpers.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 import {PayloadWithStorage} from './mocks/PayloadWithStorage.sol';
@@ -15,6 +25,12 @@ contract ProtocolV4TestBaseTest is ProtocolV4TestBase {
 
   function setUp() public {
     vm.createSelectFork('mainnet', BLOCK_NUMBER);
+  }
+
+  modifier gasless() {
+    vm.pauseGasMetering();
+    _;
+    vm.resumeGasMetering();
   }
 
   function _mockAccessManager() internal {
@@ -68,37 +84,40 @@ contract ProtocolV4TestBaseTest is ProtocolV4TestBase {
 }
 
 contract ProtocolV4TestE2ESingleSpoke is ProtocolV4TestBaseTest {
-  function test_e2eMainSpoke() public {
+  function test_e2eMainSpoke() public gasless {
     e2eTestSpoke({spoke: AaveV4EthereumSpokes.MAIN_SPOKE});
   }
 }
 
 contract ProtocolV4TestE2EDistinctSpokes is ProtocolV4TestBaseTest {
-  function test_e2eBluechipSpoke() public {
+  function test_e2eBluechipSpoke() public gasless {
     e2eTestSpoke({spoke: AaveV4EthereumSpokes.BLUECHIP_SPOKE});
   }
 
-  function test_e2eEthenaCorrelatedSpoke() public {
+  function test_e2eEthenaCorrelatedSpoke() public gasless {
     e2eTestSpoke({spoke: AaveV4EthereumSpokes.ETHENA_CORRELATED_SPOKE});
   }
 
-  function test_e2eLombardBtcSpoke() public {
+  function test_e2eLombardBtcSpoke() public gasless {
     e2eTestSpoke({spoke: AaveV4EthereumSpokes.LOMBARD_BTC_SPOKE});
   }
 }
 
 contract ProtocolV4TestE2EAllSpokes is ProtocolV4TestBaseTest {
-  function test_e2eAllSpokes() public {
-    e2eTestAllSpokes({spokes: AaveV4EthereumSpokeHelpers.getUserSpokes()});
+  function test_e2eAllSpokes() public gasless {
+    e2eTestAllSpokes({
+      spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
+      testPositionManagers: true
+    });
   }
 }
 
 contract ProtocolV4TestE2ETokenizationSpokes is ProtocolV4TestBaseTest {
-  function test_e2eSingleTokenizationSpoke() public {
+  function test_e2eSingleTokenizationSpoke() public gasless {
     e2eTestTokenizationSpoke(AaveV4EthereumTokenizationSpokes.CORE_WETH_TOKENIZATION_SPOKE);
   }
 
-  function test_e2eAllTokenizationSpokes() public {
+  function test_e2eAllTokenizationSpokes() public gasless {
     e2eTestAllTokenizationSpokes({
       tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes()
     });
@@ -106,21 +125,21 @@ contract ProtocolV4TestE2ETokenizationSpokes is ProtocolV4TestBaseTest {
 }
 
 contract ProtocolV4TestPositionManagers is ProtocolV4TestBaseTest {
-  function test_e2eGatewaysMainSpoke() public {
+  function test_e2eGatewaysMainSpoke() public gasless {
     e2eTestGateways({spoke: AaveV4EthereumSpokes.MAIN_SPOKE});
   }
 
-  function test_e2eRegularPositionManagers() public {
+  function test_e2eRegularPositionManagers() public gasless {
     e2eTestRegularPositionManagers({spoke: AaveV4EthereumSpokes.MAIN_SPOKE});
   }
 
-  function test_e2ePositionManagersBluechip() public {
+  function test_e2ePositionManagersBluechip() public gasless {
     e2eTestPositionManagers({spoke: AaveV4EthereumSpokes.BLUECHIP_SPOKE});
   }
 }
 
 contract ProtocolV4TestPausedFrozenAssets is ProtocolV4TestBaseTest {
-  function test_pausedAssetReverts() public {
+  function test_pausedAssetReverts() public gasless {
     ISpoke spoke = AaveV4EthereumSpokes.MAIN_SPOKE;
     Types.ReserveInfo[] memory reserves = _getReserveInfo(spoke);
     require(reserves.length > 0, 'No reserves found');
@@ -145,7 +164,7 @@ contract ProtocolV4TestPausedFrozenAssets is ProtocolV4TestBaseTest {
     e2eTestPausedAsset({spoke: spoke, pausedAsset: reserves[targetIdx]});
   }
 
-  function test_frozenAssetReverts() public {
+  function test_frozenAssetReverts() public gasless {
     ISpoke spoke = AaveV4EthereumSpokes.MAIN_SPOKE;
     Types.ReserveInfo[] memory reserves = _getReserveInfo(spoke);
     require(reserves.length > 0, 'No reserves found');
@@ -202,7 +221,8 @@ contract ProtocolV4TestDefaultTest is ProtocolV4TestBaseTest {
       spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
       tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes(),
       payload: address(new PayloadWithEmit()),
-      runE2E: false
+      runE2E: false,
+      testPositionManagers: false
     });
     _cleanupArtifacts(name);
   }
@@ -216,7 +236,8 @@ contract ProtocolV4TestStorageValidation is ProtocolV4TestBaseTest {
       spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
       tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes(),
       payload: address(new PayloadWithEmit()),
-      runE2E: false
+      runE2E: false,
+      testPositionManagers: false
     });
     _cleanupArtifacts(name);
   }
@@ -230,7 +251,8 @@ contract ProtocolV4TestStorageValidation is ProtocolV4TestBaseTest {
       spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
       tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes(),
       payload: payload,
-      runE2E: false
+      runE2E: false,
+      testPositionManagers: false
     });
     // filesystem writes persist through EVM reverts, so clean up manually
     _cleanupArtifacts(name);

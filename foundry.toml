@@ -8,7 +8,6 @@ remappings = []
 fs_permissions = [{ access = "read-write", path = "./reports" }, { access = "read-write", path = "./diffs" }]
 ffi = true
 evm_version = 'cancun'
-gas_limit = 9223372036854775807
 decode_external_storage = true
 
 [profile.zksync]

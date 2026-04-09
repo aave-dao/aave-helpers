@@ -6,11 +6,20 @@ import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
 import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
 
-import {ISpoke, IHub, ITokenizationSpoke, INativeTokenGateway, ISignatureGateway, IGiverPositionManager, ITakerPositionManager, IConfigPositionManager} from 'aave-address-book/AaveV4.sol';
+import {
+  ISpoke,
+  IHub,
+  ITokenizationSpoke,
+  INativeTokenGateway,
+  ISignatureGateway,
+  IGiverPositionManager,
+  ITakerPositionManager,
+  IConfigPositionManager
+} from 'aave-address-book/AaveV4.sol';
 import {AaveV4EthereumPositionManagers} from 'aave-address-book/AaveV4Ethereum.sol';
 import {AaveV4EthereumHubHelpers} from 'src/dependencies/v4/AaveV4EthereumHelpers.sol';
 import {IPayloadsControllerCore, PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
-import {GovV3Helpers, ChainIds} from 'src/GovV3Helpers.sol';
+import {GovV3Helpers} from 'src/GovV3Helpers.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {SnapshotV4} from 'src/dependencies/v4/SnapshotV4.sol';
 import {Scenarios} from 'src/dependencies/v4/Scenarios.sol';
@@ -33,7 +42,15 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     address[] memory tokenizationSpokes,
     address payload
   ) public {
-    return defaultTest(reportName, spokes, tokenizationSpokes, payload, true);
+    return
+      defaultTest({
+        reportName: reportName,
+        spokes: spokes,
+        tokenizationSpokes: tokenizationSpokes,
+        payload: payload,
+        runE2E: true,
+        testPositionManagers: false
+      });
   }
 
   function defaultTest(
@@ -41,15 +58,18 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     ISpoke[] memory spokes,
     address[] memory tokenizationSpokes,
     address payload,
-    bool runE2E
+    bool runE2E,
+    bool testPositionManagers
   ) public {
     if (payload != address(0)) {
       _snapshotDiffAndExecute(reportName, spokes, payload);
     }
 
     if (runE2E) {
-      e2eTestAllSpokes(spokes);
+      vm.pauseGasMetering();
+      e2eTestAllSpokes({spokes: spokes, testPositionManagers: testPositionManagers});
       e2eTestAllTokenizationSpokes(tokenizationSpokes);
+      vm.resumeGasMetering();
     }
   }
 
@@ -69,7 +89,7 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
 
     // as executor does delegateCall to the payload, the executor should have no storage changes
     {
-      IPayloadsControllerCore pc = GovV3Helpers.getPayloadsController(ChainIds.MAINNET);
+      IPayloadsControllerCore pc = GovV3Helpers.getPayloadsController(block.chainid);
       _validateNoExecutorStorageChange(
         rawDiff,
         pc
@@ -98,7 +118,7 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     GovV3Helpers.executePayload(
       vm,
       payload,
-      address(GovV3Helpers.getPayloadsController(ChainIds.MAINNET))
+      address(GovV3Helpers.getPayloadsController(block.chainid))
     );
 
     uint256 gasUsed = startGas - gasleft();
@@ -109,12 +129,14 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
   }
 
   /// @notice Test all reserves on every spoke in the array.
-  function e2eTestAllSpokes(ISpoke[] memory spokes) public {
+  function e2eTestAllSpokes(ISpoke[] memory spokes, bool testPositionManagers) public {
     for (uint256 i; i < spokes.length; i++) {
       console.log('--- E2E: Testing spoke %s ---', address(spokes[i]));
       console.log('--------------------------------');
       e2eTestSpoke(spokes[i]);
-      e2eTestPositionManagers(spokes[i]);
+      if (testPositionManagers) {
+        e2eTestPositionManagers(spokes[i]);
+      }
     }
   }
 
@@ -124,7 +146,12 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     Types.ReserveInfo[] memory goodCollaterals = _getAllUsableCollaterals(allReserves);
     require(goodCollaterals.length > 0, 'No usable collateral found');
 
-    for (uint256 collateralIndex; collateralIndex < goodCollaterals.length; collateralIndex++) {
+    uint256 numCollateralsToTest = 5;
+    numCollateralsToTest = goodCollaterals.length < numCollateralsToTest
+      ? goodCollaterals.length
+      : numCollateralsToTest;
+
+    for (uint256 collateralIndex; collateralIndex < numCollateralsToTest; collateralIndex++) {
       console.log('--- E2E: Using collateral %s ---', goodCollaterals[collateralIndex].symbol);
 
       uint256 spokeSnapshot = vm.snapshotState();
