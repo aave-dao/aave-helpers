@@ -1,0 +1,41 @@
+src/dependencies/v4/GatewayScenarios.sol
+  h_ac33fd5bdc4037 70-74,390,440,489-493,720-729,748
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "1ebf00692a0ac1a48f40530c9273f1d62dfd9c1b",
+  "prompts": {
+    "0e36084a45611522": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "775db6dc-fe30-40c4-823e-3d0971ec91e5",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": null,
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1889,
+      "overriden_lines": 2
+    },
+    "2109aeaf676af7d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "925bd6bb-d3cb-4885-8ae1-7e4cacab3c2e",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 11,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_ac33fd5bdc4037": {
+      "author": "YBM"
+    }
+  }
+}
