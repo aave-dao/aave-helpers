@@ -441,6 +441,19 @@ abstract contract Scenarios is Helpers {
       reserveInfo: testAssetInfo,
       dollarValue: vm.randomUint(1, 400)
     });
+    // simple check - ensure at least 1 share worth of debt assets is liquidated
+    // technically possible to liquidate less if premium debt exists, but serves as a basic check
+    if (
+      spoke.getReserve(testAssetInfo.reserveId).hub.previewRestoreByAssets(
+        testAssetInfo.reserveId,
+        partialDebt
+      ) == 0
+    ) {
+      partialDebt = spoke.getReserve(testAssetInfo.reserveId).hub.previewRestoreByShares(
+        testAssetInfo.reserveId,
+        1
+      );
+    }
     _liquidationCall({
       spoke: spoke,
       collateralInfo: collateralInfo,
