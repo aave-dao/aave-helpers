@@ -54,21 +54,11 @@ contract ProtocolV4TestBaseTest is ProtocolV4TestBase {
   function _cleanupArtifacts(string memory reportName) internal {
     string memory beforePath = string.concat('./reports/', reportName, '_before.json');
     string memory afterPath = string.concat('./reports/', reportName, '_after.json');
-    string memory diffPath = string.concat(
-      './diffs/',
-      reportName,
-      '_before_',
-      reportName,
-      '_after.md'
-    );
     if (vm.exists(beforePath)) {
       vm.removeFile(beforePath);
     }
     if (vm.exists(afterPath)) {
       vm.removeFile(afterPath);
-    }
-    if (vm.exists(diffPath)) {
-      vm.removeFile(diffPath);
     }
   }
 }

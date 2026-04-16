@@ -96,7 +96,7 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     vm.writeJson(rawDiff, afterPath, '$.raw');
     vm.writeJson(logsJson, afterPath, '$.logs');
 
-    diffV4Snapshots(reportName, snapshotBefore, snapshotAfter);
+    diffV4Snapshots(reportName);
   }
 
   function _executePayloadWithRecording(

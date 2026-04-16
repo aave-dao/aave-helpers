@@ -9,7 +9,7 @@ import {V4DiffWriter} from 'src/dependencies/v4/V4DiffWriter.sol';
 import {Helpers} from 'src/dependencies/v4/Helpers.sol';
 
 /// @title SnapshotV4
-/// @notice Snapshot capture for Aave V4. JSON + markdown diff delegated to V4DiffWriter.
+/// @notice Snapshot capture for Aave V4. JSON serialization via V4DiffWriter, diff via TypeScript FFI.
 abstract contract SnapshotV4 is Helpers {
   /// @notice Capture a full V4 configuration snapshot from the given spokes and hubs.
   function createV4Snapshot(
@@ -27,13 +27,27 @@ abstract contract SnapshotV4 is Helpers {
     V4DiffWriter.writeSnapshotJson(name, snap);
   }
 
-  /// @notice Generate markdown diff between two snapshots.
-  function diffV4Snapshots(
-    string memory reportName,
-    Types.V4Snapshot memory snapBefore,
-    Types.V4Snapshot memory snapAfter
-  ) internal {
-    V4DiffWriter.writeDiff(reportName, snapBefore, snapAfter);
+  /// @notice Generate markdown diff between two snapshots via TypeScript CLI (FFI).
+  function diffV4Snapshots(string memory reportName) internal {
+    string memory beforePath = string.concat('./reports/', reportName, '_before.json');
+    string memory afterPath = string.concat('./reports/', reportName, '_after.json');
+    string memory outPath = string.concat(
+      './diffs/',
+      reportName,
+      '_before_',
+      reportName,
+      '_after.md'
+    );
+
+    string[] memory inputs = new string[](7);
+    inputs[0] = 'npx';
+    inputs[1] = '@aave-dao/aave-helpers-js@^1.0.1';
+    inputs[2] = 'diff-v4-snapshots';
+    inputs[3] = beforePath;
+    inputs[4] = afterPath;
+    inputs[5] = '-o';
+    inputs[6] = outPath;
+    vm.ffi(inputs);
   }
 
   // Spoke reserves
@@ -85,12 +99,8 @@ abstract contract SnapshotV4 is Helpers {
 
     address oracleAddr = spoke.ORACLE();
     snap.oracleAddress = oracleAddr;
-    try IAaveOracle(oracleAddr).getReserveSource(reserveId) returns (address src) {
-      snap.priceSource = src;
-    } catch {}
-    try IAaveOracle(oracleAddr).getReservePrice(reserveId) returns (uint256 price) {
-      snap.oraclePrice = price;
-    } catch {}
+    snap.priceSource = IAaveOracle(oracleAddr).getReserveSource(reserveId);
+    snap.oraclePrice = IAaveOracle(oracleAddr).getReservePrice(reserveId);
   }
 
   // Spoke liquidation configs
@@ -151,19 +161,14 @@ abstract contract SnapshotV4 is Helpers {
     snap.reinvestmentController = config.reinvestmentController;
 
     if (config.irStrategy != address(0)) {
-      try IAssetInterestRateStrategy(config.irStrategy).getInterestRateData(assetId) returns (
-        IAssetInterestRateStrategy.InterestRateData memory irData
-      ) {
-        snap.optimalUsageRatio = irData.optimalUsageRatio;
-        snap.baseDrawnRate = irData.baseDrawnRate;
-        snap.rateGrowthBeforeOptimal = irData.rateGrowthBeforeOptimal;
-        snap.rateGrowthAfterOptimal = irData.rateGrowthAfterOptimal;
-      } catch {}
-      try IAssetInterestRateStrategy(config.irStrategy).getMaxDrawnRate(assetId) returns (
-        uint256 rate
-      ) {
-        snap.maxDrawnRate = rate;
-      } catch {}
+      IAssetInterestRateStrategy.InterestRateData memory irData = IAssetInterestRateStrategy(
+        config.irStrategy
+      ).getInterestRateData(assetId);
+      snap.optimalUsageRatio = irData.optimalUsageRatio;
+      snap.baseDrawnRate = irData.baseDrawnRate;
+      snap.rateGrowthBeforeOptimal = irData.rateGrowthBeforeOptimal;
+      snap.rateGrowthAfterOptimal = irData.rateGrowthAfterOptimal;
+      snap.maxDrawnRate = IAssetInterestRateStrategy(config.irStrategy).getMaxDrawnRate(assetId);
     }
   }
 

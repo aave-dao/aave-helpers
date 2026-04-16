@@ -745,7 +745,7 @@ abstract contract GatewayScenarios is Helpers {
     });
 
     // Ensure liquidity + borrow + repay
-    _ensureLiquidity({spoke: spoke, reserveInfo: reserveInfo, amount: borrowAmount});
+    _ensureLiquidity(spoke, reserveInfo, borrowAmount);
     _sigBorrow({
       gateway: gateway,
       spoke: spoke,
