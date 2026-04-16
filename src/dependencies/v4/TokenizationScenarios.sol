@@ -4,8 +4,7 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
-import {ITokenizationSpoke, IHub, IHubConfigurator} from 'aave-address-book/AaveV4.sol';
-import {AaveV4Ethereum} from 'aave-address-book/AaveV4Ethereum.sol';
+import {ITokenizationSpoke, IHub} from 'aave-address-book/AaveV4.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {TokenizationActions} from 'src/dependencies/v4/TokenizationActions.sol';
 
@@ -42,21 +41,15 @@ abstract contract TokenizationScenarios is TokenizationActions {
       });
   }
 
-  /// @notice Set addCap to max for a tokenization spoke's asset.
+  /// @notice Set addCap/drawCap to max for a tokenization spoke's asset.
   function _setTokenizationCapsToMax(ITokenizationSpoke tokenizationSpoke) internal {
-    vm.mockCall(
-      address(AaveV4Ethereum.ACCESS_MANAGER),
-      abi.encodeWithSelector(bytes4(keccak256('canCall(address,address,bytes4)'))),
-      abi.encode(true, uint32(0))
-    );
-    AaveV4Ethereum.HUB_CONFIGURATOR.updateSpokeCaps({
-      hub: tokenizationSpoke.hub(),
+    _setSpokeCapsToMax({
+      hub: IHub(tokenizationSpoke.hub()),
       assetId: tokenizationSpoke.assetId(),
       spoke: address(tokenizationSpoke),
-      addCap: type(uint40).max,
-      drawCap: type(uint40).max
+      maxAddCap: true,
+      maxDrawCap: true
     });
-    vm.clearMockedCalls();
   }
 
   // -------------------------------------------------------------------------

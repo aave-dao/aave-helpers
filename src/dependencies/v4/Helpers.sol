@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {IERC20Metadata} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
-import {ISpoke, IHubConfigurator, IAaveOracle} from 'aave-address-book/AaveV4.sol';
-import {AaveV4Ethereum} from 'aave-address-book/AaveV4Ethereum.sol';
+import {
+  IERC20Metadata
+} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
+import {IAccessManaged} from 'aave-v4/dependencies/openzeppelin/IAccessManaged.sol';
+import {HubConfigurator} from 'aave-v4/hub/HubConfigurator.sol';
+import {ISpoke, IHub, IHubConfigurator, IAaveOracle} from 'aave-address-book/AaveV4.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {Actions} from 'src/dependencies/v4/Actions.sol';
 
@@ -334,45 +337,64 @@ abstract contract Helpers is Actions {
 
   /// @notice Set all addCap/drawCap to max for every reserve on the spoke.
   function _setCapsToMax(ISpoke spoke) internal {
-    IHubConfigurator hubConfigurator = AaveV4Ethereum.HUB_CONFIGURATOR;
+    _setSpokeCapsToMaxForAllReserves({spoke: spoke, maxAddCap: true, maxDrawCap: true});
+  }
 
+  /// @notice Set all addCap to max for every reserve on the spoke (leaves drawCap unchanged).
+  function _setAddCapsToMax(ISpoke spoke) internal {
+    _setSpokeCapsToMaxForAllReserves({spoke: spoke, maxAddCap: true, maxDrawCap: false});
+  }
+
+  /// @notice Set caps to max for a single hub-asset-spoke combination.
+  /// @param maxAddCap If true, set addCap to max.
+  /// @param maxDrawCap If true, set drawCap to max.
+  function _setSpokeCapsToMax(
+    IHub hub,
+    uint256 assetId,
+    address spoke,
+    bool maxAddCap,
+    bool maxDrawCap
+  ) internal {
+    IHubConfigurator configurator = _deployMockedHubConfigurator(hub);
+    IHub.SpokeConfig memory config = hub.getSpokeConfig(assetId, spoke);
+    if (maxAddCap) {
+      config.addCap = hub.MAX_ALLOWED_SPOKE_CAP();
+    }
+    if (maxDrawCap) {
+      config.drawCap = hub.MAX_ALLOWED_SPOKE_CAP();
+    }
+    configurator.updateSpokeCaps({
+      hub: address(hub),
+      assetId: assetId,
+      spoke: spoke,
+      addCap: config.addCap,
+      drawCap: config.drawCap
+    });
+  }
+
+  function _setSpokeCapsToMaxForAllReserves(ISpoke spoke, bool maxAddCap, bool maxDrawCap) private {
     Types.ReserveInfo[] memory infos = _getReserveInfo(spoke);
-    vm.mockCall(
-      address(AaveV4Ethereum.ACCESS_MANAGER),
-      abi.encodeWithSelector(bytes4(keccak256('canCall(address,address,bytes4)'))),
-      abi.encode(true, uint32(0))
-    );
     for (uint256 i; i < infos.length; i++) {
-      hubConfigurator.updateSpokeCaps({
-        hub: infos[i].hub,
+      _setSpokeCapsToMax({
+        hub: IHub(infos[i].hub),
         assetId: infos[i].assetId,
         spoke: address(spoke),
-        addCap: type(uint40).max,
-        drawCap: type(uint40).max
+        maxAddCap: maxAddCap,
+        maxDrawCap: maxDrawCap
       });
     }
     vm.clearMockedCalls();
   }
 
-  /// @notice Set all addCap to max for every reserve on the spoke (leaves drawCap unchanged).
-  function _setAddCapsToMax(ISpoke spoke) internal {
-    IHubConfigurator hubConfigurator = AaveV4Ethereum.HUB_CONFIGURATOR;
-
-    Types.ReserveInfo[] memory infos = _getReserveInfo(spoke);
+  /// @notice Deploy a temporary HubConfigurator with the hub's access manager, mocked to allow all calls.
+  function _deployMockedHubConfigurator(IHub hub) internal returns (IHubConfigurator) {
+    address accessManager = IAccessManaged(address(hub)).authority();
     vm.mockCall(
-      address(AaveV4Ethereum.ACCESS_MANAGER),
+      accessManager,
       abi.encodeWithSelector(bytes4(keccak256('canCall(address,address,bytes4)'))),
       abi.encode(true, uint32(0))
     );
-    for (uint256 i; i < infos.length; i++) {
-      hubConfigurator.updateSpokeAddCap({
-        hub: infos[i].hub,
-        assetId: infos[i].assetId,
-        spoke: address(spoke),
-        addCap: type(uint40).max
-      });
-    }
-    vm.clearMockedCalls();
+    return IHubConfigurator(address(new HubConfigurator(accessManager)));
   }
 
   function _safeSymbol(address token) internal view returns (string memory) {

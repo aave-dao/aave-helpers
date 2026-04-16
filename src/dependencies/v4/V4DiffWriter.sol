@@ -37,29 +37,31 @@ library V4DiffWriter {
     for (uint256 i; i < reserves.length; i++) {
       string memory obj = _serReserve(reserves[i]);
 
-      string memory spokeKey = string.concat('spoke_', vm.toString(reserves[i].spokeAddress));
-      if (reserves[i].reserveId == 0) vm.serializeJson(spokeKey, '{}');
+      string memory spokeKey = string.concat(
+        'spoke_',
+        vm.toString(reserves[i].spokeAddress)
+      );
+      if (reserves[i].reserveId == 0) {
+        vm.serializeJson(spokeKey, '{}');
+      }
       string memory spokeObj = vm.serializeString(
         spokeKey,
         vm.toString(reserves[i].reserveId),
         obj
       );
 
-      if (_isLastForSpoke(reserves, i)) {
-        content = vm.serializeString(sectionKey, vm.toString(reserves[i].spokeAddress), spokeObj);
+      if (
+        i + 1 == reserves.length ||
+        reserves[i + 1].spokeAddress != reserves[i].spokeAddress
+      ) {
+        content = vm.serializeString(
+          sectionKey,
+          vm.toString(reserves[i].spokeAddress),
+          spokeObj
+        );
       }
     }
     vm.writeJson(vm.serializeString('root', 'spokeReserves', content), path);
-  }
-
-  function _isLastForSpoke(
-    Types.SpokeReserveSnapshot[] memory arr,
-    uint256 idx
-  ) private pure returns (bool) {
-    for (uint256 j = idx + 1; j < arr.length; j++) {
-      if (arr[j].spokeAddress == arr[idx].spokeAddress) return false;
-    }
-    return true;
   }
 
   function _serReserve(Types.SpokeReserveSnapshot memory r) private returns (string memory) {
@@ -121,24 +123,19 @@ library V4DiffWriter {
       string memory obj = _serHubAsset(assets[i]);
 
       string memory hubKey = string.concat('hub_', vm.toString(assets[i].hubAddress));
-      if (assets[i].assetId == 0) vm.serializeJson(hubKey, '{}');
+      if (i == 0 || assets[i].hubAddress != assets[i - 1].hubAddress) {
+        vm.serializeJson(hubKey, '{}');
+      }
       string memory hubObj = vm.serializeString(hubKey, vm.toString(assets[i].assetId), obj);
 
-      if (_isLastForHub(assets, i)) {
+      if (
+        i + 1 == assets.length ||
+        assets[i + 1].hubAddress != assets[i].hubAddress
+      ) {
         content = vm.serializeString(sectionKey, vm.toString(assets[i].hubAddress), hubObj);
       }
     }
     vm.writeJson(vm.serializeString('root', 'hubAssets', content), path);
-  }
-
-  function _isLastForHub(
-    Types.HubAssetSnapshot[] memory arr,
-    uint256 idx
-  ) private pure returns (bool) {
-    for (uint256 j = idx + 1; j < arr.length; j++) {
-      if (arr[j].hubAddress == arr[idx].hubAddress) return false;
-    }
-    return true;
   }
 
   function _serHubAsset(Types.HubAssetSnapshot memory a) private returns (string memory) {
