@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "a387aaf9542c4e97a9c36a6f6d429697164e5104",
+  "prompts": {
+    "559cb0827b371a99": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1f742bd0-3713-40d8-95b7-b0f0f62aadf9",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 14774,
+      "overriden_lines": 0
+    }
+  }
+}
