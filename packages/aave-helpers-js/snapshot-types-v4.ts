@@ -51,6 +51,11 @@ export const v4HubAssetSchema = z.object({
   rateGrowthBeforeOptimal: z.number(),
   rateGrowthAfterOptimal: z.number(),
   maxDrawnRate: z.string(), // uint256 serialized as string
+  // Asset state
+  deficitRay: z.string(), // uint200 serialized as string (RAY)
+  swept: z.string(), // uint120 serialized as string
+  premiumShares: z.string(), // uint120 serialized as string
+  premiumOffsetRay: z.string(), // int200 serialized as string (RAY, signed)
 });
 
 export type V4HubAsset = z.infer<typeof v4HubAssetSchema>;

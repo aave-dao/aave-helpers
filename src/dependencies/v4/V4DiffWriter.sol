@@ -155,7 +155,12 @@ library V4DiffWriter {
     vm.serializeUint(k, 'baseDrawnRate', a.baseDrawnRate);
     vm.serializeUint(k, 'rateGrowthBeforeOptimal', a.rateGrowthBeforeOptimal);
     vm.serializeUint(k, 'rateGrowthAfterOptimal', a.rateGrowthAfterOptimal);
-    return vm.serializeString(k, 'maxDrawnRate', vm.toString(a.maxDrawnRate));
+    vm.serializeString(k, 'maxDrawnRate', vm.toString(a.maxDrawnRate));
+    // Asset state
+    vm.serializeString(k, 'deficitRay', vm.toString(uint256(a.deficitRay)));
+    vm.serializeString(k, 'swept', vm.toString(uint256(a.swept)));
+    vm.serializeString(k, 'premiumShares', vm.toString(uint256(a.premiumShares)));
+    return vm.serializeString(k, 'premiumOffsetRay', vm.toString(a.premiumOffsetRay));
   }
 
   function _writeSpokeCaps(string memory path, Types.SpokeCapSnapshot[] memory caps) private {

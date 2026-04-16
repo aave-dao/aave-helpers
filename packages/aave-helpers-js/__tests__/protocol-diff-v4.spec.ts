@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { diffV4Snapshots } from '../protocol-diff-v4';
 import { aaveV4SnapshotSchema, type AaveV4Snapshot } from '../snapshot-types-v4';
-import { formatBps } from '../formatters-v4';
+import { formatV4Value } from '../formatters-v4';
 
 // --- Fixtures ---
 
@@ -63,6 +63,10 @@ function makeSnapshot(overrides?: Partial<AaveV4Snapshot>): AaveV4Snapshot {
           rateGrowthBeforeOptimal: 400,
           rateGrowthAfterOptimal: 6000,
           maxDrawnRate: '10000',
+          deficitRay: '0',
+          swept: '0',
+          premiumShares: '0',
+          premiumOffsetRay: '0',
         },
       },
     },
@@ -102,25 +106,83 @@ describe('V4 snapshot Zod schema', () => {
 
 // --- Formatter ---
 
-describe('formatBps', () => {
+describe('BPS formatting via formatV4Value', () => {
+  const ctx = { chainId: 1 };
+
   it('formats 8000 as 80.00 %', () => {
-    expect(formatBps(8000)).toBe('80.00 % [8000]');
+    expect(formatV4Value('spokeReserve', 'collateralFactor', 8000, ctx)).toBe('80.00 % [8000]');
   });
 
   it('formats 100 as 1.00 %', () => {
-    expect(formatBps(100)).toBe('1.00 % [100]');
+    expect(formatV4Value('spokeReserve', 'liquidationFee', 100, ctx)).toBe('1.00 % [100]');
   });
 
   it('formats 50 as 0.50 %', () => {
-    expect(formatBps(50)).toBe('0.50 % [50]');
-  });
-
-  it('formats 5 as 0.05 %', () => {
-    expect(formatBps(5)).toBe('0.05 % [5]');
+    expect(formatV4Value('spokeReserve', 'collateralFactor', 50, ctx)).toBe('0.50 % [50]');
   });
 
   it('formats 0 as 0.00 %', () => {
-    expect(formatBps(0)).toBe('0.00 % [0]');
+    expect(formatV4Value('spokeReserve', 'collateralFactor', 0, ctx)).toBe('0.00 % [0]');
+  });
+
+  it('formats collateralRisk as BPS', () => {
+    expect(formatV4Value('spokeReserve', 'collateralRisk', 5000, ctx)).toBe('50.00 % [5000]');
+  });
+
+  it('formats maxLiquidationBonus as BPS', () => {
+    expect(formatV4Value('spokeReserve', 'maxLiquidationBonus', 10100, ctx)).toBe('101.00 % [10100]');
+  });
+
+  it('formats hub asset IR strategy fields as BPS', () => {
+    expect(formatV4Value('hubAsset', 'optimalUsageRatio', 9200, ctx)).toBe('92.00 % [9200]');
+    expect(formatV4Value('hubAsset', 'baseDrawnRate', 25, ctx)).toBe('0.25 % [25]');
+    expect(formatV4Value('hubAsset', 'rateGrowthBeforeOptimal', 450, ctx)).toBe('4.50 % [450]');
+    expect(formatV4Value('hubAsset', 'rateGrowthAfterOptimal', 3000, ctx)).toBe('30.00 % [3000]');
+    expect(formatV4Value('hubAsset', 'maxDrawnRate', '3450', ctx)).toBe('34.50 % [3450]');
+  });
+
+  it('formats hub asset liquidityFee as BPS', () => {
+    expect(formatV4Value('hubAsset', 'liquidityFee', 1500, ctx)).toBe('15.00 % [1500]');
+  });
+
+  it('formats WAD fields for spoke liquidation', () => {
+    expect(formatV4Value('spokeLiq', 'targetHealthFactor', '1050000000000000000', ctx)).toBe(
+      '1.05 [1050000000000000000]'
+    );
+    expect(formatV4Value('spokeLiq', 'healthFactorForMaxBonus', '1000000000000000000', ctx)).toBe(
+      '1 [1000000000000000000]'
+    );
+  });
+
+  it('formats spokeLiq liquidationBonusFactor as BPS', () => {
+    expect(formatV4Value('spokeLiq', 'liquidationBonusFactor', 500, ctx)).toBe('5.00 % [500]');
+  });
+
+  it('formats RAY fields for hub asset state', () => {
+    expect(formatV4Value('hubAsset', 'deficitRay', '1000000000000000000000000000', ctx)).toBe(
+      '1 [1000000000000000000000000000]'
+    );
+    expect(formatV4Value('hubAsset', 'premiumOffsetRay', '-500000000000000000000000000', ctx)).toBe(
+      '-0.5 [-500000000000000000000000000]'
+    );
+  });
+
+  it('formats booleans as checkmarks', () => {
+    expect(formatV4Value('spokeReserve', 'paused', true, ctx)).toBe(':white_check_mark:');
+    expect(formatV4Value('spokeReserve', 'frozen', false, ctx)).toBe(':x:');
+    expect(formatV4Value('spokeCap', 'active', true, ctx)).toBe(':white_check_mark:');
+    expect(formatV4Value('spokeCap', 'halted', false, ctx)).toBe(':x:');
+  });
+
+  it('formats addresses as explorer links', () => {
+    const result = formatV4Value('spokeReserve', 'underlying', UNDERLYING, ctx);
+    expect(result).toContain(UNDERLYING);
+    expect(result).toContain(']('); // markdown link
+  });
+
+  it('falls back to raw string for unformatted fields', () => {
+    expect(formatV4Value('spokeLiq', 'maxUserReservesLimit', 128, ctx)).toBe('128');
+    expect(formatV4Value('spokeCap', 'addCap', '1000000', ctx)).toBe('1000000');
   });
 });
 
@@ -245,5 +307,140 @@ describe('diffV4Snapshots', () => {
     const md = await diffV4Snapshots(before, after);
     expect(md).toContain('## Raw diff');
     expect(md).toContain('```json');
+  });
+
+  // --- New/removed for all section types ---
+
+  it('detects new hub asset', async () => {
+    const before = makeSnapshot();
+    const after = makeSnapshot();
+    after.hubAssets[HUB_ADDR]['1'] = {
+      symbol: 'USDC',
+      underlying: '0x9999999999999999999999999999999999999999',
+      decimals: 6,
+      liquidityFee: 1500,
+      irStrategy: IR_STRATEGY,
+      feeReceiver: FEE_RECV,
+      reinvestmentController: REINVEST,
+      optimalUsageRatio: 9200,
+      baseDrawnRate: 0,
+      rateGrowthBeforeOptimal: 450,
+      rateGrowthAfterOptimal: 2000,
+      maxDrawnRate: '2450',
+      deficitRay: '0',
+      swept: '0',
+      premiumShares: '0',
+      premiumOffsetRay: '0',
+    };
+
+    const md = await diffV4Snapshots(before, after);
+    expect(md).toContain('## Hub Asset Changes');
+    expect(md).toContain('NEW ASSET');
+    expect(md).toContain('USDC');
+  });
+
+  it('detects removed hub asset', async () => {
+    const before = makeSnapshot();
+    const after = makeSnapshot();
+    after.hubAssets[HUB_ADDR] = {};
+
+    const md = await diffV4Snapshots(before, after);
+    expect(md).toContain('## Hub Asset Changes');
+    expect(md).toContain('REMOVED');
+  });
+
+  it('detects new spoke cap', async () => {
+    const before = makeSnapshot();
+    const after = makeSnapshot();
+    const newCapKey = `${HUB_ADDR}_1_${SPOKE_ADDR}`;
+    after.spokeCaps[newCapKey] = {
+      assetSymbol: 'USDC',
+      addCap: '500000',
+      drawCap: '250000',
+      riskPremiumThreshold: 50,
+      active: true,
+      halted: false,
+    };
+
+    const md = await diffV4Snapshots(before, after);
+    expect(md).toContain('## Hub Spoke Cap Changes');
+    expect(md).toContain('NEW SPOKE');
+    expect(md).toContain('USDC');
+  });
+
+  it('detects removed spoke cap', async () => {
+    const before = makeSnapshot();
+    const after = makeSnapshot();
+    const capKey = `${HUB_ADDR}_0_${SPOKE_ADDR}`;
+    delete after.spokeCaps[capKey];
+
+    const md = await diffV4Snapshots(before, after);
+    expect(md).toContain('## Hub Spoke Cap Changes');
+    expect(md).toContain('REMOVED');
+  });
+
+  it('detects new spoke liquidation config', async () => {
+    const before = makeSnapshot();
+    const after = makeSnapshot();
+    const newSpoke = '0xAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    after.spokeLiquidationConfigs[newSpoke] = {
+      targetHealthFactor: '1100000000000000000',
+      healthFactorForMaxBonus: '1050000000000000000',
+      liquidationBonusFactor: 400,
+      maxUserReservesLimit: 64,
+    };
+
+    const md = await diffV4Snapshots(before, after);
+    expect(md).toContain('## Spoke Liquidation Config Changes');
+    expect(md).toContain('NEW');
+  });
+
+  it('detects removed spoke liquidation config', async () => {
+    const before = makeSnapshot();
+    const after = makeSnapshot();
+    delete after.spokeLiquidationConfigs[SPOKE_ADDR];
+
+    const md = await diffV4Snapshots(before, after);
+    expect(md).toContain('## Spoke Liquidation Config Changes');
+    expect(md).toContain('REMOVED');
+  });
+
+  // --- Hub asset state fields ---
+
+  it('detects hub asset state changes (deficit, swept, premiumShares)', async () => {
+    const before = makeSnapshot();
+    const after = makeSnapshot();
+    after.hubAssets[HUB_ADDR]['0'] = {
+      ...after.hubAssets[HUB_ADDR]['0'],
+      deficitRay: '1000000000000000000000000000',
+      swept: '5000000',
+      premiumShares: '100000',
+      premiumOffsetRay: '-500000000000000000000000000',
+    };
+
+    const md = await diffV4Snapshots(before, after);
+    expect(md).toContain('## Hub Asset Changes');
+    expect(md).toContain('deficitRay');
+    expect(md).toContain('swept');
+    expect(md).toContain('premiumShares');
+    expect(md).toContain('premiumOffsetRay');
+  });
+
+  // --- Spoke cap composite key parsing ---
+
+  it('parses spoke cap composite key correctly in headers', async () => {
+    const before = makeSnapshot();
+    const after = makeSnapshot();
+    const capKey = `${HUB_ADDR}_0_${SPOKE_ADDR}`;
+    after.spokeCaps[capKey] = {
+      ...after.spokeCaps[capKey],
+      addCap: '9999999',
+    };
+
+    const md = await diffV4Snapshots(before, after);
+    // Header should contain the hub and spoke addresses from the parsed key
+    expect(md).toContain(HUB_ADDR);
+    expect(md).toContain(SPOKE_ADDR);
+    expect(md).toContain('assetId: 0');
   });
 });

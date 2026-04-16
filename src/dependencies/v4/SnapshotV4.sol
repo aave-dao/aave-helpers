@@ -148,6 +148,7 @@ abstract contract SnapshotV4 is Helpers {
     uint256 assetId
   ) private view returns (Types.HubAssetSnapshot memory snap) {
     IHub.AssetConfig memory config = hub.getAssetConfig(assetId);
+    IHub.Asset memory asset = hub.getAsset(assetId);
     (address underlying, uint8 decimals) = hub.getAssetUnderlyingAndDecimals(assetId);
 
     snap.hubAddress = address(hub);
@@ -170,6 +171,12 @@ abstract contract SnapshotV4 is Helpers {
       snap.rateGrowthAfterOptimal = irData.rateGrowthAfterOptimal;
       snap.maxDrawnRate = IAssetInterestRateStrategy(config.irStrategy).getMaxDrawnRate(assetId);
     }
+
+    // Asset state
+    snap.deficitRay = asset.deficitRay;
+    snap.swept = asset.swept;
+    snap.premiumShares = asset.premiumShares;
+    snap.premiumOffsetRay = asset.premiumOffsetRay;
   }
 
   // Hub spoke caps

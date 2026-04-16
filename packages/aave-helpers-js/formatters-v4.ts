@@ -1,4 +1,4 @@
-import type { Hex } from 'viem';
+import { type Hex, formatUnits } from 'viem';
 import { getClient } from '@bgd-labs/toolbox';
 import { toAddressLink, boolToMarkdown } from './utils/markdown';
 import type {
@@ -31,7 +31,7 @@ function isAddress(value: unknown): boolean {
 }
 
 /** Format BPS value as percentage, matching Solidity _ps(): "W.FF % [bps]" */
-export function formatBps(bps: number): string {
+function formatBps(bps: number): string {
   const w = Math.floor(bps / 100);
   const f = bps % 100;
   const fs = f < 10 ? `0${f}` : `${f}`;
@@ -43,6 +43,7 @@ export function formatBps(bps: number): string {
 type SpokeReserveKey = keyof V4SpokeReserve;
 
 const SPOKE_RESERVE_BPS_FIELDS: readonly SpokeReserveKey[] = [
+  'collateralRisk',
   'collateralFactor',
   'maxLiquidationBonus',
   'liquidationFee',
@@ -83,8 +84,10 @@ for (const field of SPOKE_RESERVE_ADDRESS_FIELDS) {
 
 type HubAssetKey = keyof V4HubAsset;
 
-const HUB_ASSET_BPS_FIELDS: readonly HubAssetKey[] = [
-  'liquidityFee',
+const HUB_ASSET_BPS_FIELDS: readonly HubAssetKey[] = ['liquidityFee'] as const;
+
+/** IR strategy fields — per-asset on V4, BPS scale (unlike V3 RAY). */
+const HUB_ASSET_IR_STRATEGY_BPS_FIELDS: readonly HubAssetKey[] = [
   'optimalUsageRatio',
   'baseDrawnRate',
   'rateGrowthBeforeOptimal',
@@ -106,12 +109,22 @@ for (const field of HUB_ASSET_BPS_FIELDS) {
   (hubAssetFormatters[field] as FieldFormatter<number>) = (value) => formatBps(value);
 }
 
+for (const field of HUB_ASSET_IR_STRATEGY_BPS_FIELDS) {
+  (hubAssetFormatters[field] as FieldFormatter<number>) = (value) => formatBps(value);
+}
+
 hubAssetFormatters['maxDrawnRate'] = (value) => formatBps(Number(value));
 
 for (const field of HUB_ASSET_ADDRESS_FIELDS) {
   (hubAssetFormatters[field] as FieldFormatter<string>) = (value, ctx) =>
     addressLink(value, ctx.chainId);
 }
+
+// Asset state — RAY fields (1e27)
+hubAssetFormatters['deficitRay'] = (value) =>
+  `${formatUnits(BigInt(value), 27)} [${value}]`;
+hubAssetFormatters['premiumOffsetRay'] = (value) =>
+  `${formatUnits(BigInt(value), 27)} [${value}]`;
 
 // --- Spoke Cap formatters ---
 
@@ -134,6 +147,15 @@ type SpokeLiqKey = keyof V4SpokeLiquidationConfig;
 export const spokeLiqFormatters: Partial<{
   [K in SpokeLiqKey]: FieldFormatter<V4SpokeLiquidationConfig[K]>;
 }> = {};
+
+// WAD fields (1e18) — serialized as strings
+spokeLiqFormatters['targetHealthFactor'] = (value) =>
+  `${formatUnits(BigInt(value), 18)} [${value}]`;
+spokeLiqFormatters['healthFactorForMaxBonus'] = (value) =>
+  `${formatUnits(BigInt(value), 18)} [${value}]`;
+
+// BPS field
+spokeLiqFormatters['liquidationBonusFactor'] = (value) => formatBps(value);
 
 // --- Generic format function ---
 

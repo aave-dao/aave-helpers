@@ -19,6 +19,11 @@ const FIELD_ORDER: (keyof V4HubAsset)[] = [
   'rateGrowthBeforeOptimal',
   'rateGrowthAfterOptimal',
   'maxDrawnRate',
+  // Asset state
+  'deficitRay',
+  'swept',
+  'premiumShares',
+  'premiumOffsetRay',
 ];
 
 function hubAssetHeader(asset: V4HubAsset, hubAddr: string, assetId: string, chainId: number): string {

@@ -99,6 +99,11 @@ library Types {
     uint32 rateGrowthBeforeOptimal;
     uint32 rateGrowthAfterOptimal;
     uint256 maxDrawnRate;
+    // Asset state (from getAsset)
+    uint200 deficitRay;
+    uint120 swept;
+    uint120 premiumShares;
+    int200 premiumOffsetRay;
   }
 
   struct SpokeCapSnapshot {
