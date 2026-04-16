@@ -37,10 +37,7 @@ library V4DiffWriter {
     for (uint256 i; i < reserves.length; i++) {
       string memory obj = _serReserve(reserves[i]);
 
-      string memory spokeKey = string.concat(
-        'spoke_',
-        vm.toString(reserves[i].spokeAddress)
-      );
+      string memory spokeKey = string.concat('spoke_', vm.toString(reserves[i].spokeAddress));
       if (reserves[i].reserveId == 0) {
         vm.serializeJson(spokeKey, '{}');
       }
@@ -50,15 +47,8 @@ library V4DiffWriter {
         obj
       );
 
-      if (
-        i + 1 == reserves.length ||
-        reserves[i + 1].spokeAddress != reserves[i].spokeAddress
-      ) {
-        content = vm.serializeString(
-          sectionKey,
-          vm.toString(reserves[i].spokeAddress),
-          spokeObj
-        );
+      if (i + 1 == reserves.length || reserves[i + 1].spokeAddress != reserves[i].spokeAddress) {
+        content = vm.serializeString(sectionKey, vm.toString(reserves[i].spokeAddress), spokeObj);
       }
     }
     vm.writeJson(vm.serializeString('root', 'spokeReserves', content), path);
@@ -128,10 +118,7 @@ library V4DiffWriter {
       }
       string memory hubObj = vm.serializeString(hubKey, vm.toString(assets[i].assetId), obj);
 
-      if (
-        i + 1 == assets.length ||
-        assets[i + 1].hubAddress != assets[i].hubAddress
-      ) {
+      if (i + 1 == assets.length || assets[i + 1].hubAddress != assets[i].hubAddress) {
         content = vm.serializeString(sectionKey, vm.toString(assets[i].hubAddress), hubObj);
       }
     }
