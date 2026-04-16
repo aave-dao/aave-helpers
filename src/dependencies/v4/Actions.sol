@@ -2,17 +2,18 @@
 pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
-import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
-import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
+import {SafeERC20, IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
 import {CommonTestBase} from 'src/CommonTestBase.sol';
 import {ISpoke} from 'aave-address-book/AaveV4.sol';
 import {IHubBase} from 'aave-v4/hub/interfaces/IHubBase.sol';
+import {WadRayMath} from 'aave-v4/libraries/math/WadRayMath.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 
 /// @title Actions
 /// @notice Low-level spoke actions with hub and spoke accounting assertions.
 abstract contract Actions is CommonTestBase {
   using SafeERC20 for IERC20;
+  using stdMath for uint256;
 
   uint256 constant HEALTH_FACTOR_LIQUIDATION_THRESHOLD = 1e18;
   uint256 constant MAX_DEAL_UNIT = 1e12; // whole units not accounting for token decimals
@@ -150,7 +151,11 @@ abstract contract Actions is CommonTestBase {
     // Hub drawn index should have grown
     IHubBase hub = IHubBase(reserveInfo.hub);
     uint256 drawnIndexAfter = hub.getAssetDrawnIndex(reserveInfo.assetId);
-    assertGt(drawnIndexAfter, 1e27, 'TIME_SKIP: drawn index should be greater than 1e27');
+    assertGt(
+      drawnIndexAfter,
+      WadRayMath.RAY,
+      'TIME_SKIP: drawn index should be greater than default 1 RAY'
+    );
 
     vm.revertToState(snapshot);
   }
@@ -166,16 +171,15 @@ abstract contract Actions is CommonTestBase {
 
     Types.PositionSnapshot memory snapshotBefore = _getPositionSnapshot(spoke, reserveInfo, user);
 
-    vm.startPrank(user);
-    deal2(reserveInfo.underlying, user, amount);
-    IERC20(reserveInfo.underlying).forceApprove(address(spoke), amount);
+    _forceApprove({spoke: spoke, underlying: reserveInfo.underlying, user: user, amount: amount});
+
     _logAction('SUPPLY', reserveInfo.symbol, amount);
+    vm.prank(user);
     (uint256 returnedShares, uint256 returnedAssets) = spoke.supply({
       reserveId: reserveInfo.reserveId,
       amount: amount,
       onBehalfOf: user
     });
-    vm.stopPrank();
 
     Types.PositionSnapshot memory snapshotAfter = _getPositionSnapshot(spoke, reserveInfo, user);
 
@@ -210,6 +214,13 @@ abstract contract Actions is CommonTestBase {
       snapshotBefore.spokeOnHub.collateralShares + expectedAddedShares,
       'SUPPLY: hub shares mismatch'
     );
+  }
+
+  /// @notice Deal to the user and force approve the spoke to spend the amount of the underlying token for the user
+  function _forceApprove(ISpoke spoke, address underlying, address user, uint256 amount) internal {
+    deal2(underlying, user, amount);
+    vm.prank(user);
+    IERC20(underlying).forceApprove(address(spoke), amount);
   }
 
   function _withdraw(
@@ -323,26 +334,28 @@ abstract contract Actions is CommonTestBase {
     uint256 effectiveRepayAmount = amount >= snapshotBefore.user.totalDebt
       ? snapshotBefore.user.totalDebt
       : amount;
-    uint256 drawnRepayAmount = effectiveRepayAmount > snapshotBefore.user.drawnDebt
-      ? snapshotBefore.user.drawnDebt
-      : effectiveRepayAmount;
+    uint256 drawnRepayAmount = effectiveRepayAmount > snapshotBefore.user.premiumDebt
+      ? effectiveRepayAmount - snapshotBefore.user.premiumDebt
+      : 0;
     uint256 expectedRestoredShares = IHubBase(reserveInfo.hub).previewRestoreByAssets(
       reserveInfo.assetId,
       drawnRepayAmount
     );
 
-    vm.startPrank(user);
-    // deal enough to cover full repay, capped to avoid overflow
-    uint256 maxDeal = _maxDealAmount(reserveInfo.decimals);
-    deal2(reserveInfo.underlying, user, maxDeal);
-    IERC20(reserveInfo.underlying).forceApprove(address(spoke), maxDeal);
+    _forceApprove({
+      spoke: spoke,
+      underlying: reserveInfo.underlying,
+      user: user,
+      amount: effectiveRepayAmount
+    });
+
     _logAction('REPAY', reserveInfo.symbol, amount);
+    vm.prank(user);
     (uint256 returnedShares, uint256 returnedAssets) = spoke.repay({
       reserveId: reserveInfo.reserveId,
       amount: amount,
       onBehalfOf: user
     });
-    vm.stopPrank();
 
     Types.PositionSnapshot memory snapshotAfter = _getPositionSnapshot(spoke, reserveInfo, user);
 
@@ -353,7 +366,7 @@ abstract contract Actions is CommonTestBase {
       assertEq(snapshotAfter.user.totalDebt, 0, 'REPAY: user debt should be zero');
     } else {
       assertApproxEqAbs(
-        stdMath.delta(snapshotAfter.user.totalDebt, snapshotBefore.user.totalDebt),
+        snapshotAfter.user.totalDebt.delta(snapshotBefore.user.totalDebt),
         amount,
         2,
         'REPAY: user debt mismatch'
@@ -361,13 +374,13 @@ abstract contract Actions is CommonTestBase {
     }
     // Hub spoke - up to 2 wei diff due to premium/drawn debt
     assertApproxEqAbs(
-      stdMath.delta(snapshotBefore.spokeOnHub.totalDebt, snapshotAfter.spokeOnHub.totalDebt),
+      snapshotBefore.spokeOnHub.totalDebt.delta(snapshotAfter.spokeOnHub.totalDebt),
       effectiveRepayAmount,
       2,
       'REPAY: hub debt mismatch'
     );
     assertEq(
-      stdMath.delta(snapshotBefore.spokeOnHub.drawnShares, snapshotAfter.spokeOnHub.drawnShares),
+      snapshotBefore.spokeOnHub.drawnShares.delta(snapshotAfter.spokeOnHub.drawnShares),
       expectedRestoredShares,
       'REPAY: hub drawn shares mismatch'
     );
@@ -394,10 +407,12 @@ abstract contract Actions is CommonTestBase {
     );
     assertGt(debtSnapshotBefore.user.totalDebt, 0, 'LIQUIDATE: borrower has no debt');
 
-    vm.startPrank(liquidator);
-    uint256 dealAmount = _maxDealAmount(debtInfo.decimals);
-    deal2(debtInfo.underlying, liquidator, dealAmount);
-    IERC20(debtInfo.underlying).forceApprove(address(spoke), debtToCover);
+    _forceApprove({
+      spoke: spoke,
+      underlying: debtInfo.underlying,
+      user: liquidator,
+      amount: debtSnapshotBefore.user.totalDebt
+    });
 
     if (debtToCover == UINT256_MAX) {
       console.log(
@@ -414,6 +429,7 @@ abstract contract Actions is CommonTestBase {
       );
     }
 
+    vm.prank(liquidator);
     spoke.liquidationCall({
       collateralReserveId: collateralInfo.reserveId,
       debtReserveId: debtInfo.reserveId,
@@ -421,7 +437,6 @@ abstract contract Actions is CommonTestBase {
       debtToCover: debtToCover,
       receiveShares: receiveShares
     });
-    vm.stopPrank();
 
     Types.PositionSnapshot memory collateralSnapshotAfter = _getPositionSnapshot(
       spoke,

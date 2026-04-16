@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {IERC20Metadata} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
+import {
+  IERC20Metadata
+} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import {ISpoke, IHubConfigurator, IAaveOracle} from 'aave-address-book/AaveV4.sol';
 import {AaveV4Ethereum} from 'aave-address-book/AaveV4Ethereum.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
@@ -15,22 +17,20 @@ abstract contract Helpers is Actions {
     uint256 count = spoke.getReserveCount();
     Types.ReserveInfo[] memory info = new Types.ReserveInfo[](count);
 
-    for (uint256 i; i < count; i++) {
-      ISpoke.Reserve memory reserve = spoke.getReserve(i);
-      ISpoke.ReserveConfig memory config = spoke.getReserveConfig(i);
+    for (uint256 reserveId; reserveId < count; reserveId++) {
+      ISpoke.Reserve memory reserve = spoke.getReserve(reserveId);
+      ISpoke.ReserveConfig memory config = spoke.getReserveConfig(reserveId);
       ISpoke.DynamicReserveConfig memory dynamicConfig = spoke.getDynamicReserveConfig(
-        i,
+        reserveId,
         reserve.dynamicConfigKey
       );
 
-      string memory symbol = _safeSymbol(reserve.underlying);
-
-      info[i] = Types.ReserveInfo({
-        reserveId: i,
+      info[reserveId] = Types.ReserveInfo({
+        reserveId: reserveId,
         underlying: reserve.underlying,
         hub: address(reserve.hub),
         assetId: reserve.assetId,
-        symbol: symbol,
+        symbol: _safeSymbol(reserve.underlying),
         decimals: reserve.decimals,
         paused: config.paused,
         frozen: config.frozen,
@@ -377,17 +377,7 @@ abstract contract Helpers is Actions {
     vm.clearMockedCalls();
   }
 
-  /// @notice Safely get the ERC20 symbol, fallback to "UNKNOWN".
   function _safeSymbol(address token) internal view returns (string memory) {
-    try IERC20Metadata(token).symbol() returns (string memory s) {
-      return s;
-    } catch {
-      return 'UNKNOWN';
-    }
-  }
-
-  /// @notice Half a token in the asset's native decimals.
-  function _halfToken(uint8 decimals) internal pure returns (uint256) {
-    return 10 ** decimals / 2;
+    return IERC20Metadata(token).symbol();
   }
 }

@@ -445,12 +445,12 @@ abstract contract Scenarios is Helpers {
     // technically possible to liquidate less if premium debt exists, but serves as a basic check
     if (
       spoke.getReserve(testAssetInfo.reserveId).hub.previewRestoreByAssets(
-        testAssetInfo.reserveId,
+        testAssetInfo.assetId,
         partialDebt
       ) == 0
     ) {
       partialDebt = spoke.getReserve(testAssetInfo.reserveId).hub.previewRestoreByShares(
-        testAssetInfo.reserveId,
+        testAssetInfo.assetId,
         1
       );
     }

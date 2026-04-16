@@ -4,7 +4,12 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
-import {ISpoke, IAaveOracle, INativeTokenGateway, ISignatureGateway} from 'aave-address-book/AaveV4.sol';
+import {
+  ISpoke,
+  IAaveOracle,
+  INativeTokenGateway,
+  ISignatureGateway
+} from 'aave-address-book/AaveV4.sol';
 import {IHubBase} from 'aave-v4/hub/interfaces/IHubBase.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {Helpers} from 'src/dependencies/v4/Helpers.sol';
@@ -13,6 +18,7 @@ import {Helpers} from 'src/dependencies/v4/Helpers.sol';
 /// @notice E2E test scenarios for NativeTokenGateway and SignatureGateway.
 abstract contract GatewayScenarios is Helpers {
   using SafeERC20 for IERC20;
+  using stdMath for uint256;
 
   // -------------------------------------------------------------------------
   // Helpers
@@ -61,7 +67,11 @@ abstract contract GatewayScenarios is Helpers {
     uint256 gatewaySnapshot = vm.snapshotState();
 
     address user = vm.randomAddress();
-    uint256 amount = _halfToken(wethInfo.decimals);
+    uint256 amount = _getTokenAmountByDollarValue(
+      spoke.ORACLE(),
+      wethInfo,
+      vm.randomUint(1_000, 10_000)
+    );
 
     // Authorize gateway as position manager for user
     vm.prank(user);
@@ -142,21 +152,18 @@ abstract contract GatewayScenarios is Helpers {
 
     Types.PositionSnapshot memory snapshotAfter = _getPositionSnapshot(spoke, wethInfo, user);
     assertApproxEqAbs(
-      stdMath.delta(snapshotAfter.user.collateralAssets, snapshotBefore.user.collateralAssets),
+      snapshotAfter.user.collateralAssets.delta(snapshotBefore.user.collateralAssets),
       amountSupplied,
       1,
       'NATIVE_SUPPLY: user assets mismatch'
     );
     assertEq(
-      stdMath.delta(snapshotAfter.user.collateralShares, snapshotBefore.user.collateralShares),
+      snapshotAfter.user.collateralShares.delta(snapshotBefore.user.collateralShares),
       sharesSupplied,
       'NATIVE_SUPPLY: user shares mismatch'
     );
     assertApproxEqAbs(
-      stdMath.delta(
-        snapshotAfter.spokeOnHub.collateralAssets,
-        snapshotBefore.spokeOnHub.collateralAssets
-      ),
+      snapshotAfter.spokeOnHub.collateralAssets.delta(snapshotBefore.spokeOnHub.collateralAssets),
       amountSupplied,
       1,
       'NATIVE_SUPPLY: hub assets mismatch'
@@ -190,21 +197,18 @@ abstract contract GatewayScenarios is Helpers {
 
     Types.PositionSnapshot memory snapshotAfter = _getPositionSnapshot(spoke, wethInfo, user);
     assertApproxEqAbs(
-      stdMath.delta(snapshotAfter.user.collateralAssets, snapshotBefore.user.collateralAssets),
+      snapshotAfter.user.collateralAssets.delta(snapshotBefore.user.collateralAssets),
       amountSupplied,
       1,
       'NATIVE_SUPPLY_AS_COLLATERAL: user assets mismatch'
     );
     assertEq(
-      stdMath.delta(snapshotAfter.user.collateralShares, snapshotBefore.user.collateralShares),
+      snapshotAfter.user.collateralShares.delta(snapshotBefore.user.collateralShares),
       sharesSupplied,
       'NATIVE_SUPPLY_AS_COLLATERAL: user shares mismatch'
     );
     assertApproxEqAbs(
-      stdMath.delta(
-        snapshotAfter.spokeOnHub.collateralAssets,
-        snapshotBefore.spokeOnHub.collateralAssets
-      ),
+      snapshotAfter.spokeOnHub.collateralAssets.delta(snapshotBefore.spokeOnHub.collateralAssets),
       amountSupplied,
       1,
       'NATIVE_SUPPLY_AS_COLLATERAL: hub assets mismatch'
@@ -273,7 +277,7 @@ abstract contract GatewayScenarios is Helpers {
         assertEq(amountWithdrawn, withdrawAmount, 'NATIVE_WITHDRAW: amount mismatch');
       }
       assertEq(
-        stdMath.delta(user.balance, ethBefore),
+        user.balance.delta(ethBefore),
         expectedWithdrawnAmount,
         'NATIVE_WITHDRAW: user ETH mismatch'
       );
@@ -282,30 +286,24 @@ abstract contract GatewayScenarios is Helpers {
     Types.PositionSnapshot memory snapshotAfter = _getPositionSnapshot(spoke, wethInfo, user);
 
     assertApproxEqAbs(
-      stdMath.delta(snapshotBefore.user.collateralAssets, snapshotAfter.user.collateralAssets),
+      snapshotBefore.user.collateralAssets.delta(snapshotAfter.user.collateralAssets),
       expectedWithdrawnAmount,
       1,
       'NATIVE_WITHDRAW: user assets mismatch'
     );
     assertEq(
-      stdMath.delta(snapshotBefore.user.collateralShares, snapshotAfter.user.collateralShares),
+      snapshotBefore.user.collateralShares.delta(snapshotAfter.user.collateralShares),
       sharesWithdrawn,
       'NATIVE_WITHDRAW: user shares mismatch'
     );
     assertApproxEqAbs(
-      stdMath.delta(
-        snapshotBefore.spokeOnHub.collateralAssets,
-        snapshotAfter.spokeOnHub.collateralAssets
-      ),
+      snapshotBefore.spokeOnHub.collateralAssets.delta(snapshotAfter.spokeOnHub.collateralAssets),
       expectedWithdrawnAmount,
       1,
       'NATIVE_WITHDRAW: hub assets mismatch'
     );
     assertEq(
-      stdMath.delta(
-        snapshotBefore.spokeOnHub.collateralShares,
-        snapshotAfter.spokeOnHub.collateralShares
-      ),
+      snapshotBefore.spokeOnHub.collateralShares.delta(snapshotAfter.spokeOnHub.collateralShares),
       sharesWithdrawn,
       'NATIVE_WITHDRAW: hub shares mismatch'
     );
@@ -389,33 +387,29 @@ abstract contract GatewayScenarios is Helpers {
         borrowAmount
       );
       assertEq(amountBorrowed, borrowAmount, 'NATIVE_BORROW: amount mismatch');
-      assertEq(
-        stdMath.delta(user.balance, ethBefore),
-        borrowAmount,
-        'NATIVE_BORROW: user ETH mismatch'
-      );
+      assertEq(user.balance.delta(ethBefore), borrowAmount, 'NATIVE_BORROW: user ETH mismatch');
     }
 
     Types.PositionSnapshot memory snapshotAfter = _getPositionSnapshot(spoke, wethInfo, user);
     assertEq(
-      stdMath.delta(snapshotAfter.user.drawnShares, snapshotBefore.user.drawnShares),
+      snapshotAfter.user.drawnShares.delta(snapshotBefore.user.drawnShares),
       sharesBorrowed,
       'NATIVE_BORROW: user drawn shares mismatch'
     );
     assertApproxEqAbs(
-      stdMath.delta(snapshotAfter.user.totalDebt, snapshotBefore.user.totalDebt),
+      snapshotAfter.user.totalDebt.delta(snapshotBefore.user.totalDebt),
       borrowAmount,
       2,
       'NATIVE_BORROW: user debt asset mismatch'
     );
     assertApproxEqAbs(
-      stdMath.delta(snapshotAfter.spokeOnHub.totalDebt, snapshotBefore.spokeOnHub.totalDebt),
+      snapshotAfter.spokeOnHub.totalDebt.delta(snapshotBefore.spokeOnHub.totalDebt),
       borrowAmount,
       2,
       'NATIVE_BORROW: hub debt mismatch'
     );
     assertEq(
-      stdMath.delta(snapshotAfter.spokeOnHub.drawnShares, snapshotBefore.spokeOnHub.drawnShares),
+      snapshotAfter.spokeOnHub.drawnShares.delta(snapshotBefore.spokeOnHub.drawnShares),
       sharesBorrowed,
       'NATIVE_BORROW: hub drawn shares mismatch'
     );
@@ -443,33 +437,29 @@ abstract contract GatewayScenarios is Helpers {
         repayAmount
       );
       assertEq(amountRepaid, repayAmount, 'NATIVE_REPAY: amount mismatch');
-      assertEq(
-        stdMath.delta(user.balance, ethBefore),
-        repayAmount,
-        'NATIVE_REPAY: user ETH mismatch'
-      );
+      assertEq(user.balance.delta(ethBefore), repayAmount, 'NATIVE_REPAY: user ETH mismatch');
     }
 
     Types.PositionSnapshot memory snapshotAfter = _getPositionSnapshot(spoke, wethInfo, user);
     assertEq(
-      stdMath.delta(snapshotBefore.user.drawnShares, snapshotAfter.user.drawnShares),
+      snapshotBefore.user.drawnShares.delta(snapshotAfter.user.drawnShares),
       sharesRepaid,
       'NATIVE_REPAY: user drawn shares mismatch'
     );
     assertApproxEqAbs(
-      stdMath.delta(snapshotBefore.user.totalDebt, snapshotAfter.user.totalDebt),
+      snapshotBefore.user.totalDebt.delta(snapshotAfter.user.totalDebt),
       repayAmount,
       2,
       'NATIVE_REPAY: user debt mismatch'
     );
     assertApproxEqAbs(
-      stdMath.delta(snapshotBefore.spokeOnHub.totalDebt, snapshotAfter.spokeOnHub.totalDebt),
+      snapshotBefore.spokeOnHub.totalDebt.delta(snapshotAfter.spokeOnHub.totalDebt),
       repayAmount,
       2,
       'NATIVE_REPAY: hub debt mismatch'
     );
     assertEq(
-      stdMath.delta(snapshotBefore.spokeOnHub.drawnShares, snapshotAfter.spokeOnHub.drawnShares),
+      snapshotBefore.spokeOnHub.drawnShares.delta(snapshotAfter.spokeOnHub.drawnShares),
       sharesRepaid,
       'NATIVE_REPAY: hub drawn shares mismatch'
     );
@@ -496,7 +486,11 @@ abstract contract GatewayScenarios is Helpers {
   ) internal {
     uint256 privateKey = vm.randomUint(1, type(uint248).max);
     address user = vm.addr(privateKey);
-    uint256 amount = _halfToken(reserveInfo.decimals);
+    uint256 amount = _getTokenAmountByDollarValue(
+      spoke.ORACLE(),
+      reserveInfo,
+      vm.randomUint(1_000, 10_000)
+    );
 
     // Authorize gateway as position manager for user
     vm.prank(user);
@@ -530,8 +524,7 @@ abstract contract GatewayScenarios is Helpers {
         reserveInfo: reserveInfo,
         collateralInfo: collateralInfo,
         privateKey: privateKey,
-        user: user,
-        amount: amount
+        user: user
       });
     }
   }
@@ -722,11 +715,19 @@ abstract contract GatewayScenarios is Helpers {
     Types.ReserveInfo memory reserveInfo,
     Types.ReserveInfo memory collateralInfo,
     uint256 privateKey,
-    address user,
-    uint256 amount
+    address user
   ) internal {
+    address oracleAddr = spoke.ORACLE();
+    uint256 borrowDollars = vm.randomUint(1_000, 10_000);
+    uint256 borrowAmount = _getTokenAmountByDollarValue(oracleAddr, reserveInfo, borrowDollars);
+    // 3x collateral to ensure HF stays above 1
+    uint256 collateralAmount = _getTokenAmountByDollarValue(
+      oracleAddr,
+      collateralInfo,
+      borrowDollars * 3
+    );
+
     // Supply collateral + enable as collateral via sig
-    uint256 collateralAmount = _halfToken(collateralInfo.decimals);
     _sigSupply({
       gateway: gateway,
       spoke: spoke,
@@ -744,8 +745,7 @@ abstract contract GatewayScenarios is Helpers {
     });
 
     // Ensure liquidity + borrow + repay
-    _ensureLiquidity({spoke: spoke, reserveInfo: reserveInfo, amount: amount});
-    uint256 borrowAmount = amount / 4;
+    _ensureLiquidity({spoke: spoke, reserveInfo: reserveInfo, amount: borrowAmount});
     _sigBorrow({
       gateway: gateway,
       spoke: spoke,
