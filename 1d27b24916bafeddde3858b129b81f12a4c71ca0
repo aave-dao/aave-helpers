@@ -1,0 +1,23 @@
+tests/MegaEthForkTest.t.sol
+  559cb0827b371a99 1-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "1d27b24916bafeddde3858b129b81f12a4c71ca0",
+  "prompts": {
+    "559cb0827b371a99": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1f742bd0-3713-40d8-95b7-b0f0f62aadf9",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 14871,
+      "total_deletions": 45,
+      "accepted_lines": 14805,
+      "overriden_lines": 11
+    }
+  }
+}
