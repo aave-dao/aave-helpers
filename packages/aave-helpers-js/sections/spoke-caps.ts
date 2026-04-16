@@ -29,7 +29,13 @@ function parseCapKey(key: string): { hubAddr: string; assetId: string; spokeAddr
   return { hubAddr, assetId, spokeAddr };
 }
 
-function capHeader(cap: V4SpokeCap, hubAddr: string, assetId: string, spokeAddr: string, chainId: number): string {
+function capHeader(
+  cap: V4SpokeCap,
+  hubAddr: string,
+  assetId: string,
+  spokeAddr: string,
+  chainId: number
+): string {
   const client = getClient(chainId, {});
   const hubLink = toAddressLink(hubAddr as Hex, true, client);
   const spokeLink = toAddressLink(spokeAddr as Hex, true, client);
@@ -77,16 +83,10 @@ function renderCapDiff(
   return md + '\n';
 }
 
-export function renderSpokeCapsSection(
-  before: AaveV4Snapshot,
-  after: AaveV4Snapshot
-): string {
+export function renderSpokeCapsSection(before: AaveV4Snapshot, after: AaveV4Snapshot): string {
   const ctx: V4FormatterContext = { chainId: after.chainId };
 
-  const allKeys = new Set([
-    ...Object.keys(before.spokeCaps),
-    ...Object.keys(after.spokeCaps),
-  ]);
+  const allKeys = new Set([...Object.keys(before.spokeCaps), ...Object.keys(after.spokeCaps)]);
 
   let body = '';
 

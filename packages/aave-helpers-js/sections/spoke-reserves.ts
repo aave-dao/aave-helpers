@@ -77,10 +77,7 @@ function renderReserveDiff(
   return md + '\n';
 }
 
-export function renderSpokeReservesSection(
-  before: AaveV4Snapshot,
-  after: AaveV4Snapshot
-): string {
+export function renderSpokeReservesSection(before: AaveV4Snapshot, after: AaveV4Snapshot): string {
   const ctx: V4FormatterContext = { chainId: after.chainId };
 
   const allSpokeAddrs = new Set([

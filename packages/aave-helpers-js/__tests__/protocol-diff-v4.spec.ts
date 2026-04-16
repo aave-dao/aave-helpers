@@ -130,7 +130,9 @@ describe('BPS formatting via formatV4Value', () => {
   });
 
   it('formats maxLiquidationBonus as BPS', () => {
-    expect(formatV4Value('spokeReserve', 'maxLiquidationBonus', 10100, ctx)).toBe('101.00 % [10100]');
+    expect(formatV4Value('spokeReserve', 'maxLiquidationBonus', 10100, ctx)).toBe(
+      '101.00 % [10100]'
+    );
   });
 
   it('formats hub asset IR strategy fields as BPS', () => {

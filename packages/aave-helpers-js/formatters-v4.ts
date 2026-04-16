@@ -121,10 +121,8 @@ for (const field of HUB_ASSET_ADDRESS_FIELDS) {
 }
 
 // Asset state — RAY fields (1e27)
-hubAssetFormatters['deficitRay'] = (value) =>
-  `${formatUnits(BigInt(value), 27)} [${value}]`;
-hubAssetFormatters['premiumOffsetRay'] = (value) =>
-  `${formatUnits(BigInt(value), 27)} [${value}]`;
+hubAssetFormatters['deficitRay'] = (value) => `${formatUnits(BigInt(value), 27)} [${value}]`;
+hubAssetFormatters['premiumOffsetRay'] = (value) => `${formatUnits(BigInt(value), 27)} [${value}]`;
 
 // --- Spoke Cap formatters ---
 

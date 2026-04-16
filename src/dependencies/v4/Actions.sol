@@ -322,6 +322,10 @@ abstract contract Actions is CommonTestBase {
       snapshotBefore.spokeOnHub.drawnShares + expectedDrawnShares,
       'BORROW: hub drawn shares mismatch'
     );
+
+    // Health factor must remain above liquidation threshold after borrow
+    uint256 healthFactor = spoke.getUserAccountData(user).healthFactor;
+    assertGt(healthFactor, HEALTH_FACTOR_LIQUIDATION_THRESHOLD, 'BORROW: health factor below 1');
   }
 
   function _repay(

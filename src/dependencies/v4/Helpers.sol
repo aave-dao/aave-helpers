@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {
-  IERC20Metadata
-} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
+import {IERC20Metadata} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import {ISpoke, IHubConfigurator, IAaveOracle} from 'aave-address-book/AaveV4.sol';
 import {AaveV4Ethereum} from 'aave-address-book/AaveV4Ethereum.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
@@ -104,7 +102,7 @@ abstract contract Helpers is Actions {
     address borrower,
     uint256 amount
   ) internal {
-    _supply({spoke: spoke, reserveInfo: reserveInfo, user: borrower, amount: amount});
+    _supply(spoke, reserveInfo, borrower, amount);
     vm.prank(borrower);
     spoke.setUsingAsCollateral({
       reserveId: reserveInfo.reserveId,

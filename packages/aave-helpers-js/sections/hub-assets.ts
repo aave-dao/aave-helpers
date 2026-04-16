@@ -26,7 +26,12 @@ const FIELD_ORDER: (keyof V4HubAsset)[] = [
   'premiumOffsetRay',
 ];
 
-function hubAssetHeader(asset: V4HubAsset, hubAddr: string, assetId: string, chainId: number): string {
+function hubAssetHeader(
+  asset: V4HubAsset,
+  hubAddr: string,
+  assetId: string,
+  chainId: number
+): string {
   const client = getClient(chainId, {});
   const hubLink = toAddressLink(hubAddr as Hex, true, client);
   return `### ${asset.symbol} (assetId: ${assetId}) on Hub ${hubLink}\n\n`;
@@ -71,16 +76,10 @@ function renderHubAssetDiff(
   return md + '\n';
 }
 
-export function renderHubAssetsSection(
-  before: AaveV4Snapshot,
-  after: AaveV4Snapshot
-): string {
+export function renderHubAssetsSection(before: AaveV4Snapshot, after: AaveV4Snapshot): string {
   const ctx: V4FormatterContext = { chainId: after.chainId };
 
-  const allHubAddrs = new Set([
-    ...Object.keys(before.hubAssets),
-    ...Object.keys(after.hubAssets),
-  ]);
+  const allHubAddrs = new Set([...Object.keys(before.hubAssets), ...Object.keys(after.hubAssets)]);
 
   let body = '';
 
