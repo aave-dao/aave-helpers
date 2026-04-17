@@ -337,39 +337,26 @@ abstract contract Scenarios is Helpers {
     skip(skipDays * 1 days);
 
     // Verify health factor is below 1 after making liquidatable
-    ISpoke.UserAccountData memory accountData = spoke.getUserAccountData(collateralSupplier);
     assertLt(
-      accountData.healthFactor,
+      spoke.getUserAccountData(collateralSupplier).healthFactor,
       HEALTH_FACTOR_LIQUIDATION_THRESHOLD,
       'HEALTH: should be below 1 for liquidation'
     );
 
     address liquidator = vm.randomAddress();
     uint256 snapshotBeforeLiquidation = vm.snapshotState();
+    bool receiveSharesEnabled = vm.randomBool();
 
-    bool receiveSharesEnabled = spoke
-      .getReserveConfig(collateralInfo.reserveId)
-      .receiveSharesEnabled;
-
-    // Partial liquidation — only if no dust remains
+    // Partial liquidation
     _testPartialLiquidation({
       spoke: spoke,
       collateralInfo: collateralInfo,
       testAssetInfo: testAssetInfo,
       liquidator: liquidator,
       borrower: collateralSupplier,
-      receiveShares: false
+      receiveShares: receiveSharesEnabled
     });
-    if (receiveSharesEnabled) {
-      _testPartialLiquidation({
-        spoke: spoke,
-        collateralInfo: collateralInfo,
-        testAssetInfo: testAssetInfo,
-        liquidator: liquidator,
-        borrower: collateralSupplier,
-        receiveShares: true
-      });
-    }
+    vm.revertToState(snapshotBeforeLiquidation);
 
     // Full liquidation - receive underlying
     _liquidationCall({

@@ -418,16 +418,14 @@ abstract contract Actions is CommonTestBase {
       amount: debtSnapshotBefore.user.totalDebt
     });
 
-    // Capture pre-liquidation state for profitability check
-    // Track debt and collateral token balances + share positions separately
-    uint256 liquidatorDebtBalanceBefore = IERC20(debtInfo.underlying).balanceOf(liquidator);
-    uint256 liquidatorCollateralTokenBefore = IERC20(collateralInfo.underlying).balanceOf(
+    // Capture pre-liquidation totals (token balance + supplied assets) for profitability check
+    uint256 liquidatorDebtTotalBefore = IERC20(debtInfo.underlying).balanceOf(liquidator) +
+      spoke.getUserSuppliedAssets(debtInfo.reserveId, liquidator);
+    uint256 liquidatorCollateralTotalBefore = IERC20(collateralInfo.underlying).balanceOf(
       liquidator
-    );
-    uint256 liquidatorCollateralSharesBefore = spoke.getUserSuppliedAssets(
-      collateralInfo.reserveId,
-      liquidator
-    );
+    ) + spoke.getUserSuppliedAssets(collateralInfo.reserveId, liquidator);
+
+    ISpoke.UserAccountData memory borrowerAccountDataBefore = spoke.getUserAccountData(borrower);
 
     if (debtToCover == UINT256_MAX) {
       console.log(
@@ -481,6 +479,32 @@ abstract contract Actions is CommonTestBase {
       collateralSnapshotBefore.user.collateralAssets,
       'LIQUIDATE: collateral did not decrease'
     );
+    // hub collateral can remain unchanged if receiveShares is true
+    assertLe(
+      collateralSnapshotAfter.spokeOnHub.totalDebt,
+      collateralSnapshotAfter.spokeOnHub.totalDebt,
+      'LIQUIDATE: hub collateral did not decrease or stay the same'
+    );
+    assertLe(
+      spoke.getUserAccountData(borrower).activeCollateralCount,
+      borrowerAccountDataBefore.activeCollateralCount,
+      'LIQUIDATE: borrower collateral count did not decrease or stay the same'
+    );
+    assertLe(
+      spoke.getUserAccountData(borrower).borrowCount,
+      borrowerAccountDataBefore.borrowCount,
+      'LIQUIDATE: borrower borrow count did not decrease or stay the same'
+    );
+    assertLe(
+      spoke.getUserAccountData(borrower).totalCollateralValue,
+      borrowerAccountDataBefore.totalCollateralValue,
+      'LIQUIDATE: borrower collateral value did not decrease or stay the same'
+    );
+    assertLe(
+      spoke.getUserAccountData(borrower).totalDebtValueRay,
+      borrowerAccountDataBefore.totalDebtValueRay,
+      'LIQUIDATE: borrower debt value did not decrease or stay the same'
+    );
 
     // Liquidation profitability: collateral value received > debt value paid
     _assertLiquidationProfitable({
@@ -488,76 +512,50 @@ abstract contract Actions is CommonTestBase {
       collateralInfo: collateralInfo,
       debtInfo: debtInfo,
       liquidator: liquidator,
-      liquidatorDebtBalanceBefore: liquidatorDebtBalanceBefore,
-      liquidatorCollateralTokenBefore: liquidatorCollateralTokenBefore,
-      liquidatorCollateralSharesBefore: liquidatorCollateralSharesBefore
+      liquidatorDebtBefore: liquidatorDebtTotalBefore,
+      liquidatorCollateralBefore: liquidatorCollateralTotalBefore
     });
   }
 
+  /// @dev Totals = token balance + supplied share assets. Caller passes pre-computed before-totals.
   function _assertLiquidationProfitable(
     ISpoke spoke,
     Types.ReserveInfo memory collateralInfo,
     Types.ReserveInfo memory debtInfo,
     address liquidator,
-    uint256 liquidatorDebtBalanceBefore,
-    uint256 liquidatorCollateralTokenBefore,
-    uint256 liquidatorCollateralSharesBefore
+    uint256 liquidatorDebtBefore,
+    uint256 liquidatorCollateralBefore
   ) private view {
-    // with the same asset, total position (tokens + shares) should increase after liquidation.
-    if (collateralInfo.underlying == debtInfo.underlying) {
-      _assertProfitableSameUnderlying({
-        spoke: spoke,
-        collateralInfo: collateralInfo,
-        liquidator: liquidator,
-        liquidatorCollateralTokenBefore: liquidatorCollateralTokenBefore,
-        liquidatorCollateralSharesBefore: liquidatorCollateralSharesBefore
-      });
-    } else {
-      _assertProfitableDiffUnderlying({
-        spoke: spoke,
-        collateralInfo: collateralInfo,
-        liquidator: liquidator,
-        liquidatorCollateralTokenBefore: liquidatorCollateralTokenBefore,
-        liquidatorCollateralSharesBefore: liquidatorCollateralSharesBefore
-      });
-    }
-  }
-
-  /// @dev Same underlying: total position (tokens + shares) should increase after liquidation.
-  function _assertProfitableSameUnderlying(
-    ISpoke spoke,
-    Types.ReserveInfo memory collateralInfo,
-    address liquidator,
-    uint256 liquidatorCollateralTokenBefore,
-    uint256 liquidatorCollateralSharesBefore
-  ) private view {
-    uint256 totalBefore = liquidatorCollateralTokenBefore + liquidatorCollateralSharesBefore;
-    uint256 totalAfter = IERC20(collateralInfo.underlying).balanceOf(liquidator) +
+    uint256 liquidatorDebtAfter = IERC20(debtInfo.underlying).balanceOf(liquidator) +
+      spoke.getUserSuppliedAssets(debtInfo.reserveId, liquidator);
+    uint256 liquidatorCollateralAfter = IERC20(collateralInfo.underlying).balanceOf(liquidator) +
       spoke.getUserSuppliedAssets(collateralInfo.reserveId, liquidator);
 
-    assertGt(
-      totalAfter,
-      totalBefore,
-      'LIQUIDATE: not profitable (same underlying) - total position did not increase'
-    );
-  }
+    uint256 debtSpent = liquidatorDebtAfter.delta(liquidatorDebtBefore);
+    uint256 collateralGained = liquidatorCollateralAfter.delta(liquidatorCollateralBefore);
 
-  /// @dev Different underlyings: compare oracle-normalized collateral gained vs debt spent.
-  /// @dev Different underlyings: oracle prices may be mocked during liquidation tests,
-  ///      so cross-asset value comparison is unreliable. Just verify the liquidator received collateral.
-  function _assertProfitableDiffUnderlying(
-    ISpoke spoke,
-    Types.ReserveInfo memory collateralInfo,
-    address liquidator,
-    uint256 liquidatorCollateralTokenBefore,
-    uint256 liquidatorCollateralSharesBefore
-  ) private view {
-    uint256 collateralGained = IERC20(collateralInfo.underlying).balanceOf(liquidator) +
-      spoke.getUserSuppliedAssets(collateralInfo.reserveId, liquidator) -
-      liquidatorCollateralTokenBefore -
-      liquidatorCollateralSharesBefore;
+    if (collateralInfo.underlying == debtInfo.underlying) {
+      // Same underlying: collateral/debt assets are the same, so debtSpent should == collateralGained and be positive
+      assertEq(debtSpent, collateralGained); // sanity check
+      assertGt(
+        collateralGained,
+        0,
+        'LIQUIDATE: not profitable (same underlying) - collateral gained <= debt spent'
+      );
+    } else {
+      // Different underlyings: compare oracle-normalized $ values.
+      // Cross-multiply to avoid precision loss from division with extreme mocked prices:
+      // collGained * collPrice * 10^debtDecimals > debtSpent * debtPrice * 10^collDecimals
+      IAaveOracle oracle = IAaveOracle(spoke.ORACLE());
+      uint256 collPrice = oracle.getReservePrice(collateralInfo.reserveId);
+      uint256 debtPrice = oracle.getReservePrice(debtInfo.reserveId);
 
-    assertGt(collateralGained, 0, 'LIQUIDATE: liquidator received no collateral');
+      assertGt(
+        collateralGained * collPrice * (10 ** debtInfo.decimals),
+        debtSpent * debtPrice * (10 ** collateralInfo.decimals),
+        'LIQUIDATE: not profitable - collateral $ value <= debt $ value'
+      );
+    }
   }
 
   /// @notice Convert a token amount to its oracle-denominated value.
