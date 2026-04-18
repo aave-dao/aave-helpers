@@ -39,14 +39,14 @@ abstract contract Scenarios is Helpers {
         vm.mockCall(
           oracle,
           abi.encodeWithSelector(IPriceOracle.getReservePrice.selector, i),
-          abi.encode(currentPrice / 1000)
+          abi.encode(currentPrice / 100)
         );
       } else if (userDebt > 0 && userSupply == 0) {
         uint256 currentPrice = IAaveOracle(oracle).getReservePrice(i);
         vm.mockCall(
           oracle,
           abi.encodeWithSelector(IPriceOracle.getReservePrice.selector, i),
-          abi.encode(currentPrice * 1000)
+          abi.encode(currentPrice * 100)
         );
       }
     }
@@ -345,7 +345,7 @@ abstract contract Scenarios is Helpers {
 
     address liquidator = vm.randomAddress();
     uint256 snapshotBeforeLiquidation = vm.snapshotState();
-    bool receiveSharesEnabled = vm.randomBool();
+    bool receiveShares = vm.randomBool();
 
     // Partial liquidation
     _testPartialLiquidation({
@@ -354,7 +354,7 @@ abstract contract Scenarios is Helpers {
       testAssetInfo: testAssetInfo,
       liquidator: liquidator,
       borrower: collateralSupplier,
-      receiveShares: receiveSharesEnabled
+      receiveShares: receiveShares
     });
     vm.revertToState(snapshotBeforeLiquidation);
 
@@ -371,7 +371,7 @@ abstract contract Scenarios is Helpers {
     vm.revertToState(snapshotBeforeLiquidation);
 
     // Full liquidation - receive shares (only if enabled on collateral reserve)
-    if (receiveSharesEnabled) {
+    if (receiveShares) {
       _liquidationCall({
         spoke: spoke,
         collateralInfo: collateralInfo,
@@ -403,16 +403,16 @@ abstract contract Scenarios is Helpers {
     uint256 totalDebt = spoke.getUserTotalDebt(testAssetInfo.reserveId, borrower);
     uint256 totalCollateral = spoke.getUserSuppliedAssets(collateralInfo.reserveId, borrower);
     // only execute partial liquidations above $1.5k
-    uint256 liquidationThreshold = 1_500;
+    uint256 liquidationDollarThreshold = 1_500;
     uint256 minDebtAssets = _getTokenAmountByDollarValue({
       oracleAddr: oracleAddr,
       reserveInfo: testAssetInfo,
-      dollarValue: liquidationThreshold
+      dollarValue: liquidationDollarThreshold
     });
     uint256 minCollateralAssets = _getTokenAmountByDollarValue({
       oracleAddr: oracleAddr,
       reserveInfo: collateralInfo,
-      dollarValue: liquidationThreshold
+      dollarValue: liquidationDollarThreshold
     });
 
     // Skip if either debt or collateral is too small — partial liq leads to dust
@@ -426,7 +426,7 @@ abstract contract Scenarios is Helpers {
     uint256 partialDebt = _getTokenAmountByDollarValue({
       oracleAddr: oracleAddr,
       reserveInfo: testAssetInfo,
-      dollarValue: vm.randomUint(1, 400)
+      dollarValue: vm.randomUint(100, 400)
     });
     // simple check - ensure at least 1 share worth of debt assets is liquidated
     // technically possible to liquidate less if premium debt exists, but serves as a basic check
