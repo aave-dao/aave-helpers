@@ -368,6 +368,8 @@ abstract contract Helpers is Actions {
       addCap: config.addCap,
       drawCap: config.drawCap
     });
+    // clear mocked call from _deployMockedHubConfigurator
+    vm.clearMockedCalls();
   }
 
   function _setSpokeCapsToMaxForAllReserves(ISpoke spoke, bool maxAddCap, bool maxDrawCap) private {

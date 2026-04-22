@@ -16,7 +16,7 @@ library V4DiffWriter {
     string memory path = string.concat('./reports/', reportName, '.json');
     vm.writeFile(
       path,
-      '{ "spokeReserves": {}, "spokeLiquidationConfigs": {}, "hubAssets": {}, "spokeCaps": {}, "raw": {} }'
+      '{ "spokeReserves": {}, "spokeLiquidationConfigs": {}, "hubAssets": {}, "spokeCaps": {} }'
     );
     vm.serializeUint('root', 'chainId', block.chainid);
 

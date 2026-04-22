@@ -369,22 +369,37 @@ abstract contract Actions is CommonTestBase {
     if (amount >= snapshotBefore.user.totalDebt) {
       assertEq(snapshotAfter.user.totalDebt, 0, 'REPAY: user debt should be zero');
     } else {
+      assertGe(
+        snapshotBefore.user.totalDebt,
+        snapshotAfter.user.totalDebt,
+        'REPAY: user debt did not decrease'
+      );
       assertApproxEqAbs(
-        snapshotAfter.user.totalDebt.delta(snapshotBefore.user.totalDebt),
+        snapshotBefore.user.totalDebt - snapshotAfter.user.totalDebt,
         amount,
         2,
         'REPAY: user debt mismatch'
       );
     }
     // Hub spoke - up to 2 wei diff due to premium/drawn debt
+    assertGe(
+      snapshotBefore.spokeOnHub.totalDebt,
+      snapshotAfter.spokeOnHub.totalDebt,
+      'REPAY: hub debt did not decrease'
+    );
     assertApproxEqAbs(
-      snapshotBefore.spokeOnHub.totalDebt.delta(snapshotAfter.spokeOnHub.totalDebt),
+      snapshotBefore.spokeOnHub.totalDebt - snapshotAfter.spokeOnHub.totalDebt,
       effectiveRepayAmount,
       2,
       'REPAY: hub debt mismatch'
     );
+    assertGe(
+      snapshotBefore.spokeOnHub.drawnShares,
+      snapshotAfter.spokeOnHub.drawnShares,
+      'REPAY: hub drawn shares did not decrease'
+    );
     assertEq(
-      snapshotBefore.spokeOnHub.drawnShares.delta(snapshotAfter.spokeOnHub.drawnShares),
+      snapshotBefore.spokeOnHub.drawnShares - snapshotAfter.spokeOnHub.drawnShares,
       expectedRestoredShares,
       'REPAY: hub drawn shares mismatch'
     );
@@ -481,8 +496,8 @@ abstract contract Actions is CommonTestBase {
     );
     // hub collateral can remain unchanged if receiveShares is true
     assertLe(
-      collateralSnapshotAfter.spokeOnHub.totalDebt,
-      collateralSnapshotAfter.spokeOnHub.totalDebt,
+      collateralSnapshotAfter.spokeOnHub.collateralAssets,
+      collateralSnapshotBefore.spokeOnHub.collateralAssets,
       'LIQUIDATE: hub collateral did not decrease or stay the same'
     );
     assertLe(
@@ -500,10 +515,10 @@ abstract contract Actions is CommonTestBase {
       borrowerAccountDataBefore.totalCollateralValue,
       'LIQUIDATE: borrower collateral value did not decrease or stay the same'
     );
-    assertLe(
+    assertLt(
       spoke.getUserAccountData(borrower).totalDebtValueRay,
       borrowerAccountDataBefore.totalDebtValueRay,
-      'LIQUIDATE: borrower debt value did not decrease or stay the same'
+      'LIQUIDATE: borrower debt value did not decrease'
     );
 
     // Liquidation profitability: collateral value received > debt value paid

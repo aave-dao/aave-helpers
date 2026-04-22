@@ -609,7 +609,7 @@ abstract contract Scenarios is Helpers {
     // Remove addCaps so enough collateral can be supplied to borrow up to drawCap
     _setAddCapsToMax(spoke);
 
-    console.log('TEST_DRAW_CAP: drawCap=%e', drawCap);
+    _logAction('TEST_DRAW_CAP', 'drawCap', drawCap);
     address borrower = vm.randomAddress();
     uint256 drawCapScaled = uint256(drawCap) * 10 ** reserveInfo.decimals;
     uint256 currentDebt = spoke.getReserveTotalDebt(reserveInfo.reserveId);
@@ -619,7 +619,7 @@ abstract contract Scenarios is Helpers {
 
     uint256 room = drawCapScaled - currentDebt;
 
-    // Supply the debt asset itself as collateral (3x room for borrow headroom) + liquidity
+    // Supply the debt asset itself as collateral (10x room for borrow headroom) + liquidity
     uint256 collateralAmount = room * 10;
     _supply({spoke: spoke, reserveInfo: reserveInfo, user: borrower, amount: collateralAmount});
     vm.prank(borrower);

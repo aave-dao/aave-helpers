@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
+import {IERC20Metadata} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
 import {ITokenizationSpoke, IHub} from 'aave-address-book/AaveV4.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
@@ -21,6 +22,10 @@ abstract contract TokenizationScenarios is TokenizationActions {
     uint16 assetId = uint16(tokenizationSpoke.assetId());
     address underlying = tokenizationSpoke.asset();
     uint8 decimals = tokenizationSpoke.decimals();
+    require(
+      decimals == IERC20Metadata(underlying).decimals(),
+      'TOKENIZATION: spoke decimals must match underlying'
+    );
     string memory symbol = _safeSymbol(underlying);
 
     return

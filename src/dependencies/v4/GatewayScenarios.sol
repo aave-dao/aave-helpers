@@ -272,7 +272,7 @@ abstract contract GatewayScenarios is Helpers {
         assertEq(amountWithdrawn, withdrawAmount, 'NATIVE_WITHDRAW: amount mismatch');
       }
       assertEq(
-        user.balance.delta(ethBefore),
+        user.balance - ethBefore,
         expectedWithdrawnAmount,
         'NATIVE_WITHDRAW: user ETH mismatch'
       );
@@ -281,24 +281,24 @@ abstract contract GatewayScenarios is Helpers {
     Types.PositionSnapshot memory snapshotAfter = _getPositionSnapshot(spoke, wethInfo, user);
 
     assertApproxEqAbs(
-      snapshotBefore.user.collateralAssets.delta(snapshotAfter.user.collateralAssets),
+      snapshotBefore.user.collateralAssets - snapshotAfter.user.collateralAssets,
       expectedWithdrawnAmount,
       1,
       'NATIVE_WITHDRAW: user assets mismatch'
     );
     assertEq(
-      snapshotBefore.user.collateralShares.delta(snapshotAfter.user.collateralShares),
+      snapshotBefore.user.collateralShares - snapshotAfter.user.collateralShares,
       sharesWithdrawn,
       'NATIVE_WITHDRAW: user shares mismatch'
     );
     assertApproxEqAbs(
-      snapshotBefore.spokeOnHub.collateralAssets.delta(snapshotAfter.spokeOnHub.collateralAssets),
+      snapshotBefore.spokeOnHub.collateralAssets - snapshotAfter.spokeOnHub.collateralAssets,
       expectedWithdrawnAmount,
       1,
       'NATIVE_WITHDRAW: hub assets mismatch'
     );
     assertEq(
-      snapshotBefore.spokeOnHub.collateralShares.delta(snapshotAfter.spokeOnHub.collateralShares),
+      snapshotBefore.spokeOnHub.collateralShares - snapshotAfter.spokeOnHub.collateralShares,
       sharesWithdrawn,
       'NATIVE_WITHDRAW: hub shares mismatch'
     );

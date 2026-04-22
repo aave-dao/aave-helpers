@@ -26,7 +26,7 @@ abstract contract TokenizationActions is Helpers {
     return
       Types.TokenizationSnapshot({
         userShares: userShares,
-        userAssets: userShares > 0 ? tokenizationSpoke.convertToAssets(userShares) : 0,
+        userAssets: tokenizationSpoke.convertToAssets(userShares),
         totalShares: tokenizationSpoke.totalSupply(),
         totalAssets: tokenizationSpoke.totalAssets(),
         spokeOnHub: _getSpokeOnHubAccounting(ISpoke(address(tokenizationSpoke)), reserveInfo)
@@ -40,6 +40,17 @@ abstract contract TokenizationActions is Helpers {
     assertEq(snapshot.spokeOnHub.drawnDebt, 0, 'TOKENIZATION: hub drawn debt should be zero');
     assertEq(snapshot.spokeOnHub.drawnShares, 0, 'TOKENIZATION: hub drawn shares should be zero');
     assertEq(snapshot.spokeOnHub.totalDebt, 0, 'TOKENIZATION: hub total debt should be zero');
+    assertEq(snapshot.spokeOnHub.premiumDebt, 0, 'TOKENIZATION: hub premium debt should be zero');
+    assertEq(
+      snapshot.spokeOnHub.premiumShares,
+      0,
+      'TOKENIZATION: hub premium shares should be zero'
+    );
+    assertEq(
+      snapshot.spokeOnHub.premiumOffsetRay,
+      0,
+      'TOKENIZATION: hub premium offset should be zero'
+    );
   }
 
   // -------------------------------------------------------------------------
@@ -56,6 +67,7 @@ abstract contract TokenizationActions is Helpers {
       reserveInfo,
       user
     );
+    _assertTokenizationNoDebt(snapshotBefore);
 
     uint256 expectedShares = tokenizationSpoke.previewDeposit(assets);
 
@@ -123,13 +135,14 @@ abstract contract TokenizationActions is Helpers {
       reserveInfo,
       user
     );
+    _assertTokenizationNoDebt(snapshotBefore);
 
     uint256 expectedAssets = tokenizationSpoke.previewMint(shares);
 
     vm.startPrank(user);
-    // Add some extra assets to avoid rounding errors
-    deal2(reserveInfo.underlying, user, expectedAssets * 2);
-    IERC20(reserveInfo.underlying).forceApprove(address(tokenizationSpoke), expectedAssets * 2);
+    // previewMint rounds assets UP per EIP-4626, so the exact amount is sufficient
+    deal2(reserveInfo.underlying, user, expectedAssets);
+    IERC20(reserveInfo.underlying).forceApprove(address(tokenizationSpoke), expectedAssets);
     _logAction('TOKENIZATION_MINT', reserveInfo.symbol, shares);
     uint256 assetsDeposited = tokenizationSpoke.mint(shares, user);
     vm.stopPrank();
@@ -180,6 +193,7 @@ abstract contract TokenizationActions is Helpers {
       reserveInfo,
       user
     );
+    _assertTokenizationNoDebt(snapshotBefore);
 
     uint256 expectedSharesBurned = tokenizationSpoke.previewWithdraw(assets);
 
@@ -233,6 +247,7 @@ abstract contract TokenizationActions is Helpers {
       reserveInfo,
       user
     );
+    _assertTokenizationNoDebt(snapshotBefore);
 
     uint256 expectedAssets = tokenizationSpoke.previewRedeem(shares);
 
@@ -286,12 +301,12 @@ abstract contract TokenizationActions is Helpers {
     uint256 shares
   ) internal {
     address user = vm.addr(privateKey);
-    uint256 userSharesBefore = tokenizationSpoke.balanceOf(user);
-    uint256 totalAssetsBefore = tokenizationSpoke.totalAssets();
-    uint256 hubCollateralBefore = IHubBase(reserveInfo.hub).getSpokeAddedAssets(
-      reserveInfo.assetId,
-      address(tokenizationSpoke)
+    Types.TokenizationSnapshot memory snapshotBefore = _getTokenizationSnapshot(
+      tokenizationSpoke,
+      reserveInfo,
+      user
     );
+    _assertTokenizationNoDebt(snapshotBefore);
 
     uint256 assetsDeposited = _executeTokenizationMintWithSig({
       tokenizationSpoke: tokenizationSpoke,
@@ -301,26 +316,41 @@ abstract contract TokenizationActions is Helpers {
       shares: shares
     });
 
+    Types.TokenizationSnapshot memory snapshotAfter = _getTokenizationSnapshot(
+      tokenizationSpoke,
+      reserveInfo,
+      user
+    );
+
     assertEq(
-      tokenizationSpoke.balanceOf(user) - userSharesBefore,
+      snapshotAfter.userShares - snapshotBefore.userShares,
       shares,
       'TOKENIZATION_MINT_WITH_SIG: user shares mismatch'
     );
     assertApproxEqAbs(
-      tokenizationSpoke.totalAssets() - totalAssetsBefore,
+      snapshotAfter.totalAssets - snapshotBefore.totalAssets,
       assetsDeposited,
       1,
       'TOKENIZATION_MINT_WITH_SIG: totalAssets mismatch'
     );
     assertApproxEqAbs(
-      IHubBase(reserveInfo.hub).getSpokeAddedAssets(
-        reserveInfo.assetId,
-        address(tokenizationSpoke)
-      ) - hubCollateralBefore,
+      snapshotAfter.spokeOnHub.collateralAssets - snapshotBefore.spokeOnHub.collateralAssets,
       assetsDeposited,
       1,
       'TOKENIZATION_MINT_WITH_SIG: hub collateral assets mismatch'
     );
+    {
+      uint256 expectedAddedShares = IHubBase(reserveInfo.hub).previewAddByAssets(
+        reserveInfo.assetId,
+        assetsDeposited
+      );
+      assertEq(
+        snapshotAfter.spokeOnHub.collateralShares,
+        snapshotBefore.spokeOnHub.collateralShares + expectedAddedShares,
+        'TOKENIZATION_MINT_WITH_SIG: hub collateral shares mismatch'
+      );
+    }
+    _assertTokenizationNoDebt(snapshotAfter);
   }
 
   function _executeTokenizationMintWithSig(
@@ -333,9 +363,9 @@ abstract contract TokenizationActions is Helpers {
     uint256 expectedAssets = tokenizationSpoke.previewMint(shares);
     _logAction('TOKENIZATION_MINT_WITH_SIG', reserveInfo.symbol, shares);
 
-    deal2(reserveInfo.underlying, user, expectedAssets * 2);
+    deal2(reserveInfo.underlying, user, expectedAssets);
     vm.prank(user);
-    IERC20(reserveInfo.underlying).forceApprove(address(tokenizationSpoke), expectedAssets * 2);
+    IERC20(reserveInfo.underlying).forceApprove(address(tokenizationSpoke), expectedAssets);
 
     uint192 nonceKey = tokenizationSpoke.PERMIT_NONCE_NAMESPACE();
     uint256 nonce = tokenizationSpoke.nonces(user, nonceKey);
@@ -385,12 +415,12 @@ abstract contract TokenizationActions is Helpers {
     uint256 shares
   ) internal {
     address user = vm.addr(userPrivateKey);
-    uint256 userSharesBefore = tokenizationSpoke.balanceOf(user);
-    uint256 totalAssetsBefore = tokenizationSpoke.totalAssets();
-    uint256 hubCollateralBefore = IHubBase(reserveInfo.hub).getSpokeAddedAssets(
-      reserveInfo.assetId,
-      address(tokenizationSpoke)
+    Types.TokenizationSnapshot memory snapshotBefore = _getTokenizationSnapshot(
+      tokenizationSpoke,
+      reserveInfo,
+      user
     );
+    _assertTokenizationNoDebt(snapshotBefore);
 
     uint256 assetsReceived = _executeTokenizationRedeemWithSig({
       tokenizationSpoke: tokenizationSpoke,
@@ -400,34 +430,37 @@ abstract contract TokenizationActions is Helpers {
       shares: shares
     });
 
+    Types.TokenizationSnapshot memory snapshotAfter = _getTokenizationSnapshot(
+      tokenizationSpoke,
+      reserveInfo,
+      user
+    );
+
     assertEq(
-      userSharesBefore - tokenizationSpoke.balanceOf(user),
+      snapshotBefore.userShares - snapshotAfter.userShares,
       shares,
       'TOKENIZATION_REDEEM_WITH_SIG: user shares mismatch'
     );
-    if (shares == userSharesBefore) {
+    if (shares == snapshotBefore.userShares) {
       assertEq(
-        tokenizationSpoke.balanceOf(user),
+        snapshotAfter.userShares,
         0,
         'TOKENIZATION_REDEEM_WITH_SIG: user shares should be zero'
       );
     }
     assertApproxEqAbs(
-      totalAssetsBefore - tokenizationSpoke.totalAssets(),
+      snapshotBefore.totalAssets - snapshotAfter.totalAssets,
       assetsReceived,
       1,
       'TOKENIZATION_REDEEM_WITH_SIG: totalAssets mismatch'
     );
     assertApproxEqAbs(
-      hubCollateralBefore -
-        IHubBase(reserveInfo.hub).getSpokeAddedAssets(
-          reserveInfo.assetId,
-          address(tokenizationSpoke)
-        ),
+      snapshotBefore.spokeOnHub.collateralAssets - snapshotAfter.spokeOnHub.collateralAssets,
       assetsReceived,
       1,
       'TOKENIZATION_REDEEM_WITH_SIG: hub collateral assets mismatch'
     );
+    _assertTokenizationNoDebt(snapshotAfter);
   }
 
   function _executeTokenizationRedeemWithSig(
@@ -491,12 +524,16 @@ abstract contract TokenizationActions is Helpers {
     uint256 deadline
   ) internal view returns (bytes32) {
     // Query nonces and DOMAIN_SEPARATOR from the underlying ERC20Permit token
-    (, bytes memory nonceData) = underlying.staticcall(
+    (bool nonceOk, bytes memory nonceData) = underlying.staticcall(
       abi.encodeWithSignature('nonces(address)', owner)
     );
+    require(nonceOk && nonceData.length == 32, 'PERMIT: underlying missing nonces(address)');
     uint256 nonce = abi.decode(nonceData, (uint256));
 
-    (, bytes memory dsData) = underlying.staticcall(abi.encodeWithSignature('DOMAIN_SEPARATOR()'));
+    (bool dsOk, bytes memory dsData) = underlying.staticcall(
+      abi.encodeWithSignature('DOMAIN_SEPARATOR()')
+    );
+    require(dsOk && dsData.length == 32, 'PERMIT: underlying missing DOMAIN_SEPARATOR()');
     bytes32 domainSeparator = abi.decode(dsData, (bytes32));
 
     bytes32 permitTypehash = keccak256(
@@ -520,17 +557,18 @@ abstract contract TokenizationActions is Helpers {
       reserveInfo,
       user
     );
+    _assertTokenizationNoDebt(snapshotBefore);
 
     deal2(reserveInfo.underlying, user, assets);
 
     uint256 deadline = vm.getBlockTimestamp() + 1 hours;
-    bytes32 digest = _buildUnderlyingPermitDigest(
-      reserveInfo.underlying,
-      user,
-      address(tokenizationSpoke),
-      assets,
-      deadline
-    );
+    bytes32 digest = _buildUnderlyingPermitDigest({
+      underlying: reserveInfo.underlying,
+      owner: user,
+      spender: address(tokenizationSpoke),
+      value: assets,
+      deadline: deadline
+    });
     (uint8 v, bytes32 r, bytes32 s) = vm.sign(userPrivateKey, digest);
 
     vm.prank(user);
