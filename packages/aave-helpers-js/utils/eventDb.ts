@@ -2441,4 +2441,107 @@ export const eventDb: AbiEvent[] = [
     name: 'Bridge',
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'id', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'upkeep', type: 'address' },
+      { indexed: true, internalType: 'uint32', name: 'gasLimit', type: 'uint32' },
+    ],
+    name: 'GasLimitSet',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'address', name: 'keeperRegistry', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'keeperRegistrar', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'linkWithdrawAddress', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'operatorOwner', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'operatorGuardian', type: 'address' },
+    ],
+    name: 'Initialized',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'id', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'upkeep', type: 'address' },
+    ],
+    name: 'KeeperCancelled',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'uint256', name: 'id', type: 'uint256' }],
+    name: 'KeeperPaused',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'id', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'from', type: 'address' },
+      { indexed: true, internalType: 'uint96', name: 'amount', type: 'uint96' },
+    ],
+    name: 'KeeperRefilled',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'newKeeperRegistrar', type: 'address' },
+    ],
+    name: 'KeeperRegistrarSet',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'newKeeperRegistry', type: 'address' },
+    ],
+    name: 'KeeperRegistrySet',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'uint256', name: 'id', type: 'uint256' }],
+    name: 'KeeperUnpaused',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'uint256[]', name: 'ids', type: 'uint256[]' },
+      { indexed: true, internalType: 'address', name: 'newKeeperRegistry', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newKeeperRegistrar', type: 'address' },
+    ],
+    name: 'KeepersMigrated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'uint256', name: 'id', type: 'uint256' },
+      { indexed: true, internalType: 'address', name: 'upkeep', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'to', type: 'address' },
+    ],
+    name: 'LinkWithdrawn',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'uint256', name: 'id', type: 'uint256' }],
+    name: 'TriggerConfigSet',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'newWithdrawAddress', type: 'address' },
+    ],
+    name: 'WithdrawAddressSet',
+    type: 'event',
+  },
 ];
