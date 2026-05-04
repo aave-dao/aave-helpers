@@ -1,0 +1,25 @@
+src/dependencies/v4/GatewayScenarios.sol
+  b92becd9588100d6 713-715
+src/dependencies/v4/Actions.sol
+  b92becd9588100d6 326-328,331
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "1afd3f20f9f23469f3b9f197ae908d33c05d3b45",
+  "prompts": {
+    "b92becd9588100d6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1113d87a-addf-406f-bf5c-5868ffd9d996",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 2,
+      "accepted_lines": 7,
+      "overriden_lines": 0
+    }
+  }
+}

@@ -1,0 +1,23 @@
+src/v4-config-engine/AaveV4PayloadEthereum.sol
+  559cb0827b371a99 1-8,10-11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.8",
+  "base_commit_sha": "0b9c44c98ec0e0f6bcece82bbf541092d1f83a27",
+  "prompts": {
+    "559cb0827b371a99": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1f742bd0-3713-40d8-95b7-b0f0f62aadf9",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 11,
+      "total_deletions": 0,
+      "accepted_lines": 10,
+      "overriden_lines": 1
+    }
+  }
+}

@@ -1,0 +1,41 @@
+src/dependencies/v4/Actions.sol
+  b92becd9588100d6 8-9
+src/dependencies/v4/TokenizationScenarios.sol
+  b92becd9588100d6 7-8,48,52
+src/dependencies/v4/Helpers.sol
+  b92becd9588100d6 5-6,339,343,348,361,365,370
+src/dependencies/v4/AaveV4EthereumHelpers.sol
+  b92becd9588100d6 1-78
+src/dependencies/v4/SnapshotV4.sol
+  b92becd9588100d6 6-7
+src/dependencies/v4/Scenarios.sol
+  b92becd9588100d6 7-9,72,76
+src/ProtocolV4TestBase.sol
+  b92becd9588100d6 9-11,61,173,189,257-258,348-349,472-473
+tests/ProtocolV4TestBase.t.sol
+  b92becd9588100d6 6-8,22,30,40,92,98,103,178-179,191-192,202-203,216-217,230-231
+src/dependencies/v4/GatewayScenarios.sol
+  b92becd9588100d6 7-8
+src/dependencies/v4/TokenizationActions.sol
+  b92becd9588100d6 7-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "6843bfd46237a6d34a21d2e39c9c1b8ac13db020",
+  "prompts": {
+    "b92becd9588100d6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1113d87a-addf-406f-bf5c-5868ffd9d996",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 129,
+      "total_deletions": 81,
+      "accepted_lines": 134,
+      "overriden_lines": 0
+    }
+  }
+}

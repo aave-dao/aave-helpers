@@ -1,0 +1,23 @@
+tests/ProtocolV4TestBase.t.sol
+  9b10e1ac8c008430 25-42,44,50,124,149,160,165-166,172,174,179,183,185,191-192,194-197
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "6246deaad49ff7df645d9634769b7bd30aec28c8",
+  "prompts": {
+    "9b10e1ac8c008430": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "445bf424-d39e-4f34-bef5-14dcfad99464",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 45,
+      "total_deletions": 35,
+      "accepted_lines": 36,
+      "overriden_lines": 0
+    }
+  }
+}

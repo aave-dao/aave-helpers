@@ -1,0 +1,14 @@
+src/dependencies/v4/Scenarios.sol
+  h_ac33fd5bdc4037 444-455
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "cfce2f1e5ff64c920e0f3484803e8bb98121def9",
+  "prompts": {},
+  "humans": {
+    "h_ac33fd5bdc4037": {
+      "author": "YBM"
+    }
+  }
+}
