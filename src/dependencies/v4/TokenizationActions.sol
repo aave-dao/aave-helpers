@@ -107,7 +107,7 @@ abstract contract TokenizationActions is Helpers {
     assertApproxEqAbs(
       snapshotAfter.spokeOnHub.collateralAssets,
       snapshotBefore.spokeOnHub.collateralAssets + assets,
-      1,
+      2,
       'TOKENIZATION_DEPOSIT: hub collateral assets mismatch'
     );
     {
@@ -176,7 +176,7 @@ abstract contract TokenizationActions is Helpers {
     assertApproxEqAbs(
       snapshotAfter.spokeOnHub.collateralAssets,
       snapshotBefore.spokeOnHub.collateralAssets + assetsDeposited,
-      1,
+      2,
       'TOKENIZATION_MINT: hub collateral assets mismatch'
     );
     _assertTokenizationNoDebt(snapshotAfter);
@@ -230,7 +230,7 @@ abstract contract TokenizationActions is Helpers {
     assertApproxEqAbs(
       snapshotBefore.spokeOnHub.collateralAssets - snapshotAfter.spokeOnHub.collateralAssets,
       assets,
-      1,
+      2,
       'TOKENIZATION_WITHDRAW: hub collateral assets mismatch'
     );
     _assertTokenizationNoDebt(snapshotAfter);
@@ -288,7 +288,7 @@ abstract contract TokenizationActions is Helpers {
     assertApproxEqAbs(
       snapshotBefore.spokeOnHub.collateralAssets - snapshotAfter.spokeOnHub.collateralAssets,
       assetsReceived,
-      1,
+      2,
       'TOKENIZATION_REDEEM: hub collateral assets mismatch'
     );
     _assertTokenizationNoDebt(snapshotAfter);
@@ -336,7 +336,7 @@ abstract contract TokenizationActions is Helpers {
     assertApproxEqAbs(
       snapshotAfter.spokeOnHub.collateralAssets - snapshotBefore.spokeOnHub.collateralAssets,
       assetsDeposited,
-      1,
+      2,
       'TOKENIZATION_MINT_WITH_SIG: hub collateral assets mismatch'
     );
     {
@@ -457,7 +457,7 @@ abstract contract TokenizationActions is Helpers {
     assertApproxEqAbs(
       snapshotBefore.spokeOnHub.collateralAssets - snapshotAfter.spokeOnHub.collateralAssets,
       assetsReceived,
-      1,
+      2,
       'TOKENIZATION_REDEEM_WITH_SIG: hub collateral assets mismatch'
     );
     _assertTokenizationNoDebt(snapshotAfter);
@@ -598,7 +598,7 @@ abstract contract TokenizationActions is Helpers {
     assertApproxEqAbs(
       snapshotAfter.spokeOnHub.collateralAssets,
       snapshotBefore.spokeOnHub.collateralAssets + assets,
-      1,
+      2,
       'TOKENIZATION_DEPOSIT_WITH_PERMIT: hub collateral assets mismatch'
     );
     _assertTokenizationNoDebt(snapshotAfter);

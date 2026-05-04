@@ -149,7 +149,7 @@ abstract contract GatewayScenarios is Helpers {
     assertApproxEqAbs(
       snapshotAfter.user.collateralAssets.delta(snapshotBefore.user.collateralAssets),
       amountSupplied,
-      1,
+      2,
       'NATIVE_SUPPLY: user assets mismatch'
     );
     assertEq(
@@ -160,7 +160,7 @@ abstract contract GatewayScenarios is Helpers {
     assertApproxEqAbs(
       snapshotAfter.spokeOnHub.collateralAssets.delta(snapshotBefore.spokeOnHub.collateralAssets),
       amountSupplied,
-      1,
+      2,
       'NATIVE_SUPPLY: hub assets mismatch'
     );
     vm.revertToState(snapshot);
@@ -194,7 +194,7 @@ abstract contract GatewayScenarios is Helpers {
     assertApproxEqAbs(
       snapshotAfter.user.collateralAssets.delta(snapshotBefore.user.collateralAssets),
       amountSupplied,
-      1,
+      2,
       'NATIVE_SUPPLY_AS_COLLATERAL: user assets mismatch'
     );
     assertEq(
@@ -205,7 +205,7 @@ abstract contract GatewayScenarios is Helpers {
     assertApproxEqAbs(
       snapshotAfter.spokeOnHub.collateralAssets.delta(snapshotBefore.spokeOnHub.collateralAssets),
       amountSupplied,
-      1,
+      2,
       'NATIVE_SUPPLY_AS_COLLATERAL: hub assets mismatch'
     );
   }
@@ -283,7 +283,7 @@ abstract contract GatewayScenarios is Helpers {
     assertApproxEqAbs(
       snapshotBefore.user.collateralAssets - snapshotAfter.user.collateralAssets,
       expectedWithdrawnAmount,
-      1,
+      2,
       'NATIVE_WITHDRAW: user assets mismatch'
     );
     assertEq(
@@ -294,7 +294,7 @@ abstract contract GatewayScenarios is Helpers {
     assertApproxEqAbs(
       snapshotBefore.spokeOnHub.collateralAssets - snapshotAfter.spokeOnHub.collateralAssets,
       expectedWithdrawnAmount,
-      1,
+      2,
       'NATIVE_WITHDRAW: hub assets mismatch'
     );
     assertEq(

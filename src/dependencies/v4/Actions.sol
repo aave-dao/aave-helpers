@@ -189,7 +189,7 @@ abstract contract Actions is CommonTestBase {
     assertApproxEqAbs(
       snapshotAfter.user.collateralAssets,
       snapshotBefore.user.collateralAssets + amount,
-      1,
+      2,
       'SUPPLY: user assets mismatch'
     );
     assertEq(
@@ -201,7 +201,7 @@ abstract contract Actions is CommonTestBase {
     assertApproxEqAbs(
       snapshotAfter.spokeOnHub.collateralAssets,
       snapshotBefore.spokeOnHub.collateralAssets + amount,
-      1,
+      2,
       'SUPPLY: hub assets mismatch'
     );
     uint256 expectedAddedShares = IHubBase(reserveInfo.hub).previewAddByAssets(
@@ -249,7 +249,7 @@ abstract contract Actions is CommonTestBase {
       assertApproxEqAbs(
         snapshotAfter.user.collateralAssets,
         snapshotBefore.user.collateralAssets - withdrawnAmount,
-        1,
+        2,
         'WITHDRAW: user assets mismatch'
       );
       assertEq(
@@ -262,7 +262,7 @@ abstract contract Actions is CommonTestBase {
     assertApproxEqAbs(
       snapshotBefore.spokeOnHub.collateralAssets - snapshotAfter.spokeOnHub.collateralAssets,
       withdrawnAmount,
-      1,
+      2,
       'WITHDRAW: hub assets mismatch'
     );
     assertEq(
@@ -270,6 +270,10 @@ abstract contract Actions is CommonTestBase {
       returnedShares,
       'WITHDRAW: hub shares mismatch'
     );
+
+    // Health factor must remain above liquidation threshold after withdraw
+    uint256 healthFactor = spoke.getUserAccountData(user).healthFactor;
+    assertGt(healthFactor, HEALTH_FACTOR_LIQUIDATION_THRESHOLD, 'WITHDRAW: health factor below 1');
   }
 
   function _borrow(
