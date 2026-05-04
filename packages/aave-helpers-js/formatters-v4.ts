@@ -147,6 +147,8 @@ for (const field of SPOKE_CAP_TOKEN_AMOUNT_FIELDS) {
     `${value.toLocaleString('en-US')} ${ctx.spokeCap?.assetSymbol ?? ''}`.trim();
 }
 
+spokeCapFormatters['riskPremiumThreshold'] = (value) => formatBps(value);
+
 // --- Spoke Liquidation Config formatters ---
 
 type SpokeLiqKey = keyof V4SpokeLiquidationConfig;
