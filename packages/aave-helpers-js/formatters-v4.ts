@@ -12,6 +12,7 @@ import type {
 
 export interface V4FormatterContext {
   chainId: number;
+  spokeCap?: V4SpokeCap;
 }
 
 export type FieldFormatter<T = unknown> = (value: T, ctx: V4FormatterContext) => string;
@@ -130,12 +131,20 @@ type SpokeCapKey = keyof V4SpokeCap;
 
 const SPOKE_CAP_BOOL_FIELDS: readonly SpokeCapKey[] = ['active', 'halted'] as const;
 
+/** uint40 token-unit cap fields — formatted with thousands separators + asset symbol. */
+const SPOKE_CAP_TOKEN_AMOUNT_FIELDS: readonly SpokeCapKey[] = ['addCap', 'drawCap'] as const;
+
 export const spokeCapFormatters: Partial<{
   [K in SpokeCapKey]: FieldFormatter<V4SpokeCap[K]>;
 }> = {};
 
 for (const field of SPOKE_CAP_BOOL_FIELDS) {
   (spokeCapFormatters[field] as FieldFormatter<boolean>) = (value) => boolToMarkdown(value);
+}
+
+for (const field of SPOKE_CAP_TOKEN_AMOUNT_FIELDS) {
+  (spokeCapFormatters[field] as FieldFormatter<number>) = (value, ctx) =>
+    `${value.toLocaleString('en-US')} ${ctx.spokeCap?.assetSymbol ?? ''}`.trim();
 }
 
 // --- Spoke Liquidation Config formatters ---

@@ -162,8 +162,8 @@ library V4DiffWriter {
       );
       vm.serializeJson(k, '{}');
       vm.serializeString(k, 'assetSymbol', caps[i].assetSymbol);
-      vm.serializeString(k, 'addCap', vm.toString(uint256(caps[i].addCap)));
-      vm.serializeString(k, 'drawCap', vm.toString(uint256(caps[i].drawCap)));
+      vm.serializeUint(k, 'addCap', uint256(caps[i].addCap));
+      vm.serializeUint(k, 'drawCap', uint256(caps[i].drawCap));
       vm.serializeUint(k, 'riskPremiumThreshold', caps[i].riskPremiumThreshold);
       vm.serializeBool(k, 'active', caps[i].active);
       string memory obj = vm.serializeBool(k, 'halted', caps[i].halted);

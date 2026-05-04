@@ -49,11 +49,12 @@ function renderNewCap(
   spokeAddr: string,
   ctx: V4FormatterContext
 ): string {
+  const capCtx: V4FormatterContext = { ...ctx, spokeCap: cap };
   let md = capHeader(cap, hubAddr, assetId, spokeAddr, ctx.chainId);
   md += '**NEW SPOKE**\n\n';
   md += '| description | value |\n| --- | --- |\n';
   for (const key of FIELD_ORDER) {
-    md += `| ${key} | ${formatV4Value('spokeCap', key, cap[key], ctx)} |\n`;
+    md += `| ${key} | ${formatV4Value('spokeCap', key, cap[key], capCtx)} |\n`;
   }
   return md + '\n';
 }
@@ -66,13 +67,14 @@ function renderCapDiff(
   spokeAddr: string,
   ctx: V4FormatterContext
 ): string {
+  const capCtx: V4FormatterContext = { ...ctx, spokeCap: after };
   const rows: string[] = [];
   for (const key of FIELD_ORDER) {
     const bVal = before[key];
     const aVal = after[key];
     if (String(bVal) === String(aVal)) continue;
-    const fromFmt = formatV4Value('spokeCap', key, bVal, ctx);
-    const toFmt = formatV4Value('spokeCap', key, aVal, ctx);
+    const fromFmt = formatV4Value('spokeCap', key, bVal, capCtx);
+    const toFmt = formatV4Value('spokeCap', key, aVal, capCtx);
     rows.push(`| ${key} | ${fromFmt} | ${toFmt} |`);
   }
   if (rows.length === 0) return '';

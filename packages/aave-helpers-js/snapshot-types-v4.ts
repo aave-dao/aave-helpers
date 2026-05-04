@@ -64,8 +64,8 @@ export type V4HubAsset = z.infer<typeof v4HubAssetSchema>;
 
 export const v4SpokeCapSchema = z.object({
   assetSymbol: z.string(),
-  addCap: z.string(), // uint40 serialized as string
-  drawCap: z.string(), // uint40 serialized as string
+  addCap: z.number(), // uint40 — fits in JS safe int
+  drawCap: z.number(), // uint40 — fits in JS safe int
   riskPremiumThreshold: z.number(),
   active: z.boolean(),
   halted: z.boolean(),

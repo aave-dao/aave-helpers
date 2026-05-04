@@ -73,8 +73,8 @@ function makeSnapshot(overrides?: Partial<AaveV4Snapshot>): AaveV4Snapshot {
     spokeCaps: {
       [`${HUB_ADDR}_0_${SPOKE_ADDR}`]: {
         assetSymbol: 'WETH',
-        addCap: '1000000',
-        drawCap: '500000',
+        addCap: 1000000,
+        drawCap: 500000,
         riskPremiumThreshold: 100,
         active: true,
         halted: false,
@@ -184,7 +184,24 @@ describe('BPS formatting via formatV4Value', () => {
 
   it('falls back to raw string for unformatted fields', () => {
     expect(formatV4Value('spokeLiq', 'maxUserReservesLimit', 128, ctx)).toBe('128');
-    expect(formatV4Value('spokeCap', 'addCap', '1000000', ctx)).toBe('1000000');
+  });
+
+  it('formats spoke cap uint40 fields with thousands separators and asset symbol', () => {
+    const capCtx = {
+      ...ctx,
+      spokeCap: {
+        assetSymbol: 'USDT',
+        addCap: 0,
+        drawCap: 0,
+        riskPremiumThreshold: 0,
+        active: true,
+        halted: false,
+      },
+    };
+    expect(formatV4Value('spokeCap', 'addCap', 1000000, capCtx)).toBe('1,000,000 USDT');
+    expect(formatV4Value('spokeCap', 'drawCap', 1880000, capCtx)).toBe('1,880,000 USDT');
+    // Falls back gracefully when symbol unavailable
+    expect(formatV4Value('spokeCap', 'addCap', 1000000, ctx)).toBe('1,000,000');
   });
 });
 
@@ -275,7 +292,7 @@ describe('diffV4Snapshots', () => {
     const capKey = `${HUB_ADDR}_0_${SPOKE_ADDR}`;
     after.spokeCaps[capKey] = {
       ...after.spokeCaps[capKey],
-      addCap: '2000000',
+      addCap: 2000000,
       halted: true,
     };
 
@@ -357,8 +374,8 @@ describe('diffV4Snapshots', () => {
     const newCapKey = `${HUB_ADDR}_1_${SPOKE_ADDR}`;
     after.spokeCaps[newCapKey] = {
       assetSymbol: 'USDC',
-      addCap: '500000',
-      drawCap: '250000',
+      addCap: 500000,
+      drawCap: 250000,
       riskPremiumThreshold: 50,
       active: true,
       halted: false,
@@ -436,7 +453,7 @@ describe('diffV4Snapshots', () => {
     const capKey = `${HUB_ADDR}_0_${SPOKE_ADDR}`;
     after.spokeCaps[capKey] = {
       ...after.spokeCaps[capKey],
-      addCap: '9999999',
+      addCap: 9999999,
     };
 
     const md = await diffV4Snapshots(before, after);
