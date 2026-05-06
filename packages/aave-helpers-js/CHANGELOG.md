@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.0.14
+
+### Patch Changes
+
+- 6c96817: add robot events
+
 ## 1.0.13
 
 ### Patch Changes
