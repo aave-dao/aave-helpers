@@ -243,8 +243,6 @@ contract ProtocolV4TestPlausibility is Test, ProtocolV4TestBase {
   address internal HUB_A = makeAddr('HUB_A');
   address internal HUB_B = makeAddr('HUB_B');
 
-  
-
   function test_emptyCapsPasses() public view {
     Types.SpokeCapSnapshot[] memory caps = new Types.SpokeCapSnapshot[](0);
     configChangePlausibilityTest(_snapshot(caps));
