@@ -238,3 +238,98 @@ contract ProtocolV4TestStorageValidation is ProtocolV4TestBaseTest {
     _cleanupArtifacts(name);
   }
 }
+
+contract ProtocolV4TestPlausibility is Test, ProtocolV4TestBase {
+  address internal HUB_A = makeAddr('HUB_A');
+  address internal HUB_B = makeAddr('HUB_B');
+
+  
+
+  function test_emptyCapsPasses() public view {
+    Types.SpokeCapSnapshot[] memory caps = new Types.SpokeCapSnapshot[](0);
+    configChangePlausibilityTest(_snapshot(caps));
+  }
+
+  function test_zeroDrawCapSkipped() public view {
+    Types.SpokeCapSnapshot[] memory caps = new Types.SpokeCapSnapshot[](1);
+    caps[0] = _cap(HUB_A, 0, 0, 0);
+    configChangePlausibilityTest(_snapshot(caps));
+  }
+
+  function test_singleSpokeDrawLeAddPasses() public view {
+    Types.SpokeCapSnapshot[] memory caps = new Types.SpokeCapSnapshot[](1);
+    caps[0] = _cap(HUB_A, 0, 1_000_000, 500_000);
+    configChangePlausibilityTest(_snapshot(caps));
+  }
+
+  function test_singleSpokeDrawGtAddReverts() public {
+    Types.SpokeCapSnapshot[] memory caps = new Types.SpokeCapSnapshot[](1);
+    caps[0] = _cap(HUB_A, 0, 500_000, 1_000_000);
+    vm.expectRevert(bytes('PL_ADD_LT_DRAW'));
+    this.configChangePlausibilityTest(_snapshot(caps));
+  }
+
+  function test_borrowOnlySpokePassesWhenAggregateHolds() public view {
+    // Spoke A: borrow-only (addCap=0, drawCap=1M) — invalid per-spoke but valid in V4.
+    // Spoke B: supply-only (addCap=5M, drawCap=0). Aggregate: 1M draw <= 5M add.
+    Types.SpokeCapSnapshot[] memory caps = new Types.SpokeCapSnapshot[](2);
+    caps[0] = _cap(HUB_A, 0, 0, 1_000_000);
+    caps[1] = _cap(HUB_A, 0, 5_000_000, 0);
+    configChangePlausibilityTest(_snapshot(caps));
+  }
+
+  function test_aggregateDrawGtAggregateAddReverts() public {
+    // Same (hub, asset), two spokes: 2M+1M=3M add, 2M+2M=4M draw -> 4M > 3M reverts.
+    Types.SpokeCapSnapshot[] memory caps = new Types.SpokeCapSnapshot[](2);
+    caps[0] = _cap(HUB_A, 0, 2_000_000, 2_000_000);
+    caps[1] = _cap(HUB_A, 0, 1_000_000, 2_000_000);
+    vm.expectRevert(bytes('PL_ADD_LT_DRAW'));
+    this.configChangePlausibilityTest(_snapshot(caps));
+  }
+
+  function test_distinctAssetGroupsAreIndependent() public {
+    // (HUB_A, 0): 1M add, 0 draw -> skipped. (HUB_A, 1): 1M add, 2M draw -> reverts.
+    Types.SpokeCapSnapshot[] memory caps = new Types.SpokeCapSnapshot[](2);
+    caps[0] = _cap(HUB_A, 0, 1_000_000, 0);
+    caps[1] = _cap(HUB_A, 1, 1_000_000, 2_000_000);
+    vm.expectRevert(bytes('PL_ADD_LT_DRAW'));
+    this.configChangePlausibilityTest(_snapshot(caps));
+  }
+
+  function test_distinctHubsAreIndependent() public {
+    // Same assetId on two hubs aggregate separately.
+    // HUB_A asset 0: 1M add, 500k draw -> passes.
+    // HUB_B asset 0: 500k add, 1M draw -> reverts.
+    Types.SpokeCapSnapshot[] memory caps = new Types.SpokeCapSnapshot[](2);
+    caps[0] = _cap(HUB_A, 0, 1_000_000, 500_000);
+    caps[1] = _cap(HUB_B, 0, 500_000, 1_000_000);
+    vm.expectRevert(bytes('PL_ADD_LT_DRAW'));
+    this.configChangePlausibilityTest(_snapshot(caps));
+  }
+
+  function _cap(
+    address hub,
+    uint256 assetId,
+    uint40 addCap,
+    uint40 drawCap
+  ) internal pure returns (Types.SpokeCapSnapshot memory) {
+    return
+      Types.SpokeCapSnapshot({
+        hubAddress: hub,
+        assetId: assetId,
+        assetSymbol: 'X',
+        spokeAddress: address(0),
+        addCap: addCap,
+        drawCap: drawCap,
+        riskPremiumThreshold: 0,
+        active: true,
+        halted: false
+      });
+  }
+
+  function _snapshot(
+    Types.SpokeCapSnapshot[] memory caps
+  ) internal pure returns (Types.V4Snapshot memory snap) {
+    snap.spokeCaps = caps;
+  }
+}

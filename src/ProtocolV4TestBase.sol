@@ -53,7 +53,8 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     bool testPositionManagers
   ) public {
     if (payload != address(0)) {
-      _snapshotDiffAndExecute(reportName, spokes, payload);
+      Types.V4Snapshot memory snapshotAfter = _snapshotDiffAndExecute(reportName, spokes, payload);
+      configChangePlausibilityTest(snapshotAfter);
     }
 
     if (runE2E) {
@@ -64,11 +65,43 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     }
   }
 
+  /// @notice Sanity-check post-payload spoke caps for known invariants.
+  /// @dev Liquidity is pooled at the hub, so invariant is per-asset aggregate across all spokes
+  function configChangePlausibilityTest(Types.V4Snapshot memory snapshotAfter) public pure {
+    Types.SpokeCapSnapshot[] memory caps = snapshotAfter.spokeCaps;
+    for (uint256 i; i < caps.length; i++) {
+      // Skip (hub, assetId) groups already aggregated in a prior iteration.
+      bool alreadyAggregated = false;
+      for (uint256 j; j < i; j++) {
+        if (caps[j].hubAddress == caps[i].hubAddress && caps[j].assetId == caps[i].assetId) {
+          alreadyAggregated = true;
+          break;
+        }
+      }
+      if (alreadyAggregated) {
+        continue;
+      }
+
+      uint256 sumAdd;
+      uint256 sumDraw;
+      for (uint256 k; k < caps.length; k++) {
+        if (caps[k].hubAddress == caps[i].hubAddress && caps[k].assetId == caps[i].assetId) {
+          sumAdd += uint256(caps[k].addCap);
+          sumDraw += uint256(caps[k].drawCap);
+        }
+      }
+      if (sumDraw == 0) {
+        continue;
+      }
+      require(sumDraw <= sumAdd, 'PL_ADD_LT_DRAW');
+    }
+  }
+
   function _snapshotDiffAndExecute(
     string memory reportName,
     ISpoke[] memory spokes,
     address payload
-  ) internal virtual {
+  ) internal virtual returns (Types.V4Snapshot memory snapshotAfter) {
     IHub[] memory hubs = AaveV4EthereumHubHelpers.getHubs();
     string memory beforeName = string.concat(reportName, '_before');
     string memory afterName = string.concat(reportName, '_after');
@@ -89,7 +122,7 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
       );
     }
 
-    Types.V4Snapshot memory snapshotAfter = createV4Snapshot(spokes, hubs);
+    snapshotAfter = createV4Snapshot(spokes, hubs);
     writeV4SnapshotJson(afterName, snapshotAfter);
 
     string memory afterPath = string.concat('./reports/', afterName, '.json');
