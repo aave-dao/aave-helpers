@@ -39,6 +39,18 @@ function formatBps(bps: number): string {
   return `${w}.${fs} % [${bps}]`;
 }
 
+/** Render a uint as "1,500,000 (1.5e6) USDT"; suffix (e.g. asset symbol) goes
+ *  at the end after the exponential. Values < 1000 skip the exponential.
+ *  Exponential uses `Number.toExponential()`, so bigints exceeding
+ *  Number.MAX_SAFE_INTEGER (~9e15) the exponent is rounded */
+export function formatBigIntWithExp(value: bigint, suffix?: string): string {
+  const commas = value.toLocaleString('en-US');
+  const useExp = value >= 1000n || value <= -1000n;
+  const expPart = useExp ? ` (${Number(value).toExponential().replace('e+', 'e')})` : '';
+  const suf = suffix ? ` ${suffix}` : '';
+  return `${commas}${expPart}${suf}`;
+}
+
 // --- Spoke Reserve formatters ---
 
 type SpokeReserveKey = keyof V4SpokeReserve;
@@ -144,7 +156,7 @@ for (const field of SPOKE_CAP_BOOL_FIELDS) {
 
 for (const field of SPOKE_CAP_TOKEN_AMOUNT_FIELDS) {
   (spokeCapFormatters[field] as FieldFormatter<number>) = (value, ctx) =>
-    `${value.toLocaleString('en-US')} ${ctx.spokeCap?.assetSymbol ?? ''}`.trim();
+    formatBigIntWithExp(BigInt(value), ctx.spokeCap?.assetSymbol);
 }
 
 spokeCapFormatters['riskPremiumThreshold'] = (value) => formatBps(value);
@@ -195,5 +207,11 @@ export function formatV4Value(
   if (typeof value === 'boolean') return boolToMarkdown(value);
   if (typeof value === 'number') return value.toLocaleString('en-US');
   if (isAddress(value)) return addressLink(value as string, ctx.chainId);
+  // Pure numeric strings (uint serialized as string) — render with thousand separators
+  // and a parenthetical exponential ("1,500,000 (1.5e6)") so price feeds and large uints
+  // are easy to scan at both scales.
+  if (typeof value === 'string' && /^-?\d+$/.test(value)) {
+    return formatBigIntWithExp(BigInt(value));
+  }
   return String(value);
 }

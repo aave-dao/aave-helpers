@@ -186,7 +186,7 @@ describe('BPS formatting via formatV4Value', () => {
     expect(formatV4Value('spokeLiq', 'maxUserReservesLimit', 128, ctx)).toBe('128');
   });
 
-  it('formats spoke cap uint40 fields with thousands separators and asset symbol', () => {
+  it('formats spoke cap uint40 fields with separators, asset symbol, and exponential', () => {
     const capCtx = {
       ...ctx,
       spokeCap: {
@@ -198,10 +198,34 @@ describe('BPS formatting via formatV4Value', () => {
         halted: false,
       },
     };
-    expect(formatV4Value('spokeCap', 'addCap', 1000000, capCtx)).toBe('1,000,000 USDT');
-    expect(formatV4Value('spokeCap', 'drawCap', 1880000, capCtx)).toBe('1,880,000 USDT');
+    expect(formatV4Value('spokeCap', 'addCap', 1000000, capCtx)).toBe('1,000,000 (1e6) USDT');
+    expect(formatV4Value('spokeCap', 'drawCap', 1880000, capCtx)).toBe('1,880,000 (1.88e6) USDT');
     // Falls back gracefully when symbol unavailable
-    expect(formatV4Value('spokeCap', 'addCap', 1000000, ctx)).toBe('1,000,000');
+    expect(formatV4Value('spokeCap', 'addCap', 1000000, ctx)).toBe('1,000,000 (1e6)');
+    // Small caps (< 1000) skip the exponential
+    expect(formatV4Value('spokeCap', 'addCap', 500, capCtx)).toBe('500 USDT');
+  });
+
+  it('formats numeric-string fields (oraclePrice, swept, premiumShares) with separators + exp', () => {
+    // Price feed: uint256 oracle price serialized as string — full precision in exp
+    expect(formatV4Value('spokeReserve', 'oraclePrice', '99999850', ctx)).toBe(
+      '99,999,850 (9.999985e7)'
+    );
+    expect(formatV4Value('spokeReserve', 'oraclePrice', '150000000', ctx)).toBe(
+      '150,000,000 (1.5e8)'
+    );
+    // Sub-1000 trailing digits stay (1234 -> 1.234e3, not 1.23e3)
+    expect(formatV4Value('spokeReserve', 'oraclePrice', '1234', ctx)).toBe('1,234 (1.234e3)');
+    // uint120 hub-asset state fields, including values that exceed JS safe-int range.
+    // Comma-separated form preserves exact value; exponent's mantissa is rounded by Number.
+    expect(formatV4Value('hubAsset', 'swept', '12345678901234567890', ctx)).toBe(
+      '12,345,678,901,234,567,890 (1.2345678901234567e19)'
+    );
+    expect(formatV4Value('hubAsset', 'premiumShares', '1000000', ctx)).toBe('1,000,000 (1e6)');
+    // Small numbers (< 1000) — no separators, no exponential
+    expect(formatV4Value('spokeReserve', 'oraclePrice', '999', ctx)).toBe('999');
+    // Zero
+    expect(formatV4Value('hubAsset', 'swept', '0', ctx)).toBe('0');
   });
 });
 
