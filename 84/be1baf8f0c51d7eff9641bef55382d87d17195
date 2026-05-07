@@ -1,0 +1,31 @@
+tests/ProtocolV4TestBase.t.sol
+  s_bef57e8811ec19::t_161bc51865f194 241-242,245,247,249-252,254-258,260-271,273-281,283-290,292-300,303-307,310-327,330-335
+  h_71908bb6884da4 243-244,246,248,253,259,272,282,291,301-302,308-309,329
+src/ProtocolV4TestBase.sol
+  s_bef57e8811ec19::t_791cf245c4eec7 56-57,68,70-99,104
+  h_71908bb6884da4 69
+  s_bef57e8811ec19::t_32dcb7af845714 125
+src/dependencies/v4/SnapshotV4.sol
+  h_71908bb6884da4 44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "84be1baf8f0c51d7eff9641bef55382d87d17195",
+  "prompts": {},
+  "humans": {
+    "h_71908bb6884da4": {
+      "author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_bef57e8811ec19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5831686-2a73-4166-bd75-00f7f9c34913",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  }
+}
