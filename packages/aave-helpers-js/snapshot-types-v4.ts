@@ -60,9 +60,9 @@ export const v4HubAssetSchema = z.object({
 
 export type V4HubAsset = z.infer<typeof v4HubAssetSchema>;
 
-// --- Spoke Cap ---
+// --- Spoke Config ---
 
-export const v4SpokeCapSchema = z.object({
+export const v4SpokeConfigSchema = z.object({
   assetSymbol: z.string(),
   addCap: z.number(), // uint40 — fits in JS safe int
   drawCap: z.number(), // uint40 — fits in JS safe int
@@ -71,7 +71,7 @@ export const v4SpokeCapSchema = z.object({
   halted: z.boolean(),
 });
 
-export type V4SpokeCap = z.infer<typeof v4SpokeCapSchema>;
+export type V4SpokeConfig = z.infer<typeof v4SpokeConfigSchema>;
 
 // --- Full V4 Snapshot ---
 
@@ -80,7 +80,7 @@ export const aaveV4SnapshotSchema = z.object({
   spokeReserves: z.record(z.string(), z.record(z.string(), v4SpokeReserveSchema)),
   spokeLiquidationConfigs: z.record(z.string(), v4SpokeLiquidationConfigSchema),
   hubAssets: z.record(z.string(), z.record(z.string(), v4HubAssetSchema)),
-  spokeCaps: z.record(z.string(), v4SpokeCapSchema),
+  spokeConfigs: z.record(z.string(), v4SpokeConfigSchema),
   raw: rawStorageSchema.optional(),
   logs: z.array(logSchema).optional(),
 });

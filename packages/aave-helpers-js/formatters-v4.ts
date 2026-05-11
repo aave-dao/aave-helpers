@@ -4,7 +4,7 @@ import { toAddressLink, boolToMarkdown } from './utils/markdown';
 import type {
   V4SpokeReserve,
   V4HubAsset,
-  V4SpokeCap,
+  V4SpokeConfig,
   V4SpokeLiquidationConfig,
 } from './snapshot-types-v4';
 
@@ -12,7 +12,7 @@ import type {
 
 export interface V4FormatterContext {
   chainId: number;
-  spokeCap?: V4SpokeCap;
+  spokeConfig?: V4SpokeConfig;
 }
 
 export type FieldFormatter<T = unknown> = (value: T, ctx: V4FormatterContext) => string;
@@ -139,27 +139,27 @@ hubAssetFormatters['premiumOffsetRay'] = (value) => `${formatUnits(BigInt(value)
 
 // --- Spoke Cap formatters ---
 
-type SpokeCapKey = keyof V4SpokeCap;
+type SpokeConfigKey = keyof V4SpokeConfig;
 
-const SPOKE_CAP_BOOL_FIELDS: readonly SpokeCapKey[] = ['active', 'halted'] as const;
+const SPOKE_CONFIG_FLAGS: readonly SpokeConfigKey[] = ['active', 'halted'] as const;
 
 /** uint40 token-unit cap fields — formatted with thousands separators + asset symbol. */
-const SPOKE_CAP_TOKEN_AMOUNT_FIELDS: readonly SpokeCapKey[] = ['addCap', 'drawCap'] as const;
+const SPOKE_CONFIG_TOKEN_AMOUNT_FIELDS: readonly SpokeConfigKey[] = ['addCap', 'drawCap'] as const;
 
-export const spokeCapFormatters: Partial<{
-  [K in SpokeCapKey]: FieldFormatter<V4SpokeCap[K]>;
+export const spokeConfigFormatters: Partial<{
+  [K in SpokeConfigKey]: FieldFormatter<V4SpokeConfig[K]>;
 }> = {};
 
-for (const field of SPOKE_CAP_BOOL_FIELDS) {
-  (spokeCapFormatters[field] as FieldFormatter<boolean>) = (value) => boolToMarkdown(value);
+for (const field of SPOKE_CONFIG_FLAGS) {
+  (spokeConfigFormatters[field] as FieldFormatter<boolean>) = (value) => boolToMarkdown(value);
 }
 
-for (const field of SPOKE_CAP_TOKEN_AMOUNT_FIELDS) {
-  (spokeCapFormatters[field] as FieldFormatter<number>) = (value, ctx) =>
-    formatBigIntWithExp(BigInt(value), ctx.spokeCap?.assetSymbol);
+for (const field of SPOKE_CONFIG_TOKEN_AMOUNT_FIELDS) {
+  (spokeConfigFormatters[field] as FieldFormatter<number>) = (value, ctx) =>
+    formatBigIntWithExp(BigInt(value), ctx.spokeConfig?.assetSymbol);
 }
 
-spokeCapFormatters['riskPremiumThreshold'] = (value) => formatBps(value);
+spokeConfigFormatters['riskPremiumThreshold'] = (value) => formatBps(value);
 
 // --- Spoke Liquidation Config formatters ---
 
@@ -183,14 +183,14 @@ spokeLiqFormatters['liquidationBonusFactor'] = (value) => formatBps(value);
 type V4SectionFormatters = {
   spokeReserve: typeof spokeReserveFormatters;
   hubAsset: typeof hubAssetFormatters;
-  spokeCap: typeof spokeCapFormatters;
+  spokeConfig: typeof spokeConfigFormatters;
   spokeLiq: typeof spokeLiqFormatters;
 };
 
 const formattersMap: V4SectionFormatters = {
   spokeReserve: spokeReserveFormatters,
   hubAsset: hubAssetFormatters,
-  spokeCap: spokeCapFormatters,
+  spokeConfig: spokeConfigFormatters,
   spokeLiq: spokeLiqFormatters,
 } as const;
 
@@ -208,7 +208,7 @@ export function formatV4Value(
   if (typeof value === 'number') return value.toLocaleString('en-US');
   if (isAddress(value)) return addressLink(value as string, ctx.chainId);
   // Pure numeric strings (uint serialized as string) — render with thousand separators
-  // and a parenthetical exponential ("1,500,000 (1.5e6)") so price feeds and large uints
+  // and exponent in parens ("1,500,000 (1.5e6)") so price feeds and large uints
   // are easy to scan at both scales.
   if (typeof value === 'string' && /^-?\d+$/.test(value)) {
     return formatBigIntWithExp(BigInt(value));

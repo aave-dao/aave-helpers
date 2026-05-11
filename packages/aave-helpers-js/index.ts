@@ -19,6 +19,6 @@ export type {
   AaveV4Snapshot,
   V4SpokeReserve,
   V4HubAsset,
-  V4SpokeCap,
+  V4SpokeConfig,
   V4SpokeLiquidationConfig,
 } from './snapshot-types-v4';

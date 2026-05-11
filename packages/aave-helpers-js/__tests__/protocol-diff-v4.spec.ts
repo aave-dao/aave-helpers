@@ -70,7 +70,7 @@ function makeSnapshot(overrides?: Partial<AaveV4Snapshot>): AaveV4Snapshot {
         },
       },
     },
-    spokeCaps: {
+    spokeConfigs: {
       [`${HUB_ADDR}_0_${SPOKE_ADDR}`]: {
         assetSymbol: 'WETH',
         addCap: 1000000,
@@ -172,8 +172,8 @@ describe('BPS formatting via formatV4Value', () => {
   it('formats booleans as checkmarks', () => {
     expect(formatV4Value('spokeReserve', 'paused', true, ctx)).toBe(':white_check_mark:');
     expect(formatV4Value('spokeReserve', 'frozen', false, ctx)).toBe(':x:');
-    expect(formatV4Value('spokeCap', 'active', true, ctx)).toBe(':white_check_mark:');
-    expect(formatV4Value('spokeCap', 'halted', false, ctx)).toBe(':x:');
+    expect(formatV4Value('spokeConfig', 'active', true, ctx)).toBe(':white_check_mark:');
+    expect(formatV4Value('spokeConfig', 'halted', false, ctx)).toBe(':x:');
   });
 
   it('formats addresses as explorer links', () => {
@@ -189,7 +189,7 @@ describe('BPS formatting via formatV4Value', () => {
   it('formats spoke cap uint40 fields with separators, asset symbol, and exponential', () => {
     const capCtx = {
       ...ctx,
-      spokeCap: {
+      spokeConfig: {
         assetSymbol: 'USDT',
         addCap: 0,
         drawCap: 0,
@@ -198,12 +198,12 @@ describe('BPS formatting via formatV4Value', () => {
         halted: false,
       },
     };
-    expect(formatV4Value('spokeCap', 'addCap', 1000000, capCtx)).toBe('1,000,000 (1e6) USDT');
-    expect(formatV4Value('spokeCap', 'drawCap', 1880000, capCtx)).toBe('1,880,000 (1.88e6) USDT');
+    expect(formatV4Value('spokeConfig', 'addCap', 1000000, capCtx)).toBe('1,000,000 (1e6) USDT');
+    expect(formatV4Value('spokeConfig', 'drawCap', 1880000, capCtx)).toBe('1,880,000 (1.88e6) USDT');
     // Falls back gracefully when symbol unavailable
-    expect(formatV4Value('spokeCap', 'addCap', 1000000, ctx)).toBe('1,000,000 (1e6)');
+    expect(formatV4Value('spokeConfig', 'addCap', 1000000, ctx)).toBe('1,000,000 (1e6)');
     // Small caps (< 1000) skip the exponential
-    expect(formatV4Value('spokeCap', 'addCap', 500, capCtx)).toBe('500 USDT');
+    expect(formatV4Value('spokeConfig', 'addCap', 500, capCtx)).toBe('500 USDT');
   });
 
   it('formats numeric-string fields (oraclePrice, swept, premiumShares) with separators + exp', () => {
@@ -314,14 +314,14 @@ describe('diffV4Snapshots', () => {
     const before = makeSnapshot();
     const after = makeSnapshot();
     const capKey = `${HUB_ADDR}_0_${SPOKE_ADDR}`;
-    after.spokeCaps[capKey] = {
-      ...after.spokeCaps[capKey],
+    after.spokeConfigs[capKey] = {
+      ...after.spokeConfigs[capKey],
       addCap: 2000000,
       halted: true,
     };
 
     const md = await diffV4Snapshots(before, after);
-    expect(md).toContain('## Hub Spoke Cap Changes');
+    expect(md).toContain('## Hub Spoke Config Changes');
     expect(md).toContain('addCap');
     expect(md).toContain('halted');
   });
@@ -396,7 +396,7 @@ describe('diffV4Snapshots', () => {
     const before = makeSnapshot();
     const after = makeSnapshot();
     const newCapKey = `${HUB_ADDR}_1_${SPOKE_ADDR}`;
-    after.spokeCaps[newCapKey] = {
+    after.spokeConfigs[newCapKey] = {
       assetSymbol: 'USDC',
       addCap: 500000,
       drawCap: 250000,
@@ -406,7 +406,7 @@ describe('diffV4Snapshots', () => {
     };
 
     const md = await diffV4Snapshots(before, after);
-    expect(md).toContain('## Hub Spoke Cap Changes');
+    expect(md).toContain('## Hub Spoke Config Changes');
     expect(md).toContain('NEW SPOKE');
     expect(md).toContain('USDC');
   });
@@ -415,10 +415,10 @@ describe('diffV4Snapshots', () => {
     const before = makeSnapshot();
     const after = makeSnapshot();
     const capKey = `${HUB_ADDR}_0_${SPOKE_ADDR}`;
-    delete after.spokeCaps[capKey];
+    delete after.spokeConfigs[capKey];
 
     const md = await diffV4Snapshots(before, after);
-    expect(md).toContain('## Hub Spoke Cap Changes');
+    expect(md).toContain('## Hub Spoke Config Changes');
     expect(md).toContain('REMOVED');
   });
 
@@ -475,8 +475,8 @@ describe('diffV4Snapshots', () => {
     const before = makeSnapshot();
     const after = makeSnapshot();
     const capKey = `${HUB_ADDR}_0_${SPOKE_ADDR}`;
-    after.spokeCaps[capKey] = {
-      ...after.spokeCaps[capKey],
+    after.spokeConfigs[capKey] = {
+      ...after.spokeConfigs[capKey],
       addCap: 9999999,
     };
 

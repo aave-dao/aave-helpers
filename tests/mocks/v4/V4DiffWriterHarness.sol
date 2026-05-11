@@ -37,7 +37,10 @@ contract V4DiffWriterHarness {
     return V4DiffWriter._serializeHubAsset(a);
   }
 
-  function writeSpokeCaps(string memory path, Types.SpokeCapSnapshot[] memory caps) external {
-    V4DiffWriter._writeSpokeCaps(path, caps);
+  function writeSpokeConfigs(
+    string memory path,
+    Types.SpokeConfigSnapshot[] memory configs
+  ) external {
+    V4DiffWriter._writeSpokeConfigs(path, configs);
   }
 }

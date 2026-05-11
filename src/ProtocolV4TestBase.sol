@@ -68,7 +68,7 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
   /// @notice Sanity-check post-payload spoke caps for known invariants.
   /// @dev Liquidity is pooled at the hub, so invariant is per-asset aggregate across all spokes
   function configChangePlausibilityTest(Types.V4Snapshot memory snapshotAfter) public pure {
-    Types.SpokeCapSnapshot[] memory caps = snapshotAfter.spokeCaps;
+    Types.SpokeConfigSnapshot[] memory caps = snapshotAfter.spokeConfigs;
     for (uint256 i; i < caps.length; i++) {
       // Skip (hub, assetId) groups already aggregated in a prior iteration.
       bool alreadyAggregated = false;

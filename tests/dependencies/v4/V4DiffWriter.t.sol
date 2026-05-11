@@ -113,7 +113,7 @@ contract V4DiffWriterTest is V4DiffWriterTestBase, SnapshotV4 {
     assertTrue(vm.contains(json, '"spokeReserves"'), 'spokeReserves missing');
     assertTrue(vm.contains(json, '"spokeLiquidationConfigs"'), 'spokeLiqConfigs missing');
     assertTrue(vm.contains(json, '"hubAssets"'), 'hubAssets missing');
-    assertTrue(vm.contains(json, '"spokeCaps"'), 'spokeCaps missing');
+    assertTrue(vm.contains(json, '"spokeConfigs"'), 'spokeConfigs missing');
 
     // Per-entity values
     assertTrue(vm.contains(json, '"symbol": "USDC"'), 'reserve symbol');
@@ -134,8 +134,8 @@ contract V4DiffWriterTest is V4DiffWriterTestBase, SnapshotV4 {
     afterSnap.spokeReserves[0].collateralFactor = 8000;
     afterSnap.spokeReserves[0].paused = true;
     afterSnap.hubAssets[0].liquidityFee = 50;
-    afterSnap.spokeCaps[0].addCap = 2_000_000;
-    afterSnap.spokeCaps[0].halted = true;
+    afterSnap.spokeConfigs[0].addCap = 2_000_000;
+    afterSnap.spokeConfigs[0].halted = true;
     afterSnap.spokeLiquidationConfigs[0].liquidationBonusFactor = 200;
 
     writeV4SnapshotJson(string.concat(REPORT, '_before'), before);
@@ -184,7 +184,7 @@ contract V4DiffWriterTest is V4DiffWriterTestBase, SnapshotV4 {
     assertTrue(vm.contains(md, '0.50 % [50]'), 'liqFee after');
 
     // Spoke cap section — uint40s rendered with thousand separators
-    assertTrue(vm.contains(md, '## Hub Spoke Cap Changes'), 'spoke cap section');
+    assertTrue(vm.contains(md, '## Hub Spoke Config Changes'), 'spoke config section');
     assertTrue(vm.contains(md, 'addCap'), 'addCap row');
     assertTrue(vm.contains(md, '1,000,000'), 'addCap before');
     assertTrue(vm.contains(md, '2,000,000'), 'addCap after');
@@ -257,8 +257,8 @@ contract V4DiffWriterTest is V4DiffWriterTestBase, SnapshotV4 {
       premiumOffsetRay: int200(0)
     });
 
-    snap.spokeCaps = new Types.SpokeCapSnapshot[](1);
-    snap.spokeCaps[0] = Types.SpokeCapSnapshot({
+    snap.spokeConfigs = new Types.SpokeConfigSnapshot[](1);
+    snap.spokeConfigs[0] = Types.SpokeConfigSnapshot({
       hubAddress: hubX,
       assetId: 0,
       assetSymbol: 'USDC',
@@ -400,9 +400,9 @@ contract V4DiffWriterHarnessTest is V4DiffWriterTestBase {
     vm.removeFile(path);
   }
 
-  function test_writeSpokeCaps_writesAllCaps() public {
-    Types.SpokeCapSnapshot[] memory caps = new Types.SpokeCapSnapshot[](2);
-    caps[0] = Types.SpokeCapSnapshot({
+  function test_writeSpokeConfigs_writesAllConfigs() public {
+    Types.SpokeConfigSnapshot[] memory caps = new Types.SpokeConfigSnapshot[](2);
+    caps[0] = Types.SpokeConfigSnapshot({
       hubAddress: hubX,
       assetId: 0,
       assetSymbol: 'USDC',
@@ -413,7 +413,7 @@ contract V4DiffWriterHarnessTest is V4DiffWriterTestBase {
       active: true,
       halted: false
     });
-    caps[1] = Types.SpokeCapSnapshot({
+    caps[1] = Types.SpokeConfigSnapshot({
       hubAddress: hubX,
       assetId: 0,
       assetSymbol: 'USDC',
@@ -426,10 +426,10 @@ contract V4DiffWriterHarnessTest is V4DiffWriterTestBase {
     });
 
     string memory path = './reports/harness_spoke_caps.json';
-    harness.writeSpokeCaps(path, caps);
+    harness.writeSpokeConfigs(path, caps);
 
     string memory json = vm.readFile(path);
-    assertTrue(vm.contains(json, '"spokeCaps"'), 'section');
+    assertTrue(vm.contains(json, '"spokeConfigs"'), 'section');
     assertTrue(vm.contains(json, '"addCap": 1000000'), 'first addCap');
     assertTrue(vm.contains(json, '"addCap": 2000000'), 'second addCap');
     assertTrue(vm.contains(json, '"drawCap": 500000'), 'first drawCap');

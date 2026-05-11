@@ -3,7 +3,7 @@ import type { AaveV4Snapshot } from './snapshot-types-v4';
 import type { RawStorage, Log } from './snapshot-types';
 import { renderSpokeReservesSection } from './sections/spoke-reserves';
 import { renderHubAssetsSection } from './sections/hub-assets';
-import { renderSpokeCapsSection } from './sections/spoke-caps';
+import { renderSpokeConfigsSection } from './sections/spoke-configs';
 import { renderSpokeLiquidationSection } from './sections/spoke-liquidation';
 import { renderRawSection } from './sections/raw';
 import { renderLogsSection } from './sections/logs';
@@ -37,7 +37,7 @@ export async function diffV4Snapshots(
 
   md += renderSpokeReservesSection(before, postCopy);
   md += renderHubAssetsSection(before, postCopy);
-  md += renderSpokeCapsSection(before, postCopy);
+  md += renderSpokeConfigsSection(before, postCopy);
   md += renderSpokeLiquidationSection(before, postCopy);
   md += await renderLogsSection(logs, after.chainId);
   md += renderRawSection(raw, after.chainId);

@@ -16,14 +16,14 @@ library V4DiffWriter {
     string memory path = string.concat('./reports/', reportName, '.json');
     vm.writeFile(
       path,
-      '{ "spokeReserves": {}, "spokeLiquidationConfigs": {}, "hubAssets": {}, "spokeCaps": {} }'
+      '{ "spokeReserves": {}, "spokeLiquidationConfigs": {}, "hubAssets": {}, "spokeConfigs": {} }'
     );
     vm.serializeUint('root', 'chainId', block.chainid);
 
     _writeSpokeReserves(path, snapshot.spokeReserves);
     _writeSpokeLiqConfigs(path, snapshot.spokeLiquidationConfigs);
     _writeHubAssets(path, snapshot.hubAssets);
-    _writeSpokeCaps(path, snapshot.spokeCaps);
+    _writeSpokeConfigs(path, snapshot.spokeConfigs);
   }
 
   function _writeSpokeReserves(
@@ -147,8 +147,8 @@ library V4DiffWriter {
     return vm.serializeString(k, 'premiumOffsetRay', vm.toString(a.premiumOffsetRay));
   }
 
-  function _writeSpokeCaps(string memory path, Types.SpokeCapSnapshot[] memory caps) internal {
-    string memory sectionKey = 'spokeCaps';
+  function _writeSpokeConfigs(string memory path, Types.SpokeConfigSnapshot[] memory caps) internal {
+    string memory sectionKey = 'spokeConfigs';
     string memory content = '{}';
     vm.serializeJson(sectionKey, '{}');
 
@@ -169,6 +169,6 @@ library V4DiffWriter {
       string memory obj = vm.serializeBool(k, 'halted', caps[i].halted);
       content = vm.serializeString(sectionKey, k, obj);
     }
-    vm.writeJson(vm.serializeString('root', 'spokeCaps', content), path);
+    vm.writeJson(vm.serializeString('root', 'spokeConfigs', content), path);
   }
 }

@@ -106,7 +106,7 @@ library Types {
     int200 premiumOffsetRay;
   }
 
-  struct SpokeCapSnapshot {
+  struct SpokeConfigSnapshot {
     address hubAddress;
     uint256 assetId;
     string assetSymbol;
@@ -122,6 +122,6 @@ library Types {
     SpokeReserveSnapshot[] spokeReserves;
     SpokeLiquidationSnapshot[] spokeLiquidationConfigs;
     HubAssetSnapshot[] hubAssets;
-    SpokeCapSnapshot[] spokeCaps;
+    SpokeConfigSnapshot[] spokeConfigs;
   }
 }
