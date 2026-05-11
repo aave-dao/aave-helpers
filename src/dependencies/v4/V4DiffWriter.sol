@@ -29,7 +29,7 @@ library V4DiffWriter {
   function _writeSpokeReserves(
     string memory path,
     Types.SpokeReserveSnapshot[] memory reserves
-  ) private {
+  ) internal {
     string memory sectionKey = 'spokeReserves';
     string memory content = '{}';
     vm.serializeJson(sectionKey, '{}');
@@ -54,7 +54,7 @@ library V4DiffWriter {
     vm.writeJson(vm.serializeString('root', 'spokeReserves', content), path);
   }
 
-  function _serReserve(Types.SpokeReserveSnapshot memory r) private returns (string memory) {
+  function _serReserve(Types.SpokeReserveSnapshot memory r) internal returns (string memory) {
     string memory k = string.concat(vm.toString(r.spokeAddress), '_', vm.toString(r.reserveId));
     vm.serializeJson(k, '{}');
     vm.serializeString(k, 'symbol', r.symbol);
@@ -79,7 +79,7 @@ library V4DiffWriter {
   function _writeSpokeLiqConfigs(
     string memory path,
     Types.SpokeLiquidationSnapshot[] memory configs
-  ) private {
+  ) internal {
     string memory sectionKey = 'spokeLiqConfigs';
     string memory content = '{}';
     vm.serializeJson(sectionKey, '{}');
@@ -104,13 +104,13 @@ library V4DiffWriter {
     vm.writeJson(vm.serializeString('root', 'spokeLiquidationConfigs', content), path);
   }
 
-  function _writeHubAssets(string memory path, Types.HubAssetSnapshot[] memory assets) private {
+  function _writeHubAssets(string memory path, Types.HubAssetSnapshot[] memory assets) internal {
     string memory sectionKey = 'hubAssets';
     string memory content = '{}';
     vm.serializeJson(sectionKey, '{}');
 
     for (uint256 i; i < assets.length; i++) {
-      string memory obj = _serHubAsset(assets[i]);
+      string memory obj = _serializeHubAsset(assets[i]);
 
       string memory hubKey = string.concat('hub_', vm.toString(assets[i].hubAddress));
       if (i == 0 || assets[i].hubAddress != assets[i - 1].hubAddress) {
@@ -125,7 +125,7 @@ library V4DiffWriter {
     vm.writeJson(vm.serializeString('root', 'hubAssets', content), path);
   }
 
-  function _serHubAsset(Types.HubAssetSnapshot memory a) private returns (string memory) {
+  function _serializeHubAsset(Types.HubAssetSnapshot memory a) internal returns (string memory) {
     string memory k = string.concat(vm.toString(a.hubAddress), '_', vm.toString(a.assetId));
     vm.serializeJson(k, '{}');
     vm.serializeString(k, 'symbol', a.symbol);
@@ -147,7 +147,7 @@ library V4DiffWriter {
     return vm.serializeString(k, 'premiumOffsetRay', vm.toString(a.premiumOffsetRay));
   }
 
-  function _writeSpokeCaps(string memory path, Types.SpokeCapSnapshot[] memory caps) private {
+  function _writeSpokeCaps(string memory path, Types.SpokeCapSnapshot[] memory caps) internal {
     string memory sectionKey = 'spokeCaps';
     string memory content = '{}';
     vm.serializeJson(sectionKey, '{}');
