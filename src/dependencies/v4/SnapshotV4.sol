@@ -51,7 +51,6 @@ abstract contract SnapshotV4 is Helpers {
   }
 
   // Spoke reserves
-
   function _snapshotSpokeReserves(
     ISpoke[] memory spokes
   ) private view returns (Types.SpokeReserveSnapshot[] memory) {
