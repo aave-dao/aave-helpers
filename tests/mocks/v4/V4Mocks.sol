@@ -92,6 +92,19 @@ contract MockSpoke {
     _dynConfigs[reserveId][reserve.dynamicConfigKey] = dyn;
   }
 
+  // Per-field mutators for already-added reserves, used by snapshot delta tests.
+  function setReserveConfig(uint256 reserveId, ISpoke.ReserveConfig memory config) external {
+    _reserveConfigs[reserveId] = config;
+  }
+
+  function setDynamicReserveConfig(
+    uint256 reserveId,
+    uint32 dynamicConfigKey,
+    ISpoke.DynamicReserveConfig memory dyn
+  ) external {
+    _dynConfigs[reserveId][dynamicConfigKey] = dyn;
+  }
+
   function getReserveCount() external view returns (uint256) {
     return _reserves.length;
   }
@@ -122,6 +135,7 @@ contract MockHub {
   mapping(uint256 => IHub.AssetConfig) private _assetConfigs;
   mapping(uint256 => address[]) private _spokesByAsset;
   mapping(uint256 => mapping(address => IHub.SpokeConfig)) private _spokeConfigs;
+  mapping(uint256 => mapping(address => bool)) private _spokeRegistered;
 
   function addAsset(
     IHub.Asset memory asset,
@@ -132,8 +146,20 @@ contract MockHub {
     _assetConfigs[assetId] = config;
   }
 
+  // Per-asset mutators for already-added assets, used by snapshot delta tests.
+  function setAsset(uint256 assetId, IHub.Asset memory asset) external {
+    _assets[assetId] = asset;
+  }
+
+  function setAssetConfig(uint256 assetId, IHub.AssetConfig memory config) external {
+    _assetConfigs[assetId] = config;
+  }
+
   function addSpokeConfig(uint256 assetId, address spoke, IHub.SpokeConfig memory config) external {
-    _spokesByAsset[assetId].push(spoke);
+    if (!_spokeRegistered[assetId][spoke]) {
+      _spokesByAsset[assetId].push(spoke);
+      _spokeRegistered[assetId][spoke] = true;
+    }
     _spokeConfigs[assetId][spoke] = config;
   }
 

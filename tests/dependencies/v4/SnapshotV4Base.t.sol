@@ -35,9 +35,6 @@ abstract contract SnapshotV4BaseTest is Test, SnapshotV4 {
     uint16 reserveId;
   }
 
-  /// @notice Fixtures captured by `_addReserve`
-  CachedReserveFixture[] internal _reserveFixtures;
-
   struct HubAssetFixture {
     address underlying;
     uint8 decimals;
@@ -51,15 +48,10 @@ abstract contract SnapshotV4BaseTest is Test, SnapshotV4 {
     int200 premiumOffsetRay;
   }
 
-  /// @dev Stored alongside the input fixture so tests can match snapshots against
-  /// the `assetId` returned by `MockHub.addAsset`.
   struct CachedHubAssetFixture {
     HubAssetFixture input;
     uint256 assetId;
   }
-
-  /// @notice Fixtures captured by `_addHubAsset`
-  CachedHubAssetFixture[] internal _hubAssetFixtures;
 
   struct LiqConfigFixture {
     MockSpoke spoke;
@@ -69,11 +61,7 @@ abstract contract SnapshotV4BaseTest is Test, SnapshotV4 {
     uint16 maxUserReservesLimit;
   }
 
-  /// @notice Fixtures captured by `_addLiqConfig`. The spoke's `setLiquidationConfig`
-  /// and `setMaxUserReservesLimit` calls produce no return value, so no wrapper struct.
-  LiqConfigFixture[] internal _liqConfigFixtures;
-
-  struct SpokeCapFixture {
+  struct SpokeConfigFixture {
     uint256 assetId;
     MockSpoke spoke;
     uint40 addCap;
@@ -83,9 +71,10 @@ abstract contract SnapshotV4BaseTest is Test, SnapshotV4 {
     bool halted;
   }
 
-  /// @notice Fixtures captured by `_addSpokeCap`. `MockHub.addSpokeConfig` returns nothing
-  /// and the snapshot key (hub, assetId, spoke) is already in the input, so no wrapper struct.
-  SpokeCapFixture[] internal _spokeCapFixtures;
+  SpokeConfigFixture[] internal _spokeConfigFixtures;
+  CachedHubAssetFixture[] internal _hubAssetFixtures;
+  LiqConfigFixture[] internal _liqConfigFixtures;
+  CachedReserveFixture[] internal _reserveFixtures;
 
   MockSpoke internal spokeA;
   MockSpoke internal spokeB;
@@ -108,14 +97,14 @@ abstract contract SnapshotV4BaseTest is Test, SnapshotV4 {
   address internal reinvA = makeAddr('REINVEST_A');
   address internal reinvB = makeAddr('REINVEST_B');
 
-  function setUp() public {
+  function setUp() public virtual {
     _deployMocks();
     _setSpokeOracles();
     _addLiqConfigFixtures();
     _addReserveFixtures();
     _addHubAssetFixtures();
     _configureIRStrategies();
-    _addSpokeCapFixtures();
+    _addSpokeConfigFixtures();
   }
 
   function _setSpokeOracles() internal {
@@ -271,9 +260,9 @@ abstract contract SnapshotV4BaseTest is Test, SnapshotV4 {
     );
   }
 
-  function _addSpokeCapFixtures() internal {
-    _addSpokeCap(
-      SpokeCapFixture({
+  function _addSpokeConfigFixtures() internal {
+    _addSpokeConfig(
+      SpokeConfigFixture({
         assetId: 0,
         spoke: spokeA,
         addCap: 1_000_000,
@@ -283,8 +272,8 @@ abstract contract SnapshotV4BaseTest is Test, SnapshotV4 {
         halted: false
       })
     );
-    _addSpokeCap(
-      SpokeCapFixture({
+    _addSpokeConfig(
+      SpokeConfigFixture({
         assetId: 0,
         spoke: spokeB,
         addCap: 2_000_000,
@@ -294,8 +283,8 @@ abstract contract SnapshotV4BaseTest is Test, SnapshotV4 {
         halted: true
       })
     );
-    _addSpokeCap(
-      SpokeCapFixture({
+    _addSpokeConfig(
+      SpokeConfigFixture({
         assetId: 1,
         spoke: spokeA,
         addCap: 3_000_000,
@@ -305,8 +294,8 @@ abstract contract SnapshotV4BaseTest is Test, SnapshotV4 {
         halted: false
       })
     );
-    _addSpokeCap(
-      SpokeCapFixture({
+    _addSpokeConfig(
+      SpokeConfigFixture({
         assetId: 2,
         spoke: spokeB,
         addCap: 4_000_000,
@@ -318,7 +307,7 @@ abstract contract SnapshotV4BaseTest is Test, SnapshotV4 {
     );
   }
 
-  function _addSpokeCap(SpokeCapFixture memory f) internal {
+  function _addSpokeConfig(SpokeConfigFixture memory f) internal {
     hub.addSpokeConfig(
       f.assetId,
       address(f.spoke),
@@ -330,18 +319,18 @@ abstract contract SnapshotV4BaseTest is Test, SnapshotV4 {
         halted: f.halted
       })
     );
-    _spokeCapFixtures.push(f);
+    _spokeConfigFixtures.push(f);
   }
 
-  /// @notice Assert a `SpokeCapSnapshot` matches the stored fixture inputs.
+  /// @notice Assert a `SpokeConfigSnapshot` matches the stored fixture inputs.
   /// `assetSymbol` is resolved from the asset's underlying token, mirroring
   /// `SnapshotV4._snapshotCapsForHub`.
   function assertEq(
-    Types.SpokeCapSnapshot memory snap,
-    SpokeCapFixture memory expected,
+    Types.SpokeConfigSnapshot memory snap,
+    SpokeConfigFixture memory expected,
     uint256 idx
   ) internal view {
-    string memory pfx = string.concat('spokeCap[', vm.toString(idx), '] ');
+    string memory pfx = string.concat('spokeConfig[', vm.toString(idx), '] ');
     assertEq(snap.hubAddress, address(hub), string.concat(pfx, 'hub'));
     assertEq(snap.assetId, expected.assetId, string.concat(pfx, 'assetId'));
     assertEq(snap.spokeAddress, address(expected.spoke), string.concat(pfx, 'spoke'));
@@ -670,10 +659,10 @@ abstract contract SnapshotV4BaseTest is Test, SnapshotV4 {
   }
 
   function assertEq(
-    Types.SpokeCapSnapshot[] memory snaps,
-    SpokeCapFixture[] memory expected
+    Types.SpokeConfigSnapshot[] memory snaps,
+    SpokeConfigFixture[] memory expected
   ) internal view {
-    assertEq(snaps.length, expected.length, 'spokeCaps length');
+    assertEq(snaps.length, expected.length, 'spokeConfigs length');
     for (uint256 i; i < expected.length; i++) {
       assertEq(snaps[i], expected[i], i);
     }
