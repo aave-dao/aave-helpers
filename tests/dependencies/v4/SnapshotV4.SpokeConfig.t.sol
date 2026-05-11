@@ -7,10 +7,12 @@ contract SnapshotV4SpokeConfigTest is SnapshotV4BaseTest {
   // First spoke-config fixture: assetId 0 / spokeA. Used as the mutation target.
   uint256 internal constant TARGET_IDX = 0;
 
+  /// @dev All spoke config fixtures match the snapshot array.
   function test_createV4Snapshot_spokeConfigs() public view {
     assertEq(_createV4Snapshot().spokeConfigs, _spokeConfigFixtures);
   }
 
+  /// @dev Updating SpokeConfig.addCap propagates.
   function test_delta_addCap() public {
     SpokeConfigFixture memory t = _targetSpokeConfig();
     IHub.SpokeConfig memory cfg = _newConfigFrom(t);
@@ -23,6 +25,7 @@ contract SnapshotV4SpokeConfigTest is SnapshotV4BaseTest {
     );
   }
 
+  /// @dev Updating SpokeConfig.drawCap propagates.
   function test_delta_drawCap() public {
     SpokeConfigFixture memory t = _targetSpokeConfig();
     IHub.SpokeConfig memory cfg = _newConfigFrom(t);
@@ -35,6 +38,7 @@ contract SnapshotV4SpokeConfigTest is SnapshotV4BaseTest {
     );
   }
 
+  /// @dev Updating SpokeConfig.riskPremiumThreshold propagates.
   function test_delta_riskPremiumThreshold() public {
     SpokeConfigFixture memory t = _targetSpokeConfig();
     IHub.SpokeConfig memory cfg = _newConfigFrom(t);
@@ -47,6 +51,7 @@ contract SnapshotV4SpokeConfigTest is SnapshotV4BaseTest {
     );
   }
 
+  /// @dev Flipping SpokeConfig.active propagates.
   function test_delta_active() public {
     SpokeConfigFixture memory t = _targetSpokeConfig();
     IHub.SpokeConfig memory cfg = _newConfigFrom(t);
@@ -55,6 +60,7 @@ contract SnapshotV4SpokeConfigTest is SnapshotV4BaseTest {
     assertEq(_createV4Snapshot().spokeConfigs[TARGET_IDX].active, cfg.active, 'active');
   }
 
+  /// @dev Flipping SpokeConfig.halted propagates.
   function test_delta_halted() public {
     SpokeConfigFixture memory t = _targetSpokeConfig();
     IHub.SpokeConfig memory cfg = _newConfigFrom(t);
@@ -63,8 +69,7 @@ contract SnapshotV4SpokeConfigTest is SnapshotV4BaseTest {
     assertEq(_createV4Snapshot().spokeConfigs[TARGET_IDX].halted, cfg.halted, 'halted');
   }
 
-  // Re-calling addSpokeConfig for an existing (assetId, spoke) must NOT
-  // duplicate the spoke in the array. Protects the `_spokeRegistered` dedup fix.
+  /// @dev Re-calling addSpokeConfig for an existing (assetId, spoke) doesn't duplicate the entry.
   function test_delta_reAdd_doesNotDuplicate() public {
     Types.V4Snapshot memory snapA = _createV4Snapshot();
     SpokeConfigFixture memory t = _targetSpokeConfig();

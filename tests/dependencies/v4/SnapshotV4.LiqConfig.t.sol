@@ -7,10 +7,12 @@ contract SnapshotV4LiqConfigTest is SnapshotV4BaseTest {
   // First liq-config fixture: spokeA. Used as the mutation target.
   uint256 internal constant TARGET_IDX = 0;
 
+  /// @dev All liq config fixtures match the snapshot array.
   function test_createV4Snapshot_liquidationConfigs() public view {
     assertEq(_createV4Snapshot().spokeLiquidationConfigs, _liqConfigFixtures);
   }
 
+  /// @dev Mutating targetHealthFactor propagates.
   function test_delta_targetHealthFactor() public {
     LiqConfigFixture memory t = _targetLiqConfig();
     uint128 newVal = uint128(uint256(t.targetHealthFactor) * 2 + 1);
@@ -28,6 +30,7 @@ contract SnapshotV4LiqConfigTest is SnapshotV4BaseTest {
     );
   }
 
+  /// @dev Mutating healthFactorForMaxBonus propagates.
   function test_delta_healthFactorForMaxBonus() public {
     LiqConfigFixture memory t = _targetLiqConfig();
     uint64 newVal = uint64(uint256(t.healthFactorForMaxBonus) - 1);
@@ -45,6 +48,7 @@ contract SnapshotV4LiqConfigTest is SnapshotV4BaseTest {
     );
   }
 
+  /// @dev Mutating liquidationBonusFactor propagates.
   function test_delta_liquidationBonusFactor() public {
     LiqConfigFixture memory t = _targetLiqConfig();
     uint16 newVal = t.liquidationBonusFactor + 50;
@@ -62,6 +66,7 @@ contract SnapshotV4LiqConfigTest is SnapshotV4BaseTest {
     );
   }
 
+  /// @dev Mutating maxUserReservesLimit propagates.
   function test_delta_maxUserReservesLimit() public {
     LiqConfigFixture memory t = _targetLiqConfig();
     uint16 newVal = t.maxUserReservesLimit + 1;
