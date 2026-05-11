@@ -5,7 +5,7 @@ import 'forge-std/Test.sol';
 import {SnapshotV4} from 'src/dependencies/v4/SnapshotV4.sol';
 import {V4DiffWriter} from 'src/dependencies/v4/V4DiffWriter.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
-import {V4DiffWriterHarness} from './V4DiffWriterHarness.sol';
+import {V4DiffWriterHarness} from 'tests/mocks/v4/V4DiffWriterHarness.sol';
 
 abstract contract V4DiffWriterTestBase is Test {
   address internal spokeA;
