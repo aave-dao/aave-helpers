@@ -1,0 +1,46 @@
+tests/mocks/v4/V4Mocks.sol
+  h_71908bb6884da4 1-170
+tests/dependencies/v4/SnapshotV4.t.sol
+  s_bef57e8811ec19::t_53ca141cf5ddc0 8,12,16,20
+  s_bef57e8811ec19::t_619c3e556da5a1 11
+  h_71908bb6884da4 1-7,9,13-15,17-19,21-32
+  s_bef57e8811ec19::t_88c1bf49ffbb24 10
+tests/dependencies/v4/SnapshotV4Base.t.sol
+  s_bef57e8811ec19::t_a07669d9c443ef 64-89
+  s_bef57e8811ec19::t_de5b92246b3f22 159-188
+  s_bef57e8811ec19::t_4eb4e0fcbe4f6a 536
+  s_bef57e8811ec19::t_ae40fe70b89500 336-364
+  s_bef57e8811ec19::t_95d40cf20f92f1 467-469,471,473-530
+  s_bef57e8811ec19::t_0c405363073a53 34-38,40
+  s_bef57e8811ec19::t_6df3136464e276 275-333
+  s_bef57e8811ec19::t_170b94e42f2a11 638-639
+  s_bef57e8811ec19::t_52079566b7113e 112,115-118,157-158,189-203,205-274
+  s_bef57e8811ec19::t_8e6bd687a877fd 54-63
+  s_bef57e8811ec19::t_8fc59a2d32ec12 113-114,119-156
+  s_bef57e8811ec19::t_6ee1859e710cdb 641-664,666-680
+  s_bef57e8811ec19::t_a793e56bc5621a 665
+  h_71908bb6884da4 12,33,39,204,372-374,417,466,472
+  s_bef57e8811ec19::t_73e2ae866974be 470
+  s_bef57e8811ec19::t_4574e3b656f436 533-535,537-617
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "cb62cc2d94e984328b31fffda14baf5327d338d0",
+  "prompts": {},
+  "humans": {
+    "h_71908bb6884da4": {
+      "author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_bef57e8811ec19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5831686-2a73-4166-bd75-00f7f9c34913",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": null
+    }
+  }
+}
