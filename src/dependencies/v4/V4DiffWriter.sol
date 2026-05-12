@@ -147,7 +147,10 @@ library V4DiffWriter {
     return vm.serializeString(k, 'premiumOffsetRay', vm.toString(a.premiumOffsetRay));
   }
 
-  function _writeSpokeConfigs(string memory path, Types.SpokeConfigSnapshot[] memory caps) internal {
+  function _writeSpokeConfigs(
+    string memory path,
+    Types.SpokeConfigSnapshot[] memory caps
+  ) internal {
     string memory sectionKey = 'spokeConfigs';
     string memory content = '{}';
     vm.serializeJson(sectionKey, '{}');

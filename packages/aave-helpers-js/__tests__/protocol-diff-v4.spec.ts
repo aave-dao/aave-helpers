@@ -199,7 +199,9 @@ describe('BPS formatting via formatV4Value', () => {
       },
     };
     expect(formatV4Value('spokeConfig', 'addCap', 1000000, capCtx)).toBe('1,000,000 (1e6) USDT');
-    expect(formatV4Value('spokeConfig', 'drawCap', 1880000, capCtx)).toBe('1,880,000 (1.88e6) USDT');
+    expect(formatV4Value('spokeConfig', 'drawCap', 1880000, capCtx)).toBe(
+      '1,880,000 (1.88e6) USDT'
+    );
     // Falls back gracefully when symbol unavailable
     expect(formatV4Value('spokeConfig', 'addCap', 1000000, ctx)).toBe('1,000,000 (1e6)');
     // Small caps (< 1000) skip the exponential

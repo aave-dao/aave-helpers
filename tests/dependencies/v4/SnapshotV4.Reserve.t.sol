@@ -39,7 +39,11 @@ contract SnapshotV4ReserveTest is SnapshotV4BaseTest {
     ISpoke.ReserveConfig memory cfg = _buildReserveConfigFrom(t.input);
     cfg.borrowable = !cfg.borrowable;
     t.input.spoke.setReserveConfig(t.reserveId, cfg);
-    assertEq(_createV4Snapshot().spokeReserves[TARGET_IDX].borrowable, cfg.borrowable, 'borrowable');
+    assertEq(
+      _createV4Snapshot().spokeReserves[TARGET_IDX].borrowable,
+      cfg.borrowable,
+      'borrowable'
+    );
   }
 
   /// @dev Flipping ReserveConfig.receiveSharesEnabled propagates.
