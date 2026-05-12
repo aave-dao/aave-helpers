@@ -246,35 +246,6 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     }
   }
 
-  /// @notice Test that a frozen reserve correctly reverts on supply and borrow.
-  function e2eTestFrozenAsset(ISpoke spoke, Types.ReserveInfo memory frozenAsset) public {
-    console.log('E2E: Testing frozen reserve %s (should revert)', frozenAsset.symbol);
-
-    address oracleAddr = spoke.ORACLE();
-    address user = vm.randomAddress();
-    uint256 amount = _getTokenAmountByDollarValue({
-      oracleAddr: oracleAddr,
-      reserveInfo: frozenAsset,
-      dollarValue: 1_000
-    });
-
-    deal2(frozenAsset.underlying, user, amount);
-
-    // Supply should revert with ReserveFrozen
-    vm.startPrank(user);
-    IERC20(frozenAsset.underlying).forceApprove(address(spoke), amount);
-    vm.expectRevert(ISpoke.ReserveFrozen.selector);
-    spoke.supply({reserveId: frozenAsset.reserveId, amount: amount, onBehalfOf: user});
-    vm.stopPrank();
-
-    // Borrow should revert with ReserveFrozen (if borrowable)
-    if (frozenAsset.borrowable) {
-      vm.prank(user);
-      vm.expectRevert(ISpoke.ReserveFrozen.selector);
-      spoke.borrow({reserveId: frozenAsset.reserveId, amount: amount, onBehalfOf: user});
-    }
-  }
-
   /// @notice Test all regular position managers on a spoke.
   function e2eTestRegularPositionManagers(ISpoke spoke) public {
     _setCapsToMax(spoke);
@@ -636,6 +607,35 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
       usingAsCollateral: true,
       onBehalfOf: user
     });
+  }
+
+  /// @notice Test that a frozen reserve correctly reverts on supply and borrow.
+  function e2eTestFrozenAsset(ISpoke spoke, Types.ReserveInfo memory frozenAsset) public {
+    console.log('E2E: Testing frozen reserve %s (should revert)', frozenAsset.symbol);
+
+    address oracleAddr = spoke.ORACLE();
+    address user = vm.randomAddress();
+    uint256 amount = _getTokenAmountByDollarValue({
+      oracleAddr: oracleAddr,
+      reserveInfo: frozenAsset,
+      dollarValue: 1_000
+    });
+
+    deal2(frozenAsset.underlying, user, amount);
+
+    // Supply should revert with ReserveFrozen
+    vm.startPrank(user);
+    IERC20(frozenAsset.underlying).forceApprove(address(spoke), amount);
+    vm.expectRevert(ISpoke.ReserveFrozen.selector);
+    spoke.supply({reserveId: frozenAsset.reserveId, amount: amount, onBehalfOf: user});
+    vm.stopPrank();
+
+    // Borrow should revert with ReserveFrozen (if borrowable)
+    if (frozenAsset.borrowable) {
+      vm.prank(user);
+      vm.expectRevert(ISpoke.ReserveFrozen.selector);
+      spoke.borrow({reserveId: frozenAsset.reserveId, amount: amount, onBehalfOf: user});
+    }
   }
 
   /// @notice Per-asset e2e test with randomized amounts and extra collaterals.
