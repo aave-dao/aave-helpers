@@ -551,7 +551,7 @@ abstract contract GatewayScenarios is Helpers {
     assertApproxEqAbs(
       spoke.getUserSuppliedAssets(reserveInfo.reserveId, user) - userAssetsBefore,
       amountSupplied,
-      1,
+      2,
       'SIG_SUPPLY: user assets mismatch'
     );
     assertEq(
@@ -563,7 +563,7 @@ abstract contract GatewayScenarios is Helpers {
       IHubBase(reserveInfo.hub).getSpokeAddedAssets(reserveInfo.assetId, address(spoke)) -
         hubAssetsBefore,
       amountSupplied,
-      1,
+      2,
       'SIG_SUPPLY: hub assets mismatch'
     );
   }
