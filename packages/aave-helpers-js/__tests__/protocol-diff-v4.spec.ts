@@ -129,10 +129,16 @@ describe('BPS formatting via formatV4Value', () => {
     expect(formatV4Value('spokeReserve', 'collateralRisk', 5000, ctx)).toBe('50.00 % [5000]');
   });
 
-  it('formats maxLiquidationBonus as BPS', () => {
+  it('formats maxLiquidationBonus with PERCENTAGE_FACTOR offset (100_00 = 0% bonus)', () => {
     expect(formatV4Value('spokeReserve', 'maxLiquidationBonus', 10100, ctx)).toBe(
-      '101.00 % [10100]'
+      '1.00 % [10100]'
     );
+    expect(formatV4Value('spokeReserve', 'maxLiquidationBonus', 10500, ctx)).toBe(
+      '5.00 % [10500]'
+    );
+    expect(formatV4Value('spokeReserve', 'maxLiquidationBonus', 10000, ctx)).toBe('0.00 % [10000]');
+    // Uninitialized — guard avoids the misleading "-100.00 % [0]"
+    expect(formatV4Value('spokeReserve', 'maxLiquidationBonus', 0, ctx)).toBe('0.00 % [0]');
   });
 
   it('formats hub asset IR strategy fields as BPS', () => {
@@ -206,6 +212,19 @@ describe('BPS formatting via formatV4Value', () => {
     expect(formatV4Value('spokeConfig', 'addCap', 1000000, ctx)).toBe('1,000,000 (1e6)');
     // Small caps (< 1000) skip the exponential
     expect(formatV4Value('spokeConfig', 'addCap', 500, capCtx)).toBe('500 USDT');
+    // IHub sentinel (type(uint40).max) renders as "no cap" rather than a literal limit
+    const MAX_SPOKE_CAP = 2 ** 40 - 1;
+    expect(formatV4Value('spokeConfig', 'addCap', MAX_SPOKE_CAP, capCtx)).toBe(
+      'sentinel value - no cap'
+    );
+    expect(formatV4Value('spokeConfig', 'drawCap', MAX_SPOKE_CAP, capCtx)).toBe(
+      'sentinel value - no cap'
+    );
+    // riskPremiumThreshold sentinel (type(uint24).max) renders as "no threshold"
+    const MAX_RISK_THRESHOLD = 2 ** 24 - 1;
+    expect(formatV4Value('spokeConfig', 'riskPremiumThreshold', MAX_RISK_THRESHOLD, capCtx)).toBe(
+      'sentinel value - no threshold'
+    );
   });
 
   it('formats numeric-string fields (oraclePrice, swept, premiumShares) with separators + exp', () => {

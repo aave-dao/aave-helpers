@@ -58,9 +58,14 @@ type SpokeReserveKey = keyof V4SpokeReserve;
 const SPOKE_RESERVE_BPS_FIELDS: readonly SpokeReserveKey[] = [
   'collateralRisk',
   'collateralFactor',
-  'maxLiquidationBonus',
   'liquidationFee',
 ] as const;
+
+/** ISpoke.DynamicReserveConfig: 100_00 represents 0.00% bonus — subtract PERCENTAGE_FACTOR (100_00) for the actual bonus. */
+function formatLiquidationBonus(value: number): string {
+  if (value === 0) return '0.00 % [0]';
+  return `${((value - 10000) / 100).toFixed(2)} % [${value}]`;
+}
 
 const SPOKE_RESERVE_BOOL_FIELDS: readonly SpokeReserveKey[] = [
   'paused',
@@ -83,6 +88,8 @@ export const spokeReserveFormatters: Partial<{
 for (const field of SPOKE_RESERVE_BPS_FIELDS) {
   (spokeReserveFormatters[field] as FieldFormatter<number>) = (value) => formatBps(value);
 }
+
+spokeReserveFormatters['maxLiquidationBonus'] = (value) => formatLiquidationBonus(value);
 
 for (const field of SPOKE_RESERVE_BOOL_FIELDS) {
   (spokeReserveFormatters[field] as FieldFormatter<boolean>) = (value) => boolToMarkdown(value);
@@ -146,6 +153,11 @@ const SPOKE_CONFIG_FLAGS: readonly SpokeConfigKey[] = ['active', 'halted'] as co
 /** uint40 token-unit cap fields — formatted with thousands separators + asset symbol. */
 const SPOKE_CONFIG_TOKEN_AMOUNT_FIELDS: readonly SpokeConfigKey[] = ['addCap', 'drawCap'] as const;
 
+// IHub sentinels: type(uint40).max for caps and type(uint24).max for the risk
+// premium threshold both mean "no limit" rather than a real bound.
+const MAX_ALLOWED_SPOKE_CAP = 2 ** 40 - 1;
+const MAX_RISK_PREMIUM_THRESHOLD = 2 ** 24 - 1;
+
 export const spokeConfigFormatters: Partial<{
   [K in SpokeConfigKey]: FieldFormatter<V4SpokeConfig[K]>;
 }> = {};
@@ -155,11 +167,16 @@ for (const field of SPOKE_CONFIG_FLAGS) {
 }
 
 for (const field of SPOKE_CONFIG_TOKEN_AMOUNT_FIELDS) {
-  (spokeConfigFormatters[field] as FieldFormatter<number>) = (value, ctx) =>
-    formatBigIntWithExp(BigInt(value), ctx.spokeConfig?.assetSymbol);
+  (spokeConfigFormatters[field] as FieldFormatter<number>) = (value, ctx) => {
+    if (value === MAX_ALLOWED_SPOKE_CAP) return 'sentinel value - no cap';
+    return formatBigIntWithExp(BigInt(value), ctx.spokeConfig?.assetSymbol);
+  };
 }
 
-spokeConfigFormatters['riskPremiumThreshold'] = (value) => formatBps(value);
+spokeConfigFormatters['riskPremiumThreshold'] = (value) => {
+  if (value === MAX_RISK_PREMIUM_THRESHOLD) return 'sentinel value - no threshold';
+  return formatBps(value);
+};
 
 // --- Spoke Liquidation Config formatters ---
 
