@@ -130,12 +130,8 @@ describe('BPS formatting via formatV4Value', () => {
   });
 
   it('formats maxLiquidationBonus with PERCENTAGE_FACTOR offset (100_00 = 0% bonus)', () => {
-    expect(formatV4Value('spokeReserve', 'maxLiquidationBonus', 10100, ctx)).toBe(
-      '1.00 % [10100]'
-    );
-    expect(formatV4Value('spokeReserve', 'maxLiquidationBonus', 10500, ctx)).toBe(
-      '5.00 % [10500]'
-    );
+    expect(formatV4Value('spokeReserve', 'maxLiquidationBonus', 10100, ctx)).toBe('1.00 % [10100]');
+    expect(formatV4Value('spokeReserve', 'maxLiquidationBonus', 10500, ctx)).toBe('5.00 % [10500]');
     expect(formatV4Value('spokeReserve', 'maxLiquidationBonus', 10000, ctx)).toBe('0.00 % [10000]');
     // Uninitialized — guard avoids the misleading "-100.00 % [0]"
     expect(formatV4Value('spokeReserve', 'maxLiquidationBonus', 0, ctx)).toBe('0.00 % [0]');
