@@ -16,6 +16,7 @@ import {
 } from '@bgd-labs/toolbox';
 import { getAddressBookReferences } from '@aave-dao/aave-address-book/utils';
 import { diffSnapshots } from './protocol-diff';
+import { diffV4Snapshots } from './protocol-diff-v4';
 import { Address, encodeFunctionData, Hex, parseAbi, zeroAddress } from 'viem';
 import { readContract } from 'viem/actions';
 import { toAccount } from 'viem/accounts';
@@ -35,6 +36,22 @@ program
     const after = JSON.parse(readFileSync(afterPath, 'utf-8'));
 
     const md = await diffSnapshots(before, after);
+
+    mkdirSync(dirname(opts.out), { recursive: true });
+    writeFileSync(opts.out, md, 'utf-8');
+  });
+
+program
+  .command('diff-v4-snapshots')
+  .description('Diff two Aave V4 protocol snapshot JSON files and produce a markdown report')
+  .argument('<before>', 'path to the before snapshot JSON')
+  .argument('<after>', 'path to the after snapshot JSON')
+  .requiredOption('-o, --out <path>', 'output path for the markdown report')
+  .action(async (beforePath: string, afterPath: string, opts: { out: string }) => {
+    const before = JSON.parse(readFileSync(beforePath, 'utf-8'));
+    const after = JSON.parse(readFileSync(afterPath, 'utf-8'));
+
+    const md = await diffV4Snapshots(before, after);
 
     mkdirSync(dirname(opts.out), { recursive: true });
     writeFileSync(opts.out, md, 'utf-8');
