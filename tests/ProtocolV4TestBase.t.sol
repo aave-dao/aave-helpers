@@ -84,10 +84,7 @@ contract ProtocolV4TestE2EDistinctSpokes is ProtocolV4TestBaseTest {
 
 contract ProtocolV4TestE2EAllSpokes is ProtocolV4TestBaseTest {
   function test_e2eAllSpokes() public gasless {
-    e2eTestAllSpokes({
-      spokes: AaveV4EthereumGetters.getAllSpokes(),
-      testPositionManagers: true
-    });
+    e2eTestAllSpokes({spokes: AaveV4EthereumGetters.getAllSpokes(), testPositionManagers: true});
   }
 }
 
@@ -196,6 +193,20 @@ contract ProtocolV4TestDefaultTest is ProtocolV4TestBaseTest {
       runE2E: false,
       testPositionManagers: false
     });
+    _cleanupArtifacts(name);
+  }
+
+  function test_defaultTestWithSeatbelt() public {
+    string memory name = 'v4_seatbelt';
+    defaultTest({
+      reportName: name,
+      payload: address(new PayloadWithEmit()),
+      runE2E: false,
+      testPositionManagers: false,
+      runSeatbelt: true
+    });
+    assertTrue(vm.exists(string.concat('./reports/', name, '_before.json')));
+    assertTrue(vm.exists(string.concat('./reports/', name, '_after.json')));
     _cleanupArtifacts(name);
   }
 }

@@ -494,10 +494,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
         // usable as collateral
         // not isolated asset as we can only borrow stablecoins against it
         // ltv is not 0
-        _includeInE2e(configs[i]) &&
-        configs[i].usageAsCollateralEnabled &&
-        configs[i].debtCeiling == 0 &&
-        configs[i].ltv != 0
+        _includeInE2e(configs[i]) && configs[i].usageAsCollateralEnabled && configs[i].ltv != 0
       ) return configs[i];
     }
     revert('ERROR: No usable collateral found');

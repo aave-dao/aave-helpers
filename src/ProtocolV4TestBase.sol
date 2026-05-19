@@ -10,6 +10,7 @@ import {ISpoke, IHub, ITokenizationSpoke, INativeTokenGateway, ISignatureGateway
 import {AaveV4EthereumPositionManagers, AaveV4EthereumGetters} from 'aave-address-book/AaveV4Ethereum.sol';
 import {IPayloadsControllerCore, PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
 import {GovV3Helpers} from 'src/GovV3Helpers.sol';
+import {SeatbeltUtils} from 'src/SeatbeltUtils.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {SnapshotV4} from 'src/dependencies/v4/SnapshotV4.sol';
 import {Scenarios} from 'src/dependencies/v4/Scenarios.sol';
@@ -22,7 +23,13 @@ import {GatewayScenarios} from 'src/dependencies/v4/GatewayScenarios.sol';
 /// Tests deposit, mint, withdraw, redeem for each tokenization spoke.
 /// Tests NativeTokenGateway and SignatureGateway for each spoke.
 /// Loops over all good collaterals and uses randomized amounts.
-contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, GatewayScenarios {
+contract ProtocolV4TestBase is
+  SnapshotV4,
+  Scenarios,
+  TokenizationScenarios,
+  GatewayScenarios,
+  SeatbeltUtils
+{
   using SafeERC20 for IERC20;
 
   /// @notice Run the full V4 test suite: snapshot before, execute payload, snapshot after, diff, then e2e.
@@ -39,7 +46,8 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
         tokenizationSpokes: tokenizationSpokes,
         payload: payload,
         runE2E: true,
-        testPositionManagers: false
+        testPositionManagers: false,
+        runSeatbelt: false
       });
   }
 
@@ -51,8 +59,38 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     bool runE2E,
     bool testPositionManagers
   ) public {
+    return
+      defaultTest({
+        reportName: reportName,
+        spokes: spokes,
+        tokenizationSpokes: tokenizationSpokes,
+        payload: payload,
+        runE2E: runE2E,
+        testPositionManagers: testPositionManagers,
+        runSeatbelt: false
+      });
+  }
+
+  function defaultTest(
+    string memory reportName,
+    ISpoke[] memory spokes,
+    ITokenizationSpoke[] memory tokenizationSpokes,
+    address payload,
+    bool runE2E,
+    bool testPositionManagers,
+    bool runSeatbelt
+  ) public {
     if (payload != address(0)) {
       Types.V4Snapshot memory snapshotAfter = _snapshotDiffAndExecute(reportName, spokes, payload);
+
+      if (runSeatbelt) {
+        generateSeatbeltReport(
+          reportName,
+          address(GovV3Helpers.getPayloadsController(block.chainid)),
+          payload.code
+        );
+      }
+
       configChangePlausibilityTest(snapshotAfter);
     }
 
@@ -71,7 +109,8 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
         reportName: reportName,
         payload: payload,
         runE2E: true,
-        testPositionManagers: false
+        testPositionManagers: false,
+        runSeatbelt: false
       });
   }
 
@@ -84,11 +123,29 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     return
       defaultTest({
         reportName: reportName,
+        payload: payload,
+        runE2E: runE2E,
+        testPositionManagers: testPositionManagers,
+        runSeatbelt: false
+      });
+  }
+
+  function defaultTest(
+    string memory reportName,
+    address payload,
+    bool runE2E,
+    bool testPositionManagers,
+    bool runSeatbelt
+  ) public {
+    return
+      defaultTest({
+        reportName: reportName,
         spokes: AaveV4EthereumGetters.getAllSpokes(),
         tokenizationSpokes: AaveV4EthereumGetters.getAllTokenizationSpokes(),
         payload: payload,
         runE2E: runE2E,
-        testPositionManagers: testPositionManagers
+        testPositionManagers: testPositionManagers,
+        runSeatbelt: runSeatbelt
       });
   }
 
