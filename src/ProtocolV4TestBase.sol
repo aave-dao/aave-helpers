@@ -7,8 +7,7 @@ import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/Safe
 import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
 
 import {ISpoke, IHub, ITokenizationSpoke, INativeTokenGateway, ISignatureGateway, IGiverPositionManager, ITakerPositionManager, IConfigPositionManager} from 'aave-address-book/AaveV4.sol';
-import {AaveV4EthereumPositionManagers} from 'aave-address-book/AaveV4Ethereum.sol';
-import {AaveV4EthereumHubHelpers} from 'src/dependencies/v4/AaveV4EthereumHelpers.sol';
+import {AaveV4EthereumPositionManagers, AaveV4EthereumGetters} from 'aave-address-book/AaveV4Ethereum.sol';
 import {IPayloadsControllerCore, PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
 import {GovV3Helpers} from 'src/GovV3Helpers.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
@@ -30,7 +29,7 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
   function defaultTest(
     string memory reportName,
     ISpoke[] memory spokes,
-    address[] memory tokenizationSpokes,
+    ITokenizationSpoke[] memory tokenizationSpokes,
     address payload
   ) public {
     return
@@ -47,7 +46,7 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
   function defaultTest(
     string memory reportName,
     ISpoke[] memory spokes,
-    address[] memory tokenizationSpokes,
+    ITokenizationSpoke[] memory tokenizationSpokes,
     address payload,
     bool runE2E,
     bool testPositionManagers
@@ -63,6 +62,34 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
       e2eTestAllTokenizationSpokes(tokenizationSpokes);
       vm.resumeGasMetering();
     }
+  }
+
+  /// @notice Run the full V4 test suite using the full hub/spoke/tokenization-spoke lists from the address-book.
+  function defaultTest(string memory reportName, address payload) public {
+    return
+      defaultTest({
+        reportName: reportName,
+        payload: payload,
+        runE2E: true,
+        testPositionManagers: false
+      });
+  }
+
+  function defaultTest(
+    string memory reportName,
+    address payload,
+    bool runE2E,
+    bool testPositionManagers
+  ) public {
+    return
+      defaultTest({
+        reportName: reportName,
+        spokes: AaveV4EthereumGetters.getAllSpokes(),
+        tokenizationSpokes: AaveV4EthereumGetters.getAllTokenizationSpokes(),
+        payload: payload,
+        runE2E: runE2E,
+        testPositionManagers: testPositionManagers
+      });
   }
 
   /// @notice Sanity-check post-payload spoke caps for known invariants.
@@ -102,7 +129,7 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     ISpoke[] memory spokes,
     address payload
   ) internal virtual returns (Types.V4Snapshot memory snapshotAfter) {
-    IHub[] memory hubs = AaveV4EthereumHubHelpers.getHubs();
+    IHub[] memory hubs = AaveV4EthereumGetters.getAllHubs();
     string memory beforeName = string.concat(reportName, '_before');
     string memory afterName = string.concat(reportName, '_after');
 
@@ -745,11 +772,11 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
   }
 
   /// @notice Test all tokenization spokes in the array.
-  function e2eTestAllTokenizationSpokes(address[] memory tokenizationSpokes) public {
+  function e2eTestAllTokenizationSpokes(ITokenizationSpoke[] memory tokenizationSpokes) public {
     for (uint256 i; i < tokenizationSpokes.length; i++) {
-      console.log('--- E2E: Testing tokenization spoke %s ---', tokenizationSpokes[i]);
+      console.log('--- E2E: Testing tokenization spoke %s ---', address(tokenizationSpokes[i]));
       console.log('------------------------------------------');
-      e2eTestTokenizationSpoke(ITokenizationSpoke(tokenizationSpokes[i]));
+      e2eTestTokenizationSpoke(tokenizationSpokes[i]);
     }
   }
 
