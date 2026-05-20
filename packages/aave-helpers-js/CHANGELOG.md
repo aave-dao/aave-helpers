@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.1.0
+
+### Minor Changes
+
+- 5121107: Add Aave V4 snapshot diff support and CLI command
+
 ## 1.0.14
 
 ### Patch Changes
