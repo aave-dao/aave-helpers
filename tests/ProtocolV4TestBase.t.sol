@@ -4,8 +4,7 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {ProtocolV4TestBase} from '../src/ProtocolV4TestBase.sol';
 import {ISpoke, ITokenizationSpoke, ISpokeConfigurator} from 'aave-address-book/AaveV4.sol';
-import {AaveV4Ethereum, AaveV4EthereumSpokes, AaveV4EthereumHubs, AaveV4EthereumTokenizationSpokes, AaveV4EthereumPositionManagers} from 'aave-address-book/AaveV4Ethereum.sol';
-import {AaveV4EthereumHubHelpers, AaveV4EthereumSpokeHelpers, AaveV4EthereumTokenizationSpokeHelpers} from 'src/dependencies/v4/AaveV4EthereumHelpers.sol';
+import {AaveV4Ethereum, AaveV4EthereumSpokes, AaveV4EthereumHubs, AaveV4EthereumTokenizationSpokes, AaveV4EthereumPositionManagers, AaveV4EthereumGetters} from 'aave-address-book/AaveV4Ethereum.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 import {PayloadWithStorage} from './mocks/PayloadWithStorage.sol';
@@ -85,10 +84,7 @@ contract ProtocolV4TestE2EDistinctSpokes is ProtocolV4TestBaseTest {
 
 contract ProtocolV4TestE2EAllSpokes is ProtocolV4TestBaseTest {
   function test_e2eAllSpokes() public gasless {
-    e2eTestAllSpokes({
-      spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
-      testPositionManagers: true
-    });
+    e2eTestAllSpokes({spokes: AaveV4EthereumGetters.getAllSpokes(), testPositionManagers: true});
   }
 }
 
@@ -99,7 +95,7 @@ contract ProtocolV4TestE2ETokenizationSpokes is ProtocolV4TestBaseTest {
 
   function test_e2eAllTokenizationSpokes() public gasless {
     e2eTestAllTokenizationSpokes({
-      tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes()
+      tokenizationSpokes: AaveV4EthereumGetters.getAllTokenizationSpokes()
     });
   }
 }
@@ -174,8 +170,8 @@ contract ProtocolV4TestSnapshot is ProtocolV4TestBaseTest {
   function test_snapshotState() public {
     string memory name = 'v4_snapshot';
     Types.V4Snapshot memory snapshot = createV4Snapshot({
-      spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
-      hubs: AaveV4EthereumHubHelpers.getHubs()
+      spokes: AaveV4EthereumGetters.getAllSpokes(),
+      hubs: AaveV4EthereumGetters.getAllHubs()
     });
     writeV4SnapshotJson({name: name, snap: snapshot});
     vm.removeFile(string.concat('./reports/', name, '.json'));
@@ -185,12 +181,7 @@ contract ProtocolV4TestSnapshot is ProtocolV4TestBaseTest {
 contract ProtocolV4TestDefaultTest is ProtocolV4TestBaseTest {
   function test_defaultTestWithPayload() public {
     string memory name = 'v4_emit_payload';
-    defaultTest({
-      reportName: name,
-      spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
-      tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes(),
-      payload: address(new PayloadWithEmit())
-    });
+    defaultTest({reportName: name, payload: address(new PayloadWithEmit())});
     _cleanupArtifacts(name);
   }
 
@@ -198,12 +189,24 @@ contract ProtocolV4TestDefaultTest is ProtocolV4TestBaseTest {
     string memory name = 'v4_no_e2e';
     defaultTest({
       reportName: name,
-      spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
-      tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes(),
       payload: address(new PayloadWithEmit()),
       runE2E: false,
       testPositionManagers: false
     });
+    _cleanupArtifacts(name);
+  }
+
+  function test_defaultTestWithSeatbelt() public {
+    string memory name = 'v4_seatbelt';
+    defaultTest({
+      reportName: name,
+      payload: address(new PayloadWithEmit()),
+      runE2E: false,
+      testPositionManagers: false,
+      runSeatbelt: true
+    });
+    assertTrue(vm.exists(string.concat('./reports/', name, '_before.json')));
+    assertTrue(vm.exists(string.concat('./reports/', name, '_after.json')));
     _cleanupArtifacts(name);
   }
 }
@@ -213,8 +216,6 @@ contract ProtocolV4TestStorageValidation is ProtocolV4TestBaseTest {
     string memory name = 'v4_storage_pass';
     defaultTest({
       reportName: name,
-      spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
-      tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes(),
       payload: address(new PayloadWithEmit()),
       runE2E: false,
       testPositionManagers: false
@@ -228,8 +229,6 @@ contract ProtocolV4TestStorageValidation is ProtocolV4TestBaseTest {
     vm.expectRevert();
     this.defaultTest({
       reportName: name,
-      spokes: AaveV4EthereumSpokeHelpers.getUserSpokes(),
-      tokenizationSpokes: AaveV4EthereumTokenizationSpokeHelpers.getTokenizationSpokes(),
       payload: payload,
       runE2E: false,
       testPositionManagers: false

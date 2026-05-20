@@ -7,10 +7,10 @@ import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/Safe
 import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
 
 import {ISpoke, IHub, ITokenizationSpoke, INativeTokenGateway, ISignatureGateway, IGiverPositionManager, ITakerPositionManager, IConfigPositionManager} from 'aave-address-book/AaveV4.sol';
-import {AaveV4EthereumPositionManagers} from 'aave-address-book/AaveV4Ethereum.sol';
-import {AaveV4EthereumHubHelpers} from 'src/dependencies/v4/AaveV4EthereumHelpers.sol';
+import {AaveV4EthereumPositionManagers, AaveV4EthereumGetters} from 'aave-address-book/AaveV4Ethereum.sol';
 import {IPayloadsControllerCore, PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
 import {GovV3Helpers} from 'src/GovV3Helpers.sol';
+import {SeatbeltUtils} from 'src/SeatbeltUtils.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {SnapshotV4} from 'src/dependencies/v4/SnapshotV4.sol';
 import {Scenarios} from 'src/dependencies/v4/Scenarios.sol';
@@ -23,14 +23,20 @@ import {GatewayScenarios} from 'src/dependencies/v4/GatewayScenarios.sol';
 /// Tests deposit, mint, withdraw, redeem for each tokenization spoke.
 /// Tests NativeTokenGateway and SignatureGateway for each spoke.
 /// Loops over all good collaterals and uses randomized amounts.
-contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, GatewayScenarios {
+contract ProtocolV4TestBase is
+  SnapshotV4,
+  Scenarios,
+  TokenizationScenarios,
+  GatewayScenarios,
+  SeatbeltUtils
+{
   using SafeERC20 for IERC20;
 
   /// @notice Run the full V4 test suite: snapshot before, execute payload, snapshot after, diff, then e2e.
   function defaultTest(
     string memory reportName,
     ISpoke[] memory spokes,
-    address[] memory tokenizationSpokes,
+    ITokenizationSpoke[] memory tokenizationSpokes,
     address payload
   ) public {
     return
@@ -40,20 +46,51 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
         tokenizationSpokes: tokenizationSpokes,
         payload: payload,
         runE2E: true,
-        testPositionManagers: false
+        testPositionManagers: false,
+        runSeatbelt: false
       });
   }
 
   function defaultTest(
     string memory reportName,
     ISpoke[] memory spokes,
-    address[] memory tokenizationSpokes,
+    ITokenizationSpoke[] memory tokenizationSpokes,
     address payload,
     bool runE2E,
     bool testPositionManagers
   ) public {
+    return
+      defaultTest({
+        reportName: reportName,
+        spokes: spokes,
+        tokenizationSpokes: tokenizationSpokes,
+        payload: payload,
+        runE2E: runE2E,
+        testPositionManagers: testPositionManagers,
+        runSeatbelt: false
+      });
+  }
+
+  function defaultTest(
+    string memory reportName,
+    ISpoke[] memory spokes,
+    ITokenizationSpoke[] memory tokenizationSpokes,
+    address payload,
+    bool runE2E,
+    bool testPositionManagers,
+    bool runSeatbelt
+  ) public {
     if (payload != address(0)) {
       Types.V4Snapshot memory snapshotAfter = _snapshotDiffAndExecute(reportName, spokes, payload);
+
+      if (runSeatbelt) {
+        generateSeatbeltReport(
+          reportName,
+          address(GovV3Helpers.getPayloadsController(block.chainid)),
+          payload.code
+        );
+      }
+
       configChangePlausibilityTest(snapshotAfter);
     }
 
@@ -63,6 +100,53 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
       e2eTestAllTokenizationSpokes(tokenizationSpokes);
       vm.resumeGasMetering();
     }
+  }
+
+  /// @notice Run the full V4 test suite using the full hub/spoke/tokenization-spoke lists from the address-book.
+  function defaultTest(string memory reportName, address payload) public {
+    return
+      defaultTest({
+        reportName: reportName,
+        payload: payload,
+        runE2E: true,
+        testPositionManagers: false,
+        runSeatbelt: false
+      });
+  }
+
+  function defaultTest(
+    string memory reportName,
+    address payload,
+    bool runE2E,
+    bool testPositionManagers
+  ) public {
+    return
+      defaultTest({
+        reportName: reportName,
+        payload: payload,
+        runE2E: runE2E,
+        testPositionManagers: testPositionManagers,
+        runSeatbelt: false
+      });
+  }
+
+  function defaultTest(
+    string memory reportName,
+    address payload,
+    bool runE2E,
+    bool testPositionManagers,
+    bool runSeatbelt
+  ) public {
+    return
+      defaultTest({
+        reportName: reportName,
+        spokes: AaveV4EthereumGetters.getAllSpokes(),
+        tokenizationSpokes: AaveV4EthereumGetters.getAllTokenizationSpokes(),
+        payload: payload,
+        runE2E: runE2E,
+        testPositionManagers: testPositionManagers,
+        runSeatbelt: runSeatbelt
+      });
   }
 
   /// @notice Sanity-check post-payload spoke caps for known invariants.
@@ -102,7 +186,7 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
     ISpoke[] memory spokes,
     address payload
   ) internal virtual returns (Types.V4Snapshot memory snapshotAfter) {
-    IHub[] memory hubs = AaveV4EthereumHubHelpers.getHubs();
+    IHub[] memory hubs = AaveV4EthereumGetters.getAllHubs();
     string memory beforeName = string.concat(reportName, '_before');
     string memory afterName = string.concat(reportName, '_after');
 
@@ -745,11 +829,11 @@ contract ProtocolV4TestBase is SnapshotV4, Scenarios, TokenizationScenarios, Gat
   }
 
   /// @notice Test all tokenization spokes in the array.
-  function e2eTestAllTokenizationSpokes(address[] memory tokenizationSpokes) public {
+  function e2eTestAllTokenizationSpokes(ITokenizationSpoke[] memory tokenizationSpokes) public {
     for (uint256 i; i < tokenizationSpokes.length; i++) {
-      console.log('--- E2E: Testing tokenization spoke %s ---', tokenizationSpokes[i]);
+      console.log('--- E2E: Testing tokenization spoke %s ---', address(tokenizationSpokes[i]));
       console.log('------------------------------------------');
-      e2eTestTokenizationSpoke(ITokenizationSpoke(tokenizationSpokes[i]));
+      e2eTestTokenizationSpoke(tokenizationSpokes[i]);
     }
   }
 
