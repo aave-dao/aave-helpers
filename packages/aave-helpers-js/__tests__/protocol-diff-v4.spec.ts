@@ -34,6 +34,7 @@ function makeSnapshot(overrides?: Partial<AaveV4Snapshot>): AaveV4Snapshot {
           collateralFactor: 8000,
           maxLiquidationBonus: 500,
           liquidationFee: 100,
+          dynamicConfigs: {},
           oracleAddress: ORACLE_ADDR,
           priceSource: PRICE_SRC,
           oraclePrice: '200000000000',

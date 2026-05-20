@@ -203,11 +203,13 @@ abstract contract Scenarios is Helpers {
         ? maxDebtValue - currentDebtValue
         : 0;
 
-      // Convert to test asset tokens
+      // Convert to test asset tokens. `availableDebtValue` is in V4 "Value"
+      // units (1e26 per USD) while oracle prices are in 1e8 per USD, so an
+      // extra 1e18 divisor is required to land in token units.
       address oracleAddr = spoke.ORACLE();
       uint256 testAssetPrice = IAaveOracle(oracleAddr).getReservePrice(testAssetInfo.reserveId);
       uint256 maxBorrowableAmount = (availableDebtValue * 10 ** testAssetInfo.decimals) /
-        testAssetPrice;
+        (testAssetPrice * 1e18);
       // Use 50% of max for safety margin
       maxBorrowableAmount = maxBorrowableAmount / 2;
       borrowCeiling = testAssetAmount < maxBorrowableAmount ? testAssetAmount : maxBorrowableAmount;
@@ -345,7 +347,10 @@ abstract contract Scenarios is Helpers {
 
     address liquidator = vm.randomAddress();
     uint256 snapshotBeforeLiquidation = vm.snapshotState();
-    bool receiveShares = vm.randomBool();
+    // Only request share-based liquidation when the collateral reserve allows
+    // it — otherwise `LiquidationLogic._validateLiquidationCall` hard-reverts
+    // with `CannotReceiveShares`.
+    bool receiveShares = vm.randomBool() && collateralInfo.receiveSharesEnabled;
 
     // Partial liquidation
     _testPartialLiquidation({
@@ -601,43 +606,76 @@ abstract contract Scenarios is Helpers {
   }
 
   /// @dev Fill borrows up to drawCap in random chunks, then verify overflow reverts.
+  /// @dev Uses an external usable collateral (skipping the tested reserve) so
+  ///      borrow-only or low-CF reserves don't trip `HealthFactorBelowThreshold`
+  ///      before reaching the `DrawCapExceeded` branch.
   function _testDrawCap(
     ISpoke spoke,
     Types.ReserveInfo memory reserveInfo,
     uint40 drawCap
   ) internal {
-    // Remove addCaps so enough collateral can be supplied to borrow up to drawCap
     _setAddCapsToMax(spoke);
-
     _logAction('TEST_DRAW_CAP', 'drawCap', drawCap);
-    address borrower = vm.randomAddress();
+
     uint256 drawCapScaled = uint256(drawCap) * 10 ** reserveInfo.decimals;
     uint256 currentDebt = spoke.getReserveTotalDebt(reserveInfo.reserveId);
     if (drawCapScaled <= currentDebt) {
       return;
     }
-
     uint256 room = drawCapScaled - currentDebt;
 
-    // Supply the debt asset itself as collateral (10x room for borrow headroom) + liquidity
-    uint256 collateralAmount = room * 10;
-    _supply({spoke: spoke, reserveInfo: reserveInfo, user: borrower, amount: collateralAmount});
-    vm.prank(borrower);
-    spoke.setUsingAsCollateral({
-      reserveId: reserveInfo.reserveId,
-      usingAsCollateral: true,
-      onBehalfOf: borrower
-    });
+    Types.ReserveInfo memory collateralInfo;
+    bool found;
+    (collateralInfo, found) = _pickExternalCollateral(spoke, reserveInfo.reserveId);
+    if (!found) {
+      console.log('TEST_DRAW_CAP: skipping, no external usable collateral available');
+      return;
+    }
 
-    // Supply liquidity from a separate provider
-    address liquidityProvider = vm.randomAddress();
-    _supply({spoke: spoke, reserveInfo: reserveInfo, user: liquidityProvider, amount: room});
+    address borrower = vm.randomAddress();
+    _seedDrawCapCollateral(spoke, reserveInfo, collateralInfo, borrower, room);
+    _supply({spoke: spoke, reserveInfo: reserveInfo, user: vm.randomAddress(), amount: room});
 
-    // Borrow more than drawCap — should revert with DrawCapExceeded
     uint256 overflowAmount = room + 10 ** reserveInfo.decimals;
     vm.prank(borrower);
     vm.expectRevert(abi.encodeWithSelector(IHub.DrawCapExceeded.selector, uint256(drawCap)));
     spoke.borrow({reserveId: reserveInfo.reserveId, amount: overflowAmount, onBehalfOf: borrower});
+  }
+
+  function _pickExternalCollateral(
+    ISpoke spoke,
+    uint256 skipReserveId
+  ) private view returns (Types.ReserveInfo memory chosen, bool found) {
+    Types.ReserveInfo[] memory goodCollaterals = _getAllUsableCollaterals(_getReserveInfo(spoke));
+    for (uint256 i; i < goodCollaterals.length; i++) {
+      if (goodCollaterals[i].reserveId != skipReserveId) {
+        return (goodCollaterals[i], true);
+      }
+    }
+  }
+
+  function _seedDrawCapCollateral(
+    ISpoke spoke,
+    Types.ReserveInfo memory debtReserve,
+    Types.ReserveInfo memory collateralInfo,
+    address borrower,
+    uint256 room
+  ) private {
+    address oracleAddr = spoke.ORACLE();
+    uint256 borrowValue = _getOracleValue(IAaveOracle(oracleAddr), debtReserve, room);
+    uint16 cfBps = collateralInfo.collateralFactor < 1000 ? 1000 : collateralInfo.collateralFactor;
+    uint256 collateralValueTarget = (borrowValue * 10000 * 2) / uint256(cfBps);
+    uint256 collateralPrice = IAaveOracle(oracleAddr).getReservePrice(collateralInfo.reserveId);
+    require(collateralPrice > 0, 'TEST_DRAW_CAP: zero collateral price');
+    uint256 collateralAmount = (collateralValueTarget * 10 ** collateralInfo.decimals) /
+      collateralPrice;
+    _supply({spoke: spoke, reserveInfo: collateralInfo, user: borrower, amount: collateralAmount});
+    vm.prank(borrower);
+    spoke.setUsingAsCollateral({
+      reserveId: collateralInfo.reserveId,
+      usingAsCollateral: true,
+      onBehalfOf: borrower
+    });
   }
 
   /// @dev Test that 0-amount operations revert.

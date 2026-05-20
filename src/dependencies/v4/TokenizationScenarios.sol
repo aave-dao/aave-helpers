@@ -39,6 +39,7 @@ abstract contract TokenizationScenarios is TokenizationActions {
         paused: false,
         frozen: false,
         borrowable: false,
+        receiveSharesEnabled: false,
         collateralEnabled: false,
         collateralFactor: 0,
         maxLiquidationBonus: 0,

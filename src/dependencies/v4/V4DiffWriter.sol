@@ -16,7 +16,7 @@ library V4DiffWriter {
     string memory path = string.concat('./reports/', reportName, '.json');
     vm.writeFile(
       path,
-      '{ "spokeReserves": {}, "spokeLiquidationConfigs": {}, "hubAssets": {}, "spokeConfigs": {} }'
+      '{ "spokeReserves": {}, "spokeLiquidationConfigs": {}, "hubAssets": {}, "spokeConfigs": {}, "positionManagers": {}, "accessManagerRoles": {} }'
     );
     vm.serializeUint('root', 'chainId', block.chainid);
 
@@ -24,6 +24,8 @@ library V4DiffWriter {
     _writeSpokeLiqConfigs(path, snapshot.spokeLiquidationConfigs);
     _writeHubAssets(path, snapshot.hubAssets);
     _writeSpokeConfigs(path, snapshot.spokeConfigs);
+    _writePositionManagers(path, snapshot.positionManagers);
+    _writeAccessManagerRoles(path, snapshot.accessManagerRoles);
   }
 
   function _writeSpokeReserves(
@@ -31,9 +33,18 @@ library V4DiffWriter {
     Types.SpokeReserveSnapshot[] memory reserves
   ) internal {
     string memory sectionKey = 'spokeReserves';
-    string memory content = '{}';
     vm.serializeJson(sectionKey, '{}');
 
+    if (reserves.length == 0) {
+      // `serializeString` would emit the section as `"{}"` (a string). Use the
+      // 3-arg `writeJson` to overwrite the section with a real JSON object so
+      // downstream consumers (Zod schema, TS diff) keep treating it as a record.
+      vm.writeJson(vm.serializeString('root', 'spokeReserves', '{}'), path);
+      vm.writeJson('{}', path, '$.spokeReserves');
+      return;
+    }
+
+    string memory content;
     for (uint256 i; i < reserves.length; i++) {
       string memory obj = _serReserve(reserves[i]);
 
@@ -71,9 +82,27 @@ library V4DiffWriter {
     vm.serializeUint(k, 'collateralFactor', r.collateralFactor);
     vm.serializeUint(k, 'maxLiquidationBonus', r.maxLiquidationBonus);
     vm.serializeUint(k, 'liquidationFee', r.liquidationFee);
+    vm.serializeString(k, 'dynamicConfigs', _serDynamicConfigs(k, r.dynamicConfigs));
     vm.serializeAddress(k, 'oracleAddress', r.oracleAddress);
     vm.serializeAddress(k, 'priceSource', r.priceSource);
     return vm.serializeString(k, 'oraclePrice', vm.toString(r.oraclePrice));
+  }
+
+  function _serDynamicConfigs(
+    string memory parentKey,
+    Types.DynamicConfigSnapshot[] memory configs
+  ) private returns (string memory) {
+    string memory bucket = string.concat(parentKey, '__dynamicConfigs');
+    string memory result = vm.serializeJson(bucket, '{}');
+    for (uint256 i; i < configs.length; i++) {
+      string memory entryKey = string.concat(bucket, '_', vm.toString(configs[i].key));
+      vm.serializeJson(entryKey, '{}');
+      vm.serializeUint(entryKey, 'collateralFactor', configs[i].collateralFactor);
+      vm.serializeUint(entryKey, 'maxLiquidationBonus', configs[i].maxLiquidationBonus);
+      string memory entry = vm.serializeUint(entryKey, 'liquidationFee', configs[i].liquidationFee);
+      result = vm.serializeString(bucket, vm.toString(configs[i].key), entry);
+    }
+    return result;
   }
 
   function _writeSpokeLiqConfigs(
@@ -81,9 +110,15 @@ library V4DiffWriter {
     Types.SpokeLiquidationSnapshot[] memory configs
   ) internal {
     string memory sectionKey = 'spokeLiqConfigs';
-    string memory content = '{}';
     vm.serializeJson(sectionKey, '{}');
 
+    if (configs.length == 0) {
+      vm.writeJson(vm.serializeString('root', 'spokeLiquidationConfigs', '{}'), path);
+      vm.writeJson('{}', path, '$.spokeLiquidationConfigs');
+      return;
+    }
+
+    string memory content;
     for (uint256 i; i < configs.length; i++) {
       string memory k = string.concat('liq_', vm.toString(configs[i].spokeAddress));
       vm.serializeJson(k, '{}');
@@ -106,9 +141,15 @@ library V4DiffWriter {
 
   function _writeHubAssets(string memory path, Types.HubAssetSnapshot[] memory assets) internal {
     string memory sectionKey = 'hubAssets';
-    string memory content = '{}';
     vm.serializeJson(sectionKey, '{}');
 
+    if (assets.length == 0) {
+      vm.writeJson(vm.serializeString('root', 'hubAssets', '{}'), path);
+      vm.writeJson('{}', path, '$.hubAssets');
+      return;
+    }
+
+    string memory content;
     for (uint256 i; i < assets.length; i++) {
       string memory obj = _serializeHubAsset(assets[i]);
 
@@ -152,9 +193,15 @@ library V4DiffWriter {
     Types.SpokeConfigSnapshot[] memory caps
   ) internal {
     string memory sectionKey = 'spokeConfigs';
-    string memory content = '{}';
     vm.serializeJson(sectionKey, '{}');
 
+    if (caps.length == 0) {
+      vm.writeJson(vm.serializeString('root', 'spokeConfigs', '{}'), path);
+      vm.writeJson('{}', path, '$.spokeConfigs');
+      return;
+    }
+
+    string memory content;
     for (uint256 i; i < caps.length; i++) {
       string memory k = string.concat(
         vm.toString(caps[i].hubAddress),
@@ -173,5 +220,121 @@ library V4DiffWriter {
       content = vm.serializeString(sectionKey, k, obj);
     }
     vm.writeJson(vm.serializeString('root', 'spokeConfigs', content), path);
+  }
+
+  function _writePositionManagers(
+    string memory path,
+    Types.PositionManagerSnapshot[] memory managers
+  ) internal {
+    string memory sectionKey = 'positionManagers';
+    vm.serializeJson(sectionKey, '{}');
+
+    if (managers.length == 0) {
+      vm.writeJson(vm.serializeString('root', 'positionManagers', '{}'), path);
+      vm.writeJson('{}', path, '$.positionManagers');
+      return;
+    }
+
+    // Group by spoke address: each spoke is a sub-object keyed by manager addr.
+    string memory content;
+    for (uint256 i; i < managers.length; i++) {
+      string memory spokeKey = string.concat('pm_', vm.toString(managers[i].spokeAddress));
+      // Initialize the per-spoke bucket on first occurrence.
+      bool firstForSpoke = true;
+      for (uint256 j; j < i; j++) {
+        if (managers[j].spokeAddress == managers[i].spokeAddress) {
+          firstForSpoke = false;
+          break;
+        }
+      }
+      if (firstForSpoke) {
+        vm.serializeJson(spokeKey, '{}');
+      }
+      string memory spokeObj = vm.serializeBool(
+        spokeKey,
+        vm.toString(managers[i].positionManager),
+        managers[i].active
+      );
+
+      // Write the section entry when this is the last manager for the spoke.
+      bool lastForSpoke = true;
+      for (uint256 j = i + 1; j < managers.length; j++) {
+        if (managers[j].spokeAddress == managers[i].spokeAddress) {
+          lastForSpoke = false;
+          break;
+        }
+      }
+      if (lastForSpoke) {
+        content = vm.serializeString(sectionKey, vm.toString(managers[i].spokeAddress), spokeObj);
+      }
+    }
+    vm.writeJson(vm.serializeString('root', 'positionManagers', content), path);
+  }
+
+  function _writeAccessManagerRoles(
+    string memory path,
+    Types.AccessManagerRoleSnapshot[] memory roles
+  ) internal {
+    string memory sectionKey = 'accessManagerRoles';
+    vm.serializeJson(sectionKey, '{}');
+
+    if (roles.length == 0) {
+      vm.writeJson(vm.serializeString('root', 'accessManagerRoles', '{}'), path);
+      vm.writeJson('{}', path, '$.accessManagerRoles');
+      return;
+    }
+
+    string memory content;
+    for (uint256 i; i < roles.length; i++) {
+      string memory amKey = string.concat('am_', vm.toString(roles[i].accessManager));
+      bool firstForAm = true;
+      for (uint256 j; j < i; j++) {
+        if (roles[j].accessManager == roles[i].accessManager) {
+          firstForAm = false;
+          break;
+        }
+      }
+      if (firstForAm) {
+        vm.serializeJson(amKey, '{}');
+      }
+      string memory roleObj = _serializeRole(roles[i]);
+      string memory amObj = vm.serializeString(amKey, vm.toString(roles[i].roleId), roleObj);
+
+      bool lastForAm = true;
+      for (uint256 j = i + 1; j < roles.length; j++) {
+        if (roles[j].accessManager == roles[i].accessManager) {
+          lastForAm = false;
+          break;
+        }
+      }
+      if (lastForAm) {
+        content = vm.serializeString(sectionKey, vm.toString(roles[i].accessManager), amObj);
+      }
+    }
+    vm.writeJson(vm.serializeString('root', 'accessManagerRoles', content), path);
+  }
+
+  function _serializeRole(
+    Types.AccessManagerRoleSnapshot memory r
+  ) private returns (string memory) {
+    string memory k = string.concat(
+      'role_',
+      vm.toString(r.accessManager),
+      '_',
+      vm.toString(r.roleId)
+    );
+    vm.serializeJson(k, '{}');
+    vm.serializeString(k, 'label', r.label);
+    vm.serializeAddress(k, 'members', r.members);
+
+    // Flatten targetSelectors into parallel arrays for readability/diffability.
+    address[] memory targets = new address[](r.targetSelectors.length);
+    string[] memory selectors = new string[](r.targetSelectors.length);
+    for (uint256 i; i < r.targetSelectors.length; i++) {
+      targets[i] = r.targetSelectors[i].target;
+      selectors[i] = vm.toString(r.targetSelectors[i].selector);
+    }
+    vm.serializeAddress(k, 'targets', targets);
+    return vm.serializeString(k, 'selectors', selectors);
   }
 }

@@ -34,6 +34,7 @@ abstract contract Helpers is Actions {
         paused: config.paused,
         frozen: config.frozen,
         borrowable: config.borrowable,
+        receiveSharesEnabled: config.receiveSharesEnabled,
         collateralEnabled: dynamicConfig.collateralFactor > 0,
         collateralFactor: dynamicConfig.collateralFactor,
         maxLiquidationBonus: dynamicConfig.maxLiquidationBonus,
@@ -122,9 +123,12 @@ abstract contract Helpers is Actions {
   ) internal {
     Types.ReserveInfo[] memory goodCollaterals = _getAllUsableCollaterals(_getReserveInfo(spoke));
     address oracleAddr = spoke.ORACLE();
-    uint8 oracleDecimals = IAaveOracle(oracleAddr).decimals();
     uint256 targetCollateralDollarAmount = borrowAmountInDollars * 3;
-    uint256 targetCollateralValue = targetCollateralDollarAmount * 10 ** oracleDecimals;
+    // `account.totalCollateralValue` is denominated in V4 "Value" units (1e26
+    // per USD), not oracle units. Use the same scale here so the break
+    // condition kicks in only when the CF-weighted collateral really clears
+    // the target.
+    uint256 targetCollateralValue = targetCollateralDollarAmount * 1e26;
 
     for (uint256 i; i < goodCollaterals.length; i++) {
       uint256 supplyAmount = _getTokenAmountByDollarValue({
@@ -150,6 +154,11 @@ abstract contract Helpers is Actions {
   }
 
   /// @notice Convert a dollar value to token amount using the spoke oracle.
+  /// @dev When the oracle returns 0 (commonly the reason a reserve is paused
+  ///      or frozen) we fall back to a 1:1 token-per-dollar amount so callers
+  ///      that only need a positive amount (e.g. paused/frozen revert tests)
+  ///      can still reach their expected-revert assertions instead of panicking
+  ///      on division by zero.
   function _getTokenAmountByDollarValue(
     address oracleAddr,
     Types.ReserveInfo memory reserveInfo,
@@ -157,6 +166,9 @@ abstract contract Helpers is Actions {
   ) internal view returns (uint256) {
     IAaveOracle oracle = IAaveOracle(oracleAddr);
     uint256 price = oracle.getReservePrice(reserveInfo.reserveId);
+    if (price == 0) {
+      return dollarValue * 10 ** reserveInfo.decimals;
+    }
     uint8 oracleDecimals = oracle.decimals();
     return (dollarValue * 10 ** (oracleDecimals + reserveInfo.decimals)) / price;
   }
@@ -397,7 +409,32 @@ abstract contract Helpers is Actions {
     return IHubConfigurator(address(new HubConfigurator(accessManager)));
   }
 
+  /// @notice Return a token's `symbol()`. Falls back to `bytes32` decoding for
+  ///         non-standard tokens like MKR; returns "<unknown>" on any failure.
   function _safeSymbol(address token) internal view returns (string memory) {
-    return IERC20Metadata(token).symbol();
+    (bool ok, bytes memory data) = token.staticcall(
+      abi.encodeWithSelector(IERC20Metadata.symbol.selector)
+    );
+    if (!ok || data.length == 0) {
+      return '<unknown>';
+    }
+    // Standard string return: first word is offset, second is length.
+    if (data.length >= 64) {
+      return abi.decode(data, (string));
+    }
+    // bytes32 return (e.g. MKR): trim trailing zero bytes and return as string.
+    if (data.length == 32) {
+      bytes32 raw = abi.decode(data, (bytes32));
+      uint256 len;
+      while (len < 32 && raw[len] != 0) {
+        len++;
+      }
+      bytes memory trimmed = new bytes(len);
+      for (uint256 i; i < len; i++) {
+        trimmed[i] = raw[i];
+      }
+      return string(trimmed);
+    }
+    return '<unknown>';
   }
 }

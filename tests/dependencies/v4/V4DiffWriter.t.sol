@@ -58,6 +58,7 @@ abstract contract V4DiffWriterTestBase is Test {
         collateralFactor: collateralFactor,
         maxLiquidationBonus: 10500,
         liquidationFee: 100,
+        dynamicConfigs: new Types.DynamicConfigSnapshot[](0),
         oracleAddress: oracleAddr,
         priceSource: priceSource,
         oraclePrice: 1e8
@@ -221,6 +222,7 @@ contract V4DiffWriterTest is V4DiffWriterTestBase, SnapshotV4 {
       collateralFactor: 7500,
       maxLiquidationBonus: 10500,
       liquidationFee: 100,
+      dynamicConfigs: new Types.DynamicConfigSnapshot[](0),
       oracleAddress: oracleAddr,
       priceSource: priceSource,
       oraclePrice: 1e8

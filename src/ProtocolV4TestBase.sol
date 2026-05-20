@@ -7,7 +7,7 @@ import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/Safe
 import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
 
 import {ISpoke, IHub, ITokenizationSpoke, INativeTokenGateway, ISignatureGateway, IGiverPositionManager, ITakerPositionManager, IConfigPositionManager} from 'aave-address-book/AaveV4.sol';
-import {AaveV4EthereumPositionManagers, AaveV4EthereumGetters} from 'aave-address-book/AaveV4Ethereum.sol';
+import {AaveV4Ethereum, AaveV4EthereumPositionManagers, AaveV4EthereumGetters} from 'aave-address-book/AaveV4Ethereum.sol';
 import {IPayloadsControllerCore, PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
 import {GovV3Helpers} from 'src/GovV3Helpers.sol';
 import {SeatbeltUtils} from 'src/SeatbeltUtils.sol';
@@ -150,9 +150,13 @@ contract ProtocolV4TestBase is
   }
 
   /// @notice Sanity-check post-payload spoke caps for known invariants.
-  /// @dev Liquidity is pooled at the hub, so invariant is per-asset aggregate across all spokes
+  /// @dev Liquidity is pooled at the hub, so the invariant is a per-asset
+  ///      aggregate across all spokes. `type(uint40).max` is the IHub sentinel
+  ///      meaning "no cap" — we branch on it instead of summing, so the check
+  ///      neither inflates totals nor false-positives on uncapped configs.
   function configChangePlausibilityTest(Types.V4Snapshot memory snapshotAfter) public pure {
     Types.SpokeConfigSnapshot[] memory caps = snapshotAfter.spokeConfigs;
+    uint40 sentinel = type(uint40).max;
     for (uint256 i; i < caps.length; i++) {
       // Skip (hub, assetId) groups already aggregated in a prior iteration.
       bool alreadyAggregated = false;
@@ -168,13 +172,27 @@ contract ProtocolV4TestBase is
 
       uint256 sumAdd;
       uint256 sumDraw;
+      bool addUnlimited;
+      bool drawUnlimited;
       for (uint256 k; k < caps.length; k++) {
         if (caps[k].hubAddress == caps[i].hubAddress && caps[k].assetId == caps[i].assetId) {
-          sumAdd += uint256(caps[k].addCap);
-          sumDraw += uint256(caps[k].drawCap);
+          if (caps[k].addCap == sentinel) {
+            addUnlimited = true;
+          } else {
+            sumAdd += uint256(caps[k].addCap);
+          }
+          if (caps[k].drawCap == sentinel) {
+            drawUnlimited = true;
+          } else {
+            sumDraw += uint256(caps[k].drawCap);
+          }
         }
       }
-      if (sumDraw == 0) {
+      // Unlimited draw with bounded add is economically impossible: hub
+      // liquidity is bounded by the supply caps.
+      require(!(drawUnlimited && !addUnlimited), 'PL_UNLIMITED_DRAW_BOUNDED_ADD');
+      // If add is unlimited, sumAdd can hold any draw — skip the numeric check.
+      if (addUnlimited) {
         continue;
       }
       require(sumDraw <= sumAdd, 'PL_ADD_LT_DRAW');
@@ -187,26 +205,39 @@ contract ProtocolV4TestBase is
     address payload
   ) internal virtual returns (Types.V4Snapshot memory snapshotAfter) {
     IHub[] memory hubs = AaveV4EthereumGetters.getAllHubs();
+    address[] memory positionManagerCandidates = _positionManagerCandidates();
+    address[] memory accessManagers = _accessManagers();
     string memory beforeName = string.concat(reportName, '_before');
     string memory afterName = string.concat(reportName, '_after');
 
-    Types.V4Snapshot memory snapshotBefore = createV4Snapshot(spokes, hubs);
+    Types.V4Snapshot memory snapshotBefore = createV4Snapshot(
+      spokes,
+      hubs,
+      positionManagerCandidates,
+      accessManagers
+    );
     writeV4SnapshotJson(beforeName, snapshotBefore);
 
     (string memory rawDiff, string memory logsJson) = _executePayloadWithRecording(payload);
 
-    // as executor does delegateCall to the payload, the executor should have no storage changes
+    // as executor does delegateCall to the payload, the executor should have no storage changes.
+    // Walk every configured access level so payloads run by Level_2+ are also covered.
     {
       IPayloadsControllerCore pc = GovV3Helpers.getPayloadsController(block.chainid);
-      _validateNoExecutorStorageChange(
-        rawDiff,
-        pc
-          .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
-          .executor
-      );
+      PayloadsControllerUtils.AccessControl[2] memory levels = [
+        PayloadsControllerUtils.AccessControl.Level_1,
+        PayloadsControllerUtils.AccessControl.Level_2
+      ];
+      for (uint256 i; i < levels.length; i++) {
+        address executor = pc.getExecutorSettingsByAccessControl(levels[i]).executor;
+        if (executor == address(0)) {
+          continue;
+        }
+        _validateNoExecutorStorageChange(rawDiff, executor);
+      }
     }
 
-    snapshotAfter = createV4Snapshot(spokes, hubs);
+    snapshotAfter = createV4Snapshot(spokes, hubs, positionManagerCandidates, accessManagers);
     writeV4SnapshotJson(afterName, snapshotAfter);
 
     string memory afterPath = string.concat('./reports/', afterName, '.json');
@@ -886,6 +917,28 @@ contract ProtocolV4TestBase is
       maxAddAmount: maxAddAmount
     });
     vm.revertToState(snapshot);
+  }
+
+  /// @notice Default list of position-manager candidates checked per spoke.
+  /// @dev Override on non-Ethereum chains. Returning more addresses costs only
+  ///      one `isPositionManagerActive` call each; missing addresses produce
+  ///      blind spots in the diff.
+  function _positionManagerCandidates() internal view virtual returns (address[] memory) {
+    address[] memory candidates = new address[](5);
+    candidates[0] = address(AaveV4EthereumPositionManagers.GIVER_POSITION_MANAGER);
+    candidates[1] = address(AaveV4EthereumPositionManagers.TAKER_POSITION_MANAGER);
+    candidates[2] = address(AaveV4EthereumPositionManagers.CONFIG_POSITION_MANAGER);
+    candidates[3] = address(AaveV4EthereumPositionManagers.NATIVE_TOKEN_GATEWAY);
+    candidates[4] = address(AaveV4EthereumPositionManagers.SIGNATURE_GATEWAY);
+    return candidates;
+  }
+
+  /// @notice Default list of AccessManagers whose role grants should be snapshotted.
+  /// @dev Override on non-Ethereum chains.
+  function _accessManagers() internal view virtual returns (address[] memory) {
+    address[] memory ams = new address[](1);
+    ams[0] = address(AaveV4Ethereum.ACCESS_MANAGER);
+    return ams;
   }
 
   /// @notice Validate that the executor has no storage changes after payload execution.
