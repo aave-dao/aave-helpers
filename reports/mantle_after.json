@@ -8,7 +8,8 @@
       "label": "sUSDe Stablecoins",
       "liquidationBonus": 10400,
       "liquidationThreshold": 9200,
-      "ltv": 9000
+      "ltv": 9000,
+      "ltvzeroBitmap": "0"
     },
     "2": {
       "borrowableBitmap": "524",
@@ -17,7 +18,8 @@
       "label": "USDe Stablecoins",
       "liquidationBonus": 10200,
       "liquidationThreshold": 9300,
-      "ltv": 9000
+      "ltv": 9000,
+      "ltvzeroBitmap": "0"
     },
     "3": {
       "borrowableBitmap": "28",
@@ -26,7 +28,8 @@
       "label": "fBTC Stablecoins",
       "liquidationBonus": 10800,
       "liquidationThreshold": 7900,
-      "ltv": 7500
+      "ltv": 7500,
+      "ltvzeroBitmap": "0"
     },
     "4": {
       "borrowableBitmap": "524",
@@ -35,7 +38,8 @@
       "label": "syrupUSDT Stablecoins",
       "liquidationBonus": 10400,
       "liquidationThreshold": 9200,
-      "ltv": 9000
+      "ltv": 9000,
+      "ltvzeroBitmap": "0"
     },
     "5": {
       "borrowableBitmap": "1",
@@ -44,7 +48,8 @@
       "label": "wrsETH Correlated",
       "liquidationBonus": 10100,
       "liquidationThreshold": 9500,
-      "ltv": 9300
+      "ltv": 9300,
+      "ltvzeroBitmap": "0"
     }
   },
   "poolConfig": {

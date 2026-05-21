@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.2.1
+
+### Patch Changes
+
+- b2eeeef: update aave-address-book
+
 ## 1.2.0
 
 ### Minor Changes
