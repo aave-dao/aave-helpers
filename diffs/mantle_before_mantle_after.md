@@ -443,6 +443,7 @@
 | liquidationBonus | - | 4 % [10400] |
 | borrowableBitmap | - | USDT0, USDC, GHO |
 | collateralBitmap | - | USDe, sUSDe |
+| ltvzeroBitmap | - | 0 |
 
 
 ### EMode: USDe Stablecoins (id: 2)
@@ -455,6 +456,7 @@
 | liquidationBonus | - | 2 % [10200] |
 | borrowableBitmap | - | USDT0, USDC, GHO |
 | collateralBitmap | - | USDe |
+| ltvzeroBitmap | - | 0 |
 
 
 ### EMode: fBTC Stablecoins (id: 3)
@@ -467,6 +469,7 @@
 | liquidationBonus | - | 8 % [10800] |
 | borrowableBitmap | - | USDT0, USDC, USDe |
 | collateralBitmap | - | FBTC |
+| ltvzeroBitmap | - | 0 |
 
 
 ### EMode: syrupUSDT Stablecoins (id: 4)
@@ -479,6 +482,7 @@
 | liquidationBonus | - | 4 % [10400] |
 | borrowableBitmap | - | USDT0, USDC, GHO |
 | collateralBitmap | - | syrupUSDT |
+| ltvzeroBitmap | - | 0 |
 
 
 ### EMode: wrsETH Correlated (id: 5)
@@ -491,6 +495,7 @@
 | liquidationBonus | - | 1 % [10100] |
 | borrowableBitmap | - | WETH |
 | collateralBitmap | - | wrsETH |
+| ltvzeroBitmap | - | 0 |
 
 
 ## Event logs
@@ -1554,7 +1559,8 @@
         "label": "sUSDe Stablecoins",
         "liquidationBonus": 10400,
         "liquidationThreshold": 9200,
-        "ltv": 9000
+        "ltv": 9000,
+        "ltvzeroBitmap": "0"
       }
     },
     "2": {
@@ -1566,7 +1572,8 @@
         "label": "USDe Stablecoins",
         "liquidationBonus": 10200,
         "liquidationThreshold": 9300,
-        "ltv": 9000
+        "ltv": 9000,
+        "ltvzeroBitmap": "0"
       }
     },
     "3": {
@@ -1578,7 +1585,8 @@
         "label": "fBTC Stablecoins",
         "liquidationBonus": 10800,
         "liquidationThreshold": 7900,
-        "ltv": 7500
+        "ltv": 7500,
+        "ltvzeroBitmap": "0"
       }
     },
     "4": {
@@ -1590,7 +1598,8 @@
         "label": "syrupUSDT Stablecoins",
         "liquidationBonus": 10400,
         "liquidationThreshold": 9200,
-        "ltv": 9000
+        "ltv": 9000,
+        "ltvzeroBitmap": "0"
       }
     },
     "5": {
@@ -1602,7 +1611,8 @@
         "label": "wrsETH Correlated",
         "liquidationBonus": 10100,
         "liquidationThreshold": 9500,
-        "ltv": 9300
+        "ltv": 9300,
+        "ltvzeroBitmap": "0"
       }
     }
   },
