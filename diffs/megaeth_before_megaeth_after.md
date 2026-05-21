@@ -315,6 +315,7 @@
 | liquidationBonus | - | 5.5 % [10550] |
 | borrowableBitmap | - | USDT0, USDm |
 | collateralBitmap | - | WETH |
+| ltvzeroBitmap | - | 0 |
 
 
 ### EMode: BTCb Stablecoins (id: 2)
@@ -327,6 +328,7 @@
 | liquidationBonus | - | 6.5 % [10650] |
 | borrowableBitmap | - | USDT0, USDm |
 | collateralBitmap | - | BTC.b |
+| ltvzeroBitmap | - | 0 |
 
 
 ### EMode: wstETH Stablecoins (id: 3)
@@ -339,6 +341,7 @@
 | liquidationBonus | - | 6.5 % [10650] |
 | borrowableBitmap | - | USDT0, USDm |
 | collateralBitmap | - | wstETH |
+| ltvzeroBitmap | - | 0 |
 
 
 ### EMode: wstETH Correlated (id: 4)
@@ -351,6 +354,7 @@
 | liquidationBonus | - | 1 % [10100] |
 | borrowableBitmap | - | WETH |
 | collateralBitmap | - | wstETH |
+| ltvzeroBitmap | - | 0 |
 
 
 ### EMode: wrsETH Correlated (id: 5)
@@ -363,6 +367,7 @@
 | liquidationBonus | - | 1 % [10100] |
 | borrowableBitmap | - | WETH |
 | collateralBitmap | - | wrsETH |
+| ltvzeroBitmap | - | 0 |
 
 
 ### EMode: ezETH Correlated (id: 6)
@@ -375,6 +380,7 @@
 | liquidationBonus | - | 1 % [10100] |
 | borrowableBitmap | - | WETH |
 | collateralBitmap | - | ezETH |
+| ltvzeroBitmap | - | 0 |
 
 
 ## Pool config changes
@@ -1184,7 +1190,8 @@
         "label": "WETH Stablecoins",
         "liquidationBonus": 10550,
         "liquidationThreshold": 8300,
-        "ltv": 8050
+        "ltv": 8050,
+        "ltvzeroBitmap": "0"
       }
     },
     "2": {
@@ -1196,7 +1203,8 @@
         "label": "BTCb Stablecoins",
         "liquidationBonus": 10650,
         "liquidationThreshold": 7500,
-        "ltv": 7000
+        "ltv": 7000,
+        "ltvzeroBitmap": "0"
       }
     },
     "3": {
@@ -1208,7 +1216,8 @@
         "label": "wstETH Stablecoins",
         "liquidationBonus": 10650,
         "liquidationThreshold": 7900,
-        "ltv": 7500
+        "ltv": 7500,
+        "ltvzeroBitmap": "0"
       }
     },
     "4": {
@@ -1220,7 +1229,8 @@
         "label": "wstETH Correlated",
         "liquidationBonus": 10100,
         "liquidationThreshold": 9600,
-        "ltv": 9400
+        "ltv": 9400,
+        "ltvzeroBitmap": "0"
       }
     },
     "5": {
@@ -1232,7 +1242,8 @@
         "label": "wrsETH Correlated",
         "liquidationBonus": 10100,
         "liquidationThreshold": 9500,
-        "ltv": 9300
+        "ltv": 9300,
+        "ltvzeroBitmap": "0"
       }
     },
     "6": {
@@ -1244,7 +1255,8 @@
         "label": "ezETH Correlated",
         "liquidationBonus": 10100,
         "liquidationThreshold": 9500,
-        "ltv": 9300
+        "ltv": 9300,
+        "ltvzeroBitmap": "0"
       }
     }
   },
