@@ -412,9 +412,7 @@ abstract contract Helpers is Actions {
   /// @notice Return a token's `symbol()`. Falls back to `bytes32` decoding for
   ///         non-standard tokens like MKR; returns "<unknown>" on any failure.
   function _safeSymbol(address token) internal view returns (string memory) {
-    (bool ok, bytes memory data) = token.staticcall(
-      abi.encodeWithSelector(IERC20Metadata.symbol.selector)
-    );
+    (bool ok, bytes memory data) = token.staticcall(abi.encodeCall(IERC20Metadata.symbol, ()));
     if (!ok || data.length == 0) {
       return '<unknown>';
     }

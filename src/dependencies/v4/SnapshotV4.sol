@@ -125,20 +125,8 @@ abstract contract SnapshotV4 is Helpers {
 
     address oracleAddr = spoke.ORACLE();
     snap.oracleAddress = oracleAddr;
-    // A broken oracle source (zero address) or stale/zero price both make
-    // AaveOracle revert. Catching here keeps `createV4Snapshot` usable so
-    // governance diffs still reach `diffV4Snapshots` instead of aborting the
-    // whole audit on the first bad feed.
-    try IAaveOracle(oracleAddr).getReserveSource(reserveId) returns (address src) {
-      snap.priceSource = src;
-    } catch {
-      snap.priceSource = address(0);
-    }
-    try IAaveOracle(oracleAddr).getReservePrice(reserveId) returns (uint256 px) {
-      snap.oraclePrice = px;
-    } catch {
-      snap.oraclePrice = 0;
-    }
+    snap.priceSource = IAaveOracle(oracleAddr).getReserveSource(reserveId);
+    snap.oraclePrice = IAaveOracle(oracleAddr).getReservePrice(reserveId);
   }
 
   /// @dev Walks `[1, latestKey]` and records every non-empty DynamicReserveConfig.
