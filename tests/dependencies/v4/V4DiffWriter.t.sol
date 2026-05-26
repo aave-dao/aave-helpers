@@ -495,9 +495,6 @@ contract V4DiffWriterHarnessTest is V4DiffWriterTestBase {
     string memory objectMarker = string.concat('"', section, '": {}');
     string memory stringMarker = string.concat('"', section, '": "');
     assertTrue(vm.contains(json, objectMarker), string.concat(section, ' not an empty object'));
-    assertFalse(
-      vm.contains(json, stringMarker),
-      string.concat(section, ' serialized as string')
-    );
+    assertFalse(vm.contains(json, stringMarker), string.concat(section, ' serialized as string'));
   }
 }
