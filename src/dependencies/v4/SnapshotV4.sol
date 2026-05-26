@@ -129,7 +129,7 @@ abstract contract SnapshotV4 is Helpers {
     snap.oraclePrice = IAaveOracle(oracleAddr).getReservePrice(reserveId);
   }
 
-  /// @dev Walks `[1, latestKey]` and records every non-empty DynamicReserveConfig.
+  /// @dev Walks `[0, latestKey]` and records every non-empty DynamicReserveConfig.
   ///      `getDynamicReserveConfig` returns the zero struct for unset keys, so
   ///      we use a populated-field check to detect real entries.
   function _snapshotDynamicConfigs(
@@ -137,12 +137,11 @@ abstract contract SnapshotV4 is Helpers {
     uint256 reserveId,
     uint32 latestKey
   ) private view returns (Types.DynamicConfigSnapshot[] memory) {
-    if (latestKey == 0) {
-      return new Types.DynamicConfigSnapshot[](0);
-    }
-    Types.DynamicConfigSnapshot[] memory buf = new Types.DynamicConfigSnapshot[](latestKey);
+    Types.DynamicConfigSnapshot[] memory buf = new Types.DynamicConfigSnapshot[](
+      uint256(latestKey) + 1
+    );
     uint256 count;
-    for (uint32 key = 1; key <= latestKey; key++) {
+    for (uint32 key; key <= latestKey; key++) {
       ISpoke.DynamicReserveConfig memory cfg = spoke.getDynamicReserveConfig(reserveId, key);
       if (cfg.collateralFactor == 0 && cfg.maxLiquidationBonus == 0 && cfg.liquidationFee == 0) {
         continue;

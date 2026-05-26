@@ -881,7 +881,7 @@ contract ProtocolV4TestBase is
     _setTokenizationCapsToMax(tokenizationSpoke);
     snapshot = vm.snapshotState();
 
-    uint256 maxAddAmount = 10_000 * 10 ** reserveInfo.decimals;
+    uint256 maxAddAmount = _toAssetDecimals(10_000, reserveInfo.decimals);
 
     _testTokenizationDepositWithdraw({
       tokenizationSpoke: tokenizationSpoke,

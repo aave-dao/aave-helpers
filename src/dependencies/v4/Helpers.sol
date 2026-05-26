@@ -11,6 +11,23 @@ import {Actions} from 'src/dependencies/v4/Actions.sol';
 /// @title Helpers
 /// @notice Query and utility functions for V4 e2e tests.
 abstract contract Helpers is Actions {
+  uint256 internal constant WAD = 1e18;
+
+  /// @notice Multiply `value` by WAD (1e18).
+  function _scaleUp(uint256 value) internal pure returns (uint256) {
+    return value * WAD;
+  }
+
+  /// @notice Divide `value` by WAD (1e18).
+  function _scaleDown(uint256 value) internal pure returns (uint256) {
+    return value / WAD;
+  }
+
+  /// @notice Scale a whole-token quantity to the asset's base units (`value * 10 ** decimals`).
+  function _toAssetDecimals(uint256 value, uint8 decimals) internal pure returns (uint256) {
+    return value * 10 ** decimals;
+  }
+
   /// @notice Build ReserveInfo[] for all reserves on a spoke.
   function _getReserveInfo(ISpoke spoke) internal view returns (Types.ReserveInfo[] memory) {
     uint256 count = spoke.getReserveCount();
@@ -167,7 +184,7 @@ abstract contract Helpers is Actions {
     IAaveOracle oracle = IAaveOracle(oracleAddr);
     uint256 price = oracle.getReservePrice(reserveInfo.reserveId);
     if (price == 0) {
-      return dollarValue * 10 ** reserveInfo.decimals;
+      return _toAssetDecimals(dollarValue, reserveInfo.decimals);
     }
     uint8 oracleDecimals = oracle.decimals();
     return (dollarValue * 10 ** (oracleDecimals + reserveInfo.decimals)) / price;

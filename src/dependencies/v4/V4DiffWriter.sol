@@ -36,9 +36,6 @@ library V4DiffWriter {
     vm.serializeJson(sectionKey, '{}');
 
     if (reserves.length == 0) {
-      // `serializeString` would emit the section as `"{}"` (a string). Use the
-      // 3-arg `writeJson` to overwrite the section with a real JSON object so
-      // downstream consumers (Zod schema, TS diff) keep treating it as a record.
       vm.writeJson(vm.serializeString('root', 'spokeReserves', '{}'), path);
       vm.writeJson('{}', path, '$.spokeReserves');
       return;

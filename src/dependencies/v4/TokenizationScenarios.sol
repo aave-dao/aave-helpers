@@ -177,7 +177,7 @@ abstract contract TokenizationScenarios is TokenizationActions {
       return;
     }
 
-    uint256 addCapScaled = uint256(spokeConfig.addCap) * 10 ** reserveInfo.decimals;
+    uint256 addCapScaled = _toAssetDecimals(uint256(spokeConfig.addCap), reserveInfo.decimals);
     uint256 currentAdded = hub.getSpokeAddedAssets(reserveInfo.assetId, address(tokenizationSpoke));
     if (addCapScaled <= currentAdded) {
       return;
@@ -187,7 +187,7 @@ abstract contract TokenizationScenarios is TokenizationActions {
     address depositor = vm.randomAddress();
 
     // Deposit more than remaining room — should revert with AddCapExceeded
-    uint256 overflowAmount = room + 10 ** reserveInfo.decimals;
+    uint256 overflowAmount = room + _toAssetDecimals(1, reserveInfo.decimals);
     vm.startPrank(depositor);
     deal2(reserveInfo.underlying, depositor, overflowAmount);
     IERC20(reserveInfo.underlying).forceApprove(address(tokenizationSpoke), overflowAmount);

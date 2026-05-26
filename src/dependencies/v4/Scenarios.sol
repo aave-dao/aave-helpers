@@ -196,8 +196,9 @@ abstract contract Scenarios is Helpers {
     {
       ISpoke.UserAccountData memory accountData = spoke.getUserAccountData(collateralSupplier);
       // maxDebtValue = CF-weighted collateral value (HF=1 threshold)
-      uint256 maxDebtValue = (accountData.totalCollateralValue * accountData.avgCollateralFactor) /
-        1e18;
+      uint256 maxDebtValue = _scaleDown(
+        accountData.totalCollateralValue * accountData.avgCollateralFactor
+      );
       uint256 currentDebtValue = accountData.totalDebtValueRay / 1e27;
       uint256 availableDebtValue = maxDebtValue > currentDebtValue
         ? maxDebtValue - currentDebtValue
@@ -208,8 +209,8 @@ abstract contract Scenarios is Helpers {
       // extra 1e18 divisor is required to land in token units.
       address oracleAddr = spoke.ORACLE();
       uint256 testAssetPrice = IAaveOracle(oracleAddr).getReservePrice(testAssetInfo.reserveId);
-      uint256 maxBorrowableAmount = (availableDebtValue * 10 ** testAssetInfo.decimals) /
-        (testAssetPrice * 1e18);
+      uint256 maxBorrowableAmount = _toAssetDecimals(availableDebtValue, testAssetInfo.decimals) /
+        _scaleUp(testAssetPrice);
       // Use 50% of max for safety margin
       maxBorrowableAmount = maxBorrowableAmount / 2;
       borrowCeiling = testAssetAmount < maxBorrowableAmount ? testAssetAmount : maxBorrowableAmount;
@@ -586,7 +587,7 @@ abstract contract Scenarios is Helpers {
 
   /// @dev Fill supply up to addCap in random chunks, then verify overflow reverts.
   function _testAddCap(ISpoke spoke, Types.ReserveInfo memory reserveInfo, uint40 addCap) internal {
-    uint256 addCapScaled = uint256(addCap) * 10 ** reserveInfo.decimals;
+    uint256 addCapScaled = _toAssetDecimals(uint256(addCap), reserveInfo.decimals);
     uint256 currentSupply = spoke.getReserveSuppliedAssets(reserveInfo.reserveId);
     if (addCapScaled <= currentSupply) {
       return;
@@ -596,7 +597,7 @@ abstract contract Scenarios is Helpers {
     address supplier = vm.randomAddress();
 
     // Supply more than addCap — should revert with AddCapExceeded
-    uint256 overflowAmount = room + 10 ** reserveInfo.decimals;
+    uint256 overflowAmount = room + _toAssetDecimals(1, reserveInfo.decimals);
     vm.startPrank(supplier);
     deal2({asset: reserveInfo.underlying, user: supplier, amount: overflowAmount});
     IERC20(reserveInfo.underlying).forceApprove(address(spoke), overflowAmount);
@@ -617,7 +618,7 @@ abstract contract Scenarios is Helpers {
     _setAddCapsToMax(spoke);
     _logAction('TEST_DRAW_CAP', 'drawCap', drawCap);
 
-    uint256 drawCapScaled = uint256(drawCap) * 10 ** reserveInfo.decimals;
+    uint256 drawCapScaled = _toAssetDecimals(uint256(drawCap), reserveInfo.decimals);
     uint256 currentDebt = spoke.getReserveTotalDebt(reserveInfo.reserveId);
     if (drawCapScaled <= currentDebt) {
       return;
@@ -636,7 +637,7 @@ abstract contract Scenarios is Helpers {
     _seedDrawCapCollateral(spoke, reserveInfo, collateralInfo, borrower, room);
     _supply({spoke: spoke, reserveInfo: reserveInfo, user: vm.randomAddress(), amount: room});
 
-    uint256 overflowAmount = room + 10 ** reserveInfo.decimals;
+    uint256 overflowAmount = room + _toAssetDecimals(1, reserveInfo.decimals);
     vm.prank(borrower);
     vm.expectRevert(abi.encodeWithSelector(IHub.DrawCapExceeded.selector, uint256(drawCap)));
     spoke.borrow({reserveId: reserveInfo.reserveId, amount: overflowAmount, onBehalfOf: borrower});
@@ -667,7 +668,7 @@ abstract contract Scenarios is Helpers {
     uint256 collateralValueTarget = (borrowValue * 10000 * 2) / uint256(cfBps);
     uint256 collateralPrice = IAaveOracle(oracleAddr).getReservePrice(collateralInfo.reserveId);
     require(collateralPrice > 0, 'TEST_DRAW_CAP: zero collateral price');
-    uint256 collateralAmount = (collateralValueTarget * 10 ** collateralInfo.decimals) /
+    uint256 collateralAmount = _toAssetDecimals(collateralValueTarget, collateralInfo.decimals) /
       collateralPrice;
     _supply({spoke: spoke, reserveInfo: collateralInfo, user: borrower, amount: collateralAmount});
     vm.prank(borrower);
