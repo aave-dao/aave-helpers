@@ -14,12 +14,12 @@ abstract contract Helpers is Actions {
   uint256 internal constant WAD = 1e18;
 
   /// @notice Multiply `value` by WAD (1e18).
-  function _scaleUp(uint256 value) internal pure returns (uint256) {
+  function _wadScaleUp(uint256 value) internal pure returns (uint256) {
     return value * WAD;
   }
 
   /// @notice Divide `value` by WAD (1e18).
-  function _scaleDown(uint256 value) internal pure returns (uint256) {
+  function _wadScaleDown(uint256 value) internal pure returns (uint256) {
     return value / WAD;
   }
 

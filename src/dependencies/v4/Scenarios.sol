@@ -196,7 +196,7 @@ abstract contract Scenarios is Helpers {
     {
       ISpoke.UserAccountData memory accountData = spoke.getUserAccountData(collateralSupplier);
       // maxDebtValue = CF-weighted collateral value (HF=1 threshold)
-      uint256 maxDebtValue = _scaleDown(
+      uint256 maxDebtValue = _wadScaleDown(
         accountData.totalCollateralValue * accountData.avgCollateralFactor
       );
       uint256 currentDebtValue = accountData.totalDebtValueRay / 1e27;
@@ -210,7 +210,7 @@ abstract contract Scenarios is Helpers {
       address oracleAddr = spoke.ORACLE();
       uint256 testAssetPrice = IAaveOracle(oracleAddr).getReservePrice(testAssetInfo.reserveId);
       uint256 maxBorrowableAmount = _toAssetDecimals(availableDebtValue, testAssetInfo.decimals) /
-        _scaleUp(testAssetPrice);
+        _wadScaleUp(testAssetPrice);
       // Use 50% of max for safety margin
       maxBorrowableAmount = maxBorrowableAmount / 2;
       borrowCeiling = testAssetAmount < maxBorrowableAmount ? testAssetAmount : maxBorrowableAmount;
