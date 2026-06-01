@@ -46,6 +46,46 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
   using SafeERC20 for IERC20;
   using Strings for string;
 
+  // @dev Override to handle pre-v3.7 pools that lack getIsEModeCategoryIsolated
+  function _writeEModeConfigs(string memory path, IPool pool) internal override {
+    string memory eModesKey = 'emodes';
+    string memory content = '{}';
+    vm.serializeJson(eModesKey, '{}');
+    uint8 emptyCounter = 0;
+    for (uint8 i = 0; i < 256; i++) {
+      DataTypes.CollateralConfig memory cfg = pool.getEModeCategoryCollateralConfig(i);
+      if (cfg.liquidationThreshold == 0) {
+        if (++emptyCounter > 2) break;
+      } else {
+        string memory key = vm.toString(i);
+        vm.serializeJson(key, '{}');
+        vm.serializeUint(key, 'eModeCategory', i);
+        vm.serializeString(key, 'label', pool.getEModeCategoryLabel(i));
+        vm.serializeUint(key, 'ltv', cfg.ltv);
+        try pool.getIsEModeCategoryIsolated(i) returns (bool isolated) {
+          vm.serializeBool(key, 'isolated', isolated);
+        } catch {
+          vm.serializeBool(key, 'isolated', false);
+        }
+        vm.serializeString(
+          key,
+          'collateralBitmap',
+          vm.toString(pool.getEModeCategoryCollateralBitmap(i))
+        );
+        vm.serializeString(
+          key,
+          'borrowableBitmap',
+          vm.toString(pool.getEModeCategoryBorrowableBitmap(i))
+        );
+        vm.serializeUint(key, 'liquidationThreshold', cfg.liquidationThreshold);
+        string memory object = vm.serializeUint(key, 'liquidationBonus', cfg.liquidationBonus);
+        content = vm.serializeString(eModesKey, key, object);
+        emptyCounter = 0;
+      }
+    }
+    vm.writeJson(content, path, '.eModes');
+  }
+
   // mock receiver for flashloans
   function executeOperation(
     address[] calldata assets,
@@ -126,7 +166,11 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
 
     configChangePlausibilityTest(pool, configBefore, configAfter);
 
-    if (runE2E) e2eTest(pool);
+    if (runE2E) {
+      vm.pauseGasMetering();
+      e2eTest(pool);
+      vm.resumeGasMetering();
+    }
     return (configBefore, configAfter);
   }
 
@@ -175,7 +219,16 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
 
   function _isBorrowableInAnyEMode(IPool pool, address asset) internal view returns (bool) {
     uint16 reserveId = pool.getReserveData(asset).id;
+    uint8 emptyCounter;
     for (uint256 categoryId = 1; categoryId <= 255; categoryId++) {
+      DataTypes.CollateralConfig memory cfg = pool.getEModeCategoryCollateralConfig(
+        uint8(categoryId)
+      );
+      if (cfg.liquidationThreshold == 0) {
+        if (++emptyCounter > 2) break;
+        continue;
+      }
+      emptyCounter = 0;
       uint128 borrowableBitmap = pool.getEModeCategoryBorrowableBitmap(uint8(categoryId));
       if (
         borrowableBitmap != 0 &&
@@ -187,17 +240,158 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     return false;
   }
 
+  function _isCollateralInAnyEMode(IPool pool, address asset) internal view returns (bool) {
+    uint16 reserveId = pool.getReserveData(asset).id;
+    uint8 emptyCounter;
+    for (uint256 categoryId = 1; categoryId <= 255; categoryId++) {
+      DataTypes.CollateralConfig memory cfg = pool.getEModeCategoryCollateralConfig(
+        uint8(categoryId)
+      );
+      if (cfg.liquidationThreshold == 0) {
+        if (++emptyCounter > 2) break;
+        continue;
+      }
+      emptyCounter = 0;
+      uint128 collateralBitmap = pool.getEModeCategoryCollateralBitmap(uint8(categoryId));
+      if (
+        collateralBitmap != 0 &&
+        EModeConfiguration.isReserveEnabledOnBitmap(collateralBitmap, reserveId)
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @dev Returns the first eMode category where collateralAsset is collateral AND borrowAsset is borrowable.
+   * Returns 0 if no shared eMode exists.
+   */
+  function _getSharedEModeCategory(
+    IPool pool,
+    address collateralAsset,
+    address borrowAsset
+  ) internal view returns (uint8) {
+    uint16 collateralReserveId = pool.getReserveData(collateralAsset).id;
+    uint16 borrowReserveId = pool.getReserveData(borrowAsset).id;
+    uint8 emptyCounter;
+    for (uint256 categoryId = 1; categoryId <= 255; categoryId++) {
+      DataTypes.CollateralConfig memory cfg = pool.getEModeCategoryCollateralConfig(
+        uint8(categoryId)
+      );
+      if (cfg.liquidationThreshold == 0) {
+        if (++emptyCounter > 2) break;
+        continue;
+      }
+      emptyCounter = 0;
+      uint128 collateralBitmap = pool.getEModeCategoryCollateralBitmap(uint8(categoryId));
+      uint128 borrowableBitmap = pool.getEModeCategoryBorrowableBitmap(uint8(categoryId));
+      if (
+        EModeConfiguration.isReserveEnabledOnBitmap(collateralBitmap, collateralReserveId) &&
+        EModeConfiguration.isReserveEnabledOnBitmap(borrowableBitmap, borrowReserveId)
+      ) {
+        return uint8(categoryId);
+      }
+    }
+    return 0;
+  }
+
+  /**
+   * @dev If the test asset is only borrowable in an eMode, sets the user into the appropriate eMode.
+   */
+  /**
+   * @dev If the test asset is only borrowable in an eMode and the collateral shares that eMode,
+   * sets the user into the appropriate eMode. No-op if no shared eMode exists.
+   */
+  function _setupEModeIfNeeded(
+    IPool pool,
+    ReserveConfig memory collateralConfig,
+    ReserveConfig memory testAssetConfig,
+    address user
+  ) internal {
+    if (!testAssetConfig.borrowingEnabled) {
+      uint8 eModeCategory = _getSharedEModeCategory(
+        pool,
+        collateralConfig.underlying,
+        testAssetConfig.underlying
+      );
+      if (eModeCategory != 0) {
+        vm.prank(user);
+        pool.setUserEMode(eModeCategory);
+      }
+    }
+  }
+
   /**
    * @dev Makes a e2e test including withdrawals/borrows and supplies to various reserves.
    * @param pool the pool that should be tested
    */
   function e2eTest(IPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    ReserveConfig memory collateralConfig = _getGoodCollateral(configs);
+    // precompute default collateral (first with ltv > 0)
+    ReserveConfig memory defaultCollateral;
+    bool hasDefaultCollateral;
+    for (uint256 i = 0; i < configs.length; i++) {
+      if (_includeInE2e(configs[i]) && configs[i].usageAsCollateralEnabled && configs[i].ltv != 0) {
+        defaultCollateral = configs[i];
+        hasDefaultCollateral = true;
+        break;
+      }
+    }
     uint256 snapshot = vm.snapshotState();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
-        e2eTestAsset(pool, collateralConfig, configs[i]);
+        ReserveConfig memory collateral;
+        ReserveConfig memory testAsset = configs[i];
+        bool found;
+
+        if (!configs[i].borrowingEnabled && _isBorrowableInAnyEMode(pool, configs[i].underlying)) {
+          // asset is only borrowable in eMode — find eMode-compatible collateral, preferring ltv > 0
+          uint256 fallbackIdx = type(uint256).max;
+          for (uint256 j = 0; j < configs.length; j++) {
+            if (
+              _includeInE2e(configs[j]) &&
+              _getSharedEModeCategory(pool, configs[j].underlying, configs[i].underlying) != 0
+            ) {
+              if (configs[j].ltv > 0) {
+                collateral = configs[j];
+                found = true;
+                break;
+              } else if (fallbackIdx == type(uint256).max) {
+                fallbackIdx = j;
+              }
+            }
+          }
+          if (!found && fallbackIdx != type(uint256).max) {
+            collateral = configs[fallbackIdx];
+            found = true;
+          }
+        } else if (
+          !configs[i].borrowingEnabled && _isCollateralInAnyEMode(pool, configs[i].underlying)
+        ) {
+          // asset is only collateral in eMode — use it as collateral and find a borrowable asset in the same eMode
+          for (uint256 j = 0; j < configs.length; j++) {
+            if (
+              _includeInE2e(configs[j]) &&
+              configs[j].underlying != configs[i].underlying &&
+              _getSharedEModeCategory(pool, configs[i].underlying, configs[j].underlying) != 0
+            ) {
+              collateral = configs[i];
+              testAsset = configs[j];
+              found = true;
+              break;
+            }
+          }
+        } else if (hasDefaultCollateral) {
+          collateral = defaultCollateral;
+          found = true;
+        }
+
+        if (found) {
+          e2eTestAsset(pool, collateral, testAsset);
+        } else {
+          console.log('E2E: TestAsset %s SKIPPED (no suitable collateral)', configs[i].symbol);
+        }
         vm.revertToState(snapshot);
       } else {
         console.log('E2E: TestAsset %s SKIPPED', configs[i].symbol);
@@ -217,7 +411,11 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     );
     address collateralSupplier = vm.addr(3);
     address testAssetSupplier = vm.addr(4);
-    require(collateralConfig.usageAsCollateralEnabled, 'COLLATERAL_CONFIG_MUST_BE_COLLATERAL');
+    require(
+      collateralConfig.usageAsCollateralEnabled ||
+        _isCollateralInAnyEMode(pool, collateralConfig.underlying),
+      'COLLATERAL_CONFIG_MUST_BE_COLLATERAL'
+    );
     uint256 collateralAssetAmount = _getTokenAmountByDollarValue(pool, collateralConfig, 100_000);
     uint256 testAssetAmount = _getTokenAmountByDollarValue(pool, testAssetConfig, 10_000);
 
@@ -244,6 +442,24 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
       poolConfigurator.setBorrowCap(testAssetConfig.underlying, 0);
     }
     vm.stopPrank();
+
+    // set eMode before deposits so collateral with ltv=0 in default mode gets auto-enabled
+    // needed when: test asset is eMode-only borrowable, OR collateral is eMode-only (ltv=0 + LT=0 in default)
+    {
+      uint8 eModeCategory = _getSharedEModeCategory(
+        pool,
+        collateralConfig.underlying,
+        testAssetConfig.underlying
+      );
+      if (
+        eModeCategory != 0 &&
+        // test asset needs eMode to borrow, OR collateral needs eMode (ltv=0 in default mode)
+        (!testAssetConfig.borrowingEnabled || collateralConfig.ltv == 0)
+      ) {
+        vm.prank(collateralSupplier);
+        pool.setUserEMode(eModeCategory);
+      }
+    }
 
     _deposit(collateralConfig, pool, collateralSupplier, collateralAssetAmount);
     _deposit(testAssetConfig, pool, testAssetSupplier, testAssetAmount);
@@ -276,7 +492,10 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
         onBehalfOf: testAssetSupplier,
         referralCode: 0
       });
-      if (testAssetConfig.borrowingEnabled) {
+      if (
+        (testAssetConfig.borrowingEnabled || pool.getUserEMode(collateralSupplier) != 0) &&
+        (collateralConfig.ltv >= 10_00 || pool.getUserEMode(collateralSupplier) != 0)
+      ) {
         uint256 borrowAmount = 11 ** testAssetConfig.decimals;
 
         if (aTokenTotalSupply < borrowAmount) {
@@ -320,7 +539,12 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     }
 
     // test borrows, repayments and liquidations
-    if (testAssetConfig.borrowingEnabled) {
+    // borrow only if asset is borrowable AND collateral can support the borrow
+    // collateral needs ltv >= 10% (1000 bps) or user must be in eMode for meaningful borrowing
+    if (
+      (testAssetConfig.borrowingEnabled || pool.getUserEMode(collateralSupplier) != 0) &&
+      (collateralConfig.ltv >= 10_00 || pool.getUserEMode(collateralSupplier) != 0)
+    ) {
       // test borrowing and repayment
       _borrow({
         config: testAssetConfig,
@@ -358,44 +582,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
         vm.revertToState(snapshotBeforeRepay);
       }
 
-      if (testAssetConfig.underlying != collateralConfig.underlying) {
-        _changeAssetPrice(pool, testAssetConfig, 1000_00); // price increases to 1'000%
-      } else {
-        _setAssetLtvAndLiquidationThreshold({
-          pool: pool,
-          config: testAssetConfig,
-          newLtv: 5_00,
-          newLiquidationThreshold: 5_00
-        });
-      }
-
-      address liquidator = vm.addr(5);
-
-      uint256 snapshotBeforeLiquidation = vm.snapshotState();
-
-      // receive underlying tokens
-      _liquidationCall({
-        collateralConfig: collateralConfig,
-        debtConfig: testAssetConfig,
-        pool: pool,
-        liquidator: liquidator,
-        borrower: collateralSupplier,
-        debtToCover: type(uint256).max,
-        receiveAToken: false
-      });
-
-      vm.revertToState(snapshotBeforeLiquidation);
-
-      // receive ATokens
-      _liquidationCall({
-        collateralConfig: collateralConfig,
-        debtConfig: testAssetConfig,
-        pool: pool,
-        liquidator: liquidator,
-        borrower: collateralSupplier,
-        debtToCover: type(uint256).max,
-        receiveAToken: true
-      });
+      _testLiquidation(pool, collateralConfig, testAssetConfig, collateralSupplier);
 
       vm.revertToState(snapshotAfterDeposits);
     }
@@ -411,7 +598,10 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
         interestRateMode: 0
       });
 
-      if (testAssetConfig.borrowingEnabled) {
+      if (
+        (testAssetConfig.borrowingEnabled || pool.getUserEMode(collateralSupplier) != 0) &&
+        (collateralConfig.ltv >= 10_00 || pool.getUserEMode(collateralSupplier) != 0)
+      ) {
         _flashLoan({
           config: testAssetConfig,
           pool: pool,
@@ -480,27 +670,6 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
       newLiquidationThreshold,
       105_00
     );
-  }
-
-  /**
-   * @dev returns a "good" collateral in the list
-   */
-  function _getGoodCollateral(
-    ReserveConfig[] memory configs
-  ) private pure returns (ReserveConfig memory config) {
-    for (uint256 i = 0; i < configs.length; i++) {
-      if (
-        // not frozen etc
-        // usable as collateral
-        // not isolated asset as we can only borrow stablecoins against it
-        // ltv is not 0
-        _includeInE2e(configs[i]) &&
-        configs[i].usageAsCollateralEnabled &&
-        configs[i].debtCeiling == 0 &&
-        configs[i].ltv != 0
-      ) return configs[i];
-    }
-    revert('ERROR: No usable collateral found');
   }
 
   function _deposit(
@@ -615,6 +784,56 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     }
 
     vm.stopPrank();
+  }
+
+  function _testLiquidation(
+    IPool pool,
+    ReserveConfig memory collateralConfig,
+    ReserveConfig memory testAssetConfig,
+    address borrower
+  ) internal {
+    if (testAssetConfig.underlying != collateralConfig.underlying) {
+      _changeAssetPrice(pool, testAssetConfig, 1000_00);
+    } else if (pool.getUserEMode(borrower) != 0) {
+      // in eMode, reserve-level LT is overridden — lower the eMode LT instead
+      IPoolAddressesProvider addressesProvider = IPoolAddressesProvider(pool.ADDRESSES_PROVIDER());
+      IPoolConfigurator poolConfigurator = IPoolConfigurator(
+        addressesProvider.getPoolConfigurator()
+      );
+      uint8 categoryId = uint8(pool.getUserEMode(borrower));
+      vm.prank(addressesProvider.getACLAdmin());
+      poolConfigurator.setEModeCategory(categoryId, 5_00, 5_00, 105_00, '', false);
+    } else {
+      _setAssetLtvAndLiquidationThreshold({
+        pool: pool,
+        config: testAssetConfig,
+        newLtv: 5_00,
+        newLiquidationThreshold: 5_00
+      });
+    }
+
+    address liquidator = vm.addr(5);
+    uint256 snapshotBeforeLiquidation = vm.snapshotState();
+
+    _liquidationCall(
+      collateralConfig,
+      testAssetConfig,
+      pool,
+      liquidator,
+      borrower,
+      type(uint256).max,
+      false
+    );
+    vm.revertToState(snapshotBeforeLiquidation);
+    _liquidationCall(
+      collateralConfig,
+      testAssetConfig,
+      pool,
+      liquidator,
+      borrower,
+      type(uint256).max,
+      true
+    );
   }
 
   function _liquidationCall(
