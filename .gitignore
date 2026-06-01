@@ -13,3 +13,6 @@ yarn-error.log
 .vscode/
 
 dist
+
+reports/v4*
+diffs/v4*

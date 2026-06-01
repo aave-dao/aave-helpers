@@ -1,5 +1,29 @@
 # @aave-dao/aave-helpers-js
 
+## 1.2.1
+
+### Patch Changes
+
+- b2eeeef: update aave-address-book
+
+## 1.2.0
+
+### Minor Changes
+
+- ed1dd75: Add Aave V4 contract events to eventDb (Hub, Spoke, TokenizationSpoke, AccessManager, HubConfigurator, SpokeConfigurator, ConfigEngine, NativeTokenGateway, SignatureGateway, Giver/Taker/Config PositionManagers, LiquidationLogic, SpokeOracle) so downstream consumers like the governance seatbelt can decode V4 transaction logs.
+
+## 1.1.0
+
+### Minor Changes
+
+- 5121107: Add Aave V4 snapshot diff support and CLI command
+
+## 1.0.14
+
+### Patch Changes
+
+- 6c96817: add robot events
+
 ## 1.0.13
 
 ### Patch Changes

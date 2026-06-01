@@ -21,7 +21,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
 
   PayloadWithEmit payload;
 
-  uint256 public constant BLOCK_NUMBER = 22840005;
+  uint256 public constant BLOCK_NUMBER = 24655671;
 
   function setUp() public {
     vm.createSelectFork('mainnet', BLOCK_NUMBER);

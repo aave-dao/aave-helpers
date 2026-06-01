@@ -294,7 +294,7 @@ contract ProtocolV3TestPlausibilityEMode is ProtocolV3TestBase {
 
 contract ProtocolV3TestStorageValidation is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('mainnet', 21858534);
+    vm.createSelectFork('mainnet', 24655671);
   }
 
   function test_noExecutorStorageChange_passes() public {
