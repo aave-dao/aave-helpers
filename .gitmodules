@@ -4,4 +4,3 @@
 [submodule "lib/aave-address-book"]
 	path = lib/aave-address-book
 	url = https://github.com/aave-dao/aave-address-book
-	branch = v3.7-fixes
