@@ -5,6 +5,7 @@ import 'forge-std/Test.sol';
 import {ProtocolV3TestBase, ReserveConfig} from '../src/ProtocolV3TestBase.sol';
 import {IPool, IPoolAddressesProvider, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
+import {AaveV3EthereumEtherFi} from 'aave-address-book/AaveV3EthereumEtherFi.sol';
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Arbitrum, AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
@@ -188,7 +189,7 @@ contract ProtocolV3TestMantleSnapshot is ProtocolV3TestBase {
 
 contract ProtocolV3TestPlausibilityEMode is ProtocolV3TestBase {
   function setUp() public {
-    vm.createSelectFork('mainnet', 24655671);
+    vm.createSelectFork('mainnet', 24955851);
   }
 
   function test_borrowCapIncrease_borrowDisabled_noEMode_reverts() public {
@@ -230,12 +231,16 @@ contract ProtocolV3TestPlausibilityEMode is ProtocolV3TestBase {
   }
 
   function test_borrowCapIncrease_borrowDisabled_eModeBorrowable_passes() public {
-    ReserveConfig[] memory configsBefore = _getReservesConfigs(AaveV3Ethereum.POOL);
-    ReserveConfig[] memory configsAfter = _getReservesConfigs(AaveV3Ethereum.POOL);
+    ReserveConfig[] memory configsBefore = _getReservesConfigs(AaveV3EthereumEtherFi.POOL);
+    ReserveConfig[] memory configsAfter = _getReservesConfigs(AaveV3EthereumEtherFi.POOL);
 
     uint256 idx;
     for (uint256 i; i < configsAfter.length; i++) {
-      if (configsAfter[i].borrowingEnabled && configsAfter[i].borrowCap > 0) {
+      if (
+        configsAfter[i].borrowingEnabled &&
+        configsAfter[i].borrowCap > 0 &&
+        configsAfter[i].borrowCap != configsAfter[i].supplyCap
+      ) {
         idx = i;
         break;
       }
@@ -246,7 +251,7 @@ contract ProtocolV3TestPlausibilityEMode is ProtocolV3TestBase {
     configsAfter[idx].borrowCap = configsBefore[idx].borrowCap + 1;
 
     IPoolAddressesProvider provider = IPoolAddressesProvider(
-      AaveV3Ethereum.POOL.ADDRESSES_PROVIDER()
+      AaveV3EthereumEtherFi.POOL.ADDRESSES_PROVIDER()
     );
     IPoolConfigurator configurator = IPoolConfigurator(provider.getPoolConfigurator());
     vm.startPrank(provider.getACLAdmin());
@@ -254,12 +259,19 @@ contract ProtocolV3TestPlausibilityEMode is ProtocolV3TestBase {
     configurator.setReserveBorrowing(configsAfter[idx].underlying, false);
     // ensure asset is borrowable in e-mode category 1
     // first ensure category 1 exists
-    configurator.setEModeCategory(1, 90_00, 93_00, 101_00, 'test');
+    configurator.setEModeCategory({
+      categoryId: 1,
+      ltv: 90_00,
+      liquidationThreshold: 93_00,
+      liquidationBonus: 101_00,
+      label: 'test',
+      isolated: false
+    });
     configurator.setAssetBorrowableInEMode(configsAfter[idx].underlying, 1, true);
     vm.stopPrank();
 
     // should pass because asset is borrowable in e-mode
-    this.configChangePlausibilityTest(AaveV3Ethereum.POOL, configsBefore, configsAfter);
+    this.configChangePlausibilityTest(AaveV3EthereumEtherFi.POOL, configsBefore, configsAfter);
   }
 
   function test_borrowCapIncrease_borrowEnabled_passes() public {
