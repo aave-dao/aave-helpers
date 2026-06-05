@@ -13,8 +13,6 @@
 | isPaused | :x: |
 | supplyCap | 20 ezETH |
 | borrowCap | 1 ezETH |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0xd7Da71D3acf07C604A925799B0b48E2Ec607584D](https://mega.etherscan.io/address/0xd7Da71D3acf07C604A925799B0b48E2Ec607584D) |
 | oracleDecimals | 8 |
@@ -33,7 +31,6 @@
 | variableDebtTokenName | Aave MegaEth Variable Debt ezETH |
 | variableDebtTokenSymbol | variableDebtMegezETH |
 | borrowingEnabled | :x: |
-| isBorrowableInIsolation | :x: |
 | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
 | aTokenUnderlyingBalance | 0.0025 ezETH [2500000000000000] |
 | virtualBalance | 0.0025 ezETH [2500000000000000] |
@@ -56,8 +53,6 @@
 | isPaused | :x: |
 | supplyCap | 20 WETH |
 | borrowCap | 10 WETH |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0xcA4e254D95637DE95E2a2F79244b03380d697feD](https://mega.etherscan.io/address/0xcA4e254D95637DE95E2a2F79244b03380d697feD) |
 | oracleDecimals | 8 |
@@ -76,7 +71,6 @@
 | variableDebtTokenName | Aave MegaEth Variable Debt WETH |
 | variableDebtTokenSymbol | variableDebtMegWETH |
 | borrowingEnabled | :x: |
-| isBorrowableInIsolation | :x: |
 | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
 | aTokenUnderlyingBalance | 0.0025 WETH [2500000000000000] |
 | virtualBalance | 0.0025 WETH [2500000000000000] |
@@ -99,8 +93,6 @@
 | isPaused | :x: |
 | supplyCap | 20 wrsETH |
 | borrowCap | 1 wrsETH |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0x6356b92Bc636CCe722e0F53DDc24a86baE64216E](https://mega.etherscan.io/address/0x6356b92Bc636CCe722e0F53DDc24a86baE64216E) |
 | oracleDecimals | 8 |
@@ -119,7 +111,6 @@
 | variableDebtTokenName | Aave MegaEth Variable Debt wrsETH |
 | variableDebtTokenSymbol | variableDebtMegwrsETH |
 | borrowingEnabled | :x: |
-| isBorrowableInIsolation | :x: |
 | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
 | aTokenUnderlyingBalance | 0.0025 wrsETH [2500000000000000] |
 | virtualBalance | 0.0025 wrsETH [2500000000000000] |
@@ -142,8 +133,6 @@
 | isPaused | :x: |
 | supplyCap | 20 wstETH |
 | borrowCap | 1 wstETH |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0x376397e34eA968e79DC6F629E6210ba25311a3ce](https://mega.etherscan.io/address/0x376397e34eA968e79DC6F629E6210ba25311a3ce) |
 | oracleDecimals | 8 |
@@ -162,7 +151,6 @@
 | variableDebtTokenName | Aave MegaEth Variable Debt wstETH |
 | variableDebtTokenSymbol | variableDebtMegwstETH |
 | borrowingEnabled | :x: |
-| isBorrowableInIsolation | :x: |
 | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
 | aTokenUnderlyingBalance | 0.0025 wstETH [2500000000000000] |
 | virtualBalance | 0.0025 wstETH [2500000000000000] |
@@ -185,8 +173,6 @@
 | isPaused | :x: |
 | supplyCap | 2 BTC.b |
 | borrowCap | 1 BTC.b |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0xc6E3007B597f6F5a6330d43053D1EF73cCbbE721](https://mega.etherscan.io/address/0xc6E3007B597f6F5a6330d43053D1EF73cCbbE721) |
 | oracleDecimals | 8 |
@@ -205,7 +191,6 @@
 | variableDebtTokenName | Aave MegaEth Variable Debt BTCb |
 | variableDebtTokenSymbol | variableDebtMegBTCb |
 | borrowingEnabled | :x: |
-| isBorrowableInIsolation | :x: |
 | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
 | aTokenUnderlyingBalance | 0.0005 BTC.b [50000] |
 | virtualBalance | 0.0005 BTC.b [50000] |
@@ -228,8 +213,6 @@
 | isPaused | :x: |
 | supplyCap | 50,000 USDT0 |
 | borrowCap | 20,000 USDT0 |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0xAe95ff42e16468AB1DfD405c9533C9b67d87d66A](https://mega.etherscan.io/address/0xAe95ff42e16468AB1DfD405c9533C9b67d87d66A) |
 | oracleDecimals | 8 |
@@ -248,7 +231,6 @@
 | variableDebtTokenName | Aave MegaEth Variable Debt USDT0 |
 | variableDebtTokenSymbol | variableDebtMegUSDT0 |
 | borrowingEnabled | :white_check_mark: |
-| isBorrowableInIsolation | :white_check_mark: |
 | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
 | aTokenUnderlyingBalance | 10 USDT0 [10000000] |
 | virtualBalance | 10 USDT0 [10000000] |
@@ -271,8 +253,6 @@
 | isPaused | :x: |
 | supplyCap | 50,000 USDm |
 | borrowCap | 20,000 USDm |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0xe5448B8318493c6e3F72E21e8BDB8242d3299FB5](https://mega.etherscan.io/address/0xe5448B8318493c6e3F72E21e8BDB8242d3299FB5) |
 | oracleDecimals | 8 |
@@ -291,7 +271,6 @@
 | variableDebtTokenName | Aave MegaEth Variable Debt USDm |
 | variableDebtTokenSymbol | variableDebtMegUSDm |
 | borrowingEnabled | :white_check_mark: |
-| isBorrowableInIsolation | :white_check_mark: |
 | interestRateStrategy | [0x5cC4f782cFe249286476A7eFfD9D7bd215768194](https://mega.etherscan.io/address/0x5cC4f782cFe249286476A7eFfD9D7bd215768194) |
 | aTokenUnderlyingBalance | 10 USDm [10000000000000000000] |
 | virtualBalance | 10 USDm [10000000000000000000] |
@@ -315,7 +294,7 @@
 | liquidationBonus | - | 5.5 % [10550] |
 | borrowableBitmap | - | USDT0, USDm |
 | collateralBitmap | - | WETH |
-| ltvzeroBitmap | - | 0 |
+| isolated | - | :x: |
 
 
 ### EMode: BTCb Stablecoins (id: 2)
@@ -328,7 +307,7 @@
 | liquidationBonus | - | 6.5 % [10650] |
 | borrowableBitmap | - | USDT0, USDm |
 | collateralBitmap | - | BTC.b |
-| ltvzeroBitmap | - | 0 |
+| isolated | - | :x: |
 
 
 ### EMode: wstETH Stablecoins (id: 3)
@@ -341,7 +320,7 @@
 | liquidationBonus | - | 6.5 % [10650] |
 | borrowableBitmap | - | USDT0, USDm |
 | collateralBitmap | - | wstETH |
-| ltvzeroBitmap | - | 0 |
+| isolated | - | :x: |
 
 
 ### EMode: wstETH Correlated (id: 4)
@@ -354,7 +333,7 @@
 | liquidationBonus | - | 1 % [10100] |
 | borrowableBitmap | - | WETH |
 | collateralBitmap | - | wstETH |
-| ltvzeroBitmap | - | 0 |
+| isolated | - | :x: |
 
 
 ### EMode: wrsETH Correlated (id: 5)
@@ -367,7 +346,7 @@
 | liquidationBonus | - | 1 % [10100] |
 | borrowableBitmap | - | WETH |
 | collateralBitmap | - | wrsETH |
-| ltvzeroBitmap | - | 0 |
+| isolated | - | :x: |
 
 
 ### EMode: ezETH Correlated (id: 6)
@@ -380,14 +359,7 @@
 | liquidationBonus | - | 1 % [10100] |
 | borrowableBitmap | - | WETH |
 | collateralBitmap | - | ezETH |
-| ltvzeroBitmap | - | 0 |
-
-
-## Pool config changes
-
-| description | value before | value after |
-| --- | --- | --- |
-| priceOracleSentinel | [0x0000000000000000000000000000000000000000](https://mega.etherscan.io/address/0x0000000000000000000000000000000000000000) | [0x98F756B77D6Fde14E08bb064b248ec7512F9f8ba](https://mega.etherscan.io/address/0x98F756B77D6Fde14E08bb064b248ec7512F9f8ba) |
+| isolated | - | :x: |
 
 
 ## Event logs
@@ -1180,92 +1152,6 @@
 
 ```json
 {
-  "eModes": {
-    "1": {
-      "from": null,
-      "to": {
-        "borrowableBitmap": "12",
-        "collateralBitmap": "1",
-        "eModeCategory": 1,
-        "label": "WETH Stablecoins",
-        "liquidationBonus": 10550,
-        "liquidationThreshold": 8300,
-        "ltv": 8050,
-        "ltvzeroBitmap": "0"
-      }
-    },
-    "2": {
-      "from": null,
-      "to": {
-        "borrowableBitmap": "12",
-        "collateralBitmap": "2",
-        "eModeCategory": 2,
-        "label": "BTCb Stablecoins",
-        "liquidationBonus": 10650,
-        "liquidationThreshold": 7500,
-        "ltv": 7000,
-        "ltvzeroBitmap": "0"
-      }
-    },
-    "3": {
-      "from": null,
-      "to": {
-        "borrowableBitmap": "12",
-        "collateralBitmap": "16",
-        "eModeCategory": 3,
-        "label": "wstETH Stablecoins",
-        "liquidationBonus": 10650,
-        "liquidationThreshold": 7900,
-        "ltv": 7500,
-        "ltvzeroBitmap": "0"
-      }
-    },
-    "4": {
-      "from": null,
-      "to": {
-        "borrowableBitmap": "1",
-        "collateralBitmap": "16",
-        "eModeCategory": 4,
-        "label": "wstETH Correlated",
-        "liquidationBonus": 10100,
-        "liquidationThreshold": 9600,
-        "ltv": 9400,
-        "ltvzeroBitmap": "0"
-      }
-    },
-    "5": {
-      "from": null,
-      "to": {
-        "borrowableBitmap": "1",
-        "collateralBitmap": "32",
-        "eModeCategory": 5,
-        "label": "wrsETH Correlated",
-        "liquidationBonus": 10100,
-        "liquidationThreshold": 9500,
-        "ltv": 9300,
-        "ltvzeroBitmap": "0"
-      }
-    },
-    "6": {
-      "from": null,
-      "to": {
-        "borrowableBitmap": "1",
-        "collateralBitmap": "64",
-        "eModeCategory": 6,
-        "label": "ezETH Correlated",
-        "liquidationBonus": 10100,
-        "liquidationThreshold": 9500,
-        "ltv": 9300,
-        "ltvzeroBitmap": "0"
-      }
-    }
-  },
-  "poolConfig": {
-    "priceOracleSentinel": {
-      "from": "0x0000000000000000000000000000000000000000",
-      "to": "0x98F756B77D6Fde14E08bb064b248ec7512F9f8ba"
-    }
-  },
   "reserves": {
     "0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57": {
       "from": null,
@@ -1276,16 +1162,13 @@
         "aTokenUnderlyingBalance": "2500000000000000",
         "borrowCap": 1,
         "borrowingEnabled": false,
-        "debtCeiling": 0,
         "decimals": 18,
         "id": 6,
         "interestRateStrategy": "0x5cC4f782cFe249286476A7eFfD9D7bd215768194",
         "isActive": true,
-        "isBorrowableInIsolation": false,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1314,16 +1197,13 @@
         "aTokenUnderlyingBalance": "2500000000000000",
         "borrowCap": 10,
         "borrowingEnabled": false,
-        "debtCeiling": 0,
         "decimals": 18,
         "id": 0,
         "interestRateStrategy": "0x5cC4f782cFe249286476A7eFfD9D7bd215768194",
         "isActive": true,
-        "isBorrowableInIsolation": false,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1352,16 +1232,13 @@
         "aTokenUnderlyingBalance": "2500000000000000",
         "borrowCap": 1,
         "borrowingEnabled": false,
-        "debtCeiling": 0,
         "decimals": 18,
         "id": 5,
         "interestRateStrategy": "0x5cC4f782cFe249286476A7eFfD9D7bd215768194",
         "isActive": true,
-        "isBorrowableInIsolation": false,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1390,16 +1267,13 @@
         "aTokenUnderlyingBalance": "2500000000000000",
         "borrowCap": 1,
         "borrowingEnabled": false,
-        "debtCeiling": 0,
         "decimals": 18,
         "id": 4,
         "interestRateStrategy": "0x5cC4f782cFe249286476A7eFfD9D7bd215768194",
         "isActive": true,
-        "isBorrowableInIsolation": false,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1428,16 +1302,13 @@
         "aTokenUnderlyingBalance": "50000",
         "borrowCap": 1,
         "borrowingEnabled": false,
-        "debtCeiling": 0,
         "decimals": 8,
         "id": 1,
         "interestRateStrategy": "0x5cC4f782cFe249286476A7eFfD9D7bd215768194",
         "isActive": true,
-        "isBorrowableInIsolation": false,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1466,16 +1337,13 @@
         "aTokenUnderlyingBalance": "10000000",
         "borrowCap": 20000,
         "borrowingEnabled": true,
-        "debtCeiling": 0,
         "decimals": 6,
         "id": 2,
         "interestRateStrategy": "0x5cC4f782cFe249286476A7eFfD9D7bd215768194",
         "isActive": true,
-        "isBorrowableInIsolation": true,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1504,16 +1372,13 @@
         "aTokenUnderlyingBalance": "10000000000000000000",
         "borrowCap": 20000,
         "borrowingEnabled": true,
-        "debtCeiling": 0,
         "decimals": 18,
         "id": 3,
         "interestRateStrategy": "0x5cC4f782cFe249286476A7eFfD9D7bd215768194",
         "isActive": true,
-        "isBorrowableInIsolation": true,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1610,6 +1475,86 @@
         "optimalUsageRatio": "900000000000000000000000000",
         "variableRateSlope1": "50000000000000000000000000",
         "variableRateSlope2": "100000000000000000000000000"
+      }
+    }
+  },
+  "eModes": {
+    "1": {
+      "from": null,
+      "to": {
+        "borrowableBitmap": "12",
+        "collateralBitmap": "1",
+        "eModeCategory": 1,
+        "isolated": false,
+        "label": "WETH Stablecoins",
+        "liquidationBonus": 10550,
+        "liquidationThreshold": 8300,
+        "ltv": 8050
+      }
+    },
+    "2": {
+      "from": null,
+      "to": {
+        "borrowableBitmap": "12",
+        "collateralBitmap": "2",
+        "eModeCategory": 2,
+        "isolated": false,
+        "label": "BTCb Stablecoins",
+        "liquidationBonus": 10650,
+        "liquidationThreshold": 7500,
+        "ltv": 7000
+      }
+    },
+    "3": {
+      "from": null,
+      "to": {
+        "borrowableBitmap": "12",
+        "collateralBitmap": "16",
+        "eModeCategory": 3,
+        "isolated": false,
+        "label": "wstETH Stablecoins",
+        "liquidationBonus": 10650,
+        "liquidationThreshold": 7900,
+        "ltv": 7500
+      }
+    },
+    "4": {
+      "from": null,
+      "to": {
+        "borrowableBitmap": "1",
+        "collateralBitmap": "16",
+        "eModeCategory": 4,
+        "isolated": false,
+        "label": "wstETH Correlated",
+        "liquidationBonus": 10100,
+        "liquidationThreshold": 9600,
+        "ltv": 9400
+      }
+    },
+    "5": {
+      "from": null,
+      "to": {
+        "borrowableBitmap": "1",
+        "collateralBitmap": "32",
+        "eModeCategory": 5,
+        "isolated": false,
+        "label": "wrsETH Correlated",
+        "liquidationBonus": 10100,
+        "liquidationThreshold": 9500,
+        "ltv": 9300
+      }
+    },
+    "6": {
+      "from": null,
+      "to": {
+        "borrowableBitmap": "1",
+        "collateralBitmap": "64",
+        "eModeCategory": 6,
+        "isolated": false,
+        "label": "ezETH Correlated",
+        "liquidationBonus": 10100,
+        "liquidationThreshold": 9500,
+        "ltv": 9300
       }
     }
   }

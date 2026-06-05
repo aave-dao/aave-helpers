@@ -13,8 +13,6 @@
 | isPaused | :x: |
 | supplyCap | 70,000,000 syrupUSDT |
 | borrowCap | 1 syrupUSDT |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0xCF1700Ee060AB65fa16d5f44A6fBf16721EB0D9b](https://mantlescan.xyz//address/0xCF1700Ee060AB65fa16d5f44A6fBf16721EB0D9b) |
 | oracleDecimals | 8 |
@@ -33,7 +31,6 @@
 | variableDebtTokenName | Aave Mantle Variable Debt syrupUSDT |
 | variableDebtTokenSymbol | variableDebtMansyrupUSDT |
 | borrowingEnabled | :x: |
-| isBorrowableInIsolation | :x: |
 | interestRateStrategy | [0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a](https://mantlescan.xyz//address/0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a) |
 | aTokenUnderlyingBalance | 10 syrupUSDT [10000000] |
 | virtualBalance | 10 syrupUSDT [10000000] |
@@ -56,8 +53,6 @@
 | isPaused | :x: |
 | supplyCap | 10,000,000 USDC |
 | borrowCap | 9,500,000 USDC |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0x3876FB349c14613e0633b5cAe08C4E3B1d4904fB](https://mantlescan.xyz//address/0x3876FB349c14613e0633b5cAe08C4E3B1d4904fB) |
 | oracleDecimals | 8 |
@@ -76,7 +71,6 @@
 | variableDebtTokenName | Aave Mantle Variable Debt USDC |
 | variableDebtTokenSymbol | variableDebtManUSDC |
 | borrowingEnabled | :white_check_mark: |
-| isBorrowableInIsolation | :white_check_mark: |
 | interestRateStrategy | [0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a](https://mantlescan.xyz//address/0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a) |
 | aTokenUnderlyingBalance | 10 USDC [10000000] |
 | virtualBalance | 10 USDC [10000000] |
@@ -99,8 +93,6 @@
 | isPaused | :x: |
 | supplyCap | 80,000,000 sUSDe |
 | borrowCap | 1 sUSDe |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0x8b47EC48ac560793861D94A997d020872c1cE3f5](https://mantlescan.xyz//address/0x8b47EC48ac560793861D94A997d020872c1cE3f5) |
 | oracleDecimals | 8 |
@@ -119,7 +111,6 @@
 | variableDebtTokenName | Aave Mantle Variable Debt sUSDe |
 | variableDebtTokenSymbol | variableDebtMansUSDe |
 | borrowingEnabled | :x: |
-| isBorrowableInIsolation | :x: |
 | interestRateStrategy | [0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a](https://mantlescan.xyz//address/0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a) |
 | aTokenUnderlyingBalance | 10 sUSDe [10000000000000000000] |
 | virtualBalance | 10 sUSDe [10000000000000000000] |
@@ -142,8 +133,6 @@
 | isPaused | :x: |
 | supplyCap | 40,000,000 USDe |
 | borrowCap | 36,000,000 USDe |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0xFA5dEcEd7cdCEAB065addd0E32D9527ABd1069Ee](https://mantlescan.xyz//address/0xFA5dEcEd7cdCEAB065addd0E32D9527ABd1069Ee) |
 | oracleDecimals | 8 |
@@ -162,7 +151,6 @@
 | variableDebtTokenName | Aave Mantle Variable Debt USDe |
 | variableDebtTokenSymbol | variableDebtManUSDe |
 | borrowingEnabled | :white_check_mark: |
-| isBorrowableInIsolation | :white_check_mark: |
 | interestRateStrategy | [0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a](https://mantlescan.xyz//address/0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a) |
 | aTokenUnderlyingBalance | 10 USDe [10000000000000000000] |
 | virtualBalance | 10 USDe [10000000000000000000] |
@@ -185,8 +173,6 @@
 | isPaused | :x: |
 | supplyCap | 50,000,000 USDT0 |
 | borrowCap | 47,500,000 USDT0 |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0xFA5dEcEd7cdCEAB065addd0E32D9527ABd1069Ee](https://mantlescan.xyz//address/0xFA5dEcEd7cdCEAB065addd0E32D9527ABd1069Ee) |
 | oracleDecimals | 8 |
@@ -205,7 +191,6 @@
 | variableDebtTokenName | Aave Mantle Variable Debt USDT0 |
 | variableDebtTokenSymbol | variableDebtManUSDT0 |
 | borrowingEnabled | :white_check_mark: |
-| isBorrowableInIsolation | :white_check_mark: |
 | interestRateStrategy | [0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a](https://mantlescan.xyz//address/0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a) |
 | aTokenUnderlyingBalance | 10 USDT0 [10000000] |
 | virtualBalance | 10 USDT0 [10000000] |
@@ -228,8 +213,6 @@
 | isPaused | :x: |
 | supplyCap | 5,000,000 WMNT |
 | borrowCap | 1 WMNT |
-| debtCeiling | 2,000,000 $ [200000000] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0xD97F20bEbeD74e8144134C4b148fE93417dd0F96](https://mantlescan.xyz//address/0xD97F20bEbeD74e8144134C4b148fE93417dd0F96) |
 | oracleDecimals | 8 |
@@ -248,7 +231,6 @@
 | variableDebtTokenName | Aave Mantle Variable Debt WMNT |
 | variableDebtTokenSymbol | variableDebtManWMNT |
 | borrowingEnabled | :x: |
-| isBorrowableInIsolation | :x: |
 | interestRateStrategy | [0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a](https://mantlescan.xyz//address/0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a) |
 | aTokenUnderlyingBalance | 10 WMNT [10000000000000000000] |
 | virtualBalance | 10 WMNT [10000000000000000000] |
@@ -271,8 +253,6 @@
 | isPaused | :x: |
 | supplyCap | 18,000 wrsETH |
 | borrowCap | 1 wrsETH |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0xFED794060D37391d966F931B9509378063C5B0fB](https://mantlescan.xyz//address/0xFED794060D37391d966F931B9509378063C5B0fB) |
 | oracleDecimals | 8 |
@@ -291,7 +271,6 @@
 | variableDebtTokenName | Aave Mantle Variable Debt wrsETH |
 | variableDebtTokenSymbol | variableDebtManwrsETH |
 | borrowingEnabled | :x: |
-| isBorrowableInIsolation | :x: |
 | interestRateStrategy | [0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a](https://mantlescan.xyz//address/0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a) |
 | aTokenUnderlyingBalance | 0.0025 wrsETH [2500000000000000] |
 | virtualBalance | 0.0025 wrsETH [2500000000000000] |
@@ -314,8 +293,6 @@
 | isPaused | :x: |
 | supplyCap | 50 FBTC |
 | borrowCap | 1 FBTC |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0x7db2275279F52D0914A481e14c4Ce5a59705A25b](https://mantlescan.xyz//address/0x7db2275279F52D0914A481e14c4Ce5a59705A25b) |
 | oracleDecimals | 8 |
@@ -334,7 +311,6 @@
 | variableDebtTokenName | Aave Mantle Variable Debt FBTC |
 | variableDebtTokenSymbol | variableDebtManFBTC |
 | borrowingEnabled | :x: |
-| isBorrowableInIsolation | :x: |
 | interestRateStrategy | [0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a](https://mantlescan.xyz//address/0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a) |
 | aTokenUnderlyingBalance | 0.0005 FBTC [50000] |
 | virtualBalance | 0.0005 FBTC [50000] |
@@ -357,8 +333,6 @@
 | isPaused | :x: |
 | supplyCap | 30,000 WETH |
 | borrowCap | 28,000 WETH |
-| debtCeiling | 30,000,000 $ [3000000000] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0x5bc7Cf88EB131DB18b5d7930e793095140799aD5](https://mantlescan.xyz//address/0x5bc7Cf88EB131DB18b5d7930e793095140799aD5) |
 | oracleDecimals | 8 |
@@ -377,7 +351,6 @@
 | variableDebtTokenName | Aave Mantle Variable Debt WETH |
 | variableDebtTokenSymbol | variableDebtManWETH |
 | borrowingEnabled | :white_check_mark: |
-| isBorrowableInIsolation | :x: |
 | interestRateStrategy | [0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a](https://mantlescan.xyz//address/0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a) |
 | aTokenUnderlyingBalance | 0.0025 WETH [2500000000000000] |
 | virtualBalance | 0.0025 WETH [2500000000000000] |
@@ -400,8 +373,6 @@
 | isPaused | :x: |
 | supplyCap | 20,000,000 GHO |
 | borrowCap | 18,000,000 GHO |
-| debtCeiling | 0 $ [0] |
-| isSiloed | :x: |
 | isFlashloanable | :white_check_mark: |
 | oracle | [0x360d8aa8F6b09B7BC57aF34db2Eb84dD87bf4d12](https://mantlescan.xyz//address/0x360d8aa8F6b09B7BC57aF34db2Eb84dD87bf4d12) |
 | oracleDecimals | 8 |
@@ -419,7 +390,6 @@
 | variableDebtTokenName | Aave Mantle Variable Debt GHO |
 | variableDebtTokenSymbol | variableDebtManGHO |
 | borrowingEnabled | :white_check_mark: |
-| isBorrowableInIsolation | :white_check_mark: |
 | interestRateStrategy | [0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a](https://mantlescan.xyz//address/0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a) |
 | aTokenUnderlyingBalance | 10 GHO [10000000000000000000] |
 | virtualBalance | 10 GHO [10000000000000000000] |
@@ -443,7 +413,7 @@
 | liquidationBonus | - | 4 % [10400] |
 | borrowableBitmap | - | USDT0, USDC, GHO |
 | collateralBitmap | - | USDe, sUSDe |
-| ltvzeroBitmap | - | 0 |
+| isolated | - | :x: |
 
 
 ### EMode: USDe Stablecoins (id: 2)
@@ -456,7 +426,7 @@
 | liquidationBonus | - | 2 % [10200] |
 | borrowableBitmap | - | USDT0, USDC, GHO |
 | collateralBitmap | - | USDe |
-| ltvzeroBitmap | - | 0 |
+| isolated | - | :x: |
 
 
 ### EMode: fBTC Stablecoins (id: 3)
@@ -469,7 +439,7 @@
 | liquidationBonus | - | 8 % [10800] |
 | borrowableBitmap | - | USDT0, USDC, USDe |
 | collateralBitmap | - | FBTC |
-| ltvzeroBitmap | - | 0 |
+| isolated | - | :x: |
 
 
 ### EMode: syrupUSDT Stablecoins (id: 4)
@@ -482,7 +452,7 @@
 | liquidationBonus | - | 4 % [10400] |
 | borrowableBitmap | - | USDT0, USDC, GHO |
 | collateralBitmap | - | syrupUSDT |
-| ltvzeroBitmap | - | 0 |
+| isolated | - | :x: |
 
 
 ### EMode: wrsETH Correlated (id: 5)
@@ -495,7 +465,7 @@
 | liquidationBonus | - | 1 % [10100] |
 | borrowableBitmap | - | WETH |
 | collateralBitmap | - | wrsETH |
-| ltvzeroBitmap | - | 0 |
+| isolated | - | :x: |
 
 
 ## Event logs
@@ -1549,73 +1519,6 @@
 
 ```json
 {
-  "eModes": {
-    "1": {
-      "from": null,
-      "to": {
-        "borrowableBitmap": "524",
-        "collateralBitmap": "48",
-        "eModeCategory": 1,
-        "label": "sUSDe Stablecoins",
-        "liquidationBonus": 10400,
-        "liquidationThreshold": 9200,
-        "ltv": 9000,
-        "ltvzeroBitmap": "0"
-      }
-    },
-    "2": {
-      "from": null,
-      "to": {
-        "borrowableBitmap": "524",
-        "collateralBitmap": "16",
-        "eModeCategory": 2,
-        "label": "USDe Stablecoins",
-        "liquidationBonus": 10200,
-        "liquidationThreshold": 9300,
-        "ltv": 9000,
-        "ltvzeroBitmap": "0"
-      }
-    },
-    "3": {
-      "from": null,
-      "to": {
-        "borrowableBitmap": "28",
-        "collateralBitmap": "64",
-        "eModeCategory": 3,
-        "label": "fBTC Stablecoins",
-        "liquidationBonus": 10800,
-        "liquidationThreshold": 7900,
-        "ltv": 7500,
-        "ltvzeroBitmap": "0"
-      }
-    },
-    "4": {
-      "from": null,
-      "to": {
-        "borrowableBitmap": "524",
-        "collateralBitmap": "128",
-        "eModeCategory": 4,
-        "label": "syrupUSDT Stablecoins",
-        "liquidationBonus": 10400,
-        "liquidationThreshold": 9200,
-        "ltv": 9000,
-        "ltvzeroBitmap": "0"
-      }
-    },
-    "5": {
-      "from": null,
-      "to": {
-        "borrowableBitmap": "1",
-        "collateralBitmap": "256",
-        "eModeCategory": 5,
-        "label": "wrsETH Correlated",
-        "liquidationBonus": 10100,
-        "liquidationThreshold": 9500,
-        "ltv": 9300,
-        "ltvzeroBitmap": "0"
-      }
-    }
-  },
   "reserves": {
     "0x051665f2455116e929b9972c36d23070F5054Ce0": {
       "from": null,
@@ -1626,16 +1529,13 @@
         "aTokenUnderlyingBalance": "10000000",
         "borrowCap": 1,
         "borrowingEnabled": false,
-        "debtCeiling": 0,
         "decimals": 6,
         "id": 7,
         "interestRateStrategy": "0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a",
         "isActive": true,
-        "isBorrowableInIsolation": false,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1664,16 +1564,13 @@
         "aTokenUnderlyingBalance": "10000000",
         "borrowCap": 9500000,
         "borrowingEnabled": true,
-        "debtCeiling": 0,
         "decimals": 6,
         "id": 3,
         "interestRateStrategy": "0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a",
         "isActive": true,
-        "isBorrowableInIsolation": true,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1702,16 +1599,13 @@
         "aTokenUnderlyingBalance": "10000000000000000000",
         "borrowCap": 1,
         "borrowingEnabled": false,
-        "debtCeiling": 0,
         "decimals": 18,
         "id": 5,
         "interestRateStrategy": "0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a",
         "isActive": true,
-        "isBorrowableInIsolation": false,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1740,16 +1634,13 @@
         "aTokenUnderlyingBalance": "10000000000000000000",
         "borrowCap": 36000000,
         "borrowingEnabled": true,
-        "debtCeiling": 0,
         "decimals": 18,
         "id": 4,
         "interestRateStrategy": "0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a",
         "isActive": true,
-        "isBorrowableInIsolation": true,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1778,16 +1669,13 @@
         "aTokenUnderlyingBalance": "10000000",
         "borrowCap": 47500000,
         "borrowingEnabled": true,
-        "debtCeiling": 0,
         "decimals": 6,
         "id": 2,
         "interestRateStrategy": "0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a",
         "isActive": true,
-        "isBorrowableInIsolation": true,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1816,16 +1704,13 @@
         "aTokenUnderlyingBalance": "10000000000000000000",
         "borrowCap": 1,
         "borrowingEnabled": false,
-        "debtCeiling": 200000000,
         "decimals": 18,
         "id": 1,
         "interestRateStrategy": "0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a",
         "isActive": true,
-        "isBorrowableInIsolation": false,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 11000,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 4500,
@@ -1854,16 +1739,13 @@
         "aTokenUnderlyingBalance": "2500000000000000",
         "borrowCap": 1,
         "borrowingEnabled": false,
-        "debtCeiling": 0,
         "decimals": 18,
         "id": 8,
         "interestRateStrategy": "0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a",
         "isActive": true,
-        "isBorrowableInIsolation": false,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1892,16 +1774,13 @@
         "aTokenUnderlyingBalance": "50000",
         "borrowCap": 1,
         "borrowingEnabled": false,
-        "debtCeiling": 0,
         "decimals": 8,
         "id": 6,
         "interestRateStrategy": "0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a",
         "isActive": true,
-        "isBorrowableInIsolation": false,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 0,
@@ -1930,16 +1809,13 @@
         "aTokenUnderlyingBalance": "2500000000000000",
         "borrowCap": 28000,
         "borrowingEnabled": true,
-        "debtCeiling": 3000000000,
         "decimals": 18,
         "id": 0,
         "interestRateStrategy": "0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a",
         "isActive": true,
-        "isBorrowableInIsolation": false,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 10550,
         "liquidationProtocolFee": 1000,
         "liquidationThreshold": 8300,
@@ -1968,16 +1844,13 @@
         "aTokenUnderlyingBalance": "10000000000000000000",
         "borrowCap": 18000000,
         "borrowingEnabled": true,
-        "debtCeiling": 0,
         "decimals": 18,
         "id": 9,
         "interestRateStrategy": "0x0a215D8ba66387DCA84B284D18c3B4ec3de6E54a",
         "isActive": true,
-        "isBorrowableInIsolation": true,
         "isFlashloanable": true,
         "isFrozen": false,
         "isPaused": false,
-        "isSiloed": false,
         "liquidationBonus": 0,
         "liquidationProtocolFee": 0,
         "liquidationThreshold": 0,
@@ -2106,6 +1979,73 @@
         "optimalUsageRatio": "900000000000000000000000000",
         "variableRateSlope1": "30000000000000000000000000",
         "variableRateSlope2": "400000000000000000000000000"
+      }
+    }
+  },
+  "eModes": {
+    "1": {
+      "from": null,
+      "to": {
+        "borrowableBitmap": "524",
+        "collateralBitmap": "48",
+        "eModeCategory": 1,
+        "isolated": false,
+        "label": "sUSDe Stablecoins",
+        "liquidationBonus": 10400,
+        "liquidationThreshold": 9200,
+        "ltv": 9000
+      }
+    },
+    "2": {
+      "from": null,
+      "to": {
+        "borrowableBitmap": "524",
+        "collateralBitmap": "16",
+        "eModeCategory": 2,
+        "isolated": false,
+        "label": "USDe Stablecoins",
+        "liquidationBonus": 10200,
+        "liquidationThreshold": 9300,
+        "ltv": 9000
+      }
+    },
+    "3": {
+      "from": null,
+      "to": {
+        "borrowableBitmap": "28",
+        "collateralBitmap": "64",
+        "eModeCategory": 3,
+        "isolated": false,
+        "label": "fBTC Stablecoins",
+        "liquidationBonus": 10800,
+        "liquidationThreshold": 7900,
+        "ltv": 7500
+      }
+    },
+    "4": {
+      "from": null,
+      "to": {
+        "borrowableBitmap": "524",
+        "collateralBitmap": "128",
+        "eModeCategory": 4,
+        "isolated": false,
+        "label": "syrupUSDT Stablecoins",
+        "liquidationBonus": 10400,
+        "liquidationThreshold": 9200,
+        "ltv": 9000
+      }
+    },
+    "5": {
+      "from": null,
+      "to": {
+        "borrowableBitmap": "1",
+        "collateralBitmap": "256",
+        "eModeCategory": 5,
+        "isolated": false,
+        "label": "wrsETH Correlated",
+        "liquidationBonus": 10100,
+        "liquidationThreshold": 9500,
+        "ltv": 9300
       }
     }
   }

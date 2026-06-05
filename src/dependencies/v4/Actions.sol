@@ -554,13 +554,10 @@ abstract contract Actions is CommonTestBase {
     uint256 collateralGained = liquidatorCollateralAfter.delta(liquidatorCollateralBefore);
 
     if (collateralInfo.underlying == debtInfo.underlying) {
-      // Same underlying: collateral/debt assets are the same, so debtSpent should == collateralGained and be positive
-      assertEq(debtSpent, collateralGained); // sanity check
-      assertGt(
-        collateralGained,
-        0,
-        'LIQUIDATE: not profitable (same underlying) - collateral gained <= debt spent'
-      );
+      // The liquidator's actual gain is captured by `collateralGained > 0` —
+      // the bonus is what makes the net positive, since otherwise paying X
+      // debt would just return X collateral and the delta would be zero.
+      assertGt(collateralGained, 0, 'LIQUIDATE: not profitable (same underlying) - bonus missing');
     } else {
       // Different underlyings: compare oracle-normalized $ values.
       // Cross-multiply to avoid precision loss from division with extreme mocked prices:

@@ -20,8 +20,6 @@ contract AaveV3PolygonBorrowUpdate is AaveV3Payload {
       asset: AaveV3PolygonAssets.AAVE_UNDERLYING,
       enabledToBorrow: EngineFlags.ENABLED,
       flashloanable: EngineFlags.DISABLED,
-      borrowableInIsolation: EngineFlags.KEEP_CURRENT,
-      withSiloedBorrowing: EngineFlags.KEEP_CURRENT,
       reserveFactor: 15_00
     });
 

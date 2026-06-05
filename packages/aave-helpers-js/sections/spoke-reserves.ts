@@ -1,11 +1,13 @@
 import type { Hex } from 'viem';
 import { getClient } from '@bgd-labs/toolbox';
-import type { AaveV4Snapshot, V4SpokeReserve } from '../snapshot-types-v4';
+import type { AaveV4Snapshot, V4SpokeReserve, V4DynamicConfig } from '../snapshot-types-v4';
 import { formatV4Value, type V4FormatterContext } from '../formatters-v4';
 import { toAddressLink } from '../utils/markdown';
 
 /** All fields in display order. Every field is compared — even identity fields
- *  that "shouldn't" change — so unexpected mutations are never silently missed. */
+ *  that "shouldn't" change — so unexpected mutations are never silently missed.
+ *  `dynamicConfigs` is excluded from this list and rendered separately because
+ *  it is a nested record per key, not a single value. */
 const FIELD_ORDER: (keyof V4SpokeReserve)[] = [
   'symbol',
   'underlying',
@@ -25,6 +27,49 @@ const FIELD_ORDER: (keyof V4SpokeReserve)[] = [
   'priceSource',
   'oraclePrice',
 ];
+
+const DYNAMIC_CONFIG_FIELDS: (keyof V4DynamicConfig)[] = [
+  'collateralFactor',
+  'maxLiquidationBonus',
+  'liquidationFee',
+];
+
+function fmtDynamicConfigField(field: keyof V4DynamicConfig, value: number): string {
+  if (field === 'maxLiquidationBonus') {
+    if (value === 0) return '0.00 % [0]';
+    return `${((value - 10000) / 100).toFixed(2)} % [${value}]`;
+  }
+  // collateralFactor and liquidationFee are plain BPS.
+  const w = Math.floor(value / 100);
+  const f = value % 100;
+  const fs = f < 10 ? `0${f}` : `${f}`;
+  return `${w}.${fs} % [${value}]`;
+}
+
+function renderDynamicConfigsBlock(
+  before: V4SpokeReserve['dynamicConfigs'] | undefined,
+  after: V4SpokeReserve['dynamicConfigs'] | undefined
+): string {
+  const allKeys = new Set<string>([...Object.keys(before ?? {}), ...Object.keys(after ?? {})]);
+  const rows: string[] = [];
+  for (const key of [...allKeys].sort((a, b) => Number(a) - Number(b))) {
+    const b = before?.[key];
+    const a = after?.[key];
+    for (const field of DYNAMIC_CONFIG_FIELDS) {
+      const bv = b?.[field];
+      const av = a?.[field];
+      if (String(bv) === String(av)) continue;
+      const fromFmt = bv === undefined ? '*missing*' : fmtDynamicConfigField(field, bv);
+      const toFmt = av === undefined ? '*missing*' : fmtDynamicConfigField(field, av);
+      rows.push(`| key ${key} | ${field} | ${fromFmt} | ${toFmt} |`);
+    }
+  }
+  if (rows.length === 0) return '';
+  let md = '**dynamicConfigs**\n\n';
+  md += '| key | field | before | after |\n| --- | --- | --- | --- |\n';
+  md += rows.join('\n') + '\n\n';
+  return md;
+}
 
 function reserveHeader(
   reserve: V4SpokeReserve,
@@ -50,6 +95,8 @@ function renderNewReserve(
   for (const key of FIELD_ORDER) {
     md += `| ${key} | ${formatV4Value('spokeReserve', key, reserve[key], ctx)} |\n`;
   }
+  md += '\n';
+  md += renderDynamicConfigsBlock(undefined, reserve.dynamicConfigs);
   return md + '\n';
 }
 
@@ -69,11 +116,19 @@ function renderReserveDiff(
     const toFmt = formatV4Value('spokeReserve', key, aVal, ctx);
     rows.push(`| ${key} | ${fromFmt} | ${toFmt} |`);
   }
-  if (rows.length === 0) return '';
+
+  const dynamicConfigsBlock = renderDynamicConfigsBlock(
+    before.dynamicConfigs,
+    after.dynamicConfigs
+  );
+  if (rows.length === 0 && !dynamicConfigsBlock) return '';
 
   let md = reserveHeader(after, spokeAddr, reserveId, ctx.chainId);
-  md += '| description | value before | value after |\n| --- | --- | --- |\n';
-  md += rows.join('\n') + '\n';
+  if (rows.length > 0) {
+    md += '| description | value before | value after |\n| --- | --- | --- |\n';
+    md += rows.join('\n') + '\n\n';
+  }
+  md += dynamicConfigsBlock;
   return md + '\n';
 }
 

@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.3.0
+
+### Minor Changes
+
+- 11e2207: update to 3.7 e2e tests
+
 ## 1.2.1
 
 ### Patch Changes
