@@ -44,10 +44,21 @@ library Types {
     bool paused;
     bool frozen;
     bool borrowable;
+    bool receiveSharesEnabled;
     bool collateralEnabled; // collateralFactor > 0
     uint16 collateralFactor; // BPS
     uint32 maxLiquidationBonus; // BPS
     uint16 liquidationFee; // BPS
+  }
+
+  /// @notice One DynamicReserveConfig entry, identified by its key. The same
+  ///         reserve can have multiple historic keys still anchoring live user
+  ///         positions, so snapshots record every non-empty key.
+  struct DynamicConfigSnapshot {
+    uint32 key;
+    uint16 collateralFactor;
+    uint32 maxLiquidationBonus;
+    uint16 liquidationFee;
   }
 
   struct SpokeReserveSnapshot {
@@ -64,11 +75,17 @@ library Types {
     bool frozen;
     bool borrowable;
     bool receiveSharesEnabled;
-    // DynamicReserveConfig (latest key)
+    // DynamicReserveConfig: `dynamicConfigKey` is the latest key (also the
+    // pointer used by `Reserve.dynamicConfigKey`); the `collateralFactor`,
+    // `maxLiquidationBonus`, and `liquidationFee` fields mirror that latest
+    // key. `dynamicConfigs` records every key in `[1, dynamicConfigKey]` so
+    // governance updates to non-latest keys (which still drive existing user
+    // positions) remain visible in diffs.
     uint32 dynamicConfigKey;
     uint16 collateralFactor;
     uint32 maxLiquidationBonus;
     uint16 liquidationFee;
+    DynamicConfigSnapshot[] dynamicConfigs;
     // Oracle
     address oracleAddress;
     address priceSource;
@@ -118,10 +135,35 @@ library Types {
     bool halted;
   }
 
+  /// @notice One position-manager registration on a spoke. `updatePositionManager`
+  ///         flips `active`, so the snapshot must capture this status to surface
+  ///         governance changes that authorize or revoke a delegate.
+  struct PositionManagerSnapshot {
+    address spokeAddress;
+    address positionManager;
+    bool active;
+  }
+
+  /// @notice One role grant on an AccessManager: members + per-target selectors.
+  struct AccessManagerRoleSnapshot {
+    address accessManager;
+    uint64 roleId;
+    string label;
+    address[] members;
+    AccessManagerTargetSelector[] targetSelectors;
+  }
+
+  struct AccessManagerTargetSelector {
+    address target;
+    bytes4 selector;
+  }
+
   struct V4Snapshot {
     SpokeReserveSnapshot[] spokeReserves;
     SpokeLiquidationSnapshot[] spokeLiquidationConfigs;
     HubAssetSnapshot[] hubAssets;
     SpokeConfigSnapshot[] spokeConfigs;
+    PositionManagerSnapshot[] positionManagers;
+    AccessManagerRoleSnapshot[] accessManagerRoles;
   }
 }

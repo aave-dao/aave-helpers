@@ -5,6 +5,8 @@ import { renderSpokeReservesSection } from './sections/spoke-reserves';
 import { renderHubAssetsSection } from './sections/hub-assets';
 import { renderSpokeConfigsSection } from './sections/spoke-configs';
 import { renderSpokeLiquidationSection } from './sections/spoke-liquidation';
+import { renderPositionManagersSection } from './sections/position-managers';
+import { renderAccessManagerRolesSection } from './sections/access-manager-roles';
 import { renderRawSection } from './sections/raw';
 import { renderLogsSection } from './sections/logs';
 
@@ -39,6 +41,8 @@ export async function diffV4Snapshots(
   md += renderHubAssetsSection(before, postCopy);
   md += renderSpokeConfigsSection(before, postCopy);
   md += renderSpokeLiquidationSection(before, postCopy);
+  md += renderPositionManagersSection(before, postCopy);
+  md += renderAccessManagerRolesSection(before, postCopy);
   md += await renderLogsSection(logs, after.chainId);
   md += renderRawSection(raw, after.chainId);
 

@@ -4,6 +4,8 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {ISpoke, IHub, IAaveOracle} from 'aave-address-book/AaveV4.sol';
 import {IAssetInterestRateStrategy} from 'aave-v4/hub/interfaces/IAssetInterestRateStrategy.sol';
+import {IAccessManagerEnumerable} from 'aave-v4/access/interfaces/IAccessManagerEnumerable.sol';
+import {IAccessManaged} from 'aave-v4/dependencies/openzeppelin/IAccessManaged.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {V4DiffWriter} from 'src/dependencies/v4/V4DiffWriter.sol';
 import {Helpers} from 'src/dependencies/v4/Helpers.sol';
@@ -12,14 +14,38 @@ import {Helpers} from 'src/dependencies/v4/Helpers.sol';
 /// @notice Snapshot capture for Aave V4. JSON serialization via V4DiffWriter, diff via TypeScript FFI.
 abstract contract SnapshotV4 is Helpers {
   /// @notice Capture a full V4 configuration snapshot from the given spokes and hubs.
+  /// @dev Leaves `positionManagers` and `accessManagerRoles` empty. Use the
+  ///      4-arg overload to fill those sections.
   function createV4Snapshot(
     ISpoke[] memory spokes,
     IHub[] memory hubs
+  ) internal view returns (Types.V4Snapshot memory snapshot) {
+    address[] memory noManagers;
+    address[] memory noAccessManagers;
+    snapshot = createV4Snapshot(spokes, hubs, noManagers, noAccessManagers);
+  }
+
+  /// @notice Capture a full V4 configuration snapshot, including position-manager
+  ///         activations per spoke and AccessManager role assignments.
+  /// @param positionManagerCandidates Curated list of position-manager addresses
+  ///        to check on each spoke. `updatePositionManager` flips their `active`
+  ///        flag; without snapshotting, payloads that authorize a new manager
+  ///        would produce no visible diff.
+  /// @param accessManagers AccessManager contracts to enumerate (typically one
+  ///        per hub, deduped). Role members and target-selector grants are
+  ///        recorded so role-grant payloads show up in the diff.
+  function createV4Snapshot(
+    ISpoke[] memory spokes,
+    IHub[] memory hubs,
+    address[] memory positionManagerCandidates,
+    address[] memory accessManagers
   ) internal view returns (Types.V4Snapshot memory snapshot) {
     snapshot.spokeReserves = _snapshotSpokeReserves(spokes);
     snapshot.spokeLiquidationConfigs = _snapshotSpokeLiqConfigs(spokes);
     snapshot.hubAssets = _snapshotHubAssets(hubs);
     snapshot.spokeConfigs = _snapshotSpokeConfigs(hubs);
+    snapshot.positionManagers = _snapshotPositionManagers(spokes, positionManagerCandidates);
+    snapshot.accessManagerRoles = _snapshotAccessManagerRoles(accessManagers);
   }
 
   /// @notice Write a V4 snapshot to JSON file.
@@ -95,11 +121,43 @@ abstract contract SnapshotV4 is Helpers {
     snap.collateralFactor = dyn.collateralFactor;
     snap.maxLiquidationBonus = dyn.maxLiquidationBonus;
     snap.liquidationFee = dyn.liquidationFee;
+    snap.dynamicConfigs = _snapshotDynamicConfigs(spoke, reserveId, reserve.dynamicConfigKey);
 
     address oracleAddr = spoke.ORACLE();
     snap.oracleAddress = oracleAddr;
     snap.priceSource = IAaveOracle(oracleAddr).getReserveSource(reserveId);
     snap.oraclePrice = IAaveOracle(oracleAddr).getReservePrice(reserveId);
+  }
+
+  /// @dev Walks `[0, latestKey]` and records every non-empty DynamicReserveConfig.
+  ///      `getDynamicReserveConfig` returns the zero struct for unset keys, so
+  ///      we use a populated-field check to detect real entries.
+  function _snapshotDynamicConfigs(
+    ISpoke spoke,
+    uint256 reserveId,
+    uint32 latestKey
+  ) private view returns (Types.DynamicConfigSnapshot[] memory) {
+    Types.DynamicConfigSnapshot[] memory buf = new Types.DynamicConfigSnapshot[](
+      uint256(latestKey) + 1
+    );
+    uint256 count;
+    for (uint32 key; key <= latestKey; key++) {
+      ISpoke.DynamicReserveConfig memory cfg = spoke.getDynamicReserveConfig(reserveId, key);
+      if (cfg.collateralFactor == 0 && cfg.maxLiquidationBonus == 0 && cfg.liquidationFee == 0) {
+        continue;
+      }
+      buf[count++] = Types.DynamicConfigSnapshot({
+        key: key,
+        collateralFactor: cfg.collateralFactor,
+        maxLiquidationBonus: cfg.maxLiquidationBonus,
+        liquidationFee: cfg.liquidationFee
+      });
+    }
+    Types.DynamicConfigSnapshot[] memory result = new Types.DynamicConfigSnapshot[](count);
+    for (uint256 i; i < count; i++) {
+      result[i] = buf[i];
+    }
+    return result;
   }
 
   // Spoke liquidation configs
@@ -224,5 +282,92 @@ abstract contract SnapshotV4 is Helpers {
       }
     }
     return idx;
+  }
+
+  // Position managers
+
+  function _snapshotPositionManagers(
+    ISpoke[] memory spokes,
+    address[] memory candidates
+  ) private view returns (Types.PositionManagerSnapshot[] memory) {
+    uint256 total = spokes.length * candidates.length;
+    Types.PositionManagerSnapshot[] memory result = new Types.PositionManagerSnapshot[](total);
+    uint256 idx;
+    for (uint256 s; s < spokes.length; s++) {
+      for (uint256 c; c < candidates.length; c++) {
+        bool active;
+        try spokes[s].isPositionManagerActive(candidates[c]) returns (bool a) {
+          active = a;
+        } catch {
+          active = false;
+        }
+        result[idx++] = Types.PositionManagerSnapshot({
+          spokeAddress: address(spokes[s]),
+          positionManager: candidates[c],
+          active: active
+        });
+      }
+    }
+    return result;
+  }
+
+  // AccessManager roles
+
+  function _snapshotAccessManagerRoles(
+    address[] memory accessManagers
+  ) private view returns (Types.AccessManagerRoleSnapshot[] memory) {
+    // Count total roles up front to size the output array.
+    uint256 total;
+    for (uint256 m; m < accessManagers.length; m++) {
+      total += IAccessManagerEnumerable(accessManagers[m]).getRoleCount();
+    }
+    Types.AccessManagerRoleSnapshot[] memory result = new Types.AccessManagerRoleSnapshot[](total);
+    uint256 idx;
+    for (uint256 m; m < accessManagers.length; m++) {
+      IAccessManagerEnumerable am = IAccessManagerEnumerable(accessManagers[m]);
+      uint256 roleCount = am.getRoleCount();
+      for (uint256 r; r < roleCount; r++) {
+        uint64 roleId = am.getRole(r);
+        result[idx++] = _snapshotAccessManagerRole(am, roleId);
+      }
+    }
+    return result;
+  }
+
+  function _snapshotAccessManagerRole(
+    IAccessManagerEnumerable am,
+    uint64 roleId
+  ) private view returns (Types.AccessManagerRoleSnapshot memory snap) {
+    snap.accessManager = address(am);
+    snap.roleId = roleId;
+    // `getLabelOfRole` reverts if the role has no label; treat as empty.
+    try am.getLabelOfRole(roleId) returns (string memory label) {
+      snap.label = label;
+    } catch {
+      snap.label = '';
+    }
+
+    uint256 memberCount = am.getRoleMemberCount(roleId);
+    snap.members = am.getRoleMembers(roleId, 0, memberCount);
+
+    uint256 targetCount = am.getRoleTargetCount(roleId);
+    address[] memory targets = am.getRoleTargets(roleId, 0, targetCount);
+
+    uint256 totalSelectors;
+    for (uint256 i; i < targets.length; i++) {
+      totalSelectors += am.getRoleTargetSelectorCount(roleId, targets[i]);
+    }
+    snap.targetSelectors = new Types.AccessManagerTargetSelector[](totalSelectors);
+    uint256 selIdx;
+    for (uint256 i; i < targets.length; i++) {
+      uint256 selCount = am.getRoleTargetSelectorCount(roleId, targets[i]);
+      bytes4[] memory sels = am.getRoleTargetSelectors(roleId, targets[i], 0, selCount);
+      for (uint256 j; j < sels.length; j++) {
+        snap.targetSelectors[selIdx++] = Types.AccessManagerTargetSelector({
+          target: targets[i],
+          selector: sels[j]
+        });
+      }
+    }
   }
 }

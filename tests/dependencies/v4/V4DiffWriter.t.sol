@@ -58,6 +58,7 @@ abstract contract V4DiffWriterTestBase is Test {
         collateralFactor: collateralFactor,
         maxLiquidationBonus: 10500,
         liquidationFee: 100,
+        dynamicConfigs: new Types.DynamicConfigSnapshot[](0),
         oracleAddress: oracleAddr,
         priceSource: priceSource,
         oraclePrice: 1e8
@@ -221,6 +222,7 @@ contract V4DiffWriterTest is V4DiffWriterTestBase, SnapshotV4 {
       collateralFactor: 7500,
       maxLiquidationBonus: 10500,
       liquidationFee: 100,
+      dynamicConfigs: new Types.DynamicConfigSnapshot[](0),
       oracleAddress: oracleAddr,
       priceSource: priceSource,
       oraclePrice: 1e8
@@ -440,5 +442,59 @@ contract V4DiffWriterHarnessTest is V4DiffWriterTestBase {
     assertTrue(vm.contains(json, '"halted": true'), 'second halted');
 
     vm.removeFile(path);
+  }
+
+  function test_writeSnapshotJson_emptyArrays_persistsEmptyObjects() public {
+    Types.V4Snapshot memory snap;
+
+    string memory path = './reports/v4diff_writer_empty.json';
+    V4DiffWriter.writeSnapshotJson('v4diff_writer_empty', snap);
+    string memory json = vm.readFile(path);
+
+    // Every section must be a real JSON object (`{}`), not the stringified
+    // form (`"{}"`) the loop-less code path used to produce.
+    _assertEmptyObjectSection(json, 'spokeReserves');
+    _assertEmptyObjectSection(json, 'spokeLiquidationConfigs');
+    _assertEmptyObjectSection(json, 'hubAssets');
+    _assertEmptyObjectSection(json, 'spokeConfigs');
+    _assertEmptyObjectSection(json, 'positionManagers');
+    _assertEmptyObjectSection(json, 'accessManagerRoles');
+
+    vm.removeFile(path);
+  }
+
+  function test_writeSpokeReserves_empty_persistsEmptyObject() public {
+    string memory path = './reports/harness_spoke_reserves_empty.json';
+    harness.writeSpokeReserves(path, new Types.SpokeReserveSnapshot[](0));
+    _assertEmptyObjectSection(vm.readFile(path), 'spokeReserves');
+    vm.removeFile(path);
+  }
+
+  function test_writeSpokeLiqConfigs_empty_persistsEmptyObject() public {
+    string memory path = './reports/harness_spoke_liq_empty.json';
+    harness.writeSpokeLiqConfigs(path, new Types.SpokeLiquidationSnapshot[](0));
+    _assertEmptyObjectSection(vm.readFile(path), 'spokeLiquidationConfigs');
+    vm.removeFile(path);
+  }
+
+  function test_writeHubAssets_empty_persistsEmptyObject() public {
+    string memory path = './reports/harness_hub_assets_empty.json';
+    harness.writeHubAssets(path, new Types.HubAssetSnapshot[](0));
+    _assertEmptyObjectSection(vm.readFile(path), 'hubAssets');
+    vm.removeFile(path);
+  }
+
+  function test_writeSpokeConfigs_empty_persistsEmptyObject() public {
+    string memory path = './reports/harness_spoke_caps_empty.json';
+    harness.writeSpokeConfigs(path, new Types.SpokeConfigSnapshot[](0));
+    _assertEmptyObjectSection(vm.readFile(path), 'spokeConfigs');
+    vm.removeFile(path);
+  }
+
+  function _assertEmptyObjectSection(string memory json, string memory section) internal pure {
+    string memory objectMarker = string.concat('"', section, '": {}');
+    string memory stringMarker = string.concat('"', section, '": "');
+    assertTrue(vm.contains(json, objectMarker), string.concat(section, ' not an empty object'));
+    assertFalse(vm.contains(json, stringMarker), string.concat(section, ' serialized as string'));
   }
 }
