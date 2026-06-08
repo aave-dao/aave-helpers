@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.3.1
+
+### Patch Changes
+
+- 2c035ff: Add access manager roles and position managers sections to the Aave V4 snapshot diff, and expand spoke reserves coverage.
+
 ## 1.3.0
 
 ### Minor Changes
