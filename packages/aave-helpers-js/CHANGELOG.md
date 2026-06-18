@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.3.2
+
+### Patch Changes
+
+- c825023: Add the `UpdateInterestRateData` event from `IAssetInterestRateStrategy` to eventDb, which was missed when the Aave V4 events were added.
+
 ## 1.3.1
 
 ### Patch Changes
