@@ -3376,4 +3376,17 @@ export const eventDb: AbiEvent[] = [
     name: 'UpdateReserveSource',
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'hub', type: 'address' },
+      { indexed: true, internalType: 'uint256', name: 'assetId', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'optimalUsageRatio', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'baseDrawnRate', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'rateGrowthBeforeOptimal', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'rateGrowthAfterOptimal', type: 'uint256' },
+    ],
+    name: 'UpdateInterestRateData',
+    type: 'event',
+  },
 ];
