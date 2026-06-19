@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.3.3
+
+### Patch Changes
+
+- 5891290: add monad support
+
 ## 1.3.2
 
 ### Patch Changes
