@@ -1,5 +1,5 @@
 import type { Hex } from 'viem';
-import { getClient } from '@bgd-labs/toolbox';
+import { getClient } from '@aave-dao/toolbox';
 import type { AaveV4Snapshot, V4SpokeLiquidationConfig } from '../snapshot-types-v4';
 import { formatV4Value, type V4FormatterContext } from '../formatters-v4';
 import { toAddressLink } from '../utils/markdown';

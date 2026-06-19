@@ -1,5 +1,5 @@
 import { type Hex, formatUnits } from 'viem';
-import { getClient } from '@bgd-labs/toolbox';
+import { getClient } from '@aave-dao/toolbox';
 import { toAddressLink, boolToMarkdown } from './utils/markdown';
 import type {
   V4SpokeReserve,
