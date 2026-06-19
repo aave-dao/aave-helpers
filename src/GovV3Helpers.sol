@@ -32,6 +32,7 @@ import {GovernanceV3Soneium} from 'aave-address-book/GovernanceV3Soneium.sol';
 import {GovernanceV3Ink} from 'aave-address-book/GovernanceV3Ink.sol';
 import {GovernanceV3Plasma} from 'aave-address-book/GovernanceV3Plasma.sol';
 import {GovernanceV3MegaEth} from 'aave-address-book/GovernanceV3MegaEth.sol';
+import {GovernanceV3Monad} from 'aave-address-book/GovernanceV3Monad.sol';
 import {GovernanceV3XLayer} from 'aave-address-book/GovernanceV3XLayer.sol';
 import {GovernanceV3Bob} from 'aave-address-book/GovernanceV3Bob.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
@@ -989,6 +990,30 @@ library GovV3Helpers {
    * @param vm Vm
    * @param actions actions array
    */
+  function buildMonadPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction[] memory actions
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.MONAD, actions);
+  }
+
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param action single action struct
+   */
+  function buildMonadPayload(
+    Vm vm,
+    IPayloadsControllerCore.ExecutionAction memory action
+  ) internal returns (PayloadsControllerUtils.Payload memory) {
+    return _buildPayload(vm, ChainIds.MONAD, action);
+  }
+
+  /**
+   * Builds a payload to be executed via governance
+   * @param vm Vm
+   * @param actions actions array
+   */
   function buildBobPayload(
     Vm vm,
     IPayloadsControllerCore.ExecutionAction[] memory actions
@@ -1143,6 +1168,8 @@ library GovV3Helpers {
       return GovernanceV3Plasma.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.MEGAETH) {
       return GovernanceV3MegaEth.PAYLOADS_CONTROLLER;
+    } else if (chainId == ChainIds.MONAD) {
+      return GovernanceV3Monad.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.BOB) {
       return GovernanceV3Bob.PAYLOADS_CONTROLLER;
     } else if (chainId == ChainIds.XLAYER) {

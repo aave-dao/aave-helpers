@@ -13,7 +13,7 @@ import {
   parseFrontmatterMd,
   renderTenderlyReport,
   tenderly_createVnet,
-} from '@bgd-labs/toolbox';
+} from '@aave-dao/toolbox';
 import { getAddressBookReferences } from '@aave-dao/aave-address-book/utils';
 import { diffSnapshots } from './protocol-diff';
 import { diffV4Snapshots } from './protocol-diff-v4';

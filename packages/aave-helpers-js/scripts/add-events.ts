@@ -11,7 +11,7 @@
  */
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { getSourceCode } from '@bgd-labs/toolbox';
+import { getSourceCode } from '@aave-dao/toolbox';
 import { Abi, type AbiEvent, toEventSignature } from 'viem';
 import { eventDb } from '../utils/eventDb';
 
