@@ -33,6 +33,8 @@ contract ProtocolV4TestBase is
   using SafeERC20 for IERC20;
 
   /// @notice Run the full V4 test suite: snapshot before, execute payload, snapshot after, diff, then e2e.
+  /// @dev the calling test must run under isolation (`forge-config: default.isolate = true` or `--isolate`)
+  /// for the payload gas-limit check to reflect real cold-storage transaction gas.
   function defaultTest(
     string memory reportName,
     ISpoke[] memory spokes,
@@ -250,19 +252,19 @@ contract ProtocolV4TestBase is
   function _executePayloadWithRecording(
     address payload
   ) private returns (string memory rawDiff, string memory logsJson) {
-    uint256 startGas = gasleft();
+    address payloadsController = address(GovV3Helpers.getPayloadsController(block.chainid));
+
+    // Meter execution on a dedicated run: vm.startStateDiffRecording (needed for the diff below)
+    // suppresses isolate's transaction-level gas accounting, so gas must be measured without it.
+    // This run is reverted and has no effect on the recorded snapshot/diff.
+    uint256 snapshotId = vm.snapshotState();
+    GovV3Helpers.executePayload(vm, payload, payloadsController);
+    _assertPayloadGasWithinLimit(vm.lastCallGas().gasTotalUsed);
+    vm.revertToState(snapshotId);
+
     vm.startStateDiffRecording();
     vm.recordLogs();
-
-    GovV3Helpers.executePayload(
-      vm,
-      payload,
-      address(GovV3Helpers.getPayloadsController(block.chainid))
-    );
-
-    uint256 gasUsed = startGas - gasleft();
-    assertLt(gasUsed, (block.gaslimit * 95) / 100, 'BLOCK_GAS_LIMIT_EXCEEDED');
-
+    GovV3Helpers.executePayload(vm, payload, payloadsController);
     rawDiff = vm.getStateDiffJson();
     logsJson = vm.getRecordedLogsJson();
   }

@@ -157,6 +157,7 @@ contract ProtocolV3TestMegaEthSnapshot is ProtocolV3TestBase {
     vm.createSelectFork('megaeth', 7862955);
   }
 
+  /// forge-config: default.isolate = true
   function test_snapshotState() public {
     defaultTest(
       'megaeth',
@@ -173,6 +174,7 @@ contract ProtocolV3TestMantleSnapshot is ProtocolV3TestBase {
     vm.createSelectFork('mantle', 91335553);
   }
 
+  /// forge-config: default.isolate = true
   function test_snapshotState() public {
     defaultTest(
       'mantle',
@@ -297,6 +299,7 @@ contract ProtocolV3TestStorageValidation is ProtocolV3TestBase {
     vm.createSelectFork('mainnet', 24655671);
   }
 
+  /// forge-config: default.isolate = true
   function test_noExecutorStorageChange_passes() public {
     defaultTest(
       'V3StorageValidation_pass',
@@ -307,6 +310,7 @@ contract ProtocolV3TestStorageValidation is ProtocolV3TestBase {
     );
   }
 
+  /// forge-config: default.isolate = true
   function test_executorStorageChange_reverts() public {
     address payload = address(new PayloadWithStorage());
     vm.expectRevert();

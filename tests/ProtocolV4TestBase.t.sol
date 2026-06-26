@@ -179,12 +179,14 @@ contract ProtocolV4TestSnapshot is ProtocolV4TestBaseTest {
 }
 
 contract ProtocolV4TestDefaultTest is ProtocolV4TestBaseTest {
+  /// forge-config: default.isolate = true
   function test_defaultTestWithPayload() public {
     string memory name = 'v4_emit_payload';
     defaultTest({reportName: name, payload: address(new PayloadWithEmit())});
     _cleanupArtifacts(name);
   }
 
+  /// forge-config: default.isolate = true
   function test_defaultTestNoE2E() public {
     string memory name = 'v4_no_e2e';
     defaultTest({
@@ -196,6 +198,7 @@ contract ProtocolV4TestDefaultTest is ProtocolV4TestBaseTest {
     _cleanupArtifacts(name);
   }
 
+  /// forge-config: default.isolate = true
   function test_defaultTestWithSeatbelt() public {
     string memory name = 'v4_seatbelt';
     defaultTest({
@@ -212,6 +215,7 @@ contract ProtocolV4TestDefaultTest is ProtocolV4TestBaseTest {
 }
 
 contract ProtocolV4TestStorageValidation is ProtocolV4TestBaseTest {
+  /// forge-config: default.isolate = true
   function test_noExecutorStorageChange_passes() public {
     string memory name = 'v4_storage_pass';
     defaultTest({
@@ -223,6 +227,7 @@ contract ProtocolV4TestStorageValidation is ProtocolV4TestBaseTest {
     _cleanupArtifacts(name);
   }
 
+  /// forge-config: default.isolate = true
   function test_executorStorageChange_reverts() public {
     string memory name = 'v4_storage_fail';
     address payload = address(new PayloadWithStorage());
