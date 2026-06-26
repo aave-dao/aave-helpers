@@ -1,0 +1,42 @@
+src/ProtocolV3TestBase.sol
+  s_d39b00ea4045cb::t_927b2197be961a 135
+  s_d39b00ea4045cb::t_22c5b9a47e22b7 142
+  s_d39b00ea4045cb::t_a0485c1da8b868 129-131,133,136,139-141
+src/CommonTestBase.sol
+  s_d39b00ea4045cb::t_9320ecda5a0b23 49,51-54
+  s_d39b00ea4045cb::t_5ebc553e7e78f6 55-56
+  s_d39b00ea4045cb::t_f2b0ee934ccf4e 46-48,50
+tests/ProtocolV3TestBase.t.sol
+  s_d39b00ea4045cb::t_a5087306c2d70b 160
+  s_d39b00ea4045cb::t_4643b3df92adf9 302,313
+  s_d39b00ea4045cb::t_14ff133248f1a6 177
+src/ProtocolV4TestBase.sol
+  s_d39b00ea4045cb::t_a43cbe3ec9a29e 260
+  s_d39b00ea4045cb::t_1b29b4b83ed602 253,255-259,261,263-265
+tests/ProtocolV4TestBase.t.sol
+  s_d39b00ea4045cb::t_2dd21ab84dbed6 230
+  s_d39b00ea4045cb::t_9f4604ddccc320 201
+  s_d39b00ea4045cb::t_91f8f7c1f87985 182,189
+  s_d39b00ea4045cb::t_df3f99d14f5440 218
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "208ba5d38fa4e39574b1c04aa0e7264c28824c40",
+  "prompts": {},
+  "humans": {
+    "h_0f977de3f043fc": {
+      "author": "Alexandru Niculae <43644109+avniculae@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_d39b00ea4045cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d32d931-b224-44c8-bf10-d09244f8aa33",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    }
+  }
+}
