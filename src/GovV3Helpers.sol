@@ -1205,7 +1205,7 @@ library GovV3Helpers {
       payloadsStr = string.concat(payloadsStr, payload);
     }
     console2.log(
-      'https://vote.onaave.com/proposal-create-overview?ipfsHash=%s&votingPortal=%s%s',
+      'https://vote.tools.aave.com/proposal-create-overview?ipfsHash=%s&votingPortal=%s%s',
       vm.toString(ipfsHash),
       votingPortal,
       payloadsStr
