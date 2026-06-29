@@ -50,8 +50,18 @@ contract CommonTestBase is Test {
     return 16_777_216;
   }
 
-  function _assertPayloadGasWithinLimit(uint256 gasUsed) internal view {
+  function _assertPayloadGasWithinLimit(uint256 gasUsed) internal {
+    _requireIsolation();
     assertLt(gasUsed, (_getMaxPayloadGas() * 95) / 100, 'TX_GAS_LIMIT_EXCEEDED'); // 5% is kept as a buffer
+  }
+
+  // The gas check is only meaningful under isolation (cold storage + tx intrinsic), and there is no
+  // cheatcode to query or enable it. Detect it instead: under isolation a top-level call is metered as
+  // a transaction (>= 21000 intrinsic gas), otherwise ~0. Fail loudly rather than silently under-count.
+  function _requireIsolation() internal {
+    (bool success, ) = address(0).call('');
+    success;
+    require(vm.lastCallGas().gasTotalUsed >= 21_000, 'PAYLOAD_GAS_CHECK_REQUIRES_ISOLATION');
   }
 
   /**

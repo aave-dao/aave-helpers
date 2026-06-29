@@ -33,8 +33,7 @@ contract ProtocolV4TestBase is
   using SafeERC20 for IERC20;
 
   /// @notice Run the full V4 test suite: snapshot before, execute payload, snapshot after, diff, then e2e.
-  /// @dev the calling test must run under isolation (`forge-config: default.isolate = true` or `--isolate`)
-  /// for the payload gas-limit check to reflect real cold-storage transaction gas.
+  /// @dev the calling test must run under isolation
   function defaultTest(
     string memory reportName,
     ISpoke[] memory spokes,

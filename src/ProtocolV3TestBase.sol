@@ -106,8 +106,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
    * - diffing the config
    * - checking if the changes are plausible (no conflicting config changes etc)
    * - running an e2e testsuite over all assets
-   * @dev the calling test must run under isolation (`forge-config: default.isolate = true` or `--isolate`)
-   * for the payload gas-limit check to reflect real cold-storage transaction gas.
+   * @dev the calling test must run under isolation
    */
   function defaultTest(
     string memory reportName,
