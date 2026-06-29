@@ -157,6 +157,7 @@ contract ProtocolV3TestMegaEthSnapshot is ProtocolV3TestBase {
     vm.createSelectFork('megaeth', 7862955);
   }
 
+  /// forge-config: default.isolate = true
   function test_snapshotState() public {
     defaultTest(
       'megaeth',
@@ -173,6 +174,7 @@ contract ProtocolV3TestMantleSnapshot is ProtocolV3TestBase {
     vm.createSelectFork('mantle', 91335553);
   }
 
+  /// forge-config: default.isolate = true
   function test_snapshotState() public {
     defaultTest(
       'mantle',
@@ -185,6 +187,11 @@ contract ProtocolV3TestMantleSnapshot is ProtocolV3TestBase {
 
   // overriding the executor storage check as payload artifacts does not exist
   function _validateNoExecutorStorageChange(string memory, address) internal view override {}
+
+  // Mantle's per-tx limit is well above the EIP-7825 floor; raise it so this payload fits.
+  function _getMaxPayloadGas() internal view override returns (uint256) {
+    return 30_000_000;
+  }
 }
 
 contract ProtocolV3TestPlausibilityEMode is ProtocolV3TestBase {
@@ -297,6 +304,7 @@ contract ProtocolV3TestStorageValidation is ProtocolV3TestBase {
     vm.createSelectFork('mainnet', 24655671);
   }
 
+  /// forge-config: default.isolate = true
   function test_noExecutorStorageChange_passes() public {
     defaultTest(
       'V3StorageValidation_pass',
@@ -307,6 +315,7 @@ contract ProtocolV3TestStorageValidation is ProtocolV3TestBase {
     );
   }
 
+  /// forge-config: default.isolate = true
   function test_executorStorageChange_reverts() public {
     address payload = address(new PayloadWithStorage());
     vm.expectRevert();

@@ -106,6 +106,10 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
    * - diffing the config
    * - checking if the changes are plausible (no conflicting config changes etc)
    * - running an e2e testsuite over all assets
+   * @dev the calling test must run in foundry's isolation mode (the `--isolate` CLI flag, or the
+   * per-test isolate inline-config annotation) so each top-level call is metered as its own
+   * transaction. Otherwise the payload gas measurement reads warm storage and under-counts, and the
+   * gas-limit check reverts (see `_requireIsolation`).
    */
   function defaultTest(
     string memory reportName,
@@ -126,17 +130,19 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
     string memory afterString = string(abi.encodePacked(reportName, '_after'));
 
+    // Meter execution on a dedicated run: vm.startStateDiffRecording (needed for the diff below)
+    // suppresses isolate's transaction-level gas accounting, so gas must be measured without it.
+    // This run is reverted and has no effect on the recorded snapshot/diff.
     {
-      uint256 startGas = gasleft();
-
-      vm.startStateDiffRecording();
-      vm.recordLogs();
-
+      uint256 snapshotId = vm.snapshotState();
       executePayload(vm, payload, pool);
-
-      uint256 gasUsed = startGas - gasleft();
-      assertLt(gasUsed, (block.gaslimit * 95) / 100, 'BLOCK_GAS_LIMIT_EXCEEDED'); // 5% is kept as a buffer
+      _assertPayloadGasWithinLimit(vm.lastCallGas().gasTotalUsed);
+      vm.revertToState(snapshotId);
     }
+
+    vm.startStateDiffRecording();
+    vm.recordLogs();
+    executePayload(vm, payload, pool);
 
     string memory rawDiff = vm.getStateDiffJson();
     string memory logsJson = vm.getRecordedLogsJson();

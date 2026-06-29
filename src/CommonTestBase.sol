@@ -43,6 +43,27 @@ contract CommonTestBase is Test {
     );
   }
 
+  // EIP-7825 (Fusaka) per-tx gas cap, used as a conservative floor for every chain: a payload that fits
+  // within it is executable on any supported chain. Can be replaced with an on-chain read once EIP-8123
+  // is accepted, or overridden per chain where a higher limit is needed.
+  function _getMaxPayloadGas() internal view virtual returns (uint256) {
+    return 16_777_216;
+  }
+
+  function _assertPayloadGasWithinLimit(uint256 gasUsed) internal {
+    _requireIsolation();
+    assertLt(gasUsed, (_getMaxPayloadGas() * 95) / 100, 'TX_GAS_LIMIT_EXCEEDED'); // 5% is kept as a buffer
+  }
+
+  // The gas check is only meaningful under isolation (cold storage + tx intrinsic), and there is no
+  // cheatcode to query or enable it. Detect it instead: under isolation a top-level call is metered as
+  // a transaction (>= 21000 intrinsic gas), otherwise ~0. Fail loudly rather than silently under-count.
+  function _requireIsolation() internal {
+    (bool success, ) = address(0).call('');
+    success;
+    require(vm.lastCallGas().gasTotalUsed >= 21_000, 'PAYLOAD_GAS_CHECK_REQUIRES_ISOLATION');
+  }
+
   /**
    * @notice deal doesn't support amounts stored in a script right now.
    * This function patches deal to mock and transfer funds instead.
