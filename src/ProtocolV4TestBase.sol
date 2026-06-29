@@ -33,7 +33,10 @@ contract ProtocolV4TestBase is
   using SafeERC20 for IERC20;
 
   /// @notice Run the full V4 test suite: snapshot before, execute payload, snapshot after, diff, then e2e.
-  /// @dev the calling test must run under isolation
+  /// @dev the calling test must run in foundry's isolation mode (the `--isolate` CLI flag, or the
+  /// per-test isolate inline-config annotation) so each top-level call is metered as its own
+  /// transaction. Otherwise the payload gas measurement reads warm storage and under-counts, and the
+  /// gas-limit check reverts (see `_requireIsolation`).
   function defaultTest(
     string memory reportName,
     ISpoke[] memory spokes,

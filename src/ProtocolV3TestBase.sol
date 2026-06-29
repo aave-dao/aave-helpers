@@ -106,7 +106,10 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
    * - diffing the config
    * - checking if the changes are plausible (no conflicting config changes etc)
    * - running an e2e testsuite over all assets
-   * @dev the calling test must run under isolation
+   * @dev the calling test must run in foundry's isolation mode (the `--isolate` CLI flag, or the
+   * per-test isolate inline-config annotation) so each top-level call is metered as its own
+   * transaction. Otherwise the payload gas measurement reads warm storage and under-counts, and the
+   * gas-limit check reverts (see `_requireIsolation`).
    */
   function defaultTest(
     string memory reportName,
