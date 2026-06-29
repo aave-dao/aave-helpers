@@ -187,6 +187,11 @@ contract ProtocolV3TestMantleSnapshot is ProtocolV3TestBase {
 
   // overriding the executor storage check as payload artifacts does not exist
   function _validateNoExecutorStorageChange(string memory, address) internal view override {}
+
+  // Mantle's per-tx limit is well above the EIP-7825 floor; raise it so this payload fits.
+  function _getMaxPayloadGas() internal view override returns (uint256) {
+    return 30_000_000;
+  }
 }
 
 contract ProtocolV3TestPlausibilityEMode is ProtocolV3TestBase {
