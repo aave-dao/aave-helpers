@@ -20,7 +20,7 @@ library ReportFileUtils {
     inputs[0] = 'bash';
     inputs[1] = '-c';
     inputs[2] = string.concat(
-      'f=\'',
+      "f='",
       path,
       '\'; mkdir -p "$(dirname "$f")"; [ -f "$f" ] || printf "{}" > "$f"'
     );
