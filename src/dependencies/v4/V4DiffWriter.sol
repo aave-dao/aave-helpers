@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Vm} from 'forge-std/Vm.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
+import {ReportFileUtils} from 'src/dependencies/ReportFileUtils.sol';
 
 /// @title V4DiffWriter
 /// @notice Internal library for V4 JSON serialization.
@@ -14,6 +15,7 @@ library V4DiffWriter {
 
   function writeSnapshotJson(string memory reportName, Types.V4Snapshot memory snapshot) internal {
     string memory path = string.concat('./reports/', reportName, '.json');
+    ReportFileUtils.ensureExists(path);
     vm.writeFile(
       path,
       '{ "spokeReserves": {}, "spokeLiquidationConfigs": {}, "hubAssets": {}, "spokeConfigs": {}, "positionManagers": {}, "accessManagerRoles": {} }'

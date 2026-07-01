@@ -13,6 +13,7 @@ import {WadRayMath} from 'aave-v3-origin/contracts/protocol/libraries/math/WadRa
 import {IDefaultInterestRateStrategyV2} from 'aave-v3-origin/contracts/interfaces/IDefaultInterestRateStrategyV2.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {DiffUtils} from './DiffUtils.sol';
+import {ReportFileUtils} from './dependencies/ReportFileUtils.sol';
 import {ProtocolV3TestBase as RawProtocolV3TestBase, ReserveConfig} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
 import {MockAggregator} from 'aave-v3-origin/contracts/mocks/oracle/CLAggregators/MockAggregator.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
@@ -45,6 +46,27 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
   using WadRayMath for uint256;
   using SafeERC20 for IERC20;
   using Strings for string;
+
+  // @dev Pre-create the report file so snapshot writes succeed under isolation. See ReportFileUtils.
+  function createConfigurationSnapshot(
+    string memory reportName,
+    IPool pool,
+    bool reserveConfigs,
+    bool strategyConfigs,
+    bool eModeConigs,
+    bool poolConfigs
+  ) public override returns (ReserveConfig[] memory) {
+    ReportFileUtils.ensureExists(string(abi.encodePacked('./reports/', reportName, '.json')));
+    return
+      super.createConfigurationSnapshot(
+        reportName,
+        pool,
+        reserveConfigs,
+        strategyConfigs,
+        eModeConigs,
+        poolConfigs
+      );
+  }
 
   // @dev Override to handle pre-v3.7 pools that lack getIsEModeCategoryIsolated
   function _writeEModeConfigs(string memory path, IPool pool) internal override {
