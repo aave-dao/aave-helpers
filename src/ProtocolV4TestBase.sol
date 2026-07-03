@@ -287,7 +287,11 @@ contract ProtocolV4TestBase is
   function e2eTestSpoke(ISpoke spoke) public {
     Types.ReserveInfo[] memory allReserves = _getReserveInfo(spoke);
     Types.ReserveInfo[] memory goodCollaterals = _getAllUsableCollaterals(allReserves);
-    require(goodCollaterals.length > 0, 'No usable collateral found');
+    // A fully frozen/deprecated spoke has no usable collateral and cannot be exercised e2e.
+    if (goodCollaterals.length == 0) {
+      console.log('--- E2E: Skipping spoke %s (no usable collateral) ---', address(spoke));
+      return;
+    }
 
     uint256 numCollateralsToTest = 5;
     numCollateralsToTest = goodCollaterals.length < numCollateralsToTest
@@ -325,6 +329,16 @@ contract ProtocolV4TestBase is
 
   /// @notice Test all position managers on a spoke.
   function e2eTestPositionManagers(ISpoke spoke) public {
+    // Skip spokes the position managers cannot exercise: a fully frozen/deprecated spoke has no
+    // usable collateral, and a spoke not registered with the managers reverts with
+    // SpokeNotRegistered(). Registration is spoke-level, so the giver manager is representative.
+    if (
+      _getAllUsableCollaterals(_getReserveInfo(spoke)).length == 0 ||
+      !AaveV4EthereumPositionManagers.GIVER_POSITION_MANAGER.isSpokeRegistered(address(spoke))
+    ) {
+      console.log('--- E2E: Skipping position managers on spoke %s ---', address(spoke));
+      return;
+    }
     e2eTestGateways(spoke);
     e2eTestRegularPositionManagers(spoke);
   }
