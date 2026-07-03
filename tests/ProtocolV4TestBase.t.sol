@@ -10,10 +10,8 @@ import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 import {PayloadWithStorage} from './mocks/PayloadWithStorage.sol';
 
 contract ProtocolV4TestBaseTest is ProtocolV4TestBase {
-  uint256 public constant BLOCK_NUMBER = 25440000;
-
   function setUp() public {
-    vm.createSelectFork('mainnet', BLOCK_NUMBER);
+    vm.createSelectFork('mainnet');
   }
 
   modifier gasless() {
