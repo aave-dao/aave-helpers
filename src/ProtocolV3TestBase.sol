@@ -303,13 +303,6 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
 
   function reserveConfigChangesTest(
     IPool pool,
-    address payload
-  ) internal returns (ReserveConfig[] memory, ReserveConfig[] memory) {
-    return reserveConfigChangesTest(pool, payload, new address[](0));
-  }
-
-  function reserveConfigChangesTest(
-    IPool pool,
     address payload,
     address[] memory updatedAssets
   ) internal returns (ReserveConfig[] memory, ReserveConfig[] memory) {
@@ -320,13 +313,6 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     _validateReserveConfigChanges(allConfigsBefore, allConfigsAfter, updatedAssets);
 
     return (allConfigsBefore, allConfigsAfter);
-  }
-
-  function _validateReserveConfigChanges(
-    ReserveConfig[] memory allConfigsBefore,
-    ReserveConfig[] memory allConfigsAfter
-  ) internal pure {
-    _validateReserveConfigChanges(allConfigsBefore, allConfigsAfter, new address[](0));
   }
 
   function _validateReserveConfigChanges(

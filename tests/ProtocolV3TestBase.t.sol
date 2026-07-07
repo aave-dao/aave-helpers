@@ -530,7 +530,8 @@ contract ProtocolV3TestBaseReserveConfigChangesNoChangesTest is ProtocolV3TestBa
     ReserveConfig[] memory configsBefore,
     ReserveConfig[] memory configsAfter
   ) external pure {
-    _validateReserveConfigChanges(configsBefore, configsAfter);
+    address[] memory updatedAssets = new address[](0);
+    _validateReserveConfigChanges(configsBefore, configsAfter, updatedAssets);
   }
 
   function _configsBefore() internal pure returns (ReserveConfig[] memory) {
