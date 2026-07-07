@@ -1,0 +1,38 @@
+src/CommonTestBase.sol
+  s_b59c877a4d716f::t_12a0bfce28e31c 19
+  s_b59c877a4d716f::t_50eacc4d04cd08 40-53
+foundry.toml
+  s_b59c877a4d716f::t_0900d6b175900c 60
+tests/ProtocolV3TestBase.t.sol
+  s_b59c877a4d716f::t_fe9bcb247eff61 200-221
+  s_b59c877a4d716f::t_0699728a785114 17-18,21
+src/ProtocolV3TestBase.sol
+  s_b59c877a4d716f::t_aa976c2756c6fe 193,200
+  s_b59c877a4d716f::t_3eb071ce385fc0 144-157,164-182
+  s_b59c877a4d716f::t_4db91158f0632c 218
+  s_b59c877a4d716f::t_0f4cd93fbf202f 207-212
+tests/mocks/PayloadWithExecutorCheck.sol
+  s_b59c877a4d716f::t_ba0e0a2e5b4a66 1-20
+diffs/InkExplicitPayloadsController_before_InkExplicitPayloadsController_after.md
+  s_b59c877a4d716f::t_87498fae9e0323 1-29
+reports/InkExplicitPayloadsController_after.json
+  s_b59c877a4d716f::t_67fd9969b52609 1-610
+reports/InkExplicitPayloadsController_before.json
+  s_b59c877a4d716f::t_cfe93cc5db940a 1-575
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "76027d50304ae0e2a63bb17092fde68e3ccd5f1a",
+  "prompts": {},
+  "sessions": {
+    "s_b59c877a4d716f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4ce2a2ea-22bf-4a40-aa37-31f3884fb15f",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Alexandru Niculae <43644109+avniculae@users.noreply.github.com>"
+    }
+  }
+}
