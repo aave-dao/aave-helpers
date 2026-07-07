@@ -386,66 +386,26 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     uint256 decimals,
     ReserveConfig[] memory allConfigsAfter
   ) internal pure {
-    ReserveConfig memory config = _findReserveConfig(allConfigsAfter, listing.asset);
+    ReserveConfig memory expectedConfig = _findReserveConfig(allConfigsAfter, listing.asset);
 
-    require(
-      keccak256(bytes(config.symbol)) == keccak256(bytes(listing.assetSymbol)),
-      '_validateListedReserveConfig() : INVALID_SYMBOL'
-    );
-    require(config.decimals == decimals, '_validateListedReserveConfig() : INVALID_DECIMALS');
-
+    expectedConfig.symbol = listing.assetSymbol;
+    expectedConfig.decimals = decimals;
+    expectedConfig.ltv = listing.liqThreshold != 0 ? listing.ltv : 0;
+    expectedConfig.liquidationThreshold = listing.liqThreshold;
+    expectedConfig.usageAsCollateralEnabled = listing.liqThreshold != 0;
     if (listing.liqThreshold != 0) {
-      require(config.ltv == listing.ltv, '_validateListedReserveConfig() : INVALID_LTV');
-      require(
-        config.liquidationThreshold == listing.liqThreshold,
-        '_validateListedReserveConfig() : INVALID_LIQ_THRESHOLD'
-      );
-      require(
-        config.liquidationBonus == 100_00 + listing.liqBonus,
-        '_validateListedReserveConfig() : INVALID_LIQ_BONUS'
-      );
-      require(
-        config.liquidationProtocolFee == listing.liqProtocolFee,
-        '_validateListedReserveConfig() : INVALID_LIQ_PROTOCOL_FEE'
-      );
-      require(
-        config.usageAsCollateralEnabled,
-        '_validateListedReserveConfig() : INVALID_USAGE_AS_COLLATERAL'
-      );
-    } else {
-      require(config.ltv == 0, '_validateListedReserveConfig() : INVALID_LTV');
-      require(
-        config.liquidationThreshold == 0,
-        '_validateListedReserveConfig() : INVALID_LIQ_THRESHOLD'
-      );
-      require(
-        !config.usageAsCollateralEnabled,
-        '_validateListedReserveConfig() : INVALID_USAGE_AS_COLLATERAL'
-      );
+      expectedConfig.liquidationBonus = 100_00 + listing.liqBonus;
+      expectedConfig.liquidationProtocolFee = listing.liqProtocolFee;
     }
+    expectedConfig.borrowingEnabled = EngineFlags.toBool(listing.enabledToBorrow);
+    expectedConfig.isFlashloanable = EngineFlags.toBool(listing.flashloanable);
+    expectedConfig.reserveFactor = listing.reserveFactor;
+    expectedConfig.supplyCap = listing.supplyCap;
+    expectedConfig.borrowCap = listing.borrowCap;
+    expectedConfig.isActive = true;
+    expectedConfig.isFrozen = false;
 
-    require(
-      config.borrowingEnabled == EngineFlags.toBool(listing.enabledToBorrow),
-      '_validateListedReserveConfig() : INVALID_BORROWING_ENABLED'
-    );
-    require(
-      config.isFlashloanable == EngineFlags.toBool(listing.flashloanable),
-      '_validateListedReserveConfig() : INVALID_IS_FLASHLOANABLE'
-    );
-    require(
-      config.reserveFactor == listing.reserveFactor,
-      '_validateListedReserveConfig() : INVALID_RESERVE_FACTOR'
-    );
-    require(
-      config.supplyCap == listing.supplyCap,
-      '_validateListedReserveConfig() : INVALID_SUPPLY_CAP'
-    );
-    require(
-      config.borrowCap == listing.borrowCap,
-      '_validateListedReserveConfig() : INVALID_BORROW_CAP'
-    );
-    require(config.isActive, '_validateListedReserveConfig() : INVALID_IS_ACTIVE');
-    require(!config.isFrozen, '_validateListedReserveConfig() : INVALID_IS_FROZEN');
+    _validateReserveConfig(expectedConfig, allConfigsAfter);
   }
 
   function _applyCollateralUpdates(
