@@ -14,8 +14,11 @@ import {AaveV3Metis} from 'aave-address-book/AaveV3Metis.sol';
 import {AaveV3MegaEth} from 'aave-address-book/AaveV3MegaEth.sol';
 import {AaveV3Mantle} from 'aave-address-book/AaveV3Mantle.sol';
 import {AaveV3Fantom} from 'aave-address-book/AaveV3Fantom.sol';
+import {AaveV3InkWhitelabel} from 'aave-address-book/AaveV3InkWhitelabel.sol';
+import {GovernanceV3Ink} from 'aave-address-book/GovernanceV3Ink.sol';
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 import {PayloadWithStorage} from './mocks/PayloadWithStorage.sol';
+import {PayloadWithExecutorCheck} from './mocks/PayloadWithExecutorCheck.sol';
 
 contract ProtocolV3TestBaseTest is ProtocolV3TestBase {
   function setUp() public {
@@ -191,6 +194,28 @@ contract ProtocolV3TestMantleSnapshot is ProtocolV3TestBase {
   // Mantle's per-tx limit is well above the EIP-7825 floor; raise it so this payload fits.
   function _getMaxPayloadGas() internal view override returns (uint256) {
     return 30_000_000;
+  }
+}
+
+contract ProtocolV3TestExplicitPayloadsController is ProtocolV3TestBase {
+  function setUp() public {
+    vm.createSelectFork('ink', 49250266);
+  }
+
+  // The only Ink market is a whitelabel instance, so the pool-derived controller is the whitelabel
+  // permissioned one; payloads touching DAO-owned contracts execute via the chain-level controller
+  // instead. The payload asserts it is delegatecalled by the DAO executor, so this fails if
+  // defaultTest routes execution through the whitelabel governance.
+  /// forge-config: default.isolate = true
+  function test_defaultTestWithExplicitPayloadsController() public {
+    defaultTest(
+      'InkExplicitPayloadsController',
+      AaveV3InkWhitelabel.POOL,
+      address(new PayloadWithExecutorCheck(GovernanceV3Ink.EXECUTOR_LVL_1)),
+      false,
+      false,
+      GovernanceV3Ink.PAYLOADS_CONTROLLER
+    );
   }
 }
 
