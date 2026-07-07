@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
-import {ProtocolV3TestBase, ReserveConfig, ExpectedReserveListing, ReserveFreezeUpdate} from '../src/ProtocolV3TestBase.sol';
+import {ProtocolV3TestBase, ReserveConfig} from '../src/ProtocolV3TestBase.sol';
 import {IPool, IPoolAddressesProvider, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
 import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV3EthereumEtherFi} from 'aave-address-book/AaveV3EthereumEtherFi.sol';
@@ -387,38 +387,47 @@ contract ProtocolV3TestBaseReserveConfigChangesTest is ProtocolV3TestBase {
     return updates;
   }
 
-  function _expectedFreezeChanges() internal pure override returns (ReserveFreezeUpdate[] memory) {
-    ReserveFreezeUpdate[] memory updates = new ReserveFreezeUpdate[](1);
-    updates[0] = ReserveFreezeUpdate({asset: ASSET_C, frozen: true});
-    return updates;
+  function _expectedFreezeChanges()
+    internal
+    pure
+    override
+    returns (address[] memory assets, bool[] memory frozen)
+  {
+    assets = new address[](1);
+    frozen = new bool[](1);
+    assets[0] = ASSET_C;
+    frozen[0] = true;
   }
 
-  function _expectedListings() internal pure override returns (ExpectedReserveListing[] memory) {
-    ExpectedReserveListing[] memory listings = new ExpectedReserveListing[](1);
-    listings[0] = ExpectedReserveListing({
-      listing: IAaveV3ConfigEngine.Listing({
-        asset: ASSET_D,
-        assetSymbol: 'ASSET_D',
-        priceFeed: address(0),
-        rateStrategyParams: IAaveV3ConfigEngine.InterestRateInputData({
-          optimalUsageRatio: 80_00,
-          baseVariableBorrowRate: 0,
-          variableRateSlope1: 10_00,
-          variableRateSlope2: 100_00
-        }),
-        enabledToBorrow: EngineFlags.ENABLED,
-        flashloanable: EngineFlags.DISABLED,
-        ltv: 50_00,
-        liqThreshold: 60_00,
-        liqBonus: 5_00,
-        reserveFactor: 10_00,
-        supplyCap: 1_000,
-        borrowCap: 200,
-        liqProtocolFee: 15_00
+  function _expectedListings()
+    internal
+    pure
+    override
+    returns (IAaveV3ConfigEngine.Listing[] memory listings, uint256[] memory decimals)
+  {
+    listings = new IAaveV3ConfigEngine.Listing[](1);
+    decimals = new uint256[](1);
+    listings[0] = IAaveV3ConfigEngine.Listing({
+      asset: ASSET_D,
+      assetSymbol: 'ASSET_D',
+      priceFeed: address(0),
+      rateStrategyParams: IAaveV3ConfigEngine.InterestRateInputData({
+        optimalUsageRatio: 80_00,
+        baseVariableBorrowRate: 0,
+        variableRateSlope1: 10_00,
+        variableRateSlope2: 100_00
       }),
-      decimals: 6
+      enabledToBorrow: EngineFlags.ENABLED,
+      flashloanable: EngineFlags.DISABLED,
+      ltv: 50_00,
+      liqThreshold: 60_00,
+      liqBonus: 5_00,
+      reserveFactor: 10_00,
+      supplyCap: 1_000,
+      borrowCap: 200,
+      liqProtocolFee: 15_00
     });
-    return listings;
+    decimals[0] = 6;
   }
 
   function _configsBefore() internal pure returns (ReserveConfig[] memory) {

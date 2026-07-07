@@ -39,16 +39,6 @@ struct InterestStrategyValues {
   uint256 variableRateSlope2;
 }
 
-struct ReserveFreezeUpdate {
-  address asset;
-  bool frozen;
-}
-
-struct ExpectedReserveListing {
-  IAaveV3ConfigEngine.Listing listing;
-  uint256 decimals;
-}
-
 contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestBase, DiffUtils {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
   using PercentageMath for uint256;
@@ -254,17 +244,24 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     }
   }
 
-  function _expectedListings() internal pure virtual returns (ExpectedReserveListing[] memory) {
-    return new ExpectedReserveListing[](0);
+  function _expectedListings()
+    internal
+    pure
+    virtual
+    returns (IAaveV3ConfigEngine.Listing[] memory listings, uint256[] memory decimals)
+  {
+    listings = new IAaveV3ConfigEngine.Listing[](0);
+    decimals = new uint256[](0);
   }
 
   function _expectedCustomListings()
     internal
     pure
     virtual
-    returns (ExpectedReserveListing[] memory)
+    returns (IAaveV3ConfigEngine.Listing[] memory listings, uint256[] memory decimals)
   {
-    return new ExpectedReserveListing[](0);
+    listings = new IAaveV3ConfigEngine.Listing[](0);
+    decimals = new uint256[](0);
   }
 
   function _expectedCollateralChanges()
@@ -294,8 +291,14 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     return new IAaveV3ConfigEngine.BorrowUpdate[](0);
   }
 
-  function _expectedFreezeChanges() internal pure virtual returns (ReserveFreezeUpdate[] memory) {
-    return new ReserveFreezeUpdate[](0);
+  function _expectedFreezeChanges()
+    internal
+    pure
+    virtual
+    returns (address[] memory assets, bool[] memory frozen)
+  {
+    assets = new address[](0);
+    frozen = new bool[](0);
   }
 
   function reserveConfigChangesTest(
@@ -331,21 +334,34 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     ReserveConfig[] memory allConfigsAfter,
     address[] memory updatedAssets
   ) internal pure {
-    ExpectedReserveListing[] memory listings = _expectedListings();
-    ExpectedReserveListing[] memory customListings = _expectedCustomListings();
+    (
+      IAaveV3ConfigEngine.Listing[] memory listings,
+      uint256[] memory listingDecimals
+    ) = _expectedListings();
+    (
+      IAaveV3ConfigEngine.Listing[] memory customListings,
+      uint256[] memory customListingDecimals
+    ) = _expectedCustomListings();
     IAaveV3ConfigEngine.CollateralUpdate[] memory collateralUpdates = _expectedCollateralChanges();
     IAaveV3ConfigEngine.CapsUpdate[] memory capsUpdates = _expectedCapsChanges();
     IAaveV3ConfigEngine.BorrowUpdate[] memory borrowUpdates = _expectedBorrowChanges();
-    ReserveFreezeUpdate[] memory freezeUpdates = _expectedFreezeChanges();
+    (address[] memory freezeAssets, bool[] memory frozenStates) = _expectedFreezeChanges();
 
-    _validateNewListings(allConfigsBefore, allConfigsAfter, listings, customListings);
+    _validateNewListings(
+      allConfigsBefore,
+      allConfigsAfter,
+      listings,
+      listingDecimals,
+      customListings,
+      customListingDecimals
+    );
 
     for (uint256 i = 0; i < updatedAssets.length; i++) {
       ReserveConfig memory expectedConfig = _findReserveConfig(allConfigsBefore, updatedAssets[i]);
       _applyCollateralUpdates(expectedConfig, collateralUpdates);
       _applyCapsUpdates(expectedConfig, capsUpdates);
       _applyBorrowUpdates(expectedConfig, borrowUpdates);
-      _applyFreezeUpdates(expectedConfig, freezeUpdates);
+      _applyFreezeUpdates(expectedConfig, freezeAssets, frozenStates);
       _validateReserveConfig(expectedConfig, allConfigsAfter);
     }
 
@@ -355,9 +371,16 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
   function _validateNewListings(
     ReserveConfig[] memory allConfigsBefore,
     ReserveConfig[] memory allConfigsAfter,
-    ExpectedReserveListing[] memory listings,
-    ExpectedReserveListing[] memory customListings
+    IAaveV3ConfigEngine.Listing[] memory listings,
+    uint256[] memory listingDecimals,
+    IAaveV3ConfigEngine.Listing[] memory customListings,
+    uint256[] memory customListingDecimals
   ) internal pure {
+    require(listings.length == listingDecimals.length, 'INVALID_LISTING_DECIMALS');
+    require(
+      customListings.length == customListingDecimals.length,
+      'INVALID_CUSTOM_LISTING_DECIMALS'
+    );
     _validateCountOfListings(
       listings.length + customListings.length,
       allConfigsBefore,
@@ -365,28 +388,25 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     );
 
     for (uint256 i = 0; i < listings.length; i++) {
-      _validateListedReserveConfig(listings[i], allConfigsAfter);
+      _validateListedReserveConfig(listings[i], listingDecimals[i], allConfigsAfter);
     }
     for (uint256 i = 0; i < customListings.length; i++) {
-      _validateListedReserveConfig(customListings[i], allConfigsAfter);
+      _validateListedReserveConfig(customListings[i], customListingDecimals[i], allConfigsAfter);
     }
   }
 
   function _validateListedReserveConfig(
-    ExpectedReserveListing memory expectedListing,
+    IAaveV3ConfigEngine.Listing memory listing,
+    uint256 decimals,
     ReserveConfig[] memory allConfigsAfter
   ) internal pure {
-    IAaveV3ConfigEngine.Listing memory listing = expectedListing.listing;
     ReserveConfig memory config = _findReserveConfig(allConfigsAfter, listing.asset);
 
     require(
       keccak256(bytes(config.symbol)) == keccak256(bytes(listing.assetSymbol)),
       '_validateListedReserveConfig() : INVALID_SYMBOL'
     );
-    require(
-      config.decimals == expectedListing.decimals,
-      '_validateListedReserveConfig() : INVALID_DECIMALS'
-    );
+    require(config.decimals == decimals, '_validateListedReserveConfig() : INVALID_DECIMALS');
 
     if (listing.liqThreshold != 0) {
       require(config.ltv == listing.ltv, '_validateListedReserveConfig() : INVALID_LTV');
@@ -505,13 +525,14 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
 
   function _applyFreezeUpdates(
     ReserveConfig memory expectedConfig,
-    ReserveFreezeUpdate[] memory freezeUpdates
+    address[] memory freezeAssets,
+    bool[] memory frozenStates
   ) internal pure {
-    for (uint256 i = 0; i < freezeUpdates.length; i++) {
-      ReserveFreezeUpdate memory update = freezeUpdates[i];
-      if (update.asset != expectedConfig.underlying) continue;
+    require(freezeAssets.length == frozenStates.length, 'INVALID_FREEZE_UPDATES');
+    for (uint256 i = 0; i < freezeAssets.length; i++) {
+      if (freezeAssets[i] != expectedConfig.underlying) continue;
 
-      expectedConfig.isFrozen = update.frozen;
+      expectedConfig.isFrozen = frozenStates[i];
     }
   }
 
