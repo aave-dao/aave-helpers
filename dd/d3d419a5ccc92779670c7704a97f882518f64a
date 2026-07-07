@@ -1,0 +1,21 @@
+src/ProtocolV3TestBase.sol
+  s_22f80b5bcb6d41::t_2791ed2270cc9a 11-12,42-51,257-547
+tests/ProtocolV3TestBase.t.sol
+  s_22f80b5bcb6d41::t_8d3f56647701a4 5,17-18,304-569
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "ddd3d419a5ccc92779670c7704a97f882518f64a",
+  "prompts": {},
+  "sessions": {
+    "s_22f80b5bcb6d41": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f3c89-d210-7122-b483-d92bfbdf7c86",
+        "model": "gpt-5.5"
+      },
+      "human_author": "Alberto <albe@AMWM-H65F40J09H.local>"
+    }
+  }
+}
