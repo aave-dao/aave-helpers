@@ -5,7 +5,6 @@ import 'forge-std/Test.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
 import {ISpoke, IHub, IAaveOracle, ISpokeConfigurator} from 'aave-address-book/AaveV4.sol';
-import {AaveV4Ethereum} from 'aave-address-book/AaveV4Ethereum.sol';
 import {IPriceOracle} from 'aave-v4/spoke/interfaces/IPriceOracle.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {Helpers} from 'src/dependencies/v4/Helpers.sol';
@@ -14,6 +13,12 @@ import {Helpers} from 'src/dependencies/v4/Helpers.sol';
 /// @notice Test scenario orchestration for V4 e2e tests.
 abstract contract Scenarios is Helpers {
   using SafeERC20 for IERC20;
+
+  /// @notice AccessManager mocked to bypass auth when reconfiguring reserves in tests.
+  function _accessManager() internal view virtual returns (address);
+
+  /// @notice SpokeConfigurator used to reconfigure reserves in tests.
+  function _spokeConfigurator() internal view virtual returns (ISpokeConfigurator);
 
   /// @dev Makes a user liquidatable by reducing collateral factors and manipulating oracle prices.
   /// Two-passes: CF updates first, then oracle mocks
@@ -69,11 +74,11 @@ abstract contract Scenarios is Helpers {
   ) internal {
     uint32 userConfigKey = spoke.getUserPosition(reserveId, user).dynamicConfigKey;
     vm.mockCall(
-      address(AaveV4Ethereum.ACCESS_MANAGER),
+      _accessManager(),
       abi.encodeWithSelector(bytes4(keccak256('canCall(address,address,bytes4)'))),
       abi.encode(true, uint32(0))
     );
-    AaveV4Ethereum.SPOKE_CONFIGURATOR.updateCollateralFactor({
+    _spokeConfigurator().updateCollateralFactor({
       spoke: address(spoke),
       reserveId: reserveId,
       dynamicConfigKey: userConfigKey,
