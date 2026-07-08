@@ -137,11 +137,11 @@ contract CollectorUtilsTest is Test {
     uint256 amount,
     uint256 slippage
   ) public {
-    vm.assume(milkman != address(vm));
-    vm.assume(priceChecker != address(vm));
-    vm.assume(toUnderlying != address(vm));
-    vm.assume(fromUnderlyingPriceFeed != address(vm));
-    vm.assume(toUnderlyingPriceFeed != address(vm));
+    assumeNotForgeAddress(milkman);
+    assumeNotForgeAddress(priceChecker);
+    assumeNotForgeAddress(toUnderlying);
+    assumeNotForgeAddress(fromUnderlyingPriceFeed);
+    assumeNotForgeAddress(toUnderlyingPriceFeed);
     uint256 balance = UNDERLYING.balanceOf(address(COLLECTOR));
     vm.assume(amount <= balance && amount != 0);
 
