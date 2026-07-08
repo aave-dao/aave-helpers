@@ -377,7 +377,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
       _validateReserveConfig(expectedConfig, allConfigsAfter);
     }
 
-    _noReservesConfigsChangesApartFrom(allConfigsBefore, allConfigsAfter, updatedAssets, true);
+    _noPreExistingReservesConfigsChangesApartFrom(allConfigsBefore, allConfigsAfter, updatedAssets);
   }
 
   function _validateNewListings(
@@ -508,22 +508,13 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     }
   }
 
-  function _noReservesConfigsChangesApartFrom(
+  function _noPreExistingReservesConfigsChangesApartFrom(
     ReserveConfig[] memory allConfigsBefore,
     ReserveConfig[] memory allConfigsAfter,
-    address[] memory assetChangedUnderlying,
-    bool expectNewListings
+    address[] memory assetChangedUnderlying
   ) internal pure {
-    // The inherited 3-arg helper from aave-v3-origin-tests is not virtual and always rejects
-    // length changes. This overload keeps that behavior by default, while allowing expected
-    // new listings for reserve-config validation.
-    if (!expectNewListings) {
-      require(
-        allConfigsBefore.length == allConfigsAfter.length,
-        'A_UNEXPECTED_NEW_LISTING_HAPPENED'
-      );
-    }
-
+    // Duplicates RawProtocolV3TestBase._noReservesConfigsChangesApartFrom, but without the
+    // length check so expected new listings can be present in allConfigsAfter.
     for (uint256 i = 0; i < allConfigsBefore.length; i++) {
       bool isAssetExpectedToChange;
       for (uint256 j = 0; j < assetChangedUnderlying.length; j++) {
