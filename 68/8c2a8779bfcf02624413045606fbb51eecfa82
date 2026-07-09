@@ -1,0 +1,19 @@
+src/ProtocolV3TestBase.sol
+  s_22f80b5bcb6d41::t_858be4765170f5 389,391-395,397-398,400-408
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "688c2a8779bfcf02624413045606fbb51eecfa82",
+  "prompts": {},
+  "sessions": {
+    "s_22f80b5bcb6d41": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f3c89-d210-7122-b483-d92bfbdf7c86",
+        "model": "gpt-5.5"
+      },
+      "human_author": "Alberto <albe@AMWM-H65F40J09H.local>"
+    }
+  }
+}

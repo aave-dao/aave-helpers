@@ -1,0 +1,36 @@
+src/dependencies/ReportFileUtils.sol
+  s_bf75d0657e5bfd::t_c09b8fc35c28dc 1-7,15-29
+  s_bf75d0657e5bfd::t_d787bde2a43bf2 8-11
+  s_bf75d0657e5bfd::t_0c891911831509 14
+  s_bf75d0657e5bfd::t_67ba9a5f8e5038 12-13
+src/dependencies/v4/V4DiffWriter.sol
+  s_bf75d0657e5bfd::t_98f0c6d5bd2f3d 18
+  s_bf75d0657e5bfd::t_df25dcaa69c193 6
+src/ProtocolV3TestBase.sol
+  s_bf75d0657e5bfd::t_81569a79ed0f40 16
+  s_bf75d0657e5bfd::t_95aa4f12e8b548 50-70
+src/ProtocolV2TestBase.sol
+  s_bf75d0657e5bfd::t_8ee04516167515 132
+  s_bf75d0657e5bfd::t_a867c0c3d07790 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "e099f1f074719a8734dad44fb73f7150bd53f009",
+  "prompts": {},
+  "humans": {
+    "h_0f977de3f043fc": {
+      "author": "Alexandru Niculae <43644109+avniculae@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_bf75d0657e5bfd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a045ea25-ba2f-4783-8214-e987111c157a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Alexandru Niculae <43644109+avniculae@users.noreply.github.com>"
+    }
+  }
+}

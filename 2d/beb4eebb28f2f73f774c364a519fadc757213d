@@ -1,0 +1,38 @@
+tests/mocks/PayloadWithExecutorCheck.sol
+  s_f85123fefeb6cd::t_4c5fb4a5f5ba88 1-20
+reports/InkExplicitPayloadsController_before.json
+  s_f85123fefeb6cd::t_4c5fb4a5f5ba88 1-575
+src/ProtocolV3TestBase.sol
+  s_f85123fefeb6cd::t_4c5fb4a5f5ba88 143-156,163-181,192,199,206-211,217
+tests/CollectorUtils.t.sol
+  s_f85123fefeb6cd::t_4c5fb4a5f5ba88 140-144
+diffs/InkExplicitPayloadsController_before_InkExplicitPayloadsController_after.md
+  s_f85123fefeb6cd::t_4c5fb4a5f5ba88 1-29
+reports/InkExplicitPayloadsController_after.json
+  s_f85123fefeb6cd::t_4c5fb4a5f5ba88 1-610
+tests/ProtocolV3TestBase.t.sol
+  s_f85123fefeb6cd::t_4c5fb4a5f5ba88 19-20,23,202-221
+  s_f85123fefeb6cd::t_fcb38d2b1bbeb9 222-223
+foundry.toml
+  s_f85123fefeb6cd::t_4c5fb4a5f5ba88 60
+src/CommonTestBase.sol
+  s_f85123fefeb6cd::t_4c5fb4a5f5ba88 19,40-53
+src/dependencies/v4/TokenizationActions.sol
+  s_f85123fefeb6cd::t_4c5fb4a5f5ba88 99,103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "2dbeb4eebb28f2f73f774c364a519fadc757213d",
+  "prompts": {},
+  "sessions": {
+    "s_f85123fefeb6cd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f40c5-1244-7173-b2aa-b27bddf96f15",
+        "model": "gpt-5.5"
+      },
+      "human_author": "Alberto <albe@AMWM-H65F40J09H.local>"
+    }
+  }
+}

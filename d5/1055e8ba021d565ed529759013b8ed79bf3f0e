@@ -1,0 +1,23 @@
+.github/workflows/comment.yml
+  s_7504e6412ce1f4::t_f2e8deae54d713 18
+.github/workflows/merge-main.yml
+  s_7504e6412ce1f4::t_871376a1c0ec12 15,17
+.github/workflows/release.yml
+  s_7504e6412ce1f4::t_16a1628911d990 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "d51055e8ba021d565ed529759013b8ed79bf3f0e",
+  "prompts": {},
+  "sessions": {
+    "s_7504e6412ce1f4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "11cabea8-adfb-4c66-8f7f-7471c408407f",
+        "model": "unknown"
+      },
+      "human_author": "Alberto <albe@AMWM-H65F40J09H.local>"
+    }
+  }
+}
