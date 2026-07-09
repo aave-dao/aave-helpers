@@ -1,0 +1,14 @@
+src/dependencies/v4/GatewayScenarios.sol
+  h_71908bb6884da4 554,566
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "87e297d4e70cbe04c424f4e4b2bba4e10920c976",
+  "prompts": {},
+  "humans": {
+    "h_71908bb6884da4": {
+      "author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  }
+}

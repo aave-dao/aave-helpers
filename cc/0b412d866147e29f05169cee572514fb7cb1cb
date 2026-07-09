@@ -1,0 +1,31 @@
+packages/aave-helpers-js/formatters-v4.ts
+  s_e1c16c13a515b9::t_b6b6372d06fc87 156-160,170,172-173,176,178-179
+  s_e1c16c13a515b9::t_df68bba76b1007 65-68
+  h_71908bb6884da4 64,171,177
+  s_e1c16c13a515b9::t_3f8a6d4a714794 92-93
+packages/aave-helpers-js/__tests__/protocol-diff-v4.spec.ts
+  s_e1c16c13a515b9::t_bd0348e8a3af36 132,134,136-141
+  s_e1c16c13a515b9::t_0070f81c0757cf 215-217,219-220,222-225,227
+  h_71908bb6884da4 218,221,226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.9",
+  "base_commit_sha": "cc0b412d866147e29f05169cee572514fb7cb1cb",
+  "prompts": {},
+  "humans": {
+    "h_71908bb6884da4": {
+      "author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_e1c16c13a515b9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c809caa1-573d-4ecf-a985-21d4182f607d",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  }
+}

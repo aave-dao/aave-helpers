@@ -1,0 +1,14 @@
+tests/dependencies/v4/V4DiffWriter.t.sol
+  h_71908bb6884da4 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "ed9b99c8616580b37c47062874add08a596cccb3",
+  "prompts": {},
+  "humans": {
+    "h_71908bb6884da4": {
+      "author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  }
+}

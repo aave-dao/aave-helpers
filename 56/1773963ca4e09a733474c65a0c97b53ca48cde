@@ -1,0 +1,29 @@
+src/dependencies/v4/Actions.sol
+  0e36084a45611522 7,421-431,484-505,507-569
+  h_ac33fd5bdc4037 506,570
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "561773963ca4e09a733474c65a0c97b53ca48cde",
+  "prompts": {
+    "0e36084a45611522": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "775db6dc-fe30-40c4-823e-3d0971ec91e5",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 288,
+      "total_deletions": 189,
+      "accepted_lines": 97,
+      "overriden_lines": 1
+    }
+  },
+  "humans": {
+    "h_ac33fd5bdc4037": {
+      "author": "YBM"
+    }
+  }
+}

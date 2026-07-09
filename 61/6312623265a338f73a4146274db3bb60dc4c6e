@@ -1,0 +1,33 @@
+tests/dependencies/v4/SnapshotV4.LiqConfig.t.sol
+  s_bef57e8811ec19::t_4135d8cf4c639d 10,15,33,51,69
+tests/dependencies/v4/SnapshotV4.SpokeConfig.t.sol
+  s_bef57e8811ec19::t_3781889b7a8e2f 10,15,28,41,54,63,72
+tests/dependencies/v4/SnapshotV4.HubAsset.t.sol
+  s_bef57e8811ec19::t_ee8774fdfed41d 10,40,53,66,79,94,107,130,140,156,175,190,209,228
+  h_71908bb6884da4 15,27
+tests/dependencies/v4/SnapshotV4Combined.t.sol
+  s_bef57e8811ec19::t_f265ddf8b0e6d0 7,14,25,34,44,53,63,79,112,141,180,243-249
+  s_bef57e8811ec19::t_108464dac1fddc 250
+  h_71908bb6884da4 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "616312623265a338f73a4146274db3bb60dc4c6e",
+  "prompts": {},
+  "humans": {
+    "h_71908bb6884da4": {
+      "author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_bef57e8811ec19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5831686-2a73-4166-bd75-00f7f9c34913",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  }
+}

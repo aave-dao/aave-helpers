@@ -1,0 +1,33 @@
+src/dependencies/v4/Actions.sol
+  h_ac33fd5bdc4037 273-276
+  bef57e8811ec195a 192,204,252,265
+src/dependencies/v4/GatewayScenarios.sol
+  bef57e8811ec195a 152,163,197,208,286,297
+src/dependencies/v4/TokenizationActions.sol
+  bef57e8811ec195a 110,179,233,291,339,460,601
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "e42c3fc9a6b48189bd77781bf4f90e731ea60324",
+  "prompts": {
+    "bef57e8811ec195a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5831686-2a73-4166-bd75-00f7f9c34913",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 17,
+      "total_deletions": 17,
+      "accepted_lines": 17,
+      "overriden_lines": 0
+    }
+  },
+  "humans": {
+    "h_ac33fd5bdc4037": {
+      "author": "YBM"
+    }
+  }
+}

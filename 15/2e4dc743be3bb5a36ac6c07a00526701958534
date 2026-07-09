@@ -1,0 +1,19 @@
+src/ProtocolV3TestBase.sol
+  s_f58f6c19df07b3::t_254e30ddc31dd2 380,511,514,516-517
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "152e4dc743be3bb5a36ac6c07a00526701958534",
+  "prompts": {},
+  "sessions": {
+    "s_f58f6c19df07b3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "20407fd3-cd39-45bd-886b-6bfc14e2c144",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Alberto <albe@AMWM-H65F40J09H.local>"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+src/dependencies/v4/V4DiffWriter.sol
+  9b10e1ac8c008430 9-10
+src/ProtocolV4TestBase.sol
+  9b10e1ac8c008430 30-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "fbc44d1df4ba94d05302bef17d5865cf2802a816",
+  "prompts": {
+    "9b10e1ac8c008430": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "445bf424-d39e-4f34-bef5-14dcfad99464",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 6,
+      "total_deletions": 6,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    }
+  }
+}

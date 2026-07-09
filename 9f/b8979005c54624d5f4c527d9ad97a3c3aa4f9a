@@ -1,0 +1,47 @@
+src/dependencies/v4/V4DiffWriter.sol
+  0e36084a45611522 8-9
+packages/aave-helpers-js/sections/spoke-caps.ts
+  0e36084a45611522 1-109
+packages/aave-helpers-js/sections/spoke-liquidation.ts
+  0e36084a45611522 1-86
+packages/aave-helpers-js/protocol-diff-v4.ts
+  0e36084a45611522 1-57
+packages/aave-helpers-js/sections/spoke-reserves.ts
+  0e36084a45611522 1-115
+packages/aave-helpers-js/sections/hub-assets.ts
+  0e36084a45611522 1-104
+src/ProtocolV4TestBase.sol
+  0e36084a45611522 99
+packages/aave-helpers-js/cli.ts
+  0e36084a45611522 19,44-59
+packages/aave-helpers-js/formatters-v4.ts
+  0e36084a45611522 1-167
+src/dependencies/v4/SnapshotV4.sol
+  0e36084a45611522 12,30-50,102-103,164-171
+packages/aave-helpers-js/index.ts
+  0e36084a45611522 2,18-24
+packages/aave-helpers-js/snapshot-types-v4.ts
+  0e36084a45611522 1-83
+packages/aave-helpers-js/__tests__/protocol-diff-v4.spec.ts
+  0e36084a45611522 1-249
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "9fb8979005c54624d5f4c527d9ad97a3c3aa4f9a",
+  "prompts": {
+    "0e36084a45611522": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "775db6dc-fe30-40c4-823e-3d0971ec91e5",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 7992,
+      "total_deletions": 472,
+      "accepted_lines": 2226,
+      "overriden_lines": 5
+    }
+  }
+}

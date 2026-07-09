@@ -1,0 +1,23 @@
+packages/aave-helpers-js/formatters-v4.ts
+  bef57e8811ec195a 150-151
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "f6d8f1c2829c15bce9810bfa21c142262c5247f3",
+  "prompts": {
+    "bef57e8811ec195a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5831686-2a73-4166-bd75-00f7f9c34913",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 3,
+      "total_deletions": 1,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}

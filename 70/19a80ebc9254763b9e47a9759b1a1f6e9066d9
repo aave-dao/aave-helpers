@@ -1,0 +1,21 @@
+src/dependencies/v4/TokenizationActions.sol
+  s_b59c877a4d716f::t_775eae0a3de780 99,103
+tests/CollectorUtils.t.sol
+  s_b59c877a4d716f::t_20e811b60f262d 140-144
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "7019a80ebc9254763b9e47a9759b1a1f6e9066d9",
+  "prompts": {},
+  "sessions": {
+    "s_b59c877a4d716f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4ce2a2ea-22bf-4a40-aa37-31f3884fb15f",
+        "model": "claude-fable-5"
+      },
+      "human_author": "Alexandru Niculae <43644109+avniculae@users.noreply.github.com>"
+    }
+  }
+}

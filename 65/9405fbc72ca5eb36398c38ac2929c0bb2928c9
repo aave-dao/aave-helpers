@@ -1,0 +1,24 @@
+src/dependencies/ReportFileUtils.sol
+  s_bf75d0657e5bfd::t_76acef118cc011 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "659405fbc72ca5eb36398c38ac2929c0bb2928c9",
+  "prompts": {},
+  "humans": {
+    "h_0f977de3f043fc": {
+      "author": "Alexandru Niculae <43644109+avniculae@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_bf75d0657e5bfd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a045ea25-ba2f-4783-8214-e987111c157a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Alexandru Niculae <43644109+avniculae@users.noreply.github.com>"
+    }
+  }
+}

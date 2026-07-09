@@ -1,0 +1,29 @@
+src/CommonTestBase.sol
+  s_d39b00ea4045cb::t_969cfca25aa33e 53-54,58-64
+  s_d39b00ea4045cb::t_9efd0ad60ba506 65-66
+src/ProtocolV3TestBase.sol
+  s_d39b00ea4045cb::t_c1066dd632bce5 109
+src/ProtocolV4TestBase.sol
+  h_0f977de3f043fc 36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "b8719e07bc26eb49672ff2339eccf67bc06cccd8",
+  "prompts": {},
+  "humans": {
+    "h_0f977de3f043fc": {
+      "author": "Alexandru Niculae <43644109+avniculae@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_d39b00ea4045cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d32d931-b224-44c8-bf10-d09244f8aa33",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Alexandru Niculae <43644109+avniculae@users.noreply.github.com>"
+    }
+  }
+}
