@@ -13,6 +13,7 @@ import {WadRayMath} from 'aave-v3-origin/contracts/protocol/libraries/math/WadRa
 import {IDefaultInterestRateStrategyV2} from 'aave-v3-origin/contracts/interfaces/IDefaultInterestRateStrategyV2.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {DiffUtils} from './DiffUtils.sol';
+import {ReportFileUtils} from './dependencies/ReportFileUtils.sol';
 import {ProtocolV3TestBase as RawProtocolV3TestBase, ReserveConfig} from 'aave-v3-origin-tests/utils/ProtocolV3TestBase.sol';
 import {MockAggregator} from 'aave-v3-origin/contracts/mocks/oracle/CLAggregators/MockAggregator.sol';
 import {IInitializableAdminUpgradeabilityProxy} from './interfaces/IInitializableAdminUpgradeabilityProxy.sol';
@@ -45,6 +46,27 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
   using WadRayMath for uint256;
   using SafeERC20 for IERC20;
   using Strings for string;
+
+  // @dev Pre-create the report file so snapshot writes succeed under isolation. See ReportFileUtils.
+  function createConfigurationSnapshot(
+    string memory reportName,
+    IPool pool,
+    bool reserveConfigs,
+    bool strategyConfigs,
+    bool eModeConigs,
+    bool poolConfigs
+  ) public override returns (ReserveConfig[] memory) {
+    ReportFileUtils.ensureExists(string(abi.encodePacked('./reports/', reportName, '.json')));
+    return
+      super.createConfigurationSnapshot(
+        reportName,
+        pool,
+        reserveConfigs,
+        strategyConfigs,
+        eModeConigs,
+        poolConfigs
+      );
+  }
 
   // @dev Override to handle pre-v3.7 pools that lack getIsEModeCategoryIsolated
   function _writeEModeConfigs(string memory path, IPool pool) internal override {
@@ -119,12 +141,45 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     return defaultTest(reportName, pool, payload, true, false);
   }
 
+  /**
+   * @dev variant with an explicit payloadsController, for chains where the governance executing the
+   * payload differs from the one derived from the pool — e.g. a DAO payload touching DAO-owned
+   * contracts (GHO, CCIP token pools) on a chain whose only market is a whitelabel instance.
+   */
+  function defaultTest(
+    string memory reportName,
+    IPool pool,
+    address payload,
+    IPayloadsControllerCore payloadsController
+  ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
+    return defaultTest(reportName, pool, payload, true, false, payloadsController);
+  }
+
   function defaultTest(
     string memory reportName,
     IPool pool,
     address payload,
     bool runE2E,
     bool runSeatbelt
+  ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
+    return
+      defaultTest(
+        reportName,
+        pool,
+        payload,
+        runE2E,
+        runSeatbelt,
+        GovV3Helpers.getPayloadsController(pool, block.chainid)
+      );
+  }
+
+  function defaultTest(
+    string memory reportName,
+    IPool pool,
+    address payload,
+    bool runE2E,
+    bool runSeatbelt,
+    IPayloadsControllerCore payloadsController
   ) public returns (ReserveConfig[] memory, ReserveConfig[] memory) {
     string memory beforeString = string(abi.encodePacked(reportName, '_before'));
     ReserveConfig[] memory configBefore = createConfigurationSnapshot(beforeString, pool);
@@ -135,39 +190,32 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     // This run is reverted and has no effect on the recorded snapshot/diff.
     {
       uint256 snapshotId = vm.snapshotState();
-      executePayload(vm, payload, pool);
+      executePayload(vm, payload, payloadsController);
       _assertPayloadGasWithinLimit(vm.lastCallGas().gasTotalUsed);
       vm.revertToState(snapshotId);
     }
 
     vm.startStateDiffRecording();
     vm.recordLogs();
-    executePayload(vm, payload, pool);
+    executePayload(vm, payload, payloadsController);
 
     string memory rawDiff = vm.getStateDiffJson();
     string memory logsJson = vm.getRecordedLogsJson();
     ReserveConfig[] memory configAfter = createConfigurationSnapshot(afterString, pool);
 
     // as executor does delegateCall to the payload, the executor should have no storage changes
-    {
-      IPayloadsControllerCore pc = GovV3Helpers.getPayloadsController(pool, block.chainid);
-      _validateNoExecutorStorageChange(
-        rawDiff,
-        pc
-          .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
-          .executor
-      );
-    }
+    _validateNoExecutorStorageChange(
+      rawDiff,
+      payloadsController
+        .getExecutorSettingsByAccessControl(PayloadsControllerUtils.AccessControl.Level_1)
+        .executor
+    );
     vm.writeJson(rawDiff, string(abi.encodePacked('./reports/', afterString, '.json')), '$.raw');
     vm.writeJson(logsJson, string(abi.encodePacked('./reports/', afterString, '.json')), '$.logs');
 
     diffReports(beforeString, afterString);
     if (runSeatbelt) {
-      generateSeatbeltReport(
-        reportName,
-        address(GovV3Helpers.getPayloadsController(pool, block.chainid)),
-        payload.code
-      );
+      generateSeatbeltReport(reportName, address(payloadsController), payload.code);
     }
 
     configChangePlausibilityTest(pool, configBefore, configAfter);

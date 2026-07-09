@@ -2,18 +2,16 @@
 pragma solidity ^0.8.0;
 
 import 'forge-std/Test.sol';
-import {ProtocolV4TestBase} from '../src/ProtocolV4TestBase.sol';
+import {ProtocolV4TestBaseEthereum} from '../src/v4-protocol-test/ProtocolV4TestBaseEthereum.sol';
 import {ISpoke, ITokenizationSpoke, ISpokeConfigurator} from 'aave-address-book/AaveV4.sol';
 import {AaveV4Ethereum, AaveV4EthereumSpokes, AaveV4EthereumHubs, AaveV4EthereumTokenizationSpokes, AaveV4EthereumPositionManagers, AaveV4EthereumGetters} from 'aave-address-book/AaveV4Ethereum.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {PayloadWithEmit} from './mocks/PayloadWithEmit.sol';
 import {PayloadWithStorage} from './mocks/PayloadWithStorage.sol';
 
-contract ProtocolV4TestBaseTest is ProtocolV4TestBase {
-  uint256 public constant BLOCK_NUMBER = 24829000;
-
+contract ProtocolV4TestBaseTest is ProtocolV4TestBaseEthereum {
   function setUp() public {
-    vm.createSelectFork('mainnet', BLOCK_NUMBER);
+    vm.createSelectFork('mainnet');
   }
 
   modifier gasless() {
@@ -243,7 +241,7 @@ contract ProtocolV4TestStorageValidation is ProtocolV4TestBaseTest {
   }
 }
 
-contract ProtocolV4TestPlausibility is Test, ProtocolV4TestBase {
+contract ProtocolV4TestPlausibility is Test, ProtocolV4TestBaseEthereum {
   address internal hubA = makeAddr('hubA');
   address internal hubB = makeAddr('hubB');
 

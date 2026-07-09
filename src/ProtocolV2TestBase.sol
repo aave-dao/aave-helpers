@@ -19,6 +19,7 @@ import {ProxyHelpers} from 'aave-v3-origin/../tests/utils/ProxyHelpers.sol';
 import {SeatbeltUtils} from './SeatbeltUtils.sol';
 import {GovV3Helpers} from './GovV3Helpers.sol';
 import {IPayloadsControllerCore, PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
+import {ReportFileUtils} from './dependencies/ReportFileUtils.sol';
 
 struct ReserveConfig {
   string symbol;
@@ -128,6 +129,7 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
     ILendingPool pool
   ) public returns (ReserveConfig[] memory) {
     string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
+    ReportFileUtils.ensureExists(path);
     vm.writeFile(path, '{ "reserves": {}, "strategies": {}, "poolConfiguration": {} }');
     vm.serializeUint('root', 'chainId', block.chainid);
     ReserveConfig[] memory configs = _getReservesConfigs(pool);

@@ -6,8 +6,7 @@ import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
 import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
 
-import {ISpoke, IHub, ITokenizationSpoke, INativeTokenGateway, ISignatureGateway, IGiverPositionManager, ITakerPositionManager, IConfigPositionManager} from 'aave-address-book/AaveV4.sol';
-import {AaveV4Ethereum, AaveV4EthereumPositionManagers, AaveV4EthereumGetters} from 'aave-address-book/AaveV4Ethereum.sol';
+import {ISpoke, IHub, ITokenizationSpoke, INativeTokenGateway, ISignatureGateway, IGiverPositionManager, ITakerPositionManager, IConfigPositionManager, PositionManagers} from 'aave-address-book/AaveV4.sol';
 import {IPayloadsControllerCore, PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
 import {GovV3Helpers} from 'src/GovV3Helpers.sol';
 import {SeatbeltUtils} from 'src/SeatbeltUtils.sol';
@@ -23,7 +22,7 @@ import {GatewayScenarios} from 'src/dependencies/v4/GatewayScenarios.sol';
 /// Tests deposit, mint, withdraw, redeem for each tokenization spoke.
 /// Tests NativeTokenGateway and SignatureGateway for each spoke.
 /// Loops over all good collaterals and uses randomized amounts.
-contract ProtocolV4TestBase is
+abstract contract ProtocolV4TestBase is
   SnapshotV4,
   Scenarios,
   TokenizationScenarios,
@@ -144,8 +143,8 @@ contract ProtocolV4TestBase is
     return
       defaultTest({
         reportName: reportName,
-        spokes: AaveV4EthereumGetters.getAllSpokes(),
-        tokenizationSpokes: AaveV4EthereumGetters.getAllTokenizationSpokes(),
+        spokes: _getSpokes(),
+        tokenizationSpokes: _getTokenizationSpokes(),
         payload: payload,
         runE2E: runE2E,
         testPositionManagers: testPositionManagers,
@@ -208,7 +207,7 @@ contract ProtocolV4TestBase is
     ISpoke[] memory spokes,
     address payload
   ) internal virtual returns (Types.V4Snapshot memory snapshotAfter) {
-    IHub[] memory hubs = AaveV4EthereumGetters.getAllHubs();
+    IHub[] memory hubs = _getHubs();
     address[] memory positionManagerCandidates = _positionManagerCandidates();
     address[] memory accessManagers = _accessManagers();
     string memory beforeName = string.concat(reportName, '_before');
@@ -287,7 +286,11 @@ contract ProtocolV4TestBase is
   function e2eTestSpoke(ISpoke spoke) public {
     Types.ReserveInfo[] memory allReserves = _getReserveInfo(spoke);
     Types.ReserveInfo[] memory goodCollaterals = _getAllUsableCollaterals(allReserves);
-    require(goodCollaterals.length > 0, 'No usable collateral found');
+    // A fully frozen/deprecated spoke has no usable collateral and cannot be exercised e2e.
+    if (goodCollaterals.length == 0) {
+      console.log('--- E2E: Skipping spoke %s (no usable collateral) ---', address(spoke));
+      return;
+    }
 
     uint256 numCollateralsToTest = 5;
     numCollateralsToTest = goodCollaterals.length < numCollateralsToTest
@@ -325,6 +328,16 @@ contract ProtocolV4TestBase is
 
   /// @notice Test all position managers on a spoke.
   function e2eTestPositionManagers(ISpoke spoke) public {
+    // Skip spokes the position managers cannot exercise: a fully frozen/deprecated spoke has no
+    // usable collateral, and a spoke not registered with the managers reverts with
+    // SpokeNotRegistered(). Registration is spoke-level, so the giver manager is representative.
+    if (
+      _getAllUsableCollaterals(_getReserveInfo(spoke)).length == 0 ||
+      !_getPositionManagers().giver.isSpokeRegistered(address(spoke))
+    ) {
+      console.log('--- E2E: Skipping position managers on spoke %s ---', address(spoke));
+      return;
+    }
     e2eTestGateways(spoke);
     e2eTestRegularPositionManagers(spoke);
   }
@@ -340,7 +353,7 @@ contract ProtocolV4TestBase is
 
     // NativeTokenGateway — only if spoke lists WETH
     {
-      INativeTokenGateway nativeGateway = AaveV4EthereumPositionManagers.NATIVE_TOKEN_GATEWAY;
+      INativeTokenGateway nativeGateway = _getPositionManagers().nativeGateway;
       (bool hasWeth, Types.ReserveInfo memory wethInfo) = _findNativeTokenReserveInfo(
         nativeGateway,
         spoke
@@ -356,7 +369,7 @@ contract ProtocolV4TestBase is
     if (goodCollaterals.length > 0 && goodDebtReserves.length > 0) {
       uint256 gatewaySnapshot = vm.snapshotState();
       _testSignatureGateway({
-        gateway: AaveV4EthereumPositionManagers.SIGNATURE_GATEWAY,
+        gateway: _getPositionManagers().signatureGateway,
         spoke: spoke,
         reserveInfo: goodDebtReserves[0],
         collateralInfo: goodCollaterals[0]
@@ -395,8 +408,7 @@ contract ProtocolV4TestBase is
     uint256 snapshot = vm.snapshotState();
     console.log('GIVER_PM: Testing supplyOnBehalfOf and repayOnBehalfOf');
 
-    IGiverPositionManager giverPositionManager = AaveV4EthereumPositionManagers
-      .GIVER_POSITION_MANAGER;
+    IGiverPositionManager giverPositionManager = _getPositionManagers().giver;
     address oracleAddr = spoke.ORACLE();
     address owner = makeAddr('GIVER_OWNER');
     address supplier = makeAddr('GIVER_SUPPLIER');
@@ -486,8 +498,7 @@ contract ProtocolV4TestBase is
     uint256 snapshot = vm.snapshotState();
     console.log('TAKER_PM: Testing withdrawOnBehalfOf and borrowOnBehalfOf');
 
-    ITakerPositionManager takerPositionManager = AaveV4EthereumPositionManagers
-      .TAKER_POSITION_MANAGER;
+    ITakerPositionManager takerPositionManager = _getPositionManagers().taker;
     address owner = makeAddr('TAKER_OWNER');
     address taker = makeAddr('TAKER_DELEGATEE');
 
@@ -610,8 +621,7 @@ contract ProtocolV4TestBase is
     uint256 snapshot = vm.snapshotState();
     console.log('CONFIG_PM: Testing setUsingAsCollateralOnBehalfOf');
 
-    IConfigPositionManager configPositionManager = AaveV4EthereumPositionManagers
-      .CONFIG_POSITION_MANAGER;
+    IConfigPositionManager configPositionManager = _getPositionManagers().config;
     address oracleAddr = spoke.ORACLE();
     address owner = makeAddr('CONFIG_OWNER');
     address configDelegatee = makeAddr('CONFIG_DELEGATEE');
@@ -923,25 +933,36 @@ contract ProtocolV4TestBase is
     vm.revertToState(snapshot);
   }
 
+  /// @notice Hubs to snapshot and diff.
+  function _getHubs() internal view virtual returns (IHub[] memory);
+
+  /// @notice Spokes exercised by the default e2e suite.
+  function _getSpokes() internal view virtual returns (ISpoke[] memory);
+
+  /// @notice Tokenization spokes exercised by the default e2e suite.
+  function _getTokenizationSpokes() internal view virtual returns (ITokenizationSpoke[] memory);
+
+  /// @notice Position managers and gateways exercised on each registered spoke.
+  function _getPositionManagers() internal view virtual returns (PositionManagers memory);
+
   /// @notice Default list of position-manager candidates checked per spoke.
-  /// @dev Override on non-Ethereum chains. Returning more addresses costs only
-  ///      one `isPositionManagerActive` call each; missing addresses produce
-  ///      blind spots in the diff.
+  /// @dev Returning more addresses costs only one `isPositionManagerActive` call
+  ///      each; missing addresses produce blind spots in the diff.
   function _positionManagerCandidates() internal view virtual returns (address[] memory) {
+    PositionManagers memory positionManagers = _getPositionManagers();
     address[] memory candidates = new address[](5);
-    candidates[0] = address(AaveV4EthereumPositionManagers.GIVER_POSITION_MANAGER);
-    candidates[1] = address(AaveV4EthereumPositionManagers.TAKER_POSITION_MANAGER);
-    candidates[2] = address(AaveV4EthereumPositionManagers.CONFIG_POSITION_MANAGER);
-    candidates[3] = address(AaveV4EthereumPositionManagers.NATIVE_TOKEN_GATEWAY);
-    candidates[4] = address(AaveV4EthereumPositionManagers.SIGNATURE_GATEWAY);
+    candidates[0] = address(positionManagers.giver);
+    candidates[1] = address(positionManagers.taker);
+    candidates[2] = address(positionManagers.config);
+    candidates[3] = address(positionManagers.nativeGateway);
+    candidates[4] = address(positionManagers.signatureGateway);
     return candidates;
   }
 
   /// @notice Default list of AccessManagers whose role grants should be snapshotted.
-  /// @dev Override on non-Ethereum chains.
   function _accessManagers() internal view virtual returns (address[] memory) {
     address[] memory ams = new address[](1);
-    ams[0] = address(AaveV4Ethereum.ACCESS_MANAGER);
+    ams[0] = _accessManager();
     return ams;
   }
 
