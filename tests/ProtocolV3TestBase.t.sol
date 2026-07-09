@@ -336,20 +336,80 @@ contract ProtocolV3TestBaseReserveConfigChangesTest is ProtocolV3TestBase {
     this.validateReserveConfigChanges(_configsBefore(), _configsAfter());
   }
 
+  function testFuzz_validateExpectedReserveConfigChangesWithSanitizedInputs(
+    uint256 assetASupplyCap,
+    uint256 assetABorrowCap,
+    uint256 assetBLtv,
+    uint256 assetBLiquidationThreshold,
+    uint256 assetBSupplyCap,
+    uint256 assetBBorrowCap,
+    uint256 assetCSupplyCap,
+    uint256 assetCBorrowCap
+  ) public view {
+    assetASupplyCap = bound(assetASupplyCap, 1, 1_000_000_000);
+    assetABorrowCap = bound(assetABorrowCap, 0, assetASupplyCap);
+    assetBLtv = bound(assetBLtv, 0, 95_00);
+    assetBLiquidationThreshold = bound(assetBLiquidationThreshold, assetBLtv, 97_50);
+    uint256 expectedBorrowCap = _expectedCapsChanges()[0].borrowCap;
+    assetBSupplyCap = bound(assetBSupplyCap, expectedBorrowCap, 1_000_000_000);
+    assetBBorrowCap = bound(assetBBorrowCap, 0, assetBSupplyCap);
+    assetCSupplyCap = bound(assetCSupplyCap, 1, 1_000_000_000);
+    assetCBorrowCap = bound(assetCBorrowCap, 0, assetCSupplyCap);
+
+    ReserveConfig[] memory configsBefore = _configsBefore();
+    configsBefore[0].supplyCap = assetASupplyCap;
+    configsBefore[0].borrowCap = assetABorrowCap;
+    configsBefore[1].ltv = assetBLtv;
+    configsBefore[1].liquidationThreshold = assetBLiquidationThreshold;
+    configsBefore[1].usageAsCollateralEnabled = assetBLiquidationThreshold != 0;
+    configsBefore[1].supplyCap = assetBSupplyCap;
+    configsBefore[1].borrowCap = assetBBorrowCap;
+    configsBefore[2].supplyCap = assetCSupplyCap;
+    configsBefore[2].borrowCap = assetCBorrowCap;
+
+    this.validateReserveConfigChanges(configsBefore, _configsAfter(configsBefore));
+  }
+
   function test_revertsWhenDeclaredBorrowCapIsNotApplied() public {
     ReserveConfig[] memory configsAfter = _configsAfter();
-    configsAfter[1].borrowCap = 701;
+    configsAfter[1].borrowCap = _expectedCapsChanges()[0].borrowCap + 1;
+
+    vm.expectRevert(bytes('_validateReserveConfig: InvalidBorrowCap()'));
+    this.validateReserveConfigChanges(_configsBefore(), configsAfter);
+  }
+
+  function testFuzz_revertsWhenDeclaredBorrowCapIsNotApplied(uint256 borrowCap) public {
+    uint256 expectedBorrowCap = _expectedCapsChanges()[0].borrowCap;
+    borrowCap = bound(borrowCap, 0, 1_000_000_000);
+    vm.assume(borrowCap != expectedBorrowCap);
+
+    ReserveConfig[] memory configsAfter = _configsAfter();
+    configsAfter[1].borrowCap = borrowCap;
 
     vm.expectRevert(bytes('_validateReserveConfig: InvalidBorrowCap()'));
     this.validateReserveConfigChanges(_configsBefore(), configsAfter);
   }
 
   function test_revertsWhenUndeclaredReserveConfigChanges() public {
+    ReserveConfig[] memory configsBefore = _configsBefore();
     ReserveConfig[] memory configsAfter = _configsAfter();
-    configsAfter[2].supplyCap = 301;
+    configsAfter[2].supplyCap = configsBefore[2].supplyCap + 1;
 
     vm.expectRevert(bytes('_validateReserveConfig: InvalidSupplyCap()'));
-    this.validateReserveConfigChanges(_configsBefore(), configsAfter);
+    this.validateReserveConfigChanges(configsBefore, configsAfter);
+  }
+
+  function testFuzz_revertsWhenUndeclaredReserveConfigChanges(uint256 supplyCap) public {
+    ReserveConfig[] memory configsBefore = _configsBefore();
+    uint256 expectedSupplyCap = configsBefore[2].supplyCap;
+    supplyCap = bound(supplyCap, 1, 1_000_000_000);
+    vm.assume(supplyCap != expectedSupplyCap);
+
+    ReserveConfig[] memory configsAfter = _configsAfter();
+    configsAfter[2].supplyCap = supplyCap;
+
+    vm.expectRevert(bytes('_validateReserveConfig: InvalidSupplyCap()'));
+    this.validateReserveConfigChanges(configsBefore, configsAfter);
   }
 
   function validateReserveConfigChanges(
@@ -464,8 +524,13 @@ contract ProtocolV3TestBaseReserveConfigChangesTest is ProtocolV3TestBase {
   }
 
   function _configsAfter() internal pure returns (ReserveConfig[] memory) {
+    return _configsAfter(_configsBefore());
+  }
+
+  function _configsAfter(
+    ReserveConfig[] memory configsBefore
+  ) internal pure returns (ReserveConfig[] memory) {
     ReserveConfig[] memory configs = new ReserveConfig[](4);
-    ReserveConfig[] memory configsBefore = _configsBefore();
     configs[0] = configsBefore[0];
     configs[1] = configsBefore[1];
     configs[2] = configsBefore[2];
