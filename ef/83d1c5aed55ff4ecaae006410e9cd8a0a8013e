@@ -1,0 +1,21 @@
+tests/ProtocolV3TestBase.t.sol
+  s_25be89cacd8741::t_64beec9d01fb31 384,406
+  s_25be89cacd8741::t_9beee96c1bc794 353-354,375,382,394,396,399,403-404,412
+  s_25be89cacd8741::t_7e9ba21461f0d0 339-352,355-372,376-381,383,385-387,400-402,405,407-411,527-532
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "ef83d1c5aed55ff4ecaae006410e9cd8a0a8013e",
+  "prompts": {},
+  "sessions": {
+    "s_25be89cacd8741": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f46a7-10b4-7f13-97ce-c65ff2db7339",
+        "model": "gpt-5.5"
+      },
+      "human_author": "Alberto <albe@AMWM-H65F40J09H.local>"
+    }
+  }
+}
