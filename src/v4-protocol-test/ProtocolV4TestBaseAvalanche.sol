@@ -9,27 +9,33 @@ import {ProtocolV4TestBase} from 'src/ProtocolV4TestBase.sol';
 /// @notice Avalanche binding of the chain-agnostic ProtocolV4TestBase, sourcing every
 ///         network entity from the aave-address-book getters.
 contract ProtocolV4TestBaseAvalanche is ProtocolV4TestBase {
-  function _getHubs() internal view override returns (IHub[] memory) {
+  function _getHubs() internal view virtual override returns (IHub[] memory) {
     return AaveV4AvalancheGetters.getAllHubs();
   }
 
-  function _getSpokes() internal view override returns (ISpoke[] memory) {
+  function _getSpokes() internal view virtual override returns (ISpoke[] memory) {
     return AaveV4AvalancheGetters.getAllSpokes();
   }
 
-  function _getTokenizationSpokes() internal view override returns (ITokenizationSpoke[] memory) {
+  function _getTokenizationSpokes()
+    internal
+    view
+    virtual
+    override
+    returns (ITokenizationSpoke[] memory)
+  {
     return AaveV4AvalancheGetters.getAllTokenizationSpokes();
   }
 
-  function _getPositionManagers() internal view override returns (PositionManagers memory) {
+  function _getPositionManagers() internal view virtual override returns (PositionManagers memory) {
     return AaveV4AvalancheGetters.getPositionManagers();
   }
 
-  function _accessManager() internal view override returns (address) {
+  function _accessManager() internal view virtual override returns (address) {
     return address(AaveV4Avalanche.ACCESS_MANAGER);
   }
 
-  function _spokeConfigurator() internal view override returns (ISpokeConfigurator) {
+  function _spokeConfigurator() internal view virtual override returns (ISpokeConfigurator) {
     return AaveV4Avalanche.SPOKE_CONFIGURATOR;
   }
 }
