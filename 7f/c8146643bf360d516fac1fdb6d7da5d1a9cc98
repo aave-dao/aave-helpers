@@ -1,0 +1,24 @@
+lib/aave-address-book
+  s_3af69c9e9bf54b::t_d0f3554e05ecf6 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7fc8146643bf360d516fac1fdb6d7da5d1a9cc98",
+  "prompts": {},
+  "humans": {
+    "h_8b974fbabf2fb7": {
+      "author": "Alberto <albe@AMWM-H65F40J09H.local>"
+    }
+  },
+  "sessions": {
+    "s_3af69c9e9bf54b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f3c9a-2ffe-7231-b85c-d1432ecfa18e",
+        "model": "gpt-5.5"
+      },
+      "human_author": "Alberto <albe@AMWM-H65F40J09H.local>"
+    }
+  }
+}
