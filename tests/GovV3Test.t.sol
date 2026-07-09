@@ -168,6 +168,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     this.selfExternalCallToCreatePayload(actions);
   }
 
+  /// forge-config: default.isolate = true
   function test_helpers() public {
     defaultTest('default', AaveV3Ethereum.POOL, address(payload));
   }
