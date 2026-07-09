@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.3.4
+
+### Patch Changes
+
+- d740703: update address book
+
 ## 1.3.3
 
 ### Patch Changes
