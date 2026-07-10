@@ -3389,4 +3389,94 @@ export const eventDb: AbiEvent[] = [
     name: 'UpdateInterestRateData',
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'address', name: 'asset', type: 'address' }],
+    name: 'AssetInitialized',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'claimer', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'caller', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'flag', type: 'bool' },
+    ],
+    name: 'ClaimerSet',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'newTimestamp', type: 'uint256' },
+    ],
+    name: 'LastTimestampUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'reward', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'receiver', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'RewardClaimed',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'reward', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'maxEmissionPerSecond', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'distributionEnd', type: 'uint256' },
+      { indexed: false, internalType: 'address', name: 'rewardPayer', type: 'address' },
+    ],
+    name: 'RewardConfigUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'reward', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'newIndex', type: 'uint256' },
+    ],
+    name: 'RewardIndexUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'reward', type: 'address' },
+    ],
+    name: 'RewardInitialized',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'newTargetLiquidity', type: 'uint256' },
+    ],
+    name: 'TargetLiquidityUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'reward', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'newIndex', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'accruedFromLastUpdate', type: 'uint256' },
+    ],
+    name: 'UserDataUpdated',
+    type: 'event',
+  },
 ];
