@@ -9,6 +9,14 @@ tests/ProtocolV3TestBase.t.sol
   "base_commit_sha": "ddd3d419a5ccc92779670c7704a97f882518f64a",
   "prompts": {},
   "sessions": {
+    "s_0b17c34f5ac0d8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f41ed-1e6b-70e0-9a52-4a97aabce23b",
+        "model": "gpt-5.5"
+      },
+      "human_author": "Alberto <albe@AMWM-H65F40J09H.local>"
+    },
     "s_22f80b5bcb6d41": {
       "agent_id": {
         "tool": "codex",
