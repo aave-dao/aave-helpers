@@ -420,16 +420,29 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
       if (update.asset != expectedConfig.underlying) continue;
 
       if (update.ltv != EngineFlags.KEEP_CURRENT) {
+        require(expectedConfig.ltv != update.ltv, 'COLLATERAL_UPDATE_LTV_NO_CHANGE');
         expectedConfig.ltv = update.ltv;
       }
       if (update.liqThreshold != EngineFlags.KEEP_CURRENT) {
+        require(
+          expectedConfig.liquidationThreshold != update.liqThreshold,
+          'COLLATERAL_UPDATE_LIQ_THRESHOLD_NO_CHANGE'
+        );
         expectedConfig.liquidationThreshold = update.liqThreshold;
         expectedConfig.usageAsCollateralEnabled = update.liqThreshold != 0;
       }
       if (update.liqBonus != EngineFlags.KEEP_CURRENT) {
+        require(
+          expectedConfig.liquidationBonus != 100_00 + update.liqBonus,
+          'COLLATERAL_UPDATE_LIQ_BONUS_NO_CHANGE'
+        );
         expectedConfig.liquidationBonus = 100_00 + update.liqBonus;
       }
       if (update.liqProtocolFee != EngineFlags.KEEP_CURRENT) {
+        require(
+          expectedConfig.liquidationProtocolFee != update.liqProtocolFee,
+          'COLLATERAL_UPDATE_LIQ_PROTOCOL_FEE_NO_CHANGE'
+        );
         expectedConfig.liquidationProtocolFee = update.liqProtocolFee;
       }
     }
@@ -444,9 +457,11 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
       if (update.asset != expectedConfig.underlying) continue;
 
       if (update.supplyCap != EngineFlags.KEEP_CURRENT) {
+        require(expectedConfig.supplyCap != update.supplyCap, 'CAPS_UPDATE_SUPPLY_CAP_NO_CHANGE');
         expectedConfig.supplyCap = update.supplyCap;
       }
       if (update.borrowCap != EngineFlags.KEEP_CURRENT) {
+        require(expectedConfig.borrowCap != update.borrowCap, 'CAPS_UPDATE_BORROW_CAP_NO_CHANGE');
         expectedConfig.borrowCap = update.borrowCap;
       }
     }
@@ -461,12 +476,24 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
       if (update.asset != expectedConfig.underlying) continue;
 
       if (update.enabledToBorrow != EngineFlags.KEEP_CURRENT) {
+        require(
+          expectedConfig.borrowingEnabled != EngineFlags.toBool(update.enabledToBorrow),
+          'BORROW_UPDATE_ENABLED_NO_CHANGE'
+        );
         expectedConfig.borrowingEnabled = EngineFlags.toBool(update.enabledToBorrow);
       }
       if (update.reserveFactor != EngineFlags.KEEP_CURRENT) {
+        require(
+          expectedConfig.reserveFactor != update.reserveFactor,
+          'BORROW_UPDATE_RESERVE_FACTOR_NO_CHANGE'
+        );
         expectedConfig.reserveFactor = update.reserveFactor;
       }
       if (update.flashloanable != EngineFlags.KEEP_CURRENT) {
+        require(
+          expectedConfig.isFlashloanable != EngineFlags.toBool(update.flashloanable),
+          'BORROW_UPDATE_FLASHLOANABLE_NO_CHANGE'
+        );
         expectedConfig.isFlashloanable = EngineFlags.toBool(update.flashloanable);
       }
     }
@@ -481,6 +508,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     for (uint256 i = 0; i < freezeAssets.length; i++) {
       if (freezeAssets[i] != expectedConfig.underlying) continue;
 
+      require(expectedConfig.isFrozen != frozenStates[i], 'FREEZE_UPDATE_NO_CHANGE');
       expectedConfig.isFrozen = frozenStates[i];
     }
   }

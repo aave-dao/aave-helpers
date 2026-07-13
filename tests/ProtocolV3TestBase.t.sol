@@ -353,6 +353,9 @@ contract ProtocolV3TestBaseReserveConfigChangesTest is ProtocolV3TestBase {
     uint256 expectedBorrowCap = _expectedCapsChanges()[0].borrowCap;
     assetBSupplyCap = bound(assetBSupplyCap, expectedBorrowCap, 1_000_000_000);
     assetBBorrowCap = bound(assetBBorrowCap, 0, assetBSupplyCap);
+    // the declared borrow cap change must be a real change, so the fuzzed
+    // pre-state borrow cap cannot already equal the expected new value
+    vm.assume(assetBBorrowCap != expectedBorrowCap);
     assetCSupplyCap = bound(assetCSupplyCap, 1, 1_000_000_000);
     assetCBorrowCap = bound(assetCBorrowCap, 0, assetCSupplyCap);
 
@@ -410,6 +413,65 @@ contract ProtocolV3TestBaseReserveConfigChangesTest is ProtocolV3TestBase {
 
     vm.expectRevert(bytes('_validateReserveConfig: InvalidSupplyCap()'));
     this.validateReserveConfigChanges(configsBefore, configsAfter);
+  }
+
+  function test_revertsWhenDeclaredCollateralLtvIsNoChange() public {
+    ReserveConfig[] memory configsBefore = _configsBefore();
+    configsBefore[0].ltv = _expectedCollateralChanges()[0].ltv;
+
+    vm.expectRevert(bytes('COLLATERAL_UPDATE_LTV_NO_CHANGE'));
+    this.validateReserveConfigChanges(configsBefore, _configsAfter());
+  }
+
+  function test_revertsWhenDeclaredCollateralLiqThresholdIsNoChange() public {
+    ReserveConfig[] memory configsBefore = _configsBefore();
+    configsBefore[0].liquidationThreshold = _expectedCollateralChanges()[0].liqThreshold;
+
+    vm.expectRevert(bytes('COLLATERAL_UPDATE_LIQ_THRESHOLD_NO_CHANGE'));
+    this.validateReserveConfigChanges(configsBefore, _configsAfter());
+  }
+
+  function test_revertsWhenDeclaredCollateralLiqBonusIsNoChange() public {
+    ReserveConfig[] memory configsBefore = _configsBefore();
+    configsBefore[0].liquidationBonus = 100_00 + _expectedCollateralChanges()[0].liqBonus;
+
+    vm.expectRevert(bytes('COLLATERAL_UPDATE_LIQ_BONUS_NO_CHANGE'));
+    this.validateReserveConfigChanges(configsBefore, _configsAfter());
+  }
+
+  function test_revertsWhenDeclaredBorrowCapIsNoChange() public {
+    ReserveConfig[] memory configsBefore = _configsBefore();
+    configsBefore[1].borrowCap = _expectedCapsChanges()[0].borrowCap;
+
+    vm.expectRevert(bytes('CAPS_UPDATE_BORROW_CAP_NO_CHANGE'));
+    this.validateReserveConfigChanges(configsBefore, _configsAfter());
+  }
+
+  function test_revertsWhenDeclaredBorrowingEnabledIsNoChange() public {
+    ReserveConfig[] memory configsBefore = _configsBefore();
+    configsBefore[1].borrowingEnabled = EngineFlags.toBool(
+      _expectedBorrowChanges()[0].enabledToBorrow
+    );
+
+    vm.expectRevert(bytes('BORROW_UPDATE_ENABLED_NO_CHANGE'));
+    this.validateReserveConfigChanges(configsBefore, _configsAfter());
+  }
+
+  function test_revertsWhenDeclaredReserveFactorIsNoChange() public {
+    ReserveConfig[] memory configsBefore = _configsBefore();
+    configsBefore[1].reserveFactor = _expectedBorrowChanges()[0].reserveFactor;
+
+    vm.expectRevert(bytes('BORROW_UPDATE_RESERVE_FACTOR_NO_CHANGE'));
+    this.validateReserveConfigChanges(configsBefore, _configsAfter());
+  }
+
+  function test_revertsWhenDeclaredFreezeIsNoChange() public {
+    ReserveConfig[] memory configsBefore = _configsBefore();
+    (, bool[] memory frozen) = _expectedFreezeChanges();
+    configsBefore[2].isFrozen = frozen[0];
+
+    vm.expectRevert(bytes('FREEZE_UPDATE_NO_CHANGE'));
+    this.validateReserveConfigChanges(configsBefore, _configsAfter());
   }
 
   function validateReserveConfigChanges(
@@ -527,9 +589,10 @@ contract ProtocolV3TestBaseReserveConfigChangesTest is ProtocolV3TestBase {
     ReserveConfig[] memory configsBefore
   ) internal pure returns (ReserveConfig[] memory) {
     ReserveConfig[] memory configs = new ReserveConfig[](4);
-    configs[0] = configsBefore[0];
-    configs[1] = configsBefore[1];
-    configs[2] = configsBefore[2];
+    // clone to avoid mutating the shared memory structs of `configsBefore`
+    configs[0] = _clone(configsBefore[0]);
+    configs[1] = _clone(configsBefore[1]);
+    configs[2] = _clone(configsBefore[2]);
     configs[0].ltv = 0;
     configs[0].liquidationThreshold = 0;
     configs[0].liquidationBonus = 105_00;
