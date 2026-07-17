@@ -53,10 +53,12 @@ contract CommonTestBase is Test {
     GovV3Helpers.executePayload(vm, payload, address(payloadsController));
   }
 
-  // EIP-7825 (Fusaka) per-tx gas cap, used as a conservative floor for every chain: a payload that fits
-  // within it is executable on any supported chain. Can be replaced with an on-chain read once EIP-8123
-  // is accepted, or overridden per chain where a higher limit is needed.
   function _getMaxPayloadGas() internal view virtual returns (uint256) {
+    if (
+      block.chainid == ChainIds.MANTLE ||
+      block.chainid == ChainIds.MONAD ||
+      block.chainid == ChainIds.MEGAETH
+    ) return 30_000_000;
     return 16_777_216;
   }
 
