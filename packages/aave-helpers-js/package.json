@@ -36,7 +36,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@aave-dao/aave-address-book": "^4.58.0",
+    "@aave-dao/aave-address-book": "^4.61.0",
     "@aave-dao/toolbox": "^0.5.0",
     "commander": "^14.0.3",
     "find-object-paths": "^1.1.0",
