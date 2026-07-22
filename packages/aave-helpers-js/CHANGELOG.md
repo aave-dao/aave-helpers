@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.3.6
+
+### Patch Changes
+
+- 5d673a0: update address book to 4.61.0
+
 ## 1.3.5
 
 ### Patch Changes
