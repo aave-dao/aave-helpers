@@ -46,7 +46,7 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "tsdown": "^0.20.3",
-    "typescript": "^5.8.3",
+    "typescript": "^7.0.2",
     "vitest": "^4.0.18"
   },
   "publishConfig": {
