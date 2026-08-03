@@ -6,7 +6,9 @@ import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
 import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
 
-import {ISpoke, IHub, ITokenizationSpoke, INativeTokenGateway, ISignatureGateway, IGiverPositionManager, ITakerPositionManager, IConfigPositionManager, PositionManagers, IAaveV4ConfigEngine, IAccessManagerEnumerable} from 'aave-address-book/AaveV4.sol';
+import {ISpoke, IHub, ITokenizationSpoke, INativeTokenGateway, ISignatureGateway, IGiverPositionManager, ITakerPositionManager, IConfigPositionManager, PositionManagers, IAaveV4ConfigEngine, IAccessManagerEnumerable, IAaveOracle} from 'aave-address-book/AaveV4.sol';
+import {IAccessManaged} from 'aave-v4/dependencies/openzeppelin/IAccessManaged.sol';
+import {DeployConstants} from 'aave-v4/deployments/utils/libraries/DeployConstants.sol';
 import {IPayloadsControllerCore, PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
 import {GovV3Helpers} from 'src/GovV3Helpers.sol';
 import {SeatbeltUtils} from 'src/SeatbeltUtils.sol';
@@ -223,6 +225,27 @@ abstract contract ProtocolV4TestBase is
         'ROLE_DIVERGENCE_VS_REFERENCE_TARGET'
       );
     }
+  }
+
+  /// @notice Assert a spoke a payload brings online is deployed and wired to the market.
+  /// @dev Covers what the config engine cannot: the engine configures a spoke but never checks it
+  ///      was deployed against this market's AccessManager and oracle.
+  function _assertSpokeDeployment(ISpoke spoke) internal view {
+    assertGt(address(spoke).code.length, 0, 'SPOKE_HAS_NO_CODE');
+    assertEq(
+      IAccessManaged(address(spoke)).authority(),
+      _accessManager(),
+      'SPOKE_AUTHORITY_MISMATCH'
+    );
+
+    address oracle = spoke.ORACLE();
+    assertGt(oracle.code.length, 0, 'SPOKE_ORACLE_HAS_NO_CODE');
+    assertEq(IAaveOracle(oracle).spoke(), address(spoke), 'SPOKE_ORACLE_NOT_BOUND_TO_SPOKE');
+    assertEq(
+      uint256(IAaveOracle(oracle).decimals()),
+      uint256(DeployConstants.ORACLE_DECIMALS),
+      'SPOKE_ORACLE_DECIMALS_MISMATCH'
+    );
   }
 
   function _snapshotDiffAndExecute(
