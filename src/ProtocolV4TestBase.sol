@@ -6,7 +6,7 @@ import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
 import {Strings} from 'openzeppelin-contracts/contracts/utils/Strings.sol';
 
-import {ISpoke, IHub, ITokenizationSpoke, INativeTokenGateway, ISignatureGateway, IGiverPositionManager, ITakerPositionManager, IConfigPositionManager, PositionManagers} from 'aave-address-book/AaveV4.sol';
+import {ISpoke, IHub, ITokenizationSpoke, INativeTokenGateway, ISignatureGateway, IGiverPositionManager, ITakerPositionManager, IConfigPositionManager, PositionManagers, IAaveV4ConfigEngine, IAccessManagerEnumerable} from 'aave-address-book/AaveV4.sol';
 import {IPayloadsControllerCore, PayloadsControllerUtils} from 'aave-address-book/GovernanceV3.sol';
 import {GovV3Helpers} from 'src/GovV3Helpers.sol';
 import {SeatbeltUtils} from 'src/SeatbeltUtils.sol';
@@ -199,6 +199,29 @@ abstract contract ProtocolV4TestBase is
         continue;
       }
       require(sumDraw <= sumAdd, 'PL_ADD_LT_DRAW');
+    }
+  }
+
+  /// @notice Assert a payload's declared role wiring landed on its AccessManager. Call after execution.
+  /// @param item One entry of the payload's `accessManagerTargetFunctionRoleUpdates()`.
+  /// @param referenceTarget Already-wired contract asserted to carry the same role per selector,
+  ///        or `address(0)` to skip that check.
+  function _assertRolesWired(
+    IAaveV4ConfigEngine.TargetFunctionRoleUpdate memory item,
+    address referenceTarget
+  ) internal view {
+    IAccessManagerEnumerable accessManager = IAccessManagerEnumerable(item.authority);
+    for (uint256 i; i < item.selectors.length; ++i) {
+      uint64 roleId = accessManager.getTargetFunctionRole(item.target, item.selectors[i]);
+      assertEq(uint256(roleId), uint256(item.roleId), 'ROLE_NOT_WIRED');
+      if (referenceTarget == address(0)) {
+        continue;
+      }
+      assertEq(
+        uint256(roleId),
+        uint256(accessManager.getTargetFunctionRole(referenceTarget, item.selectors[i])),
+        'ROLE_DIVERGENCE_VS_REFERENCE_TARGET'
+      );
     }
   }
 

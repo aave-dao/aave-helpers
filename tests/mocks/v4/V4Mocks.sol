@@ -179,6 +179,15 @@ contract MockHub {
     return (_assets[assetId].underlying, _assets[assetId].decimals);
   }
 
+  function getAssetId(address underlying) external view returns (uint256) {
+    for (uint256 i; i < _assets.length; i++) {
+      if (_assets[i].underlying == underlying) {
+        return i;
+      }
+    }
+    revert('MockHub: asset not listed');
+  }
+
   function getSpokeCount(uint256 assetId) external view returns (uint256) {
     return _spokesByAsset[assetId].length;
   }
@@ -192,5 +201,24 @@ contract MockHub {
     address spoke
   ) external view returns (IHub.SpokeConfig memory) {
     return _spokeConfigs[assetId][spoke];
+  }
+}
+
+/// @notice Spoke fixture exposing `asset()`, the single call that distinguishes a
+/// TokenizationSpoke from the other spoke kinds registered on a hub asset.
+contract MockTokenizationSpoke {
+  address public asset;
+
+  constructor(address asset_) {
+    asset = asset_;
+  }
+}
+
+/// @notice ProxyAdmin fixture exposing `owner()`.
+contract MockOwnable {
+  address public owner;
+
+  constructor(address owner_) {
+    owner = owner_;
   }
 }
