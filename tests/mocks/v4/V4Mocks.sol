@@ -14,11 +14,22 @@ contract MockERC20Symbol {
   }
 }
 
-/// @notice Minimal IAaveOracle mock. Only the two functions SnapshotV4 reads
-/// (`getReserveSource`, `getReservePrice`) are implemented.
+/// @notice Minimal IAaveOracle mock covering the reads SnapshotV4 and the spoke deployment
+/// assertions perform (`getReserveSource`, `getReservePrice`, `spoke`, `decimals`).
 contract MockOracle {
   mapping(uint256 => address) private _sources;
   mapping(uint256 => uint256) private _prices;
+
+  address public spoke;
+  uint8 public decimals = 8;
+
+  function setSpoke(address spoke_) external {
+    spoke = spoke_;
+  }
+
+  function setDecimals(uint8 decimals_) external {
+    decimals = decimals_;
+  }
 
   function setReserve(uint256 reserveId, address source, uint256 price) external {
     _sources[reserveId] = source;
@@ -62,6 +73,7 @@ contract MockIR {
 /// @notice Minimal ISpoke mock covering the reads SnapshotV4 performs on a spoke.
 contract MockSpoke {
   address public ORACLE;
+  address public authority;
   uint16 public MAX_USER_RESERVES_LIMIT;
   ISpoke.LiquidationConfig private _liqConfig;
 
@@ -71,6 +83,10 @@ contract MockSpoke {
 
   function setOracle(address oracle) external {
     ORACLE = oracle;
+  }
+
+  function setAuthority(address authority_) external {
+    authority = authority_;
   }
 
   function setMaxUserReservesLimit(uint16 limit) external {
@@ -179,6 +195,15 @@ contract MockHub {
     return (_assets[assetId].underlying, _assets[assetId].decimals);
   }
 
+  function getAssetId(address underlying) external view returns (uint256) {
+    for (uint256 i; i < _assets.length; i++) {
+      if (_assets[i].underlying == underlying) {
+        return i;
+      }
+    }
+    revert('MockHub: asset not listed');
+  }
+
   function getSpokeCount(uint256 assetId) external view returns (uint256) {
     return _spokesByAsset[assetId].length;
   }
@@ -192,5 +217,60 @@ contract MockHub {
     address spoke
   ) external view returns (IHub.SpokeConfig memory) {
     return _spokeConfigs[assetId][spoke];
+  }
+}
+
+/// @notice Spoke fixture exposing `asset()`, the single call that distinguishes a
+/// TokenizationSpoke from the other spoke kinds registered on a hub asset.
+contract MockTokenizationSpoke {
+  address public asset;
+
+  constructor(address asset_) {
+    asset = asset_;
+  }
+}
+
+/// @notice ProxyAdmin fixture exposing `owner()`.
+contract MockOwnable {
+  address public owner;
+
+  constructor(address owner_) {
+    owner = owner_;
+  }
+}
+
+/// @notice AccessManager fixture recording every `setTargetFunctionRole` call, so a wiring builder
+/// can be compared against what the aave-v4 deployment procedures actually assign.
+contract MockRecordingAccessManager {
+  struct RoleAssignment {
+    address target;
+    bytes4 selector;
+    uint64 roleId;
+  }
+
+  RoleAssignment[] private _assignments;
+  mapping(address => mapping(bytes4 => uint64)) private _targetFunctionRoles;
+
+  function setTargetFunctionRole(
+    address target,
+    bytes4[] calldata selectors,
+    uint64 roleId
+  ) external {
+    for (uint256 i; i < selectors.length; i++) {
+      _assignments.push(RoleAssignment({target: target, selector: selectors[i], roleId: roleId}));
+      _targetFunctionRoles[target][selectors[i]] = roleId;
+    }
+  }
+
+  function getTargetFunctionRole(address target, bytes4 selector) external view returns (uint64) {
+    return _targetFunctionRoles[target][selector];
+  }
+
+  function assignmentCount() external view returns (uint256) {
+    return _assignments.length;
+  }
+
+  function assignmentAt(uint256 index) external view returns (RoleAssignment memory) {
+    return _assignments[index];
   }
 }

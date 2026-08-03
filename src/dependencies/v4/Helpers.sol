@@ -2,9 +2,10 @@
 pragma solidity ^0.8.0;
 
 import {IERC20Metadata} from 'openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol';
+import {Ownable} from 'openzeppelin-contracts/contracts/access/Ownable.sol';
 import {IAccessManaged} from 'aave-v4/dependencies/openzeppelin/IAccessManaged.sol';
 import {HubConfigurator} from 'aave-v4/hub/HubConfigurator.sol';
-import {ISpoke, IHub, IHubConfigurator, IAaveOracle} from 'aave-address-book/AaveV4.sol';
+import {ISpoke, IHub, IHubConfigurator, IAaveOracle, ITokenizationSpoke} from 'aave-address-book/AaveV4.sol';
 import {Types} from 'src/dependencies/v4/Types.sol';
 import {Actions} from 'src/dependencies/v4/Actions.sol';
 
@@ -12,6 +13,10 @@ import {Actions} from 'src/dependencies/v4/Actions.sol';
 /// @notice Query and utility functions for V4 e2e tests.
 abstract contract Helpers is Actions {
   uint256 internal constant WAD = 1e18;
+
+  /// @notice ERC-1967 admin storage slot, holding the ProxyAdmin of a transparent proxy.
+  bytes32 internal constant ERC1967_ADMIN_SLOT =
+    0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
 
   /// @notice Multiply `value` by WAD (1e18).
   function _wadScaleUp(uint256 value) internal pure returns (uint256) {
@@ -59,6 +64,28 @@ abstract contract Helpers is Actions {
       });
     }
     return info;
+  }
+
+  /// @notice Find the TokenizationSpoke registered on `hub` for `underlying`, scanning backwards so
+  ///         the most recently registered one wins. Returns `address(0)` when the asset has none.
+  /// @dev A TokenizationSpoke is the only spoke kind exposing `asset()`, so probing it identifies it.
+  function _findTokenizationSpoke(IHub hub, address underlying) internal view returns (address) {
+    uint256 assetId = hub.getAssetId(underlying);
+    for (uint256 i = hub.getSpokeCount(assetId); i > 0; --i) {
+      address spoke = hub.getSpokeAddress(assetId, i - 1);
+      try ITokenizationSpoke(spoke).asset() returns (address tokenized) {
+        if (tokenized == underlying) {
+          return spoke;
+        }
+      } catch {}
+    }
+    return address(0);
+  }
+
+  /// @notice Return the owner of the ProxyAdmin governing a transparent proxy.
+  function _proxyAdminOwner(address proxy) internal view returns (address) {
+    address proxyAdmin = address(uint160(uint256(vm.load(proxy, ERC1967_ADMIN_SLOT))));
+    return Ownable(proxyAdmin).owner();
   }
 
   /// @notice Return all usable collaterals: not paused, not frozen, collateralFactor > 0.
