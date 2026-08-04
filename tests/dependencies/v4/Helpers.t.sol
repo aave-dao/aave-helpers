@@ -7,6 +7,9 @@ import {Helpers} from 'src/dependencies/v4/Helpers.sol';
 import {MockHub, MockSpoke, MockTokenizationSpoke, MockOwnable, MockERC20Symbol} from 'tests/mocks/v4/V4Mocks.sol';
 
 contract HelpersTest is Test, Helpers {
+  /// @dev The slot `_proxyAdminOwner` reads, from the ERC-1967 spec: keccak256('eip1967.proxy.admin') - 1.
+  bytes32 internal constant ADMIN_SLOT = bytes32(uint256(keccak256('eip1967.proxy.admin')) - 1);
+
   MockHub internal hub;
   MockERC20Symbol internal underlying;
 
@@ -53,18 +56,36 @@ contract HelpersTest is Test, Helpers {
     assertEq(_findTokenizationSpoke(IHub(address(hub)), address(underlying)), newest);
   }
 
+  function test_getTokenizationSpoke() public {
+    address tokenizationSpoke = address(new MockTokenizationSpoke(address(underlying)));
+    _registerSpoke(tokenizationSpoke);
+
+    assertEq(_getTokenizationSpoke(IHub(address(hub)), address(underlying)), tokenizationSpoke);
+  }
+
+  function test_getTokenizationSpoke_revertsWhenNoneRegistered() public {
+    _registerSpoke(address(new MockSpoke()));
+
+    vm.expectRevert(bytes('TOKENIZATION_SPOKE_NOT_FOUND'));
+    this.getTokenizationSpoke(IHub(address(hub)), address(underlying));
+  }
+
+  /// @dev External entrypoint, so `vm.expectRevert` applies to the reverting call frame.
+  function getTokenizationSpoke(
+    IHub targetHub,
+    address targetUnderlying
+  ) external view returns (address) {
+    return _getTokenizationSpoke(targetHub, targetUnderlying);
+  }
+
+  /// @dev Stores at the spec-derived slot, so it also pins the slot `_proxyAdminOwner` reads.
   function test_proxyAdminOwner() public {
     address expectedOwner = makeAddr('PROXY_ADMIN_OWNER');
     address proxyAdmin = address(new MockOwnable(expectedOwner));
     address proxy = makeAddr('PROXY');
-    vm.store(proxy, ERC1967_ADMIN_SLOT, bytes32(uint256(uint160(proxyAdmin))));
+    vm.store(proxy, ADMIN_SLOT, bytes32(uint256(uint160(proxyAdmin))));
 
     assertEq(_proxyAdminOwner(proxy), expectedOwner);
-  }
-
-  /// @dev Pins the slot against the ERC-1967 spec value: keccak256('eip1967.proxy.admin') - 1.
-  function test_erc1967AdminSlot() public pure {
-    assertEq(ERC1967_ADMIN_SLOT, bytes32(uint256(keccak256('eip1967.proxy.admin')) - 1));
   }
 
   function _addAsset(address assetUnderlying) internal {
