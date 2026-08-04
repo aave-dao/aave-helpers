@@ -15,7 +15,7 @@ abstract contract Helpers is Actions {
   uint256 internal constant WAD = 1e18;
 
   /// @notice ERC-1967 admin storage slot, holding the ProxyAdmin of a transparent proxy.
-  bytes32 internal constant ERC1967_ADMIN_SLOT =
+  bytes32 private constant ERC1967_ADMIN_SLOT =
     0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103;
 
   /// @notice Multiply `value` by WAD (1e18).
@@ -80,6 +80,16 @@ abstract contract Helpers is Actions {
       } catch {}
     }
     return address(0);
+  }
+
+  /// @notice Find the TokenizationSpoke registered on `hub` for `underlying`, reverting when the
+  ///         asset has none.
+  /// @dev For tests asserting over a wrapper they expect to exist; `_findTokenizationSpoke` is the
+  ///      one to use to assert an asset has no wrapper.
+  function _getTokenizationSpoke(IHub hub, address underlying) internal view returns (address) {
+    address spoke = _findTokenizationSpoke(hub, underlying);
+    require(spoke != address(0), 'TOKENIZATION_SPOKE_NOT_FOUND');
+    return spoke;
   }
 
   /// @notice Return the owner of the ProxyAdmin governing a transparent proxy.
