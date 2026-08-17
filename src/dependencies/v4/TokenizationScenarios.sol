@@ -68,7 +68,7 @@ abstract contract TokenizationScenarios is TokenizationActions {
     Types.ReserveInfo memory reserveInfo,
     uint256 maxAddAmount
   ) internal {
-    (address user, uint256 userPrivateKey) = makeAddrAndKey('user');
+    (uint256 userPrivateKey, address user) = _makeSigner();
     uint256 depositAmount = vm.randomUint(1, maxAddAmount);
 
     // Deposit
@@ -105,7 +105,7 @@ abstract contract TokenizationScenarios is TokenizationActions {
     Types.ReserveInfo memory reserveInfo,
     uint256 maxAddAmount
   ) internal {
-    (address user, uint256 userPrivateKey) = makeAddrAndKey('mintUser');
+    (uint256 userPrivateKey, address user) = _makeSigner();
     uint256 mintAssets = vm.randomUint(1, maxAddAmount);
     uint256 mintShares = tokenizationSpoke.convertToShares(mintAssets);
 

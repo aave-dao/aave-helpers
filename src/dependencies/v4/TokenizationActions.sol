@@ -550,7 +550,7 @@ abstract contract TokenizationActions is Helpers {
     Types.ReserveInfo memory reserveInfo,
     uint256 assets
   ) internal {
-    (address user, uint256 userPrivateKey) = makeAddrAndKey('user');
+    (uint256 userPrivateKey, address user) = _makeSigner();
 
     Types.TokenizationSnapshot memory snapshotBefore = _getTokenizationSnapshot(
       tokenizationSpoke,

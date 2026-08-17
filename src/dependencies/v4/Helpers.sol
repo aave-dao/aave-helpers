@@ -33,6 +33,17 @@ abstract contract Helpers is Actions {
     return value * 10 ** decimals;
   }
 
+  /// @notice Derive a fresh key pair to sign EIP-712 payloads with.
+  /// @dev Not `makeAddrAndKey`: a fixed label derives a publicly known address, and anyone can
+  ///      attach EIP-7702 code to it on a live network. Any code there sends `SignatureChecker`
+  ///      down its ERC-1271 branch, so every `*WithSig` call reverts on a latest-block fork.
+  /// @return privateKey Key to pass to `vm.sign`.
+  /// @return signer Address derived from `privateKey`.
+  function _makeSigner() internal returns (uint256 privateKey, address signer) {
+    privateKey = vm.randomUint(1, type(uint248).max);
+    signer = vm.addr(privateKey);
+  }
+
   /// @notice Build ReserveInfo[] for all reserves on a spoke.
   function _getReserveInfo(ISpoke spoke) internal view returns (Types.ReserveInfo[] memory) {
     uint256 count = spoke.getReserveCount();
