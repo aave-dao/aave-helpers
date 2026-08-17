@@ -1,5 +1,17 @@
 # @aave-dao/aave-helpers-js
 
+## 1.4.0
+
+### Minor Changes
+
+- cd50b32: Add `_getTokenizationSpoke`, the reverting counterpart of `_findTokenizationSpoke`, and make `ERC1967_ADMIN_SLOT` private
+- f1c2c02: Add V4 payload presets (`V4EngineDefaults`, `V4RoleWiring`) and V4 test helpers (`_findTokenizationSpoke`, `_proxyAdminOwner`, `_assertRolesWired`, `_assertSpokeDeployment`); update address book to 4.62.1
+
+### Patch Changes
+
+- 59efe2a: update address book to 4.65.6
+- 59efe2a: Derive V4 tokenization test signers from a random key instead of a fixed `makeAddrAndKey` label, so `*WithSig` flows keep working when the well-known address picks up EIP-7702 code on a live network
+
 ## 1.3.7
 
 ### Patch Changes
