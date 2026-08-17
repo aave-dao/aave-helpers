@@ -3479,4 +3479,126 @@ export const eventDb: AbiEvent[] = [
     name: 'UserDataUpdated',
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'backer', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'ghoAmount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'remainingLoss', type: 'uint256' },
+    ],
+    name: 'BackingProvided',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'burner', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'ghoOutstanding', type: 'uint256' },
+    ],
+    name: 'BurnAfterSeize',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'originator', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'receiver', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'underlyingAmount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'ghoAmount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'fee', type: 'uint256' },
+    ],
+    name: 'BuyAsset',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'uint256', name: 'oldExposureCap', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'newExposureCap', type: 'uint256' },
+    ],
+    name: 'ExposureCapUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'oldFeeStrategy', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newFeeStrategy', type: 'address' },
+    ],
+    name: 'FeeStrategyUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'ghoTreasury', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'FeesDistributedToTreasury',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'address', name: 'oldReserve', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'newReserve', type: 'address' },
+    ],
+    name: 'GhoReserveUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'oldGhoTreasury', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newGhoTreasury', type: 'address' },
+    ],
+    name: 'GhoTreasuryUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'seizer', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'recipient', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'underlyingAmount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'ghoOutstanding', type: 'uint256' },
+    ],
+    name: 'Seized',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'originator', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'receiver', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'underlyingAmount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'ghoAmount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'fee', type: 'uint256' },
+    ],
+    name: 'SellAsset',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'freezer', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'enabled', type: 'bool' },
+    ],
+    name: 'SwapFreeze',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'tokenRescued', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'recipient', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amountRescued', type: 'uint256' },
+    ],
+    name: 'TokensRescued',
+    type: 'event',
+  },
 ];
