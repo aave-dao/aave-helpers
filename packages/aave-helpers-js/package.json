@@ -1,6 +1,6 @@
 {
   "name": "@aave-dao/aave-helpers-js",
-  "version": "1.3.7",
+  "version": "1.4.0",
   "license": "MIT",
   "type": "module",
   "exports": {
