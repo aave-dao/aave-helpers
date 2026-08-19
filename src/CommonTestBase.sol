@@ -11,6 +11,7 @@ import {AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3AvalancheAssets} from 'aave-address-book/AaveV3Avalanche.sol';
+import {AaveV3MonadAssets} from 'aave-address-book/AaveV3Monad.sol';
 import {AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3GnosisAssets} from 'aave-address-book/AaveV3Gnosis.sol';
 import {AaveV3BaseAssets} from 'aave-address-book/AaveV3Base.sol';
@@ -154,6 +155,14 @@ contract CommonTestBase is Test {
       // AUSD
       if (asset == AaveV3AvalancheAssets.AUSD_UNDERLYING) {
         vm.prank(0x12A0d0F4Ea75A01C69eD6bfD20aa7d1ef1550458);
+        IERC20(asset).transfer(user, amount);
+        return true;
+      }
+    }
+    if (block.chainid == ChainIds.MONAD) {
+      // AUSD
+      if (asset == AaveV3MonadAssets.AUSD_UNDERLYING) {
+        vm.prank(0xBA3d60f5000f472aef947FB8020a3E6319F9a0B7);
         IERC20(asset).transfer(user, amount);
         return true;
       }
