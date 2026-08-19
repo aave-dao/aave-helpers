@@ -162,7 +162,7 @@ contract CommonTestBase is Test {
     if (block.chainid == ChainIds.MONAD) {
       // AUSD
       if (asset == AaveV3MonadAssets.AUSD_UNDERLYING) {
-        vm.prank(0xdeBFeDF35faEd5d1664E553545e144C02227A2Ec);
+        vm.prank(0xBA3d60f5000f472aef947FB8020a3E6319F9a0B7);
         IERC20(asset).transfer(user, amount);
         return true;
       }
