@@ -3479,4 +3479,207 @@ export const eventDb: AbiEvent[] = [
     name: 'UserDataUpdated',
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'contractAddress', type: 'address' },
+      { indexed: true, internalType: 'bool', name: 'isRestricted', type: 'bool' },
+    ],
+    name: 'AddressRestricted',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'uint8', name: 'eModeCategoryId', type: 'uint8' },
+      { indexed: true, internalType: 'bool', name: 'isRestricted', type: 'bool' },
+    ],
+    name: 'EModeRestricted',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        components: [
+          {
+            components: [
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'ltv',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'liquidationThreshold',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'liquidationBonus',
+                type: 'tuple',
+              },
+            ],
+            internalType: 'struct IRiskSteward.CollateralConfig',
+            name: 'collateralConfig',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'ltv',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'liquidationThreshold',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'liquidationBonus',
+                type: 'tuple',
+              },
+            ],
+            internalType: 'struct IRiskSteward.EmodeConfig',
+            name: 'eModeConfig',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'baseVariableBorrowRate',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'variableRateSlope1',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'variableRateSlope2',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'optimalUsageRatio',
+                type: 'tuple',
+              },
+            ],
+            internalType: 'struct IRiskSteward.RateConfig',
+            name: 'rateConfig',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'supplyCap',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'borrowCap',
+                type: 'tuple',
+              },
+            ],
+            internalType: 'struct IRiskSteward.CapConfig',
+            name: 'capConfig',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'priceCapLst',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'priceCapStable',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint256', name: 'maxPercentChange', type: 'uint256' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'discountRatePendle',
+                type: 'tuple',
+              },
+            ],
+            internalType: 'struct IRiskSteward.PriceCapConfig',
+            name: 'priceCapConfig',
+            type: 'tuple',
+          },
+        ],
+        indexed: true,
+        internalType: 'struct IRiskSteward.Config',
+        name: 'riskConfig',
+        type: 'tuple',
+      },
+    ],
+    name: 'RiskConfigSet',
+    type: 'event',
+  },
 ];
