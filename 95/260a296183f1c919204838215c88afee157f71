@@ -1,0 +1,19 @@
+.changeset/decode-risk-steward-events.md
+  s_f03a1fc6cc8b23::t_8608c51a1a61ff 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "95260a296183f1c919204838215c88afee157f71",
+  "prompts": {},
+  "sessions": {
+    "s_f03a1fc6cc8b23": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01a63-271c-73b3-8034-89ab940867a0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "AlbertoCentonze <11707683+AlbertoCentonze@users.noreply.github.com>"
+    }
+  }
+}
