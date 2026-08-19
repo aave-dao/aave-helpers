@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.4.1
+
+### Patch Changes
+
+- 6c07642: Decode RiskSteward events in protocol diffs.
+
 ## 1.4.0
 
 ### Minor Changes
