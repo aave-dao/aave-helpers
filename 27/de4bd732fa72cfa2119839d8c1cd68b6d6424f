@@ -1,0 +1,21 @@
+foundry.lock
+  s_230ef88db3c189::t_dcd5d01424b240 5
+lib/aave-address-book
+  s_230ef88db3c189::t_fa271d674a2474 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "27de4bd732fa72cfa2119839d8c1cd68b6d6424f",
+  "prompts": {},
+  "sessions": {
+    "s_230ef88db3c189": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f7e82-9f09-7752-9ac6-6984381a9ded",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "AlbertoCentonze <11707683+AlbertoCentonze@users.noreply.github.com>"
+    }
+  }
+}
