@@ -1,0 +1,25 @@
+src/dependencies/v4/Scenarios.sol
+  0e36084a45611522 448,453
+src/dependencies/v4/GatewayScenarios.sol
+  0e36084a45611522 7-12,70-74,390,440,489-493,527,718,720-729,748
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "baa6c0735f7de93b90bd355104bc9827eda698db",
+  "prompts": {
+    "0e36084a45611522": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "775db6dc-fe30-40c4-823e-3d0971ec91e5",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 33,
+      "total_deletions": 22,
+      "accepted_lines": 33,
+      "overriden_lines": 0
+    }
+  }
+}

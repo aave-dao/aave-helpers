@@ -1,0 +1,22 @@
+src/ProtocolV3TestBase.sol
+  s_59edd78a894f70::t_63fe35962f0103 460,464
+  s_59edd78a894f70::t_39277b234cb60d 423,427-430,435-438,442-445
+  s_59edd78a894f70::t_5e1c3545c22269 479-482,486-489,493-496
+  s_59edd78a894f70::t_e5032ae607a1eb 511
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "634a86b1bfde3fc6803e13cf86d347a0b2f38603",
+  "prompts": {},
+  "sessions": {
+    "s_59edd78a894f70": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc900c02-c2c3-4aa2-b5e6-eed7b8cd7e79",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "AlbertoCentonze <11707683+AlbertoCentonze@users.noreply.github.com>"
+    }
+  }
+}

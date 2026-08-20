@@ -1,0 +1,33 @@
+tests/dependencies/v4/SnapshotV4Base.t.sol
+  h_71908bb6884da4 12
+tests/dependencies/v4/SnapshotV4.t.sol
+  h_71908bb6884da4 1-177
+foundry.toml
+  s_a597f4817e1145::t_272ce111f40948 8-11
+tests/dependencies/v4/V4DiffWriter.t.sol
+  s_a597f4817e1145::t_3167cd547f4509 1-25,30-55,58,66-114,116-216
+  s_a597f4817e1145::t_c08c1b4f67e806 115
+  s_a597f4817e1145::t_a2d887536444ea 56-57,59-65
+  s_a597f4817e1145::t_69e85df7473c6b 26-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "ed8218ae77693a19a5f7159e20600f4cbd3f59ef",
+  "prompts": {},
+  "humans": {
+    "h_71908bb6884da4": {
+      "author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_a597f4817e1145": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "681d57b5-de05-4b37-add9-20da8975b32c",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  }
+}

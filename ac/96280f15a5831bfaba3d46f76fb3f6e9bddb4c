@@ -1,0 +1,19 @@
+packages/aave-helpers-js/utils/eventDb.ts
+  s_f03a1fc6cc8b23::t_11388135f032a7 3482-3684
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "ac96280f15a5831bfaba3d46f76fb3f6e9bddb4c",
+  "prompts": {},
+  "sessions": {
+    "s_f03a1fc6cc8b23": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01a63-271c-73b3-8034-89ab940867a0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "AlbertoCentonze <11707683+AlbertoCentonze@users.noreply.github.com>"
+    }
+  }
+}

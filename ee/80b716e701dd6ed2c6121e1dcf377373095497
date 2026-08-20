@@ -1,0 +1,23 @@
+src/dependencies/v4/Scenarios.sol
+  07a4ded55d620177 21,23,28,30-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.6",
+  "base_commit_sha": "ee80b716e701dd6ed2c6121e1dcf377373095497",
+  "prompts": {
+    "07a4ded55d620177": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b2054091-12b1-4b12-b6d2-d6870eca7836",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 11,
+      "total_deletions": 11,
+      "accepted_lines": 10,
+      "overriden_lines": 1
+    }
+  }
+}

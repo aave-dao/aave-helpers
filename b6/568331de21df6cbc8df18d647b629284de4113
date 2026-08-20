@@ -1,0 +1,31 @@
+src/dependencies/v4/Actions.sol
+  h_ac33fd5bdc4037 428,482-507,526-527,534-535,538-539,542
+  0e36084a45611522 421-424,426,515-516,520,529-531,537,540-541,543-558
+src/dependencies/v4/Scenarios.sol
+  h_ac33fd5bdc4037 341,348,350,357,359
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "b6568331de21df6cbc8df18d647b629284de4113",
+  "prompts": {
+    "0e36084a45611522": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "775db6dc-fe30-40c4-823e-3d0971ec91e5",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "YBM",
+      "messages": [],
+      "total_additions": 8,
+      "total_deletions": 6,
+      "accepted_lines": 61,
+      "overriden_lines": 2
+    }
+  },
+  "humans": {
+    "h_ac33fd5bdc4037": {
+      "author": "YBM"
+    }
+  }
+}

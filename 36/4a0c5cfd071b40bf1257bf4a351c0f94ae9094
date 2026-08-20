@@ -1,0 +1,22 @@
+src/dependencies/v4/SnapshotV4.sol
+  bef57e8811ec195a 44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "364a0c5cfd071b40bf1257bf4a351c0f94ae9094",
+  "prompts": {
+    "bef57e8811ec195a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5831686-2a73-4166-bd75-00f7f9c34913",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "YBM",
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}

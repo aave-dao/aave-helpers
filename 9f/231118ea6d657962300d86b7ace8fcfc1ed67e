@@ -1,0 +1,65 @@
+packages/aave-helpers-js/snapshot-types-v4.ts
+  s_bef57e8811ec19::t_def74dccae7fb9 63,65,74,83
+src/dependencies/v4/SnapshotV4.sol
+  s_bef57e8811ec19::t_fe76d27f277ac1 185,192,202,213
+  s_bef57e8811ec19::t_21bad19979ea3e 22,183
+packages/aave-helpers-js/protocol-diff-v4.ts
+  s_bef57e8811ec19::t_d6c48e37a9c948 40
+  s_bef57e8811ec19::t_3697699f95c928 6
+packages/aave-helpers-js/index.ts
+  s_bef57e8811ec19::t_347dc046f56569 22
+packages/aave-helpers-js/sections/spoke-configs.ts
+  s_bef57e8811ec19::t_831bdaf7a4f04f 1-6,8-112
+  h_71908bb6884da4 7
+packages/aave-helpers-js/formatters-v4.ts
+  s_bef57e8811ec19::t_8132c55f21ad60 15,149,154,158-159,162,186,193
+  s_bef57e8811ec19::t_3c619aece53da8 142,150
+  s_bef57e8811ec19::t_9027ae48cdd147 7
+  s_b9e2096056db48::t_2126f9fdab61d8 144,153
+  s_bef57e8811ec19::t_1f284ce81952d3 147,157
+  h_71908bb6884da4 211
+packages/aave-helpers-js/__tests__/protocol-diff-v4.spec.ts
+  s_bef57e8811ec19::t_c5e0b3a13d30eb 73,175-176,192,201-202,204,206,317-318,399,418,478-479
+  s_bef57e8811ec19::t_1c7ce9dbebbd8f 324,409,421
+src/dependencies/v4/Types.sol
+  s_bef57e8811ec19::t_ee60a1c2f606cc 109,125
+src/dependencies/v4/V4DiffWriter.sol
+  s_bef57e8811ec19::t_50567bfe9be4ea 19,151,172
+  s_bef57e8811ec19::t_4922e28b868e57 26,150
+src/ProtocolV4TestBase.sol
+  s_bef57e8811ec19::t_9eb842e1318b2e 71
+tests/ProtocolV4TestBase.t.sol
+  s_bef57e8811ec19::t_adc823f0fb1b8c 243,253,259,265,274-275,282-283,289,291-292,299,302
+  s_bef57e8811ec19::t_5b208f8fe32549 331
+  s_bef57e8811ec19::t_e361220dd55f12 247,252,258,264,273,281,290,301,313,315,329
+  s_bef57e8811ec19::t_1fc4b41c92f65f 244,300,303
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "9f231118ea6d657962300d86b7ace8fcfc1ed67e",
+  "prompts": {},
+  "humans": {
+    "h_71908bb6884da4": {
+      "author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_b9e2096056db48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5ae6994-23d4-4ac1-b68c-497f1124a988",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    },
+    "s_bef57e8811ec19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5831686-2a73-4166-bd75-00f7f9c34913",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  }
+}

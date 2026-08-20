@@ -1,0 +1,42 @@
+packages/aave-helpers-js/sections/hub-assets.ts
+  h_739c25e72c37fb 2
+packages/aave-helpers-js/sections/spoke-reserves.ts
+  h_739c25e72c37fb 2
+packages/aave-helpers-js/sections/spoke-liquidation.ts
+  h_739c25e72c37fb 2
+packages/aave-helpers-js/sections/reserves.ts
+  h_739c25e72c37fb 2
+src/v3-config-engine/AaveV3PayloadMonad.sol
+  h_739c25e72c37fb 1-15
+packages/aave-helpers-js/sections/spoke-configs.ts
+  h_739c25e72c37fb 2
+packages/aave-helpers-js/sections/logs.ts
+  h_739c25e72c37fb 3
+packages/aave-helpers-js/sections/position-managers.ts
+  h_739c25e72c37fb 2
+packages/aave-helpers-js/sections/access-manager-roles.ts
+  h_739c25e72c37fb 2
+packages/aave-helpers-js/cli.ts
+  h_739c25e72c37fb 16
+src/GovV3Helpers.sol
+  h_739c25e72c37fb 35,988-1011,1171-1172
+packages/aave-helpers-js/formatters.ts
+  h_739c25e72c37fb 2,4
+packages/aave-helpers-js/sections/pool-config.ts
+  h_739c25e72c37fb 4
+packages/aave-helpers-js/scripts/add-events.ts
+  h_739c25e72c37fb 14
+packages/aave-helpers-js/formatters-v4.ts
+  h_739c25e72c37fb 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "8b98b8c746b49c6ef0d3a882a4e2db8d1e41aaba",
+  "prompts": {},
+  "humans": {
+    "h_739c25e72c37fb": {
+      "author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}

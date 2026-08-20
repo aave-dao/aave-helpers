@@ -1,0 +1,21 @@
+lib/aave-address-book
+  s_22f80b5bcb6d41::t_fa466dcae42729 1
+tests/ProtocolV4TestBase.t.sol
+  s_22f80b5bcb6d41::t_0752ab48b5813a 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "c5ef208c564eccc98b11c11222a2e50809e372f9",
+  "prompts": {},
+  "sessions": {
+    "s_22f80b5bcb6d41": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f3c89-d210-7122-b483-d92bfbdf7c86",
+        "model": "gpt-5.5"
+      },
+      "human_author": "Alberto <albe@AMWM-H65F40J09H.local>"
+    }
+  }
+}

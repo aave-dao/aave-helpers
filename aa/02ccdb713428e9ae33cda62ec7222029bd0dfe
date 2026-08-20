@@ -1,0 +1,19 @@
+tests/GovV3Test.t.sol
+  s_d5ebddf2befc29::t_1d5130d60a0f01 171
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "aa02ccdb713428e9ae33cda62ec7222029bd0dfe",
+  "prompts": {},
+  "sessions": {
+    "s_d5ebddf2befc29": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d546697-7064-4932-8cb8-9f99c03be490",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Alberto <albe@AMWM-H65F40J09H.local>"
+    }
+  }
+}

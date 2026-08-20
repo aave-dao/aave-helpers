@@ -1,0 +1,37 @@
+lib/aave-address-book
+  s_3af69c9e9bf54b::t_1f83fc12b6462c 1
+tests/ProtocolV3TestBase.t.sol
+  s_22f80b5bcb6d41::t_98ad59fed4b998 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "7fc8146643bf360d516fac1fdb6d7da5d1a9cc98",
+  "prompts": {},
+  "sessions": {
+    "s_0b17c34f5ac0d8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f41ed-1e6b-70e0-9a52-4a97aabce23b",
+        "model": "gpt-5.5"
+      },
+      "human_author": "Alberto <albe@AMWM-H65F40J09H.local>"
+    },
+    "s_22f80b5bcb6d41": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f3c89-d210-7122-b483-d92bfbdf7c86",
+        "model": "gpt-5.5"
+      },
+      "human_author": "Alberto <albe@AMWM-H65F40J09H.local>"
+    },
+    "s_3af69c9e9bf54b": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f3c9a-2ffe-7231-b85c-d1432ecfa18e",
+        "model": "gpt-5.5"
+      },
+      "human_author": "AlbertoCentonze <11707683+AlbertoCentonze@users.noreply.github.com>"
+    }
+  }
+}

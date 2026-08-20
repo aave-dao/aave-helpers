@@ -1,0 +1,32 @@
+packages/aave-helpers-js/sections/spoke-configs.ts
+  s_bef57e8811ec19::t_831bdaf7a4f04f 1-112
+tests/dependencies/v4/V4DiffWriter.t.sol
+  s_bef57e8811ec19::t_eec3a728889295 116,137-138,260-261,432
+  s_bef57e8811ec19::t_13006595524b63 187
+  s_bef57e8811ec19::t_606aa48afc639d 403
+  s_bef57e8811ec19::t_893c0e7f81c5f7 404-405,416
+  s_bef57e8811ec19::t_7b85e49a65d586 429
+tests/mocks/v4/V4DiffWriterHarness.sol
+  s_bef57e8811ec19::t_1f5789690f18fe 40-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "0474ce20a8bb1f2b9a337f99d4d81435884a73bb",
+  "prompts": {},
+  "humans": {
+    "h_71908bb6884da4": {
+      "author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_bef57e8811ec19": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f5831686-2a73-4166-bd75-00f7f9c34913",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": null
+    }
+  }
+}

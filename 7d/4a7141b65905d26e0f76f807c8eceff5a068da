@@ -1,0 +1,22 @@
+packages/aave-helpers-js/utils/eventDb.ts
+  s_22f17ec10c1136::t_3f9a122ff76671 3379-3385,3387-3391
+  s_22f17ec10c1136::t_7b0d34f894a6a9 3386
+.changeset/aave-v4-asset-ir-event.md
+  s_22f17ec10c1136::t_fd944c159c26df 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "7d4a7141b65905d26e0f76f807c8eceff5a068da",
+  "prompts": {},
+  "sessions": {
+    "s_22f17ec10c1136": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f69ba3f1-ed24-4562-8a2f-540007bc92da",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Alexandru Niculae <43644109+avniculae@users.noreply.github.com>"
+    }
+  }
+}

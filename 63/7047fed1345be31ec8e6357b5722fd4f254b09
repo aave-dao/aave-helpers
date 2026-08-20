@@ -1,0 +1,43 @@
+tests/dependencies/v4/V4DiffWriterHarness.sol
+  h_71908bb6884da4 8
+  s_b9e2096056db48::t_36cd1cc5dca417 1-7,9-43
+tests/dependencies/v4/V4DiffWriter.t.sol
+  s_b9e2096056db48::t_003b3ab2c36f71 371-380
+  s_b9e2096056db48::t_141fbce35b416b 10-35,47,49,61-62,77,81-83,95-96,98-102,208-265,285,289,295,316-318,328-329,339,346,368,385-387,397-398,406,409,417,420
+  s_b9e2096056db48::t_d3fc0cb115304f 37-41,43-46,48,50-60,63-65,67-71,73-76,78-80,84-93,283,286-288,290-294,296-297,312-315,319-327,330-338,340-345,347-367,369-370,381-384,388-396,399-405,407-408,410-416,418-419,421-444
+  s_b9e2096056db48::t_7b2a1cf5a87567 205
+  s_b9e2096056db48::t_6d3ee9df832162 298-311
+  s_b9e2096056db48::t_1015bc8bdf13d8 8
+  h_71908bb6884da4 36,66,94,97,131,284
+  s_b9e2096056db48::t_e810b09eb1a477 42
+  s_b9e2096056db48::t_e7ba7e7d1ad783 72
+src/dependencies/v4/V4DiffWriter.sol
+  s_b9e2096056db48::t_fd64c0e80708a2 128
+  s_b9e2096056db48::t_b3fb5ba6ac06f4 57
+  s_b9e2096056db48::t_5069e6fc1729f6 82
+  s_b9e2096056db48::t_7fc86ff721c780 32
+  h_71908bb6884da4 113
+  s_b9e2096056db48::t_543f7d950836f4 107
+  s_b9e2096056db48::t_f4fdd4d43add27 150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "637047fed1345be31ec8e6357b5722fd4f254b09",
+  "prompts": {},
+  "humans": {
+    "h_71908bb6884da4": {
+      "author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_b9e2096056db48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5ae6994-23d4-4ac1-b68c-497f1124a988",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  }
+}

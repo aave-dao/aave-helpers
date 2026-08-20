@@ -1,0 +1,19 @@
+src/ProtocolV4TestBase.sol
+  s_b9e2096056db48::t_5c22fe83b3775f 612-640
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "3339333799f1b312bee74065d4a6c227d5ae370c",
+  "prompts": {},
+  "sessions": {
+    "s_b9e2096056db48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c5ae6994-23d4-4ac1-b68c-497f1124a988",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "YBM <31329384+yan-man@users.noreply.github.com>"
+    }
+  }
+}
