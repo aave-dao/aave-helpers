@@ -146,7 +146,7 @@ contract CommonTestBase is Test {
     }
     if (block.chainid == ChainIds.GNOSIS) {
       if (asset == AaveV3GnosisAssets.EURe_UNDERLYING) {
-        vm.prank(0x845C8bc94610807fCbaB5dd2bc7aC9DAbaFf3c55);
+        vm.prank(AaveV3GnosisAssets.EURe_A_TOKEN);
         IERC20(asset).transfer(user, amount);
         return true;
       }

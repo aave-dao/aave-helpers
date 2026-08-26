@@ -465,6 +465,15 @@ contract ProtocolV3TestBaseReserveConfigChangesTest is ProtocolV3TestBase {
     this.validateReserveConfigChanges(configsBefore, _configsAfter());
   }
 
+  function test_revertsWhenFrozenReserveLtvIsNotZeroed() public {
+    ReserveConfig[] memory configsAfter = _configsAfter();
+    // freezing zeroes the ltv since v3.7, so a frozen reserve keeping its ltv must be rejected
+    configsAfter[2].ltv = _configsBefore()[2].ltv;
+
+    vm.expectRevert(bytes('_validateReserveConfig: InvalidLtv()'));
+    this.validateReserveConfigChanges(_configsBefore(), configsAfter);
+  }
+
   function test_revertsWhenDeclaredFreezeIsNoChange() public {
     ReserveConfig[] memory configsBefore = _configsBefore();
     (, bool[] memory frozen) = _expectedFreezeChanges();
@@ -601,6 +610,7 @@ contract ProtocolV3TestBaseReserveConfigChangesTest is ProtocolV3TestBase {
     configs[1].borrowingEnabled = false;
     configs[1].reserveFactor = 25_00;
     configs[2].isFrozen = true;
+    configs[2].ltv = 0;
     configs[3] = _reserveConfig('ASSET_D', ASSET_D, 50_00, 60_00, true, 1_000, 200);
     configs[3].decimals = 6;
     configs[3].liquidationBonus = 105_00;
