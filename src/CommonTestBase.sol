@@ -146,9 +146,6 @@ contract CommonTestBase is Test {
     }
     if (block.chainid == ChainIds.GNOSIS) {
       if (asset == AaveV3GnosisAssets.EURe_UNDERLYING) {
-        // uniswap v3 USDC.e/EURe pool; EURe balances are shared between the legacy and current
-        // token addresses via Monerium's external balance storage, so the pool's liquidity is
-        // transferable through the legacy address aave uses as underlying
         vm.prank(0x93b7a3d164585B52f096F6eAE1EC42ee267878E1);
         IERC20(asset).transfer(user, amount);
         return true;
