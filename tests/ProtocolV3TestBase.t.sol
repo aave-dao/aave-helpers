@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import 'forge-std/Test.sol';
 import {ProtocolV3TestBase, ReserveConfig, ExpectedListing} from '../src/ProtocolV3TestBase.sol';
 import {IPool, IPoolAddressesProvider, IPoolConfigurator} from 'aave-address-book/AaveV3.sol';
-import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
+import {AaveV3Ethereum, AaveV3EthereumAssets} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV3EthereumEtherFi} from 'aave-address-book/AaveV3EthereumEtherFi.sol';
 import {AaveV3Polygon, AaveV3PolygonAssets} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Optimism, AaveV3OptimismAssets} from 'aave-address-book/AaveV3Optimism.sol';
@@ -465,6 +465,14 @@ contract ProtocolV3TestBaseReserveConfigChangesTest is ProtocolV3TestBase {
     this.validateReserveConfigChanges(configsBefore, _configsAfter());
   }
 
+  function test_revertsWhenFrozenReserveLtvIsNotZeroed() public {
+    ReserveConfig[] memory configsAfter = _configsAfter();
+    configsAfter[2].ltv = _configsBefore()[2].ltv;
+
+    vm.expectRevert(bytes('_validateReserveConfig: InvalidLtv()'));
+    this.validateReserveConfigChanges(_configsBefore(), configsAfter);
+  }
+
   function test_revertsWhenDeclaredFreezeIsNoChange() public {
     ReserveConfig[] memory configsBefore = _configsBefore();
     (, bool[] memory frozen) = _expectedFreezeChanges();
@@ -601,6 +609,7 @@ contract ProtocolV3TestBaseReserveConfigChangesTest is ProtocolV3TestBase {
     configs[1].borrowingEnabled = false;
     configs[1].reserveFactor = 25_00;
     configs[2].isFrozen = true;
+    configs[2].ltv = 0;
     configs[3] = _reserveConfig('ASSET_D', ASSET_D, 50_00, 60_00, true, 1_000, 200);
     configs[3].decimals = 6;
     configs[3].liquidationBonus = 105_00;
@@ -643,6 +652,53 @@ contract ProtocolV3TestBaseReserveConfigChangesTest is ProtocolV3TestBase {
         virtualBalance: 0,
         aTokenUnderlyingBalance: 0
       });
+  }
+}
+
+contract PayloadFreezeWeth {
+  function execute() external {
+    AaveV3Ethereum.POOL_CONFIGURATOR.setReserveFreeze(AaveV3EthereumAssets.WETH_UNDERLYING, true);
+  }
+}
+
+contract ProtocolV3TestBaseFreezePendingLtvTest is ProtocolV3TestBase {
+  function setUp() public {
+    vm.createSelectFork('mainnet', 25848520);
+  }
+
+  function test_reserveConfigChangesTest_freeze() public {
+    address[] memory updatedAssets = new address[](1);
+    updatedAssets[0] = AaveV3EthereumAssets.WETH_UNDERLYING;
+
+    (ReserveConfig[] memory configsBefore, ReserveConfig[] memory configsAfter) = reserveConfigChangesTest(
+      AaveV3Ethereum.POOL,
+      address(new PayloadFreezeWeth()),
+      updatedAssets
+    );
+
+    ReserveConfig memory wethBefore = _findReserveConfig(
+      configsBefore,
+      AaveV3EthereumAssets.WETH_UNDERLYING
+    );
+    ReserveConfig memory wethAfter = _findReserveConfig(
+      configsAfter,
+      AaveV3EthereumAssets.WETH_UNDERLYING
+    );
+    assertGt(wethBefore.ltv, 0);
+    assertEq(wethAfter.ltv, 0);
+    assertTrue(wethAfter.isFrozen);
+  }
+
+  function _expectedFreezeChanges()
+    internal
+    pure
+    override
+    returns (address[] memory assets, bool[] memory frozen)
+  {
+    assets = new address[](1);
+    frozen = new bool[](1);
+    assets[0] = AaveV3EthereumAssets.WETH_UNDERLYING;
+    frozen[0] = true;
   }
 }
 
