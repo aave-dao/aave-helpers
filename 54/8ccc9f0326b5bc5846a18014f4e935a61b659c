@@ -1,0 +1,32 @@
+tests/ProtocolV3TestBase.t.sol
+  s_4d778345b06c59::t_6b5375e583df5e 658-665,667-704
+  s_4d778345b06c59::t_668331b075ee05 666
+  s_4d778345b06c59::t_941798ace4bf28 7
+src/ProtocolV3TestBase.sol
+  s_4d778345b06c59::t_0ffc26d97a263a 333,338-352
+  s_b619a3dff67edc::t_226e7bb524e399 353-354
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "548ccc9f0326b5bc5846a18014f4e935a61b659c",
+  "prompts": {},
+  "sessions": {
+    "s_4d778345b06c59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d593999-37f8-435e-8c3b-8cb172489852",
+        "model": "claude-fable-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    },
+    "s_b619a3dff67edc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "af49671d-ab28-49db-abc2-1e67a2f65267",
+        "model": "claude-fable-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
