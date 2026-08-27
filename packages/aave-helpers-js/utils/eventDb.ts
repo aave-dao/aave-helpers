@@ -3685,6 +3685,144 @@ export const eventDb: AbiEvent[] = [
   {
     anonymous: false,
     inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'proxy', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'implementation', type: 'address' },
+    ],
+    name: 'ATokenUpgraded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint8', name: 'categoryId', type: 'uint8' },
+      { indexed: false, internalType: 'bool', name: 'ltvzero', type: 'bool' },
+    ],
+    name: 'AssetLtvzeroInEModeChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'uint8', name: 'categoryId', type: 'uint8' },
+      { indexed: false, internalType: 'bool', name: 'isolated', type: 'bool' },
+    ],
+    name: 'EModeCategoryIsolationChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint128',
+        name: 'oldFlashloanPremiumToProtocol',
+        type: 'uint128',
+      },
+      {
+        indexed: false,
+        internalType: 'uint128',
+        name: 'newFlashloanPremiumToProtocol',
+        type: 'uint128',
+      },
+    ],
+    name: 'FlashloanPremiumToProtocolUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint128',
+        name: 'oldFlashloanPremiumTotal',
+        type: 'uint128',
+      },
+      {
+        indexed: false,
+        internalType: 'uint128',
+        name: 'newFlashloanPremiumTotal',
+        type: 'uint128',
+      },
+    ],
+    name: 'FlashloanPremiumTotalUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint40', name: 'gracePeriodUntil', type: 'uint40' },
+    ],
+    name: 'LiquidationGracePeriodChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'address', name: 'asset', type: 'address' }],
+    name: 'LiquidationGracePeriodDisabled',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'ltv', type: 'uint256' },
+    ],
+    name: 'PendingLtvChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'active', type: 'bool' },
+    ],
+    name: 'ReserveActive',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'frozen', type: 'bool' },
+    ],
+    name: 'ReserveFrozen',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'oldStrategy', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'newStrategy', type: 'address' },
+    ],
+    name: 'ReserveInterestRateStrategyChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'paused', type: 'bool' },
+    ],
+    name: 'ReservePaused',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'proxy', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'implementation', type: 'address' },
+    ],
+    name: 'VariableDebtTokenUpgraded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
       { indexed: true, internalType: 'address', name: 'backer', type: 'address' },
       { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
       { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },

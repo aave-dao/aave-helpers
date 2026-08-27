@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.4.2
+
+### Patch Changes
+
+- afde5f6: Decode additional Pool events (reserve state, liquidation grace period, flashloan premium, token upgrades) in protocol diffs.
+
 ## 1.4.1
 
 ### Patch Changes
