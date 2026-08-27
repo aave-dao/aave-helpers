@@ -1,7 +1,17 @@
 import type { RawStorage, CHAIN_ID } from '../snapshot-types';
 import { isKnownAddress } from '../utils/address';
+import type { DecodedStorage } from '../utils/decodeStorage';
 
-export function renderRawSection(raw: RawStorage | undefined, chainId: CHAIN_ID): string {
+function abbreviateSlot(slot: string): string {
+  if (slot.length <= 14) return slot;
+  return `${slot.slice(0, 8)}…${slot.slice(-4)}`;
+}
+
+export function renderRawSection(
+  raw: RawStorage | undefined,
+  chainId: CHAIN_ID,
+  decoded?: DecodedStorage
+): string {
   if (!raw) return '';
 
   const contracts = Object.keys(raw);
@@ -28,27 +38,23 @@ export function renderRawSection(raw: RawStorage | undefined, chainId: CHAIN_ID)
 
     const slots = Object.keys(entry.stateDiff);
     if (slots.length) {
-      // Check if any slot has decoded info
-      const hasDecoded = slots.some((s) => {
-        const d = entry.stateDiff[s];
-        return (
-          d.label && d.decoded && (d.decoded.previousValue !== '0x' || d.decoded.newValue !== '0x')
-        );
-      });
+      const decodedSlots = decoded?.[address] ?? {};
+      const hasDecoded = slots.some((slot) => decodedSlots[slot]?.fields.length);
 
       if (hasDecoded) {
         md +=
-          '| label | type | decoded previous value | decoded new value |\n| --- | --- | --- | --- |\n';
+          '| slot | variable | type | previous value | new value |\n| --- | --- | --- | --- | --- |\n';
         for (const slot of slots) {
           const slotDiff = entry.stateDiff[slot];
-          const label = slotDiff.label || slot;
-          const type = slotDiff.type || '-';
-          const useDecoded =
-            slotDiff.decoded &&
-            (slotDiff.decoded.previousValue !== '0x' || slotDiff.decoded.newValue !== '0x');
-          const prev = useDecoded ? slotDiff.decoded!.previousValue : slotDiff.previousValue;
-          const next = useDecoded ? slotDiff.decoded!.newValue : slotDiff.newValue;
-          md += `| ${label} | ${type} | ${prev} | ${next} |\n`;
+          const fields = decodedSlots[slot]?.fields;
+          if (fields?.length) {
+            for (const field of fields) {
+              md += `| ${abbreviateSlot(slot)} | ${field.label} | ${field.type} | ${field.previousValue} | ${field.newValue} |\n`;
+            }
+          } else {
+            // undecoded slots stay visible as raw hex in the same table
+            md += `| ${abbreviateSlot(slot)} | - | - | ${slotDiff.previousValue} | ${slotDiff.newValue} |\n`;
+          }
         }
       } else {
         md += '| slot | previous value | new value |\n| --- | --- | --- |\n';

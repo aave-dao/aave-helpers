@@ -1,6 +1,10 @@
 export { diffSnapshots } from './protocol-diff';
 export { diffV4Snapshots } from './protocol-diff-v4';
 export { eventDb } from './utils/eventDb';
+export { storageLayoutDb } from './utils/storageLayoutDb';
+export { decodeRawStorage } from './utils/decodeStorage';
+export type { DecodedStorage, DecodedSlot, DecodedField } from './utils/decodeStorage';
+export type { StorageLayout, LayoutEntry } from './utils/storageLayoutTypes';
 export { diff, isChange, hasChanges } from './diff';
 export type { Change, DiffResult } from './diff';
 export type {

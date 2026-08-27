@@ -8,7 +8,8 @@ import { renderSpokeLiquidationSection } from './sections/spoke-liquidation';
 import { renderPositionManagersSection } from './sections/position-managers';
 import { renderAccessManagerRolesSection } from './sections/access-manager-roles';
 import { renderRawSection } from './sections/raw';
-import { renderLogsSection } from './sections/logs';
+import { renderLogsSection, parseSnapshotLogs } from './sections/logs';
+import { decodeRawStorage } from './utils/decodeStorage';
 
 /**
  * Diff two Aave V4 protocol snapshots and produce a formatted markdown report.
@@ -43,8 +44,12 @@ export async function diffV4Snapshots(
   md += renderSpokeLiquidationSection(before, postCopy);
   md += renderPositionManagersSection(before, postCopy);
   md += renderAccessManagerRolesSection(before, postCopy);
-  md += await renderLogsSection(logs, after.chainId);
-  md += renderRawSection(raw, after.chainId);
+  // Parse logs once (pure); decoded args also feed mapping-key candidates for
+  // storage decoding. Must run before renderLogsSection, which mutates args.
+  const parsedLogs = logs ? parseSnapshotLogs(logs) : undefined;
+  const decodedStorage = decodeRawStorage(raw, after, parsedLogs);
+  md += await renderLogsSection(logs, after.chainId, parsedLogs);
+  md += renderRawSection(raw, after.chainId, decodedStorage);
 
   // Append raw JSON diff as fallback
   const preCopy: Record<string, unknown> = { ...before };
