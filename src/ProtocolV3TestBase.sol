@@ -330,8 +330,26 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     ReserveConfig[] memory allConfigsAfter = _getReservesConfigs(pool);
 
     _validateReserveConfigChanges(allConfigsBefore, allConfigsAfter, updatedAssets);
+    _validatePendingLtvs(pool, allConfigsBefore);
 
     return (allConfigsBefore, allConfigsAfter);
+  }
+
+  function _validatePendingLtvs(IPool pool, ReserveConfig[] memory allConfigsBefore) internal view {
+    (address[] memory freezeAssets, bool[] memory frozenStates) = _expectedFreezeChanges();
+    if (freezeAssets.length == 0) return;
+
+    IPoolConfigurator configurator = IPoolConfigurator(
+      IPoolAddressesProvider(pool.ADDRESSES_PROVIDER()).getPoolConfigurator()
+    );
+    for (uint256 i = 0; i < freezeAssets.length; i++) {
+      if (!frozenStates[i]) continue;
+      require(
+        configurator.getPendingLtv(freezeAssets[i]) ==
+          _findReserveConfig(allConfigsBefore, freezeAssets[i]).ltv,
+        'FREEZE_UPDATE_INVALID_PENDING_LTV'
+      );
+    }
   }
 
   function _validateReserveConfigChanges(
@@ -510,9 +528,6 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
 
       require(expectedConfig.isFrozen != frozenStates[i], 'FREEZE_UPDATE_NO_CHANGE');
       expectedConfig.isFrozen = frozenStates[i];
-      // since v3.7 freezing a reserve also zeroes its ltv, parking the previous value in the
-      // configurator's pendingLtv; unfreezing does not restore it (that requires an explicit
-      // setReserveLtvzero(asset, false))
       if (frozenStates[i]) {
         expectedConfig.ltv = 0;
       }
