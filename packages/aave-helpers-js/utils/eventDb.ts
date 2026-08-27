@@ -3804,4 +3804,64 @@ export const eventDb: AbiEvent[] = [
     name: 'TokensRescued',
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'address', name: 'entity', type: 'address' }],
+    name: 'EntityAdded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'address', name: 'entity', type: 'address' }],
+    name: 'EntityRemoved',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'entity', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'limit', type: 'uint256' },
+    ],
+    name: 'GhoLimitUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'entity', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'GhoRestored',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'to', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'GhoTransferred',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'entity', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'GhoUsed',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'address', name: 'gsmAddress', type: 'address' }],
+    name: 'GsmAdded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'address', name: 'gsmAddress', type: 'address' }],
+    name: 'GsmRemoved',
+    type: 'event',
+  },
 ];
