@@ -1133,12 +1133,12 @@ describe('diffSnapshots', () => {
       | 0x012905…40d8 | _eModeCategories[6].borrowableBitmap | uint128 | 0 | 1 |
       | 0x426fb8…fe97 | _reservesList[5] | address | 0x0000000000000000000000000000000000000000 | 0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING) |
       | 0x448071…9105 | _reservesList[6] | address | 0x0000000000000000000000000000000000000000 | 0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING) |
-      | 0x4853ba…d92c | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].configuration.decimals | uint256 | 0 | 18 |
+      | 0x4853ba…d92c | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].configuration.decimals | uint8 | 0 | 18 |
       | 0x4853ba…d92c | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].configuration.active | bool | false | true |
-      | 0x4853ba…d92c | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].configuration.reserveFactor | uint256 | 0 | 2000 |
-      | 0x4853ba…d92c | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].configuration.borrowCap | uint256 | 0 | 1 |
-      | 0x4853ba…d92c | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].configuration.supplyCap | uint256 | 0 | 20 |
-      | 0x4853ba…d92c | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].configuration.liquidationProtocolFee | uint256 | 0 | 1000 |
+      | 0x4853ba…d92c | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].configuration.reserveFactor | uint16 | 0 | 2000 |
+      | 0x4853ba…d92c | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].configuration.borrowCap | uint36 | 0 | 1 |
+      | 0x4853ba…d92c | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].configuration.supplyCap | uint36 | 0 | 20 |
+      | 0x4853ba…d92c | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].configuration.liquidationProtocolFee | uint16 | 0 | 1000 |
       | 0x4853ba…d92c | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].configuration.flashloaningEnabled | bool | false | true |
       | 0x4853ba…d92c | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].configuration.virtualAccountingEnabled | bool | false | true |
       | 0x4853ba…d92d | _reserves[0x601aC63637933D88285A025C685AC4e9a92a98dA (AaveV3MegaEth.ASSETS.wstETH.UNDERLYING)].liquidityIndex | uint128 | 0 | 1000000000000000000000000000 |
@@ -1169,12 +1169,12 @@ describe('diffSnapshots', () => {
       | 0x67dcc8…d6b2 | _eModeCategories[2].collateralBitmap | uint128 | 0 | 2 |
       | 0x67dcc8…d6b3 | _eModeCategories[2].label | string | "" | "BTCb Stablecoins" |
       | 0x67dcc8…d6b4 | _eModeCategories[2].borrowableBitmap | uint128 | 0 | 12 |
-      | 0x7a18f9…b37b | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].configuration.decimals | uint256 | 0 | 8 |
+      | 0x7a18f9…b37b | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].configuration.decimals | uint8 | 0 | 8 |
       | 0x7a18f9…b37b | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].configuration.active | bool | false | true |
-      | 0x7a18f9…b37b | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].configuration.reserveFactor | uint256 | 0 | 2000 |
-      | 0x7a18f9…b37b | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].configuration.borrowCap | uint256 | 0 | 1 |
-      | 0x7a18f9…b37b | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].configuration.supplyCap | uint256 | 0 | 2 |
-      | 0x7a18f9…b37b | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].configuration.liquidationProtocolFee | uint256 | 0 | 1000 |
+      | 0x7a18f9…b37b | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].configuration.reserveFactor | uint16 | 0 | 2000 |
+      | 0x7a18f9…b37b | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].configuration.borrowCap | uint36 | 0 | 1 |
+      | 0x7a18f9…b37b | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].configuration.supplyCap | uint36 | 0 | 2 |
+      | 0x7a18f9…b37b | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].configuration.liquidationProtocolFee | uint16 | 0 | 1000 |
       | 0x7a18f9…b37b | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].configuration.flashloaningEnabled | bool | false | true |
       | 0x7a18f9…b37b | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].configuration.virtualAccountingEnabled | bool | false | true |
       | 0x7a18f9…b37c | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].liquidityIndex | uint128 | 0 | 1000000000000000000000000000 |
@@ -1184,12 +1184,12 @@ describe('diffSnapshots', () => {
       | 0x7a18f9…b37f | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].aTokenAddress | address | 0x0000000000000000000000000000000000000000 | 0x0889d59eA7178ee5B71DA01949a5cB42aaFBe337 (AaveV3MegaEth.ASSETS.BTCb.A_TOKEN) |
       | 0x7a18f9…b381 | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].variableDebtTokenAddress | address | 0x0000000000000000000000000000000000000000 | 0x15B550784928C5b1A93849CA5d6caA18B2545B6d (AaveV3MegaEth.ASSETS.BTCb.V_TOKEN) |
       | 0x7a18f9…b383 | _reserves[0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072 (AaveV3MegaEth.ASSETS.BTCb.UNDERLYING)].virtualUnderlyingBalance | uint128 | 0 | 50000 |
-      | 0x80432f…eced | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].configuration.decimals | uint256 | 0 | 18 |
+      | 0x80432f…eced | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].configuration.decimals | uint8 | 0 | 18 |
       | 0x80432f…eced | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].configuration.active | bool | false | true |
-      | 0x80432f…eced | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].configuration.reserveFactor | uint256 | 0 | 2000 |
-      | 0x80432f…eced | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].configuration.borrowCap | uint256 | 0 | 1 |
-      | 0x80432f…eced | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].configuration.supplyCap | uint256 | 0 | 20 |
-      | 0x80432f…eced | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].configuration.liquidationProtocolFee | uint256 | 0 | 1000 |
+      | 0x80432f…eced | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].configuration.reserveFactor | uint16 | 0 | 2000 |
+      | 0x80432f…eced | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].configuration.borrowCap | uint36 | 0 | 1 |
+      | 0x80432f…eced | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].configuration.supplyCap | uint36 | 0 | 20 |
+      | 0x80432f…eced | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].configuration.liquidationProtocolFee | uint16 | 0 | 1000 |
       | 0x80432f…eced | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].configuration.flashloaningEnabled | bool | false | true |
       | 0x80432f…eced | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].configuration.virtualAccountingEnabled | bool | false | true |
       | 0x80432f…ecee | _reserves[0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57 (AaveV3MegaEth.ASSETS.ezETH.UNDERLYING)].liquidityIndex | uint128 | 0 | 1000000000000000000000000000 |
@@ -1205,12 +1205,12 @@ describe('diffSnapshots', () => {
       | 0x81d099…3155 | _eModeCategories[3].collateralBitmap | uint128 | 0 | 16 |
       | 0x81d099…3156 | _eModeCategories[3].label | string | "" | "wstETH Stablecoins" |
       | 0x81d099…3157 | _eModeCategories[3].borrowableBitmap | uint128 | 0 | 12 |
-      | 0x8868a5…338c | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].configuration.decimals | uint256 | 0 | 18 |
+      | 0x8868a5…338c | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].configuration.decimals | uint8 | 0 | 18 |
       | 0x8868a5…338c | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].configuration.active | bool | false | true |
-      | 0x8868a5…338c | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].configuration.reserveFactor | uint256 | 0 | 2000 |
-      | 0x8868a5…338c | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].configuration.borrowCap | uint256 | 0 | 1 |
-      | 0x8868a5…338c | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].configuration.supplyCap | uint256 | 0 | 20 |
-      | 0x8868a5…338c | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].configuration.liquidationProtocolFee | uint256 | 0 | 1000 |
+      | 0x8868a5…338c | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].configuration.reserveFactor | uint16 | 0 | 2000 |
+      | 0x8868a5…338c | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].configuration.borrowCap | uint36 | 0 | 1 |
+      | 0x8868a5…338c | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].configuration.supplyCap | uint36 | 0 | 20 |
+      | 0x8868a5…338c | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].configuration.liquidationProtocolFee | uint16 | 0 | 1000 |
       | 0x8868a5…338c | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].configuration.flashloaningEnabled | bool | false | true |
       | 0x8868a5…338c | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].configuration.virtualAccountingEnabled | bool | false | true |
       | 0x8868a5…338d | _reserves[0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F (AaveV3MegaEth.ASSETS.wrsETH.UNDERLYING)].liquidityIndex | uint128 | 0 | 1000000000000000000000000000 |
@@ -1226,12 +1226,12 @@ describe('diffSnapshots', () => {
       | 0x8e0cc0…eeb0 | _eModeCategories[1].collateralBitmap | uint128 | 0 | 1 |
       | 0x8e0cc0…eeb1 | _eModeCategories[1].label | string | "" | "WETH Stablecoins" |
       | 0x8e0cc0…eeb2 | _eModeCategories[1].borrowableBitmap | uint128 | 0 | 12 |
-      | 0x9f3411…3ade | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].configuration.decimals | uint256 | 0 | 18 |
+      | 0x9f3411…3ade | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].configuration.decimals | uint8 | 0 | 18 |
       | 0x9f3411…3ade | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].configuration.active | bool | false | true |
-      | 0x9f3411…3ade | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].configuration.reserveFactor | uint256 | 0 | 1500 |
-      | 0x9f3411…3ade | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].configuration.borrowCap | uint256 | 0 | 10 |
-      | 0x9f3411…3ade | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].configuration.supplyCap | uint256 | 0 | 20 |
-      | 0x9f3411…3ade | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].configuration.liquidationProtocolFee | uint256 | 0 | 1000 |
+      | 0x9f3411…3ade | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].configuration.reserveFactor | uint16 | 0 | 1500 |
+      | 0x9f3411…3ade | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].configuration.borrowCap | uint36 | 0 | 10 |
+      | 0x9f3411…3ade | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].configuration.supplyCap | uint36 | 0 | 20 |
+      | 0x9f3411…3ade | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].configuration.liquidationProtocolFee | uint16 | 0 | 1000 |
       | 0x9f3411…3ade | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].configuration.flashloaningEnabled | bool | false | true |
       | 0x9f3411…3ade | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].configuration.virtualAccountingEnabled | bool | false | true |
       | 0x9f3411…3adf | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].liquidityIndex | uint128 | 0 | 1000000000000000000000000000 |
@@ -1240,14 +1240,14 @@ describe('diffSnapshots', () => {
       | 0x9f3411…3ae2 | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].aTokenAddress | address | 0x0000000000000000000000000000000000000000 | 0xa31E6b433382062e8A1dA41485f7b234D97c3f4d (AaveV3MegaEth.ASSETS.WETH.A_TOKEN) |
       | 0x9f3411…3ae4 | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].variableDebtTokenAddress | address | 0x0000000000000000000000000000000000000000 | 0x09ADCCC7AF2aBD356c18A4CadF2e5cC250f300E9 (AaveV3MegaEth.ASSETS.WETH.V_TOKEN) |
       | 0x9f3411…3ae6 | _reserves[0x4200000000000000000000000000000000000006 (AaveV3MegaEth.ASSETS.WETH.UNDERLYING)].virtualUnderlyingBalance | uint128 | 0 | 2500000000000000 |
-      | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.decimals | uint256 | 0 | 18 |
+      | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.decimals | uint8 | 0 | 18 |
       | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.active | bool | false | true |
       | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.borrowingEnabled | bool | false | true |
       | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.borrowingInIsolation | bool | false | true |
-      | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.reserveFactor | uint256 | 0 | 1000 |
-      | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.borrowCap | uint256 | 0 | 20000 |
-      | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.supplyCap | uint256 | 0 | 50000 |
-      | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.liquidationProtocolFee | uint256 | 0 | 1000 |
+      | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.reserveFactor | uint16 | 0 | 1000 |
+      | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.borrowCap | uint36 | 0 | 20000 |
+      | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.supplyCap | uint36 | 0 | 50000 |
+      | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.liquidationProtocolFee | uint16 | 0 | 1000 |
       | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.flashloaningEnabled | bool | false | true |
       | 0x9ff805…a6c3 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].configuration.virtualAccountingEnabled | bool | false | true |
       | 0x9ff805…a6c4 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].liquidityIndex | uint128 | 0 | 1000000000000000000000000000 |
@@ -1257,14 +1257,14 @@ describe('diffSnapshots', () => {
       | 0x9ff805…a6c7 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].aTokenAddress | address | 0x0000000000000000000000000000000000000000 | 0x5dF82810CB4B8f3e0Da3c031cCc9208ee9cF9500 (AaveV3MegaEth.ASSETS.USDm.A_TOKEN) |
       | 0x9ff805…a6c9 | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].variableDebtTokenAddress | address | 0x0000000000000000000000000000000000000000 | 0x6B408d6c479C304794abC60a4693A3AD2D3c2D0D (AaveV3MegaEth.ASSETS.USDm.V_TOKEN) |
       | 0x9ff805…a6cb | _reserves[0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7 (AaveV3MegaEth.ASSETS.USDm.UNDERLYING)].virtualUnderlyingBalance | uint128 | 0 | 10000000000000000000 |
-      | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.decimals | uint256 | 0 | 6 |
+      | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.decimals | uint8 | 0 | 6 |
       | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.active | bool | false | true |
       | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.borrowingEnabled | bool | false | true |
       | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.borrowingInIsolation | bool | false | true |
-      | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.reserveFactor | uint256 | 0 | 1000 |
-      | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.borrowCap | uint256 | 0 | 20000 |
-      | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.supplyCap | uint256 | 0 | 50000 |
-      | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.liquidationProtocolFee | uint256 | 0 | 1000 |
+      | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.reserveFactor | uint16 | 0 | 1000 |
+      | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.borrowCap | uint36 | 0 | 20000 |
+      | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.supplyCap | uint36 | 0 | 50000 |
+      | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.liquidationProtocolFee | uint16 | 0 | 1000 |
       | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.flashloaningEnabled | bool | false | true |
       | 0xace173…504a | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].configuration.virtualAccountingEnabled | bool | false | true |
       | 0xace173…504b | _reserves[0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb (AaveV3MegaEth.ASSETS.USDT0.UNDERLYING)].liquidityIndex | uint128 | 0 | 1000000000000000000000000000 |

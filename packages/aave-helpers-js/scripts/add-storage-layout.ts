@@ -24,7 +24,7 @@
  * --pin additionally records `${chainId}:${address}` -> kind in pinnedAddresses, for
  * contracts the address book / snapshot context cannot resolve.
  */
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { dirname, join, resolve } from 'path';
@@ -60,7 +60,7 @@ function usage(message: string): never {
 
 function forgeInspect(contract: string, cwd: string): StorageLayout {
   console.log(`Running forge inspect ${contract} storage in ${cwd}...`);
-  const out = execSync(`forge inspect ${contract} storage --json`, {
+  const out = execFileSync('forge', ['inspect', contract, 'storage', '--json'], {
     cwd,
     encoding: 'utf-8',
     maxBuffer: 64 * 1024 * 1024,
@@ -69,12 +69,10 @@ function forgeInspect(contract: string, cwd: string): StorageLayout {
 }
 
 function cloneRepo(repo: string, ref: string | undefined, dest: string) {
-  const refArg = ref ? `--branch ${ref} ` : '';
   console.log(`Cloning ${repo}${ref ? `@${ref}` : ''}...`);
-  execSync(
-    `git clone --depth 1 --recurse-submodules --shallow-submodules ${refArg}https://github.com/${repo}.git ${dest}`,
-    { stdio: 'inherit' }
-  );
+  const args = ['clone', '--depth', '1', '--recurse-submodules', '--shallow-submodules'];
+  if (ref) args.push('--branch', ref);
+  execFileSync('git', [...args, `https://github.com/${repo}.git`, dest], { stdio: 'inherit' });
 }
 
 type EtherscanSource = Awaited<ReturnType<typeof getSourceCode>>;
@@ -200,7 +198,10 @@ async function main() {
     const tmp = mkdtempSync(join(tmpdir(), 'add-storage-layout-'));
     try {
       cloneRepo(args.repo, args.ref, tmp);
-      const commit = execSync('git rev-parse --short HEAD', { cwd: tmp, encoding: 'utf-8' }).trim();
+      const commit = execFileSync('git', ['rev-parse', '--short', 'HEAD'], {
+        cwd: tmp,
+        encoding: 'utf-8',
+      }).trim();
       layout = forgeInspect(args.contract, tmp);
       source = `${args.repo}@${commit} ${args.contract}`;
     } finally {

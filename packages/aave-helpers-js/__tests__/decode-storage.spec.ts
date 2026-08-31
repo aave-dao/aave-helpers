@@ -1,8 +1,9 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { toHex } from 'viem';
+import { keccak256, toHex } from 'viem';
 import { describe, it, expect } from 'vitest';
-import { decodeRawStorage, buildCandidateKeys } from '../utils/decodeStorage';
+import { decodeRawStorage, buildCandidateKeys, buildWordIndex } from '../utils/decodeStorage';
+import type { StorageLayout } from '../utils/storageLayoutTypes';
 import { parseSnapshotLogs } from '../sections/logs';
 import type { AaveV3Snapshot } from '../snapshot-types';
 
@@ -120,6 +121,41 @@ describe('decodeRawStorage', () => {
     it('skips slots whose bits did not change', () => {
       // slot 1 (initializing flags) is touched but written back unchanged
       expect(ezEthAToken[slot(0x1n)]).toBeUndefined();
+    });
+  });
+
+  describe('buildWordIndex', () => {
+    it('indexes dynamic array element slots at keccak(base) + i', () => {
+      const layout: StorageLayout = {
+        storage: [
+          {
+            astId: 1,
+            contract: 'T.sol:T',
+            label: '_list',
+            offset: 0,
+            slot: '7',
+            type: 't_array(t_address)dyn_storage',
+          },
+        ],
+        types: {
+          't_array(t_address)dyn_storage': {
+            encoding: 'dynamic_array',
+            label: 'address[]',
+            numberOfBytes: '32',
+            base: 't_address',
+          },
+          t_address: { encoding: 'inplace', label: 'address', numberOfBytes: '20' },
+        },
+      };
+      const index = buildWordIndex(layout, {
+        addresses: new Set(),
+        uints: new Set(),
+        bytes32: new Set(),
+      });
+      const elementsBase = BigInt(keccak256(toHex(7n, { size: 32 })));
+      expect(index.get(7n)![0].label).toBe('_list.length');
+      expect(index.get(elementsBase)![0].label).toBe('_list[0]');
+      expect(index.get(elementsBase + 5n)![0].label).toBe('_list[5]');
     });
   });
 

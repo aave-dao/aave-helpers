@@ -72,6 +72,8 @@ const ADDRESSES_PROVIDER_IDS = [
 
 const MAX_MAPPING_DEPTH = 2;
 const MAX_ARRAY_WORDS = 64;
+/** how many element words of a dynamic array get indexed */
+const DYNAMIC_ARRAY_WORDS = 32;
 
 // --- candidate key gathering ---
 
@@ -275,6 +277,38 @@ function expand(
         offset: 0,
         special: 'arrayLength',
       });
+      // elements live at keccak(slot) + i; index the first DYNAMIC_ARRAY_WORDS words
+      if (!type.base) return;
+      const itemType = layout.types[type.base];
+      if (!itemType) return;
+      const itemSize = Number(itemType.numberOfBytes);
+      const elementsBase = BigInt(keccak256(toHex(slot, { size: 32 })));
+      if (itemSize >= 32) {
+        const wordsPerItem = Math.ceil(itemSize / 32);
+        const count = Math.floor(DYNAMIC_ARRAY_WORDS / wordsPerItem);
+        for (let i = 0; i < count; i++) {
+          expand(
+            index,
+            layout,
+            elementsBase + BigInt(i * wordsPerItem),
+            `${label}[${i}]`,
+            type.base,
+            0,
+            candidates,
+            annotate,
+            mappingDepth
+          );
+        }
+      } else {
+        const perWord = Math.floor(32 / itemSize);
+        for (let i = 0; i < DYNAMIC_ARRAY_WORDS * perWord; i++) {
+          pushField(index, elementsBase + BigInt(Math.floor(i / perWord)), {
+            label: `${label}[${i}]`,
+            typeId: type.base,
+            offset: (i % perWord) * itemSize,
+          });
+        }
+      }
       return;
     }
     case 'mapping': {
@@ -397,6 +431,24 @@ function formatBytesDataWord(word: bigint, typeLabel: string): string {
   }
 }
 
+/**
+ * Bit widths of the packed ReserveConfigurationMap fields, per aave-v3-origin
+ * ReserveConfiguration.sol bit masks. Booleans fall back to 'bool'.
+ */
+const RESERVE_CONFIG_FIELD_TYPES: Record<string, string> = {
+  ltv: 'uint16',
+  liquidationThreshold: 'uint16',
+  liquidationBonus: 'uint16',
+  decimals: 'uint8',
+  reserveFactor: 'uint16',
+  borrowCap: 'uint36',
+  supplyCap: 'uint36',
+  liquidationProtocolFee: 'uint16',
+  eModeCategory: 'uint8',
+  unbackedMintCap: 'uint36',
+  debtCeiling: 'uint40',
+};
+
 function decodeReserveConfigFields(label: string, previous: bigint, next: bigint): DecodedField[] {
   const before = decodeReserveConfiguration(previous) as unknown as Record<string, unknown>;
   const after = decodeReserveConfiguration(next) as unknown as Record<string, unknown>;
@@ -405,7 +457,8 @@ function decodeReserveConfigFields(label: string, previous: bigint, next: bigint
     if (String(before[key]) === String(after[key])) continue;
     fields.push({
       label: `${label}.${key}`,
-      type: typeof after[key] === 'boolean' ? 'bool' : 'uint256',
+      type:
+        typeof after[key] === 'boolean' ? 'bool' : (RESERVE_CONFIG_FIELD_TYPES[key] ?? 'uint256'),
       previousValue: String(before[key]),
       newValue: String(after[key]),
     });

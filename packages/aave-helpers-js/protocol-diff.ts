@@ -38,7 +38,9 @@ export async function diffSnapshots(
   let md = '';
 
   // Parse logs once (pure); decoded args also feed mapping-key candidates for
-  // storage decoding. Must run before renderLogsSection, which mutates args.
+  // storage decoding. decodeRawStorage must run before renderLogsSection:
+  // enhanceLogs (called inside it) rewrites parsedLogs' args in place with
+  // prettified strings, which would no longer match as candidate keys.
   const parsedLogs = logs ? parseSnapshotLogs(logs) : undefined;
   const decodedStorage = decodeRawStorage(raw, after, parsedLogs);
 
