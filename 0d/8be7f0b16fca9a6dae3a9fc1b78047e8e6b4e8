@@ -1,0 +1,28 @@
+packages/aave-helpers-js/utils/decodeStorage.ts
+  s_a3985ea6bcb782::t_65fb509c98b68b 161-169,172-174
+  s_a3985ea6bcb782::t_08ca1906047b72 202-203,205,210,225-226,254-255,262-271,276,280,284-294,299-309,329-330,336-345,364-365,370,379,384,399-407,417-418
+packages/aave-helpers-js/scripts/add-storage-layout.ts
+  s_a3985ea6bcb782::t_79b0191894e651 30
+  s_a3985ea6bcb782::t_b626d6ba328f1d 105-116
+  s_a3985ea6bcb782::t_16b6cfe12e7447 143-147
+  s_a3985ea6bcb782::t_e7861c9d429347 156
+  s_a3985ea6bcb782::t_f4a338310c4802 104
+packages/aave-helpers-js/__tests__/decode-storage.spec.ts
+  s_a3985ea6bcb782::t_6d1281c1d3190d 162-213
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "0d8be7f0b16fca9a6dae3a9fc1b78047e8e6b4e8",
+  "prompts": {},
+  "sessions": {
+    "s_a3985ea6bcb782": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e2dfebd4-b7e0-4fd7-94b1-452b01110e6d",
+        "model": "claude-fable-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
