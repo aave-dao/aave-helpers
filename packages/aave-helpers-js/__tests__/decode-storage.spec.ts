@@ -208,6 +208,18 @@ describe('decodeRawStorage', () => {
       expect(totalFields).toBeLessThanOrEqual(100_000);
       // mappings expand last, so the static variable survives budget exhaustion
       expect(index.get(0n)![0].label).toBe('_totalSupply');
+
+      // with target slots, mapping expansion stops once every target is matched:
+      // a target resolved by the static pass means no keccak preimaging at all
+      const lazyIndex = buildWordIndex(
+        layout,
+        { addresses, uints: new Set(), bytes32: new Set() },
+        undefined,
+        new Set([0n])
+      );
+      const lazyFields = [...lazyIndex.values()].reduce((sum, fields) => sum + fields.length, 0);
+      expect(lazyIndex.get(0n)![0].label).toBe('_totalSupply');
+      expect(lazyFields).toBe(1);
     });
   });
 

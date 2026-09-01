@@ -165,16 +165,28 @@ const LONG_BYTES_WORDS = 4;
  */
 const MAX_INDEX_ENTRIES = 100_000;
 
-type IndexBudget = { remaining: number };
+type IndexBudget = {
+  remaining: number;
+  /** changed slots the index is being built for; mapping expansion stops once all are matched */
+  targets?: Set<bigint>;
+  unresolved: number;
+};
 
 type Annotate = (address: string) => string;
+
+function allTargetsResolved(budget: IndexBudget): boolean {
+  return budget.targets !== undefined && budget.unresolved <= 0;
+}
 
 function pushField(index: WordIndex, slot: bigint, field: WordField, budget: IndexBudget) {
   if (budget.remaining <= 0) return;
   budget.remaining--;
   const fields = index.get(slot);
   if (fields) fields.push(field);
-  else index.set(slot, [field]);
+  else {
+    index.set(slot, [field]);
+    if (budget.targets?.has(slot)) budget.unresolved--;
+  }
 }
 
 function formatMappingKey(
@@ -348,7 +360,10 @@ function expand(
       return;
     }
     case 'mapping': {
+      // mapping preimaging is the expensive part (one keccak per candidate key),
+      // so it stops as soon as every changed slot has been matched
       if (mappingDepth >= MAX_MAPPING_DEPTH || !type.key || !type.value) return;
+      if (allTargetsResolved(budget)) return;
       const keyType = layout.types[type.key];
       const keyLabel = keyType?.label ?? type.key;
       const expandForKey = (derivedSlot: Hex, key: string | bigint | Hex) => {
@@ -367,7 +382,7 @@ function expand(
       };
       if (keyLabel.startsWith('address') || keyLabel.startsWith('contract')) {
         for (const address of candidates.addresses) {
-          if (budget.remaining <= 0) return;
+          if (budget.remaining <= 0 || allTargetsResolved(budget)) return;
           expandForKey(getSolidityStorageSlotAddress(slot, address as Hex), address);
         }
       } else if (
@@ -376,12 +391,12 @@ function expand(
         keyLabel.startsWith('enum')
       ) {
         for (const key of candidates.uints) {
-          if (budget.remaining <= 0) return;
+          if (budget.remaining <= 0 || allTargetsResolved(budget)) return;
           expandForKey(getSolidityStorageSlotUint(slot, key), key);
         }
       } else if (keyLabel.startsWith('bytes32')) {
         for (const key of candidates.bytes32) {
-          if (budget.remaining <= 0) return;
+          if (budget.remaining <= 0 || allTargetsResolved(budget)) return;
           expandForKey(getSolidityStorageSlotBytes(toHex(slot, { size: 32 }), key), key);
         }
       }
@@ -393,10 +408,15 @@ function expand(
 export function buildWordIndex(
   layout: StorageLayout,
   candidates: CandidateKeys,
-  annotate: Annotate = (address) => address
+  annotate: Annotate = (address) => address,
+  targetSlots?: Set<bigint>
 ): WordIndex {
   const index: WordIndex = new Map();
-  const budget: IndexBudget = { remaining: MAX_INDEX_ENTRIES };
+  const budget: IndexBudget = {
+    remaining: MAX_INDEX_ENTRIES,
+    targets: targetSlots,
+    unresolved: targetSlots?.size ?? 0,
+  };
   // mappings last: if a nested mapping exhausts the budget, the cheap static
   // slots have already been indexed
   const variables = [...layout.storage].sort((a, b) => {
@@ -617,6 +637,32 @@ export function decodeRawStorage(
     return decoded;
   }
 
+  // resolve every account's kind up front and union each kind's changed slots,
+  // so one lazily-built index (mapping expansion stops once all its slots are
+  // matched) serves all accounts of that kind
+  const kindByAccount = new Map<string, string>();
+  const targetsByKind = new Map<string, Set<bigint>>();
+  for (const [account, entry] of Object.entries(raw)) {
+    try {
+      const kind = resolveContractKind(account as Address, chainId, context);
+      if (!kind || !storageLayoutDb[kind]) continue;
+      kindByAccount.set(account, kind);
+      let targets = targetsByKind.get(kind);
+      if (!targets) {
+        targets = new Set();
+        targetsByKind.set(kind, targets);
+      }
+      for (const [slot, diff] of Object.entries(entry.stateDiff)) {
+        // slots decoded upstream or via the well-known table never hit the index
+        if (diff.label && diff.decoded) continue;
+        if (wellKnownSlots[slot as Hex]) continue;
+        targets.add(BigInt(slot));
+      }
+    } catch {
+      // unresolvable account: raw fallback
+    }
+  }
+
   const indexCache = new Map<string, WordIndex>();
 
   for (const [account, entry] of Object.entries(raw)) {
@@ -625,14 +671,14 @@ export function decodeRawStorage(
     let index: WordIndex | undefined;
     let layout: StorageLayout | undefined;
     try {
-      const kind = resolveContractKind(account as Address, chainId, context);
+      const kind = kindByAccount.get(account);
       const layoutEntry = kind ? storageLayoutDb[kind] : undefined;
-      if (layoutEntry) {
+      if (kind && layoutEntry) {
         layout = layoutEntry.layout;
-        index = indexCache.get(kind!);
+        index = indexCache.get(kind);
         if (!index) {
-          index = buildWordIndex(layout, candidates, annotate);
-          indexCache.set(kind!, index);
+          index = buildWordIndex(layout, candidates, annotate, targetsByKind.get(kind));
+          indexCache.set(kind, index);
         }
       }
     } catch {
