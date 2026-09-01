@@ -159,6 +159,58 @@ describe('decodeRawStorage', () => {
     });
   });
 
+  describe('index budget', () => {
+    it('caps nested mapping expansion and keeps static slots indexed', () => {
+      // address => address => uint mapping: expansion is quadratic in candidates
+      const layout: StorageLayout = {
+        storage: [
+          {
+            astId: 1,
+            contract: 'T.sol:T',
+            label: '_totalSupply',
+            offset: 0,
+            slot: '0',
+            type: 't_uint256',
+          },
+          {
+            astId: 2,
+            contract: 'T.sol:T',
+            label: '_allowances',
+            offset: 0,
+            slot: '1',
+            type: 't_mapping(t_address,t_mapping(t_address,t_uint256))',
+          },
+        ],
+        types: {
+          t_uint256: { encoding: 'inplace', label: 'uint256', numberOfBytes: '32' },
+          t_address: { encoding: 'inplace', label: 'address', numberOfBytes: '20' },
+          't_mapping(t_address,t_uint256)': {
+            encoding: 'mapping',
+            label: 'mapping(address => uint256)',
+            numberOfBytes: '32',
+            key: 't_address',
+            value: 't_uint256',
+          },
+          't_mapping(t_address,t_mapping(t_address,t_uint256))': {
+            encoding: 'mapping',
+            label: 'mapping(address => mapping(address => uint256))',
+            numberOfBytes: '32',
+            key: 't_address',
+            value: 't_mapping(t_address,t_uint256)',
+          },
+        },
+      };
+      const addresses = new Set<string>();
+      for (let i = 1; i <= 400; i++) addresses.add(toHex(BigInt(i), { size: 20 }));
+      const index = buildWordIndex(layout, { addresses, uints: new Set(), bytes32: new Set() });
+      const totalFields = [...index.values()].reduce((sum, fields) => sum + fields.length, 0);
+      // 400^2 = 160k pairs would exceed the 100k budget
+      expect(totalFields).toBeLessThanOrEqual(100_000);
+      // mappings expand last, so the static variable survives budget exhaustion
+      expect(index.get(0n)![0].label).toBe('_totalSupply');
+    });
+  });
+
   describe('buildCandidateKeys', () => {
     it('collects keys from snapshot, raw accounts, and parsed event args', () => {
       const after = loadReport('default_after.json');

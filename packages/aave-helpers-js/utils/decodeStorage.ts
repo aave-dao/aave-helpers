@@ -158,9 +158,20 @@ type WordIndex = Map<bigint, WordField[]>;
 /** how many overflow words of a long string/bytes variable get indexed */
 const LONG_BYTES_WORDS = 4;
 
+/**
+ * Upper bound on indexed fields per contract kind. Nested mappings expand the
+ * candidate key set once per outer key (e.g. _allowances, _roles[..].members),
+ * which is quadratic in candidates - the budget caps memory and keccak work.
+ */
+const MAX_INDEX_ENTRIES = 100_000;
+
+type IndexBudget = { remaining: number };
+
 type Annotate = (address: string) => string;
 
-function pushField(index: WordIndex, slot: bigint, field: WordField) {
+function pushField(index: WordIndex, slot: bigint, field: WordField, budget: IndexBudget) {
+  if (budget.remaining <= 0) return;
+  budget.remaining--;
   const fields = index.get(slot);
   if (fields) fields.push(field);
   else index.set(slot, [field]);
@@ -188,13 +199,15 @@ function expand(
   offset: number,
   candidates: CandidateKeys,
   annotate: Annotate,
-  mappingDepth: number
+  mappingDepth: number,
+  budget: IndexBudget
 ): void {
+  if (budget.remaining <= 0) return;
   const type = layout.types[typeId];
   if (!type) return;
 
   if (type.label.endsWith('ReserveConfigurationMap')) {
-    pushField(index, slot, { label, typeId, offset: 0, special: 'reserveConfig' });
+    pushField(index, slot, { label, typeId, offset: 0, special: 'reserveConfig' }, budget);
     return;
   }
 
@@ -209,7 +222,8 @@ function expand(
         member.offset,
         candidates,
         annotate,
-        mappingDepth
+        mappingDepth,
+        budget
       );
     }
     return;
@@ -237,46 +251,62 @@ function expand(
               0,
               candidates,
               annotate,
-              mappingDepth
+              mappingDepth,
+              budget
             );
           }
         } else {
           const perWord = Math.floor(32 / itemSize);
           const count = (totalBytes / 32) * perWord;
           for (let i = 0; i < count; i++) {
-            pushField(index, slot + BigInt(Math.floor(i / perWord)), {
-              label: `${label}[${i}]`,
-              typeId: type.base,
-              offset: (i % perWord) * itemSize,
-            });
+            pushField(
+              index,
+              slot + BigInt(Math.floor(i / perWord)),
+              {
+                label: `${label}[${i}]`,
+                typeId: type.base,
+                offset: (i % perWord) * itemSize,
+              },
+              budget
+            );
           }
         }
         return;
       }
-      pushField(index, slot, { label, typeId, offset });
+      pushField(index, slot, { label, typeId, offset }, budget);
       return;
     }
     case 'bytes': {
-      pushField(index, slot, { label, typeId, offset: 0, special: 'bytes' });
+      pushField(index, slot, { label, typeId, offset: 0, special: 'bytes' }, budget);
       // long strings/bytes overflow into keccak(slot) + i
       const contentBase = BigInt(keccak256(toHex(slot, { size: 32 })));
       for (let i = 0; i < LONG_BYTES_WORDS; i++) {
-        pushField(index, contentBase + BigInt(i), {
-          label: `${label} (data)`,
-          typeId,
-          offset: 0,
-          special: 'bytesData',
-        });
+        pushField(
+          index,
+          contentBase + BigInt(i),
+          {
+            label: `${label} (data)`,
+            typeId,
+            offset: 0,
+            special: 'bytesData',
+          },
+          budget
+        );
       }
       return;
     }
     case 'dynamic_array': {
-      pushField(index, slot, {
-        label: `${label}.length`,
-        typeId,
-        offset: 0,
-        special: 'arrayLength',
-      });
+      pushField(
+        index,
+        slot,
+        {
+          label: `${label}.length`,
+          typeId,
+          offset: 0,
+          special: 'arrayLength',
+        },
+        budget
+      );
       // elements live at keccak(slot) + i; index the first DYNAMIC_ARRAY_WORDS words
       if (!type.base) return;
       const itemType = layout.types[type.base];
@@ -296,17 +326,23 @@ function expand(
             0,
             candidates,
             annotate,
-            mappingDepth
+            mappingDepth,
+            budget
           );
         }
       } else {
         const perWord = Math.floor(32 / itemSize);
         for (let i = 0; i < DYNAMIC_ARRAY_WORDS * perWord; i++) {
-          pushField(index, elementsBase + BigInt(Math.floor(i / perWord)), {
-            label: `${label}[${i}]`,
-            typeId: type.base,
-            offset: (i % perWord) * itemSize,
-          });
+          pushField(
+            index,
+            elementsBase + BigInt(Math.floor(i / perWord)),
+            {
+              label: `${label}[${i}]`,
+              typeId: type.base,
+              offset: (i % perWord) * itemSize,
+            },
+            budget
+          );
         }
       }
       return;
@@ -325,11 +361,13 @@ function expand(
           0,
           candidates,
           annotate,
-          mappingDepth + 1
+          mappingDepth + 1,
+          budget
         );
       };
       if (keyLabel.startsWith('address') || keyLabel.startsWith('contract')) {
         for (const address of candidates.addresses) {
+          if (budget.remaining <= 0) return;
           expandForKey(getSolidityStorageSlotAddress(slot, address as Hex), address);
         }
       } else if (
@@ -338,10 +376,12 @@ function expand(
         keyLabel.startsWith('enum')
       ) {
         for (const key of candidates.uints) {
+          if (budget.remaining <= 0) return;
           expandForKey(getSolidityStorageSlotUint(slot, key), key);
         }
       } else if (keyLabel.startsWith('bytes32')) {
         for (const key of candidates.bytes32) {
+          if (budget.remaining <= 0) return;
           expandForKey(getSolidityStorageSlotBytes(toHex(slot, { size: 32 }), key), key);
         }
       }
@@ -356,7 +396,15 @@ export function buildWordIndex(
   annotate: Annotate = (address) => address
 ): WordIndex {
   const index: WordIndex = new Map();
-  for (const variable of layout.storage) {
+  const budget: IndexBudget = { remaining: MAX_INDEX_ENTRIES };
+  // mappings last: if a nested mapping exhausts the budget, the cheap static
+  // slots have already been indexed
+  const variables = [...layout.storage].sort((a, b) => {
+    const aIsMapping = layout.types[a.type]?.encoding === 'mapping' ? 1 : 0;
+    const bIsMapping = layout.types[b.type]?.encoding === 'mapping' ? 1 : 0;
+    return aIsMapping - bIsMapping;
+  });
+  for (const variable of variables) {
     expand(
       index,
       layout,
@@ -366,7 +414,8 @@ export function buildWordIndex(
       variable.offset,
       candidates,
       annotate,
-      0
+      0,
+      budget
     );
   }
   return index;

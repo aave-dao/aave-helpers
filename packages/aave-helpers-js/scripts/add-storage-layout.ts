@@ -27,7 +27,7 @@
 import { execFileSync } from 'child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
-import { dirname, join, resolve } from 'path';
+import { dirname, join, resolve, sep } from 'path';
 import { parseArgs } from 'util';
 import { getSourceCode } from '@aave-dao/toolbox';
 import type { StorageLayout } from '../utils/storageLayoutTypes';
@@ -102,6 +102,19 @@ async function fetchVerifiedSource(chainId: number, address: `0x${string}`) {
 }
 
 /**
+ * Flattens a verified-source path into a project-relative path under src/.
+ * Verified sources are attacker-controlled, so every '.', '..', empty and
+ * drive-letter segment is dropped: 'a/../../../etc/x' becomes 'src/a/etc/x'.
+ */
+function sanitizeSourcePath(sourcePath: string): string {
+  const segments = sourcePath
+    .split(/[\\/]+/)
+    .filter((segment) => segment && segment !== '.' && segment !== '..' && !segment.includes(':'));
+  if (!segments.length) throw new Error(`Unusable source path: ${sourcePath}`);
+  return join('src', ...segments);
+}
+
+/**
  * Writes an etherscan verified source into `dest` as a compilable foundry project and
  * returns the `path:Name` forge inspect target.
  */
@@ -127,9 +140,11 @@ function materializeEtherscanProject(source: EtherscanSource, dest: string): str
   let target: string | undefined;
   const contractRegex = new RegExp(`(contract|abstract contract)\\s+${contractName}[\\s({]`);
   for (const [path, { content }] of Object.entries(sources)) {
-    // source paths can escape the project root (../) or be absolute — normalize into src/
-    const safePath = join('src', path.replace(/^[/.]+/, ''));
-    const filePath = join(dest, safePath);
+    const safePath = sanitizeSourcePath(path);
+    const filePath = resolve(dest, safePath);
+    if (!filePath.startsWith(resolve(dest) + sep)) {
+      throw new Error(`Source path escapes project directory: ${path}`);
+    }
     mkdirSync(dirname(filePath), { recursive: true });
     writeFileSync(filePath, content, 'utf-8');
     if (!target && contractRegex.test(content)) target = `${safePath}:${contractName}`;
@@ -138,7 +153,7 @@ function materializeEtherscanProject(source: EtherscanSource, dest: string): str
 
   const remappings: string[] = (settings.remappings ?? []).map((r: string) => {
     const [from, to] = r.split('=');
-    return `${from}=${join('src', to.replace(/^[/.]+/, ''))}`;
+    return `${from}=${sanitizeSourcePath(to)}`;
   });
   const foundryToml = [
     '[profile.default]',
