@@ -1,0 +1,19 @@
+.changeset/decode-storage-slots.md
+  s_a3985ea6bcb782::t_aea1065dc4d30b 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "ed284431ec3f654cb696e6792a4a25d8b28414a1",
+  "prompts": {},
+  "sessions": {
+    "s_a3985ea6bcb782": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e2dfebd4-b7e0-4fd7-94b1-452b01110e6d",
+        "model": "claude-fable-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
