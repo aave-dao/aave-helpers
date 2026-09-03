@@ -33,11 +33,11 @@ importers:
   packages/aave-helpers-js:
     dependencies:
       '@aave-dao/aave-address-book':
-        specifier: ^4.65.6
-        version: 4.65.6(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
+        specifier: ^4.68.1
+        version: 4.68.1(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
       '@aave-dao/toolbox':
-        specifier: ^0.6.1
-        version: 0.6.1(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
+        specifier: ^0.7.0
+        version: 0.7.0(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
       commander:
         specifier: ^14.0.3
         version: 14.0.3
@@ -66,13 +66,13 @@ importers:
 
 packages:
 
-  '@aave-dao/aave-address-book@4.65.6':
-    resolution: {integrity: sha512-cDb+7HxLd2hFCMdhP6iNN8lXwdYWo0RTXD58XnzHSg0NzHfsr5/gPkTuFHIFneZKHguKqWn+ep3P1GzoXpXXbQ==}
+  '@aave-dao/aave-address-book@4.68.1':
+    resolution: {integrity: sha512-Tw1j/0OGN90m6cpaiNwpizxkBq4XzVgJqhz/fWdq9wF7yc2MAghVrsRWrCICBUiG+P7GKYd84mwULH0XVW3QTA==}
     peerDependencies:
       viem: ^2.23.5
 
-  '@aave-dao/toolbox@0.6.1':
-    resolution: {integrity: sha512-8xOf1XDa6VGwp2DvILlhBzLZej+DfwAPCZT6NVK/mZN9uUAdF1DyMBcqYY0X6QsWe7DrzGzQGJrzGYo6e4gSvg==}
+  '@aave-dao/toolbox@0.7.0':
+    resolution: {integrity: sha512-61+EdhZAVDtmFleKFJFewM4Fy0+pgVdi2IlZoGFRyJPErnC6rhxzM3P1yhQdNmoQrVrhhmy80WQh+I0Hg47rlA==}
     engines: {node: '>=22'}
     peerDependencies:
       prettier: ^3.5.2
@@ -807,12 +807,12 @@ packages:
   eventemitter3@5.0.1:
     resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
 
-  eventsource-parser@3.1.0:
-    resolution: {integrity: sha512-kJezFj9YFAMLeORyi7aCLxLbD5/qWMQnoMVlVPyHIll7lgRJCc3JVln9Vgl9nwQi0YkMnhdGTMNn7CkRRAptMg==}
+  eventsource-parser@3.1.1:
+    resolution: {integrity: sha512-EKN1vKAMcZ8MlYMpaNuxN6R9yakzH6uajHcHVTqWJzvu5pWw9DyhbP35HH8MVBQ+dZjAfDxk+A8NiR9KWaXiyQ==}
     engines: {node: '>=18.0.0'}
 
-  eventsource@4.1.0:
-    resolution: {integrity: sha512-2GuF51iuHX6A9xdTccMTsNb7VO0lHZihApxhvQzJB5A03DvHDd2FQepodbMaztPBmBcE/ox7o2gqaxGhYB9LhQ==}
+  eventsource@4.1.1:
+    resolution: {integrity: sha512-D6bTRWh6KahHTK/m4WnjPQyEinNPf9eFLEZSEoj7d6fTibspnAVYfzHvirL7u/aoX5d9YYfIkBVAhmigUELk9w==}
     engines: {node: '>=20.0.0'}
 
   expect-type@1.3.0:
@@ -923,12 +923,12 @@ packages:
     peerDependencies:
       ws: '*'
 
-  js-yaml@3.14.2:
-    resolution: {integrity: sha512-PMSmkqxr106Xa156c2M265Z+FTrPl+oxd/rgOQy2tijQeK5TxQ43psO1ZCwhVOSdnn+RzkzlRz/eY4BgJBYVpg==}
+  js-yaml@3.15.2:
+    resolution: {integrity: sha512-6EuL879VkRA+1Cz578mKMiKvjPNEuk6+r1JaFzoSWejZmtf7xWbIyw1e3KkxlkzTIt9Taw6JBhEppG7utc1P+w==}
     hasBin: true
 
-  js-yaml@4.1.1:
-    resolution: {integrity: sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==}
+  js-yaml@4.3.2:
+    resolution: {integrity: sha512-SFNOvSJ+Dgf/9An904Yx+CgSlIPCkIpao4qo51lpee25TIRejdH3rhR4EZMGoNx3/TP3O+wzWuiTFl4sqbltzA==}
     hasBin: true
 
   jsesc@3.1.0:
@@ -1349,16 +1349,16 @@ packages:
 
 snapshots:
 
-  '@aave-dao/aave-address-book@4.65.6(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
+  '@aave-dao/aave-address-book@4.68.1(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
     dependencies:
       viem: 2.45.3(typescript@5.9.3)(zod@4.3.6)
 
-  '@aave-dao/toolbox@0.6.1(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
+  '@aave-dao/toolbox@0.7.0(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
     dependencies:
       bs58: 6.0.0
       diff: 8.0.4
-      eventsource: 4.1.0
-      js-yaml: 4.1.1
+      eventsource: 4.1.1
+      js-yaml: 4.3.2
       prettier: 3.5.3
       prettier-plugin-solidity: 1.4.3(prettier@3.5.3)
       viem: 2.45.3(typescript@5.9.3)(zod@4.3.6)
@@ -1498,7 +1498,7 @@ snapshots:
   '@changesets/parse@0.4.2':
     dependencies:
       '@changesets/types': 6.1.0
-      js-yaml: 4.1.1
+      js-yaml: 4.3.2
 
   '@changesets/pre@2.0.2':
     dependencies:
@@ -2010,11 +2010,11 @@ snapshots:
 
   eventemitter3@5.0.1: {}
 
-  eventsource-parser@3.1.0: {}
+  eventsource-parser@3.1.1: {}
 
-  eventsource@4.1.0:
+  eventsource@4.1.1:
     dependencies:
-      eventsource-parser: 3.1.0
+      eventsource-parser: 3.1.1
 
   expect-type@1.3.0: {}
 
@@ -2113,12 +2113,12 @@ snapshots:
     dependencies:
       ws: 8.18.3
 
-  js-yaml@3.14.2:
+  js-yaml@3.15.2:
     dependencies:
       argparse: 1.0.10
       esprima: 4.0.1
 
-  js-yaml@4.1.1:
+  js-yaml@4.3.2:
     dependencies:
       argparse: 2.0.1
 
@@ -2229,7 +2229,7 @@ snapshots:
   read-yaml-file@1.1.0:
     dependencies:
       graceful-fs: 4.2.11
-      js-yaml: 3.14.2
+      js-yaml: 3.15.2
       pify: 4.0.1
       strip-bom: 3.0.0
 
