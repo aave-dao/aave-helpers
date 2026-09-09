@@ -25,6 +25,8 @@ abstract contract GatewayScenarios is Helpers {
     INativeTokenGateway gateway,
     ISpoke spoke
   ) internal view returns (bool found, Types.ReserveInfo memory info) {
+    // Markets without a NativeTokenGateway (e.g. Arc) bind address(0).
+    if (address(gateway) == address(0)) return (false, info);
     address weth = gateway.NATIVE_TOKEN_WRAPPER();
     Types.ReserveInfo[] memory allReserves = _getReserveInfo(spoke);
     for (uint256 i; i < allReserves.length; i++) {
