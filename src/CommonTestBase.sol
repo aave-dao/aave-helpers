@@ -15,6 +15,7 @@ import {AaveV3MonadAssets} from 'aave-address-book/AaveV3Monad.sol';
 import {AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3GnosisAssets} from 'aave-address-book/AaveV3Gnosis.sol';
 import {AaveV3BaseAssets} from 'aave-address-book/AaveV3Base.sol';
+import {AaveV4ArcAssets} from 'aave-address-book/AaveV4Arc.sol';
 import {ChainIds} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 import {IPool} from 'aave-address-book/AaveV3.sol';
 import {IPayloadsControllerCore} from 'aave-address-book/GovernanceV3.sol';
@@ -171,6 +172,13 @@ contract CommonTestBase is Test {
       // CELO
       if (asset == 0x471EcE3750Da237f93B8E339c536989b8978a438) {
         vm.deal(user, amount);
+        return true;
+      }
+    }
+    if (block.chainid == ChainIds.ARC) {
+      // USDC is the native coin: the ERC20 reports account.balance / 1e12
+      if (asset == AaveV4ArcAssets.USDC_UNDERLYING) {
+        vm.deal(user, amount * 1e12);
         return true;
       }
     }
