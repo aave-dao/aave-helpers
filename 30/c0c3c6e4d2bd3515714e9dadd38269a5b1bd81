@@ -1,0 +1,21 @@
+foundry.lock
+  s_3845b488e173ef::t_d12cef00438d03 5
+lib/aave-address-book
+  s_3845b488e173ef::t_a77504c9987d1c 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "30c0c3c6e4d2bd3515714e9dadd38269a5b1bd81",
+  "prompts": {},
+  "sessions": {
+    "s_3845b488e173ef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "594728f2-447a-4783-9d12-e7d5283208db",
+        "model": "claude-opus-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
