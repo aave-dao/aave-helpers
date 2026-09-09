@@ -298,7 +298,7 @@ abstract contract ProtocolV4TestBase is
 
   function _executePayloadWithRecording(
     address payload
-  ) private returns (string memory rawDiff, string memory logsJson) {
+  ) internal virtual returns (string memory rawDiff, string memory logsJson) {
     address payloadsController = address(GovV3Helpers.getPayloadsController(block.chainid));
 
     // Meter execution on a dedicated run: vm.startStateDiffRecording (needed for the diff below)
