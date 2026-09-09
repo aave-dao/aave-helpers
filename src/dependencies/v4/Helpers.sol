@@ -45,7 +45,9 @@ abstract contract Helpers is Actions {
   }
 
   /// @notice Build ReserveInfo[] for all reserves on a spoke.
-  function _getReserveInfo(ISpoke spoke) internal view returns (Types.ReserveInfo[] memory) {
+  function _getReserveInfo(
+    ISpoke spoke
+  ) internal view virtual returns (Types.ReserveInfo[] memory) {
     uint256 count = spoke.getReserveCount();
     Types.ReserveInfo[] memory info = new Types.ReserveInfo[](count);
 
