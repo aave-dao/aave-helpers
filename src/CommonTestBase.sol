@@ -86,7 +86,11 @@ contract CommonTestBase is Test {
    * @param amount the amount to deal
    * @return bool true if the caller has changed due to prank usage
    */
-  function _patchedDeal(address asset, address user, uint256 amount) internal returns (bool) {
+  function _patchedDeal(
+    address asset,
+    address user,
+    uint256 amount
+  ) internal virtual returns (bool) {
     if (block.chainid == ChainIds.MAINNET) {
       // FXS
       if (asset == 0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0) {
@@ -191,7 +195,7 @@ contract CommonTestBase is Test {
    * @param user to deal to
    * @param amount to deal
    */
-  function deal2(address asset, address user, uint256 amount) internal {
+  function deal2(address asset, address user, uint256 amount) internal virtual {
     (VmSafe.CallerMode mode, address oldSender, ) = vm.readCallers();
     if (mode != VmSafe.CallerMode.None) vm.stopPrank();
     bool patched = _patchedDeal(asset, user, amount);
