@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.5.0
+
+### Minor Changes
+
+- 918ca30: Bump `@aave-dao/toolbox` to 0.6.1 for the latest chain list.
+
 ## 1.4.2
 
 ### Patch Changes
