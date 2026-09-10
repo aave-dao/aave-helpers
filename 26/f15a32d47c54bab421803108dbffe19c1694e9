@@ -1,0 +1,19 @@
+.changeset/arb-gsm-events.md
+  s_64dcff46ca5d1d::t_da886792276e8c 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "26f15a32d47c54bab421803108dbffe19c1694e9",
+  "prompts": {},
+  "sessions": {
+    "s_64dcff46ca5d1d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2869b90a-9045-4250-9210-b50657404e79",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Alexandru Niculae <43644109+avniculae@users.noreply.github.com>"
+    }
+  }
+}
