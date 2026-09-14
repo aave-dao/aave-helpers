@@ -7,7 +7,7 @@ import {DataTypes} from 'aave-v3-origin/contracts/protocol/libraries/types/DataT
  * @notice Reads reserve configuration fields used by pools before v3.7.
  * @dev These fields were removed from the current ReserveConfiguration library.
  */
-library LegacyReserveConfiguration {
+library ReserveConfigurationV36 {
   function debtCeiling(
     DataTypes.ReserveConfigurationMap memory configuration
   ) internal pure returns (uint256) {

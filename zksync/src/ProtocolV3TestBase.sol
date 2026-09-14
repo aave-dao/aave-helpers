@@ -22,7 +22,7 @@ import {ILegacyDefaultInterestRateStrategy} from '../../src/dependencies/ILegacy
 import {GovV3Helpers} from '../../src/GovV3Helpers.sol';
 import {DiffUtils} from '../../src/DiffUtils.sol';
 import {SnapshotHelpersV3} from './SnapshotHelpersV3.sol';
-import {LegacyReserveConfiguration} from '../../src/LegacyReserveConfiguration.sol';
+import {ReserveConfigurationV36} from '../../src/ReserveConfigurationV36.sol';
 
 contract MockFlashReceiver {
   using SafeERC20 for IERC20;
@@ -43,7 +43,7 @@ contract MockFlashReceiver {
 
 contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
-  using LegacyReserveConfiguration for DataTypes.ReserveConfigurationMap;
+  using ReserveConfigurationV36 for DataTypes.ReserveConfigurationMap;
   using PercentageMath for uint256;
   using WadRayMath for uint256;
   using SafeERC20 for IERC20;

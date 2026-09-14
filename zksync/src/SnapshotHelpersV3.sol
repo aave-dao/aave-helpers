@@ -16,11 +16,11 @@ import {ReserveConfig, ReserveTokens, DataTypes} from 'aave-v3-origin-tests/util
 import {ProtocolV3TestBase as TestBase} from './ProtocolV3TestBase.sol';
 import {ILegacyDefaultInterestRateStrategy} from '../../src/dependencies/ILegacyDefaultInterestRateStrategy.sol';
 import {DiffUtils} from '../../src/DiffUtils.sol';
-import {LegacyReserveConfiguration} from '../../src/LegacyReserveConfiguration.sol';
+import {ReserveConfigurationV36} from '../../src/ReserveConfigurationV36.sol';
 
 contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
-  using LegacyReserveConfiguration for DataTypes.ReserveConfigurationMap;
+  using ReserveConfigurationV36 for DataTypes.ReserveConfigurationMap;
 
   function createConfigurationSnapshot(
     string memory reportName,
