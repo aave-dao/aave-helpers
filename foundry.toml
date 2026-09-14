@@ -18,7 +18,7 @@ src = 'zksync/src'
 test = 'zksync/tests'
 libs = ['lib']
 solc = '0.8.27'
-fs_permissions = [{ access = "write", path = "./reports" }]
+fs_permissions = [{ access = "read-write", path = "./reports" }]
 ffi = true
 evm_version = 'shanghai'
 

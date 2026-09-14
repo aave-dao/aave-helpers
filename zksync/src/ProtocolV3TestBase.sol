@@ -165,7 +165,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
    */
   function e2eTest(IPool pool) public {
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
-    ReserveConfig memory collateralConfig = _getGoodCollateral(configs);
+    ReserveConfig memory collateralConfig = _getGoodCollateral(configs, pool);
     uint256 snapshot = vm.snapshotState();
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
@@ -458,8 +458,9 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
    * @dev returns a "good" collateral in the list
    */
   function _getGoodCollateral(
-    ReserveConfig[] memory configs
-  ) private pure returns (ReserveConfig memory config) {
+    ReserveConfig[] memory configs,
+    IPool pool
+  ) internal view returns (ReserveConfig memory config) {
     for (uint256 i = 0; i < configs.length; i++) {
       if (
         // not frozen etc
@@ -468,7 +469,8 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
         // ltv is not 0
         _includeInE2e(configs[i]) &&
         configs[i].usageAsCollateralEnabled &&
-        configs[i].debtCeiling == 0 &&
+        // The pre-v3.7 debt ceiling occupies bits 212-251 of the deployed configuration.
+        uint40(pool.getConfiguration(configs[i].underlying).data >> 212) == 0 &&
         configs[i].ltv != 0
       ) return configs[i];
     }

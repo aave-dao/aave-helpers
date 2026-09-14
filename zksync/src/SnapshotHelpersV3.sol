@@ -144,6 +144,9 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
     IAaveOracle oracle = IAaveOracle(addressesProvider.getPriceOracle());
     for (uint256 i = 0; i < configs.length; i++) {
       ReserveConfig memory config = configs[i];
+      // Pre-v3.7 isolation and siloed borrowing fields are absent from ReserveConfig.
+      // Read their original bits so snapshots still describe older deployed pools.
+      uint256 configuration = pool.getConfiguration(config.underlying).data;
       ExtendedAggregatorV2V3Interface assetOracle = ExtendedAggregatorV2V3Interface(
         oracle.getSourceOfAsset(config.underlying)
       );
@@ -160,14 +163,14 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       vm.serializeUint(key, 'decimals', config.decimals);
       vm.serializeUint(key, 'borrowCap', config.borrowCap);
       vm.serializeUint(key, 'supplyCap', config.supplyCap);
-      vm.serializeUint(key, 'debtCeiling', config.debtCeiling);
+      vm.serializeUint(key, 'debtCeiling', uint40(configuration >> 212));
       vm.serializeBool(key, 'usageAsCollateralEnabled', config.usageAsCollateralEnabled);
       vm.serializeBool(key, 'borrowingEnabled', config.borrowingEnabled);
       vm.serializeBool(key, 'isPaused', config.isPaused);
       vm.serializeBool(key, 'isActive', config.isActive);
       vm.serializeBool(key, 'isFrozen', config.isFrozen);
-      vm.serializeBool(key, 'isSiloed', config.isSiloed);
-      vm.serializeBool(key, 'isBorrowableInIsolation', config.isBorrowableInIsolation);
+      vm.serializeBool(key, 'isSiloed', configuration & (1 << 62) != 0);
+      vm.serializeBool(key, 'isBorrowableInIsolation', configuration & (1 << 61) != 0);
       vm.serializeBool(key, 'isFlashloanable', config.isFlashloanable);
       vm.serializeAddress(key, 'interestRateStrategy', config.interestRateStrategy);
       vm.serializeAddress(key, 'underlying', config.underlying);
