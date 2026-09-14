@@ -22,6 +22,7 @@ import {ILegacyDefaultInterestRateStrategy} from '../../src/dependencies/ILegacy
 import {GovV3Helpers} from '../../src/GovV3Helpers.sol';
 import {DiffUtils} from '../../src/DiffUtils.sol';
 import {SnapshotHelpersV3} from './SnapshotHelpersV3.sol';
+import {LegacyReserveConfiguration} from '../../src/LegacyReserveConfiguration.sol';
 
 contract MockFlashReceiver {
   using SafeERC20 for IERC20;
@@ -42,6 +43,7 @@ contract MockFlashReceiver {
 
 contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils {
   using ReserveConfiguration for DataTypes.ReserveConfigurationMap;
+  using LegacyReserveConfiguration for DataTypes.ReserveConfigurationMap;
   using PercentageMath for uint256;
   using WadRayMath for uint256;
   using SafeERC20 for IERC20;
@@ -469,8 +471,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
         // ltv is not 0
         _includeInE2e(configs[i]) &&
         configs[i].usageAsCollateralEnabled &&
-        // The pre-v3.7 debt ceiling occupies bits 212-251 of the deployed configuration.
-        uint40(pool.getConfiguration(configs[i].underlying).data >> 212) == 0 &&
+        pool.getConfiguration(configs[i].underlying).getDebtCeiling() == 0 &&
         configs[i].ltv != 0
       ) return configs[i];
     }
