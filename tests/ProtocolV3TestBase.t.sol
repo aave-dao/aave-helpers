@@ -670,11 +670,14 @@ contract ProtocolV3TestBaseFreezePendingLtvTest is ProtocolV3TestBase {
     address[] memory updatedAssets = new address[](1);
     updatedAssets[0] = AaveV3EthereumAssets.WETH_UNDERLYING;
 
-    (ReserveConfig[] memory configsBefore, ReserveConfig[] memory configsAfter) = reserveConfigChangesTest(
-      AaveV3Ethereum.POOL,
-      address(new PayloadFreezeWeth()),
-      updatedAssets
-    );
+    (
+      ReserveConfig[] memory configsBefore,
+      ReserveConfig[] memory configsAfter
+    ) = reserveConfigChangesTest(
+        AaveV3Ethereum.POOL,
+        address(new PayloadFreezeWeth()),
+        updatedAssets
+      );
 
     ReserveConfig memory wethBefore = _findReserveConfig(
       configsBefore,
