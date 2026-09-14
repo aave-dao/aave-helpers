@@ -8,20 +8,20 @@ import {DataTypes} from 'aave-v3-origin/contracts/protocol/libraries/types/DataT
  * @dev These fields were removed from the current ReserveConfiguration library.
  */
 library LegacyReserveConfiguration {
-  function getDebtCeiling(
+  function debtCeiling(
     DataTypes.ReserveConfigurationMap memory configuration
   ) internal pure returns (uint256) {
     // Bits 212-251: debt ceiling in units of 0.01 USD.
     return uint40(configuration.data >> 212);
   }
 
-  function getSiloedBorrowing(
+  function isSiloed(
     DataTypes.ReserveConfigurationMap memory configuration
   ) internal pure returns (bool) {
     return configuration.data & (1 << 62) != 0;
   }
 
-  function getBorrowableInIsolation(
+  function isBorrowableInIsolation(
     DataTypes.ReserveConfigurationMap memory configuration
   ) internal pure returns (bool) {
     return configuration.data & (1 << 61) != 0;

@@ -471,7 +471,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
         // ltv is not 0
         _includeInE2e(configs[i]) &&
         configs[i].usageAsCollateralEnabled &&
-        pool.getConfiguration(configs[i].underlying).getDebtCeiling() == 0 &&
+        pool.getConfiguration(configs[i].underlying).debtCeiling() == 0 &&
         configs[i].ltv != 0
       ) return configs[i];
     }
