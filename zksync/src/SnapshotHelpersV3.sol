@@ -160,14 +160,11 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
       vm.serializeUint(key, 'decimals', config.decimals);
       vm.serializeUint(key, 'borrowCap', config.borrowCap);
       vm.serializeUint(key, 'supplyCap', config.supplyCap);
-      vm.serializeUint(key, 'debtCeiling', config.debtCeiling);
       vm.serializeBool(key, 'usageAsCollateralEnabled', config.usageAsCollateralEnabled);
       vm.serializeBool(key, 'borrowingEnabled', config.borrowingEnabled);
       vm.serializeBool(key, 'isPaused', config.isPaused);
       vm.serializeBool(key, 'isActive', config.isActive);
       vm.serializeBool(key, 'isFrozen', config.isFrozen);
-      vm.serializeBool(key, 'isSiloed', config.isSiloed);
-      vm.serializeBool(key, 'isBorrowableInIsolation', config.isBorrowableInIsolation);
       vm.serializeBool(key, 'isFlashloanable', config.isFlashloanable);
       vm.serializeAddress(key, 'interestRateStrategy', config.interestRateStrategy);
       vm.serializeAddress(key, 'underlying', config.underlying);
