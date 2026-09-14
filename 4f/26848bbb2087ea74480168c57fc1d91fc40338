@@ -1,0 +1,113 @@
+.changeset/decode-storage-slots.md
+  s_a3985ea6bcb782::t_874c85fdeeb6ad 1-5
+packages/aave-helpers-js/utils/resolveContractKind.ts
+  s_a3985ea6bcb782::t_8d0284dd44abef 1-83
+packages/aave-helpers-js/utils/storage-layouts/ATokenInstance.ts
+  s_a3985ea6bcb782::t_79ef3aa7f50387 1-4,201
+  s_a3985ea6bcb782::t_9035a5993e6645 5-200
+packages/aave-helpers-js/utils/storage-layouts/PoolAddressesProvider.ts
+  s_a3985ea6bcb782::t_79ef3aa7f50387 1-4,50
+  s_a3985ea6bcb782::t_9035a5993e6645 5-49
+packages/aave-helpers-js/utils/storage-layouts/Governance.ts
+  s_a3985ea6bcb782::t_46a47698840ce0 1-4,468
+  s_a3985ea6bcb782::t_9035a5993e6645 5-467
+packages/aave-helpers-js/sections/raw.ts
+  s_a3985ea6bcb782::t_b227586e70626b 3,5-14,41-42,46,49-57
+packages/aave-helpers-js/utils/storage-layouts/CrossChainController.ts
+  s_a3985ea6bcb782::t_9035a5993e6645 5-392
+  s_a3985ea6bcb782::t_46a47698840ce0 1-4,393
+packages/aave-helpers-js/README.md
+  s_a3985ea6bcb782::t_3b571df4107762 71-102
+packages/aave-helpers-js/utils/storageLayoutTypes.ts
+  s_a3985ea6bcb782::t_f6f4b3107b0ef8 1-46
+packages/aave-helpers-js/protocol-diff-v4.ts
+  s_a3985ea6bcb782::t_c7d31646fc7238 11-12
+  s_a3985ea6bcb782::t_a3515d1c6e42b1 47-52
+packages/aave-helpers-js/utils/storage-layouts/PoolConfiguratorInstance.ts
+  s_a3985ea6bcb782::t_9035a5993e6645 5-86
+  s_a3985ea6bcb782::t_79ef3aa7f50387 1-4,87
+packages/aave-helpers-js/index.ts
+  s_a3985ea6bcb782::t_7f3efca12ce652 4-7
+packages/aave-helpers-js/__tests__/protocol-diff.spec.ts
+  s_a3985ea6bcb782::t_a9c0feb3a0ec49 157-160,918-930,936-948,962-971,977-987,993-1002,1012-1023,1027-1030,1046-1054,1058-1060,1086-1098,1112-1121,1125-1278,1282-1285,1291-1303,1309-1321,1335-1347,1361-1371,1396-1407,1413-1425
+packages/aave-helpers-js/utils/storage-layouts/RewardsController.ts
+  s_a3985ea6bcb782::t_9035a5993e6645 5-295
+  s_a3985ea6bcb782::t_79ef3aa7f50387 1-4,296
+packages/aave-helpers-js/__tests__/decode-storage.spec.ts
+  s_a3985ea6bcb782::t_c8dc65e54b1ee6 1-79,81-136
+  s_a3985ea6bcb782::t_c64faf8f9ed8a9 80
+packages/aave-helpers-js/utils/storage-layouts/PoolInstance.ts
+  s_a3985ea6bcb782::t_79ef3aa7f50387 1-4,433
+  s_a3985ea6bcb782::t_9035a5993e6645 5-432
+packages/aave-helpers-js/utils/storageLayoutDb.ts
+  s_a3985ea6bcb782::t_4c84940139a42a 11,29
+  s_a3985ea6bcb782::t_79ef3aa7f50387 15-22,33-40
+  s_a3985ea6bcb782::t_46a47698840ce0 9-10,27-28
+  s_a3985ea6bcb782::t_29acf25099c789 12-14,30-32
+  s_a3985ea6bcb782::t_6fbdc486038cef 1-8,23-26,41-95
+packages/aave-helpers-js/utils/storage-layouts/AaveOracle.ts
+  s_a3985ea6bcb782::t_9035a5993e6645 5-46
+  s_a3985ea6bcb782::t_79ef3aa7f50387 1-4,47
+packages/aave-helpers-js/utils/storage-layouts/ACLManager.ts
+  s_a3985ea6bcb782::t_79ef3aa7f50387 1-4,61
+  s_a3985ea6bcb782::t_9035a5993e6645 5-60
+packages/aave-helpers-js/scripts/add-storage-layout.ts
+  s_a3985ea6bcb782::t_9035a5993e6645 89-94,186-187
+  s_a3985ea6bcb782::t_f64448cf460d5a 1-88,95-185,188-252
+packages/aave-helpers-js/utils/decodeStorage.ts
+  s_a3985ea6bcb782::t_d26347e3a9711e 384-386,393,395,397-399
+  s_a3985ea6bcb782::t_f8e974e4e10dfd 532
+  s_a3985ea6bcb782::t_0c0643fa8fd005 492
+  s_a3985ea6bcb782::t_f39ab7a2267cac 20
+  s_a3985ea6bcb782::t_3ecc6cbc95273a 106
+  s_a3985ea6bcb782::t_20dfa268705a4c 53-60
+  s_a3985ea6bcb782::t_9035a5993e6645 272-277,301-305,400,564-569
+  s_a3985ea6bcb782::t_3a96c68e6c4823 151,156-160,167-171,174
+  s_a3985ea6bcb782::t_4baede44188d4f 289,293
+  s_a3985ea6bcb782::t_adcfd80f213eea 259-268
+  s_a3985ea6bcb782::t_bc72a6af2e5d2c 387-392,394,396
+  s_a3985ea6bcb782::t_0e8a63bb93da5e 10-19
+  s_a3985ea6bcb782::t_ff00367e8d681c 135-139
+  s_a3985ea6bcb782::t_acdfda65dcda90 1-9,21-52,61-105,107-134,140-150,152-155,161-166,172-173,175-187,189-208,210-236,238-258,269-271,278-288,290-292,294-300,306-318,324-333,335-383,401-442,452-491,493-531,533-563,570-591
+  s_a3985ea6bcb782::t_869d739f41550d 188
+  s_a3985ea6bcb782::t_3d3331c5e6a2a2 319-323,334
+  s_a3985ea6bcb782::t_34a68bf24beacd 209
+  s_a3985ea6bcb782::t_410a0e7aff8282 237
+  s_a3985ea6bcb782::t_f76940cb52c711 443-451
+packages/aave-helpers-js/utils/storage-layouts/VariableDebtTokenInstance.ts
+  s_a3985ea6bcb782::t_9035a5993e6645 5-225
+  s_a3985ea6bcb782::t_79ef3aa7f50387 1-4,226
+packages/aave-helpers-js/utils/storage-layouts/HubInstance.ts
+  s_a3985ea6bcb782::t_29acf25099c789 1-4,394
+  s_a3985ea6bcb782::t_9035a5993e6645 5-393
+packages/aave-helpers-js/utils/storage-layouts/PayloadsController.ts
+  s_a3985ea6bcb782::t_9035a5993e6645 5-279
+  s_a3985ea6bcb782::t_4c84940139a42a 1-4,280
+packages/aave-helpers-js/utils/storage-layouts/SpokeInstance.ts
+  s_a3985ea6bcb782::t_9035a5993e6645 5-399
+  s_a3985ea6bcb782::t_29acf25099c789 1-4,400
+packages/aave-helpers-js/utils/storage-layouts/AccessManagerEnumerable.ts
+  s_a3985ea6bcb782::t_29acf25099c789 1-4,457
+  s_a3985ea6bcb782::t_9035a5993e6645 5-456
+packages/aave-helpers-js/protocol-diff.ts
+  s_a3985ea6bcb782::t_fa262ecf37ad54 40-44,48-49
+  s_a3985ea6bcb782::t_075b62fe74b0eb 7-8
+packages/aave-helpers-js/sections/logs.ts
+  s_a3985ea6bcb782::t_619a10c657c9c8 7,9-13,20-28,30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "4f26848bbb2087ea74480168c57fc1d91fc40338",
+  "prompts": {},
+  "sessions": {
+    "s_a3985ea6bcb782": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e2dfebd4-b7e0-4fd7-94b1-452b01110e6d",
+        "model": "claude-fable-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+tests/CommonTestBase.t.sol
+  s_4d778345b06c59::t_d24da96952176a 5,8,25-34
+  s_4d778345b06c59::t_8043226def8928 35
+src/CommonTestBase.sol
+  s_4d778345b06c59::t_d24da96952176a 149
+tests/ProtocolV3TestBase.t.sol
+  s_4d778345b06c59::t_d24da96952176a 468-476,613
+src/ProtocolV3TestBase.sol
+  s_4d778345b06c59::t_d24da96952176a 513-518
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "cddb0b60490909fa8dd86b8b2e7d3430e365a437",
+  "prompts": {},
+  "sessions": {
+    "s_4d778345b06c59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d593999-37f8-435e-8c3b-8cb172489852",
+        "model": "claude-fable-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}

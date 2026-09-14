@@ -1,0 +1,19 @@
+tests/dependencies/v4/SnapshotV4.DynamicConfigs.t.sol
+  s_2b17014360d7c7::t_c3af227e247eb9 1-98
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "64c047ceb7e5d4465daa43c965ed46797d8aefd6",
+  "prompts": {},
+  "sessions": {
+    "s_2b17014360d7c7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "773d14b5-8516-4f2c-9a13-c91d489f34cc",
+        "model": "claude-fable-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}

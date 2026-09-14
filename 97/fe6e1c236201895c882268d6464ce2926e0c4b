@@ -1,0 +1,23 @@
+packages/aave-helpers-js/package.json
+  s_5cb454b1abacbb::t_e0eafad8a898e3 40
+.changeset/arc-diff-render.md
+  s_5cb454b1abacbb::t_b99bbd45510771 1-5
+pnpm-lock.yaml
+  s_5cb454b1abacbb::t_f510234c20dde3 39-40,74-75,1356
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "97fe6e1c236201895c882268d6464ce2926e0c4b",
+  "prompts": {},
+  "sessions": {
+    "s_5cb454b1abacbb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf6c5f8c-2bd0-4298-a34d-805f54004688",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
