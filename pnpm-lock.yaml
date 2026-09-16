@@ -36,8 +36,8 @@ importers:
         specifier: ^4.65.6
         version: 4.65.6(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
       '@aave-dao/toolbox':
-        specifier: ^0.5.0
-        version: 0.5.0(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
+        specifier: ^0.6.1
+        version: 0.6.1(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
       commander:
         specifier: ^14.0.3
         version: 14.0.3
@@ -71,8 +71,8 @@ packages:
     peerDependencies:
       viem: ^2.23.5
 
-  '@aave-dao/toolbox@0.5.0':
-    resolution: {integrity: sha512-tmTEt/zWvS2EdoTv9CRjbKE/8etin8P/vSalbt19qLQw62UmaF9k/7QecvlNlhJodOE3ZAjeiOEbdgq0gj7e3Q==}
+  '@aave-dao/toolbox@0.6.1':
+    resolution: {integrity: sha512-8xOf1XDa6VGwp2DvILlhBzLZej+DfwAPCZT6NVK/mZN9uUAdF1DyMBcqYY0X6QsWe7DrzGzQGJrzGYo6e4gSvg==}
     engines: {node: '>=22'}
     peerDependencies:
       prettier: ^3.5.2
@@ -1353,7 +1353,7 @@ snapshots:
     dependencies:
       viem: 2.45.3(typescript@5.9.3)(zod@4.3.6)
 
-  '@aave-dao/toolbox@0.5.0(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
+  '@aave-dao/toolbox@0.6.1(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
     dependencies:
       bs58: 6.0.0
       diff: 8.0.4

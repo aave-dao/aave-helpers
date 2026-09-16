@@ -1,8 +1,8 @@
 {
   "lib/aave-address-book": {
     "branch": {
-      "name": "feat/arc-mainnet",
-      "rev": "0c08eab5991526e0e45d19758164c98db356e6eb"
+      "name": "main",
+      "rev": "4e13aa197ca74e84c7e878bc752e519c260d6f30"
     }
   },
   "lib/forge-std": {

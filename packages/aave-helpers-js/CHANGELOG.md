@@ -1,5 +1,41 @@
 # @aave-dao/aave-helpers-js
 
+## 1.5.1
+
+### Patch Changes
+
+- e594e82: Add GSM events to eventDb (BuyAsset, SellAsset, Seized, BurnAfterSeize, BackingProvided, ExposureCapUpdated, FeeStrategyUpdated, FeesDistributedToTreasury, GhoReserveUpdated, GhoTreasuryUpdated, SwapFreeze, TokensRescued) so GSM transaction logs decode. Also adds the GhoReserve (EntityAdded, EntityRemoved, GhoLimitUpdated, GhoUsed, GhoRestored, GhoTransferred) and GsmRegistry (GsmAdded, GsmRemoved) events emitted alongside them.
+
+## 1.5.0
+
+### Minor Changes
+
+- 918ca30: Bump `@aave-dao/toolbox` to 0.6.1 for the latest chain list.
+
+## 1.4.2
+
+### Patch Changes
+
+- afde5f6: Decode additional Pool events (reserve state, liquidation grace period, flashloan premium, token upgrades) in protocol diffs.
+
+## 1.4.1
+
+### Patch Changes
+
+- 6c07642: Decode RiskSteward events in protocol diffs.
+
+## 1.4.0
+
+### Minor Changes
+
+- cd50b32: Add `_getTokenizationSpoke`, the reverting counterpart of `_findTokenizationSpoke`, and make `ERC1967_ADMIN_SLOT` private
+- f1c2c02: Add V4 payload presets (`V4EngineDefaults`, `V4RoleWiring`) and V4 test helpers (`_findTokenizationSpoke`, `_proxyAdminOwner`, `_assertRolesWired`, `_assertSpokeDeployment`); update address book to 4.62.1
+
+### Patch Changes
+
+- 59efe2a: update address book to 4.65.6
+- 59efe2a: Derive V4 tokenization test signers from a random key instead of a fixed `makeAddrAndKey` label, so `*WithSig` flows keep working when the well-known address picks up EIP-7702 code on a live network
+
 ## 1.3.7
 
 ### Patch Changes
