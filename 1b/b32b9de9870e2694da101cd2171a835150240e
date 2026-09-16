@@ -1,0 +1,28 @@
+packages/aave-helpers-js/package.json
+  s_6d076541254270::t_8bf3cb0ab4b854 39-40
+foundry.toml
+  s_6d076541254270::t_286055d5213e6c 61
+src/v4-config-engine/AaveV4PayloadArc.sol
+  s_6d076541254270::t_286055d5213e6c 1-11
+.changeset/arc-mainnet-support.md
+  s_6d076541254270::t_0a7489dafb26ee 2,5
+  s_6d076541254270::t_286055d5213e6c 1,3-4
+pnpm-lock.yaml
+  s_6d076541254270::t_39a7ed69986c52 36-37,39-40,69-70,74-75,810-811,814-815,926-927,930-931,1352,1356,1360-1361,1501,2013,2015,2017,2116,2121,2232
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1bb32b9de9870e2694da101cd2171a835150240e",
+  "prompts": {},
+  "sessions": {
+    "s_6d076541254270": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0aa6d-d937-72b1-8071-e418990d5c6f",
+        "model": "gpt-6-astra"
+      },
+      "human_author": null
+    }
+  }
+}
