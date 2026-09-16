@@ -33,8 +33,8 @@ importers:
   packages/aave-helpers-js:
     dependencies:
       '@aave-dao/aave-address-book':
-        specifier: ^4.65.6
-        version: 4.65.6(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
+        specifier: ^4.68.1
+        version: 4.68.1(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
       '@aave-dao/toolbox':
         specifier: ^0.6.1
         version: 0.6.1(prettier-plugin-solidity@1.4.3(prettier@3.5.3))(prettier@3.5.3)(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))
@@ -66,8 +66,8 @@ importers:
 
 packages:
 
-  '@aave-dao/aave-address-book@4.65.6':
-    resolution: {integrity: sha512-cDb+7HxLd2hFCMdhP6iNN8lXwdYWo0RTXD58XnzHSg0NzHfsr5/gPkTuFHIFneZKHguKqWn+ep3P1GzoXpXXbQ==}
+  '@aave-dao/aave-address-book@4.68.1':
+    resolution: {integrity: sha512-Tw1j/0OGN90m6cpaiNwpizxkBq4XzVgJqhz/fWdq9wF7yc2MAghVrsRWrCICBUiG+P7GKYd84mwULH0XVW3QTA==}
     peerDependencies:
       viem: ^2.23.5
 
@@ -1349,7 +1349,7 @@ packages:
 
 snapshots:
 
-  '@aave-dao/aave-address-book@4.65.6(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
+  '@aave-dao/aave-address-book@4.68.1(viem@2.45.3(typescript@5.9.3)(zod@4.3.6))':
     dependencies:
       viem: 2.45.3(typescript@5.9.3)(zod@4.3.6)
 
