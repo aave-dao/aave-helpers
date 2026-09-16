@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.5.2
+
+### Patch Changes
+
+- e3055ec: Update address-book to 4.68.1 and toolbox to 0.7.0 for Arc mainnet support.
+
 ## 1.5.1
 
 ### Patch Changes
