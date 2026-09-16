@@ -4,20 +4,30 @@ import { parseLogs, enhanceLogs, getClient } from '@aave-dao/toolbox';
 import { isKnownAddress } from '../utils/address';
 import { eventDb } from '../utils/eventDb';
 
-export async function renderLogsSection(
-  logs: Log[] | undefined,
-  chainId: CHAIN_ID
-): Promise<string> {
-  if (!logs || !logs.length) return '';
+export type ParsedSnapshotLog = ReturnType<typeof parseLogs>[number];
 
+/**
+ * Decodes snapshot logs against the eventDb (pure, no RPC). Logs that don't
+ * match any known event are returned unchanged (no eventName/args).
+ */
+export function parseSnapshotLogs(logs: Log[]): ParsedSnapshotLog[] {
   // Map our Log format to parseLogs format (emitter -> address)
   const toolboxLogs = logs.map((log) => ({
     topics: log.topics as [Hex],
     data: log.data as Hex,
     address: log.emitter as Address,
   }));
+  return parseLogs({ logs: toolboxLogs, eventDb: eventDb as unknown as Abi });
+}
 
-  const parsed = parseLogs({ logs: toolboxLogs, eventDb: eventDb as unknown as Abi });
+export async function renderLogsSection(
+  logs: Log[] | undefined,
+  chainId: CHAIN_ID,
+  preParsed?: ParsedSnapshotLog[]
+): Promise<string> {
+  if (!logs || !logs.length) return '';
+
+  const parsed = preParsed ?? parseSnapshotLogs(logs);
   const client = getClient(chainId, {});
   const enhanced = await enhanceLogs(client, parsed);
 
