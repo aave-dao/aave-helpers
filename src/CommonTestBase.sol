@@ -15,6 +15,7 @@ import {AaveV3MonadAssets} from 'aave-address-book/AaveV3Monad.sol';
 import {AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3GnosisAssets} from 'aave-address-book/AaveV3Gnosis.sol';
 import {AaveV3BaseAssets} from 'aave-address-book/AaveV3Base.sol';
+import {AaveV4ArcAssets} from 'aave-address-book/AaveV4Arc.sol';
 import {ChainIds} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 import {IPool} from 'aave-address-book/AaveV3.sol';
 import {IPayloadsControllerCore} from 'aave-address-book/GovernanceV3.sol';
@@ -85,7 +86,11 @@ contract CommonTestBase is Test {
    * @param amount the amount to deal
    * @return bool true if the caller has changed due to prank usage
    */
-  function _patchedDeal(address asset, address user, uint256 amount) internal returns (bool) {
+  function _patchedDeal(
+    address asset,
+    address user,
+    uint256 amount
+  ) internal virtual returns (bool) {
     if (block.chainid == ChainIds.MAINNET) {
       // FXS
       if (asset == 0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0) {
@@ -174,6 +179,13 @@ contract CommonTestBase is Test {
         return true;
       }
     }
+    if (block.chainid == ChainIds.ARC) {
+      // USDC is the native coin: the ERC20 reports account.balance / 1e12
+      if (asset == AaveV4ArcAssets.USDC_UNDERLYING) {
+        vm.deal(user, amount * 1e12);
+        return true;
+      }
+    }
     return false;
   }
 
@@ -183,7 +195,7 @@ contract CommonTestBase is Test {
    * @param user to deal to
    * @param amount to deal
    */
-  function deal2(address asset, address user, uint256 amount) internal {
+  function deal2(address asset, address user, uint256 amount) internal virtual {
     (VmSafe.CallerMode mode, address oldSender, ) = vm.readCallers();
     if (mode != VmSafe.CallerMode.None) vm.stopPrank();
     bool patched = _patchedDeal(asset, user, amount);
