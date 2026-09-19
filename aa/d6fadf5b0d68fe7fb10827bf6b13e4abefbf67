@@ -1,0 +1,23 @@
+zksync/src/SnapshotHelpersV3.sol
+  s_a285ac47a8a541::t_a2153d44176547 19,23,149-151,168,174-175
+zksync/src/ProtocolV3TestBase.sol
+  s_a285ac47a8a541::t_a2153d44176547 25,46,474
+src/LegacyReserveConfiguration.sol
+  s_a285ac47a8a541::t_a2153d44176547 1-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "aad6fadf5b0d68fe7fb10827bf6b13e4abefbf67",
+  "prompts": {},
+  "sessions": {
+    "s_a285ac47a8a541": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09fb3-23a6-7602-9d62-c22cb56d71aa",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "AlbertoCentonze <11707683+AlbertoCentonze@users.noreply.github.com>"
+    }
+  }
+}

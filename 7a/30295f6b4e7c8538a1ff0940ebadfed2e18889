@@ -1,0 +1,19 @@
+zksync/src/ProtocolV3TestBase.sol
+  s_b3680b1b493885::t_189811364e69bb 468
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7a30295f6b4e7c8538a1ff0940ebadfed2e18889",
+  "prompts": {},
+  "sessions": {
+    "s_b3680b1b493885": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0a03a-b459-7f90-a420-efab24bcb2d5",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "AlbertoCentonze <11707683+AlbertoCentonze@users.noreply.github.com>"
+    }
+  }
+}

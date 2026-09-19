@@ -1,0 +1,19 @@
+tests/ProtocolV3TestBase.t.sol
+  s_91f470c1d4363f::t_724f48ebc663d1 673-680
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "b34759ad392ad7ac05321707e485905033c7f758",
+  "prompts": {},
+  "sessions": {
+    "s_91f470c1d4363f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0a093-62d2-7f90-966c-aee738027e95",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "AlbertoCentonze <11707683+AlbertoCentonze@users.noreply.github.com>"
+    }
+  }
+}
