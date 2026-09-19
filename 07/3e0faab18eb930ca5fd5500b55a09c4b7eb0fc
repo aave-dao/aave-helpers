@@ -1,0 +1,23 @@
+lib/aave-address-book
+  s_5cb454b1abacbb::t_e4a79890f20da9 1
+src/v4-config-engine/AaveV4PayloadBase.sol
+  s_5cb454b1abacbb::t_67b3500df0eec6 1-11
+src/v4-protocol-test/ProtocolV4TestBaseBase.sol
+  s_5cb454b1abacbb::t_69916e607ea240 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "073e0faab18eb930ca5fd5500b55a09c4b7eb0fc",
+  "prompts": {},
+  "sessions": {
+    "s_5cb454b1abacbb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf6c5f8c-2bd0-4298-a34d-805f54004688",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
