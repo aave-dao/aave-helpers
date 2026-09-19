@@ -16,6 +16,8 @@ import {AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3GnosisAssets} from 'aave-address-book/AaveV3Gnosis.sol';
 import {AaveV3BaseAssets} from 'aave-address-book/AaveV3Base.sol';
 import {AaveV4ArcAssets} from 'aave-address-book/AaveV4Arc.sol';
+import {AaveV4BaseAssets} from 'aave-address-book/AaveV4Base.sol';
+import {IB20} from './interfaces/IB20.sol';
 import {ChainIds} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 import {IPool} from 'aave-address-book/AaveV3.sol';
 import {IPayloadsControllerCore} from 'aave-address-book/GovernanceV3.sol';
@@ -183,6 +185,23 @@ contract CommonTestBase is Test {
       // USDC is the native coin: the ERC20 reports account.balance / 1e12
       if (asset == AaveV4ArcAssets.USDC_UNDERLYING) {
         vm.deal(user, amount * 1e12);
+        return true;
+      }
+    }
+    if (block.chainid == ChainIds.BASE) {
+      // B20 equities are node-native (code 0xef) with balances outside EVM storage, so `deal` cannot
+      // find a slot. Mint from the MINT_ROLE holder instead; only executable under base-anvil's forge.
+      if (
+        asset == AaveV4BaseAssets.AAPLc_UNDERLYING ||
+        asset == AaveV4BaseAssets.AMZNc_UNDERLYING ||
+        asset == AaveV4BaseAssets.GOOGLc_UNDERLYING ||
+        asset == AaveV4BaseAssets.METAc_UNDERLYING ||
+        asset == AaveV4BaseAssets.MSFTc_UNDERLYING ||
+        asset == AaveV4BaseAssets.NVDAc_UNDERLYING ||
+        asset == AaveV4BaseAssets.TSLAc_UNDERLYING
+      ) {
+        vm.prank(0xD1Ca4dAcdf3231011D175351f1f02D15C7c5664C);
+        IB20(asset).mint(user, amount);
         return true;
       }
     }
