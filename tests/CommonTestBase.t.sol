@@ -42,7 +42,7 @@ contract CommonTestBaseBaseTest is CommonTestBase {
     vm.createSelectFork('base', 51605828);
   }
 
-  // The factory is a precompile; only base-anvil's forge can execute it (and the 0xef tokens).
+  // The factory is a precompile: it returns data only when forge runs the Base EVM (`--network base`).
   function _factoryExecutable() internal view returns (bool) {
     (, bytes memory ret) = B20_FACTORY.staticcall(
       abi.encodeCall(IB20Factory.isB20, (AaveV4BaseAssets.AAPLc_UNDERLYING))
@@ -51,14 +51,14 @@ contract CommonTestBaseBaseTest is CommonTestBase {
   }
 
   function test_deal2_b20_detectedViaFactoryAndMinted() public {
-    vm.skip(!_factoryExecutable(), 'B20 factory precompile not executable under stock forge');
+    vm.skip(!_factoryExecutable(), 'requires forge with --network base');
     assertTrue(_isB20(AaveV4BaseAssets.AAPLc_UNDERLYING));
     deal2(AaveV4BaseAssets.AAPLc_UNDERLYING, address(this), 100e8);
     assertEq(IERC20(AaveV4BaseAssets.AAPLc_UNDERLYING).balanceOf(address(this)), 100e8);
   }
 
   function test_deal2_b20_revertsWhenSupplyManagerLacksMintRole() public {
-    vm.skip(!_factoryExecutable(), 'B20 factory precompile not executable under stock forge');
+    vm.skip(!_factoryExecutable(), 'requires forge with --network base');
     address asset = AaveV4BaseAssets.AAPLc_UNDERLYING;
     vm.mockCall(
       asset,
@@ -78,7 +78,7 @@ contract CommonTestBaseBaseTest is CommonTestBase {
   }
 
   function test_knownEquities_areInitialisedB20sMintableBySupplyManager() public {
-    vm.skip(!_factoryExecutable(), 'B20 factory precompile not executable under stock forge');
+    vm.skip(!_factoryExecutable(), 'requires forge with --network base');
     address[7] memory equities = [
       AaveV4BaseAssets.AAPLc_UNDERLYING,
       AaveV4BaseAssets.AMZNc_UNDERLYING,

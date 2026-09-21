@@ -17,12 +17,16 @@ jobs:
     uses: aave-dao/github-workflows/.github/workflows/foundry-test.yml@main
     secrets:
       ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
-  test-base-anvil:
-    name: Foundry test (base-anvil)
+  test-base:
+    name: Foundry test (--network base)
     runs-on: ubuntu-latest
     env:
-      BASE_FOUNDRY_VERSION: v1.1.0
-      BASE_FOUNDRY_SHA256: b87ce712be86a3a41791a8efced71f0cb8d7b3aa735ce274dc75a7a63550a9fc
+      # Upstream foundry nightly with native Base execution (foundry-rs/foundry#16809 and #16224). Bump
+      # the tag and checksum together; move to a stable release once one ships the Base network. The
+      # `base:Beryl` hardfork below must become `base:Cobalt` once the forked blocks pass
+      # 2026-09-30T10:00Z (Base mainnet Cobalt activation, timestamp 1790791200).
+      FOUNDRY_NIGHTLY: nightly-cc29fe1ce8ba9366dc3bdb57ddf790d51420cfd5
+      FOUNDRY_SHA256: 3bea287e11b92cf8144a0d0aaffe8cba9fe9dc6d7bcaf88c8d1375f060ae4ee7
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,21 +36,22 @@ jobs:
         with:
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
 
-      # Base B20 tokens and the B20 factory are node-native precompiles (account code 0xef) that
-      # upstream forge cannot execute, so the B20 deal tests self-skip in the job above and only run
-      # under base/base-anvil's forge with FOUNDRY_BASE=true. Bump the version and checksum together.
-      - name: Install base-anvil forge
+      # Base B20 tokens and the B20 factory are node-native precompiles (account code 0xef). Stable
+      # forge cannot execute them, so the B20 deal tests self-skip in the job above and only run here,
+      # under a forge that selects the Base EVM with `--network base`. No `--chain-id`: it would override
+      # `block.chainid` on the mainnet and gnosis forks in the same files; the Base fork supplies 8453.
+      - name: Install foundry nightly
         run: |
           set -euo pipefail
-          f=foundry_${BASE_FOUNDRY_VERSION}_linux_amd64.tar.gz
-          curl -sSfLO "https://github.com/base/base-anvil/releases/download/$BASE_FOUNDRY_VERSION/$f"
-          echo "$BASE_FOUNDRY_SHA256  $f" | sha256sum -c -
-          mkdir -p "$HOME/.base-foundry" && tar -xzf "$f" -C "$HOME/.base-foundry" forge
-          echo "$HOME/.base-foundry" >> "$GITHUB_PATH"
-          "$HOME/.base-foundry/forge" --version
+          f=foundry_nightly_linux_amd64.tar.gz
+          curl -sSfLO "https://github.com/foundry-rs/foundry/releases/download/$FOUNDRY_NIGHTLY/$f"
+          echo "$FOUNDRY_SHA256  $f" | sha256sum -c -
+          mkdir -p "$HOME/.foundry-base" && tar -xzf "$f" -C "$HOME/.foundry-base" forge
+          echo "$HOME/.foundry-base" >> "$GITHUB_PATH"
+          "$HOME/.foundry-base/forge" --version
 
       - name: Run B20 deal tests
-        run: forge test --match-path 'tests/CommonTestBase*.t.sol' -vv
+        run: forge test --network base --hardfork base:Beryl --match-path 'tests/CommonTestBase*.t.sol' -vv
         env:
           FOUNDRY_PROFILE: default
-          FOUNDRY_BASE: 'true'
+          FOUNDRY_DISABLE_NIGHTLY_WARNING: '1'
