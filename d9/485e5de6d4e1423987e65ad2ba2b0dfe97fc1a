@@ -1,0 +1,19 @@
+tests/CommonTestBase.t.sol
+  s_5cb454b1abacbb::t_221039fd21bd09 54,61,80-102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d9485e5de6d4e1423987e65ad2ba2b0dfe97fc1a",
+  "prompts": {},
+  "sessions": {
+    "s_5cb454b1abacbb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf6c5f8c-2bd0-4298-a34d-805f54004688",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
