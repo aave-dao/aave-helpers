@@ -17,3 +17,36 @@ jobs:
     uses: aave-dao/github-workflows/.github/workflows/foundry-test.yml@main
     secrets:
       ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+  test-base-anvil:
+    name: Foundry test (base-anvil)
+    runs-on: ubuntu-latest
+    env:
+      BASE_FOUNDRY_VERSION: v1.1.0
+      BASE_FOUNDRY_SHA256: b87ce712be86a3a41791a8efced71f0cb8d7b3aa735ce274dc75a7a63550a9fc
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: aave-dao/action-rpc-env@main
+        with:
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+
+      # Base B20 tokens and the B20 factory are node-native precompiles (account code 0xef) that
+      # upstream forge cannot execute, so the B20 deal tests self-skip in the job above and only run
+      # under base/base-anvil's forge with FOUNDRY_BASE=true. Bump the version and checksum together.
+      - name: Install base-anvil forge
+        run: |
+          set -euo pipefail
+          f=foundry_${BASE_FOUNDRY_VERSION}_linux_amd64.tar.gz
+          curl -sSfLO "https://github.com/base/base-anvil/releases/download/$BASE_FOUNDRY_VERSION/$f"
+          echo "$BASE_FOUNDRY_SHA256  $f" | sha256sum -c -
+          mkdir -p "$HOME/.base-foundry" && tar -xzf "$f" -C "$HOME/.base-foundry" forge
+          echo "$HOME/.base-foundry" >> "$GITHUB_PATH"
+          "$HOME/.base-foundry/forge" --version
+
+      - name: Run B20 deal tests
+        run: forge test --match-path 'tests/CommonTestBase*.t.sol' -vv
+        env:
+          FOUNDRY_PROFILE: default
+          FOUNDRY_BASE: 'true'
