@@ -1,0 +1,23 @@
+.github/workflows/merge-main.yml
+  s_5cb454b1abacbb::t_092437ca24e47c 20-21,24-29,39-43,46-51,54,57
+src/CommonTestBase.sol
+  s_5cb454b1abacbb::t_5acb3a224f158a 198,204-205
+tests/CommonTestBase.t.sol
+  s_5cb454b1abacbb::t_4033d4039abb35 45,54,61,81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "9ccfc33ebedc970511c6a8c0788ce0ef02bec207",
+  "prompts": {},
+  "sessions": {
+    "s_5cb454b1abacbb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf6c5f8c-2bd0-4298-a34d-805f54004688",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
