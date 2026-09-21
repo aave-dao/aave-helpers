@@ -1,0 +1,25 @@
+src/CommonTestBase.sol
+  s_5cb454b1abacbb::t_8ded35fc8edf95 20,39-43,197-204,212-228
+src/interfaces/IB20.sol
+  s_5cb454b1abacbb::t_b6c8cf3e13499d 6-9
+src/interfaces/IB20Factory.sol
+  s_5cb454b1abacbb::t_2b14d773ef6527 1-11
+tests/CommonTestBase.t.sol
+  s_5cb454b1abacbb::t_91559c29bcca00 9-11,39-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "bc555bb1d7ce42a908cdc0eb21dba3d63636951a",
+  "prompts": {},
+  "sessions": {
+    "s_5cb454b1abacbb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf6c5f8c-2bd0-4298-a34d-805f54004688",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
