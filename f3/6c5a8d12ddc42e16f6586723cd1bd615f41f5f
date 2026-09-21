@@ -1,0 +1,24 @@
+packages/aave-helpers-js/utils/decodeStorage.ts
+  s_a3985ea6bcb782::t_c41bdb704b8b6c 168-173,177-180,186-189
+  s_a3985ea6bcb782::t_3271eb0564f3dd 640-665,674,676,678,680-681
+  s_a3985ea6bcb782::t_6a139351e94904 363-364,366,385,394,399
+  s_a3985ea6bcb782::t_5abcf4f2b30403 411-412,415-419
+packages/aave-helpers-js/__tests__/decode-storage.spec.ts
+  s_a3985ea6bcb782::t_9c964710824a51 211-222
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "f36c5a8d12ddc42e16f6586723cd1bd615f41f5f",
+  "prompts": {},
+  "sessions": {
+    "s_a3985ea6bcb782": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e2dfebd4-b7e0-4fd7-94b1-452b01110e6d",
+        "model": "claude-fable-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}

@@ -1,0 +1,34 @@
+packages/aave-helpers-js/utils/decodeStorage.ts
+  s_a3985ea6bcb782::t_fa0c5552a58f27 434-451,460-461
+  s_a3985ea6bcb782::t_90edc6023b33ef 280-311
+  s_a3985ea6bcb782::t_698bbfdca3c2ef 75-76
+packages/aave-helpers-js/__tests__/decode-storage.spec.ts
+  s_a3985ea6bcb782::t_977097428bb5d4 127-161
+  s_a3985ea6bcb782::t_76f8b7a3149571 3,5-6
+packages/aave-helpers-js/scripts/add-storage-layout.ts
+  s_a3985ea6bcb782::t_0b00b4e6a81a6e 27
+  s_a3985ea6bcb782::t_afa081aebad22d 63,73-75
+  s_a3985ea6bcb782::t_6a64708028b171 201-204
+packages/aave-helpers-js/protocol-diff-v4.ts
+  s_a3985ea6bcb782::t_523662e41d0461 48-50
+packages/aave-helpers-js/protocol-diff.ts
+  s_a3985ea6bcb782::t_421751ef889009 41-43
+packages/aave-helpers-js/__tests__/protocol-diff.spec.ts
+  s_a3985ea6bcb782::t_9a46c618fde31c 1136,1138-1141,1172,1174-1177,1187,1189-1192,1208,1210-1213,1229,1231-1234,1243,1247-1250,1260,1264-1267
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.0",
+  "base_commit_sha": "b76dc5ec1e97d6a9acbf06ddece84ee57bb4d138",
+  "prompts": {},
+  "sessions": {
+    "s_a3985ea6bcb782": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e2dfebd4-b7e0-4fd7-94b1-452b01110e6d",
+        "model": "claude-fable-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}

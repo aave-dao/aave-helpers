@@ -1,0 +1,47 @@
+.changeset/arc-diff-render.md
+  s_5cb454b1abacbb::t_b99bbd45510771 1-5
+packages/aave-helpers-js/formatters-v4.ts
+  s_5cb454b1abacbb::t_01ea7f8f3c2c34 2,23
+packages/aave-helpers-js/formatters.ts
+  s_5cb454b1abacbb::t_ea2eec3b60cbd9 2,28
+packages/aave-helpers-js/package.json
+  s_5cb454b1abacbb::t_e0eafad8a898e3 40
+packages/aave-helpers-js/sections/access-manager-roles.ts
+  s_5cb454b1abacbb::t_ff88900e30215a 2,22,66
+packages/aave-helpers-js/sections/hub-assets.ts
+  s_5cb454b1abacbb::t_59e0af012747e7 2,35
+packages/aave-helpers-js/sections/logs.ts
+  s_5cb454b1abacbb::t_19b54a7d85e45a 2,4,22
+packages/aave-helpers-js/sections/pool-config.ts
+  s_5cb454b1abacbb::t_279a27cfa1ed48 2,19
+packages/aave-helpers-js/sections/position-managers.ts
+  s_5cb454b1abacbb::t_3afec60d83d793 2,18
+packages/aave-helpers-js/sections/reserves.ts
+  s_5cb454b1abacbb::t_7ef15133c95731 2,66
+packages/aave-helpers-js/sections/spoke-configs.ts
+  s_5cb454b1abacbb::t_1f184bedf87b9b 2,37
+packages/aave-helpers-js/sections/spoke-liquidation.ts
+  s_5cb454b1abacbb::t_d44a2762cfdecb 2,16
+packages/aave-helpers-js/sections/spoke-reserves.ts
+  s_5cb454b1abacbb::t_5751d3c7509dc4 2,80
+packages/aave-helpers-js/utils/client.ts
+  s_5cb454b1abacbb::t_a0a812e6712e57 1-14
+pnpm-lock.yaml
+  s_5cb454b1abacbb::t_f510234c20dde3 39-40,74-75,1356
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.2",
+  "base_commit_sha": "5cb660d98556a83ff7090d9b9dd70aac4bc04c75",
+  "prompts": {},
+  "sessions": {
+    "s_5cb454b1abacbb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf6c5f8c-2bd0-4298-a34d-805f54004688",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}

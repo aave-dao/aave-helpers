@@ -1,0 +1,27 @@
+src/v4-config-engine/AaveV4PayloadBase.sol
+  s_5cb454b1abacbb::t_67b3500df0eec6 1-11
+src/v4-protocol-test/ProtocolV4TestBaseBase.sol
+  s_5cb454b1abacbb::t_69916e607ea240 1-41
+lib/aave-address-book
+  s_5cb454b1abacbb::t_11871d5481f53b 1
+src/CommonTestBase.sol
+  s_5cb454b1abacbb::t_2af726035eefca 19-20,191-207
+src/interfaces/IB20.sol
+  s_5cb454b1abacbb::t_f2fa8c17cf4e73 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "8fd7560a473c5d7b8e59e5e4be4fd7f60befed83",
+  "prompts": {},
+  "sessions": {
+    "s_5cb454b1abacbb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf6c5f8c-2bd0-4298-a34d-805f54004688",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
