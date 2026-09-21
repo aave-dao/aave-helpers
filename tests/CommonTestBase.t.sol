@@ -51,14 +51,14 @@ contract CommonTestBaseBaseTest is CommonTestBase {
   }
 
   function test_deal2_b20_detectedViaFactoryAndMinted() public {
-    vm.skip(!_factoryExecutable());
+    vm.skip(!_factoryExecutable(), 'B20 factory precompile not executable under stock forge');
     assertTrue(_isB20(AaveV4BaseAssets.AAPLc_UNDERLYING));
     deal2(AaveV4BaseAssets.AAPLc_UNDERLYING, address(this), 100e8);
     assertEq(IERC20(AaveV4BaseAssets.AAPLc_UNDERLYING).balanceOf(address(this)), 100e8);
   }
 
   function test_deal2_b20_revertsWhenSupplyManagerLacksMintRole() public {
-    vm.skip(!_factoryExecutable());
+    vm.skip(!_factoryExecutable(), 'B20 factory precompile not executable under stock forge');
     address asset = AaveV4BaseAssets.AAPLc_UNDERLYING;
     vm.mockCall(
       asset,
@@ -75,6 +75,29 @@ contract CommonTestBaseBaseTest is CommonTestBase {
     assertFalse(_isB20(AaveV4BaseAssets.USDC_UNDERLYING));
     deal2(AaveV4BaseAssets.USDC_UNDERLYING, address(this), 100e6);
     assertEq(IERC20(AaveV4BaseAssets.USDC_UNDERLYING).balanceOf(address(this)), 100e6);
+  }
+
+  function test_knownEquities_areInitialisedB20sMintableBySupplyManager() public {
+    vm.skip(!_factoryExecutable(), 'B20 factory precompile not executable under stock forge');
+    address[7] memory equities = [
+      AaveV4BaseAssets.AAPLc_UNDERLYING,
+      AaveV4BaseAssets.AMZNc_UNDERLYING,
+      AaveV4BaseAssets.GOOGLc_UNDERLYING,
+      AaveV4BaseAssets.METAc_UNDERLYING,
+      AaveV4BaseAssets.MSFTc_UNDERLYING,
+      AaveV4BaseAssets.NVDAc_UNDERLYING,
+      AaveV4BaseAssets.TSLAc_UNDERLYING
+    ];
+    IB20Factory factory = IB20Factory(B20_FACTORY);
+    for (uint256 i; i < equities.length; i++) {
+      assertTrue(factory.isB20(equities[i]), vm.toString(equities[i]));
+      assertTrue(factory.isB20Initialized(equities[i]), vm.toString(equities[i]));
+      assertTrue(
+        IB20(equities[i]).hasRole(IB20(equities[i]).MINT_ROLE(), B20_SUPPLY_MANAGER),
+        vm.toString(equities[i])
+      );
+    }
+    assertFalse(factory.isB20(AaveV4BaseAssets.USDC_UNDERLYING));
   }
 
   function dealExternal(address asset, address user, uint256 amount) external {
