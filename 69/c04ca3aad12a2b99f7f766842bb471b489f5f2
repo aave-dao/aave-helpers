@@ -1,0 +1,19 @@
+.github/workflows/merge-main.yml
+  s_5cb454b1abacbb::t_9e85e025961a42 20-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "69c04ca3aad12a2b99f7f766842bb471b489f5f2",
+  "prompts": {},
+  "sessions": {
+    "s_5cb454b1abacbb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf6c5f8c-2bd0-4298-a34d-805f54004688",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
