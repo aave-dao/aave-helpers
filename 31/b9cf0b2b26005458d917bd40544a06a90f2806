@@ -1,0 +1,29 @@
+src/ProtocolV4TestBase.sol
+  s_5cb454b1abacbb::t_5058fb0e1de8c6 459-460,548-549,672-673,732,766,792,830-834,844-845
+src/dependencies/v4/Actions.sol
+  s_5cb454b1abacbb::t_4f939afab1ae27 21-27
+src/dependencies/v4/GatewayScenarios.sol
+  s_5cb454b1abacbb::t_991885ceb51c7c 66,485
+src/dependencies/v4/Helpers.sol
+  s_5cb454b1abacbb::t_eea3eafc9a659b 44,163-168
+src/dependencies/v4/Scenarios.sol
+  s_5cb454b1abacbb::t_1c1a3d49071776 354,602,641,643-648
+src/dependencies/v4/TokenizationScenarios.sol
+  s_5cb454b1abacbb::t_78c894cf2b8972 187,207,265,267-269
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "31b9cf0b2b26005458d917bd40544a06a90f2806",
+  "prompts": {},
+  "sessions": {
+    "s_5cb454b1abacbb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf6c5f8c-2bd0-4298-a34d-805f54004688",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
