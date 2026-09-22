@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.6.1
+
+### Patch Changes
+
+- 5d1d2b9: update address book to 4.70.0, which adds the V4 Risk Steward and Risk Council addresses on Ethereum, Base, Avalanche and Arc.
+
 ## 1.6.0
 
 ### Minor Changes
