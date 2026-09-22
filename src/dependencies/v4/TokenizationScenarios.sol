@@ -184,7 +184,7 @@ abstract contract TokenizationScenarios is TokenizationActions {
     }
 
     uint256 room = addCapScaled - currentAdded;
-    address depositor = vm.randomAddress();
+    address depositor = _fundGas(vm.randomAddress());
 
     // Deposit more than remaining room — should revert with AddCapExceeded
     uint256 overflowAmount = room + _toAssetDecimals(1, reserveInfo.decimals);
@@ -204,7 +204,7 @@ abstract contract TokenizationScenarios is TokenizationActions {
     Types.ReserveInfo memory reserveInfo,
     uint256 maxAddAmount
   ) internal {
-    address user = vm.randomAddress();
+    address user = _fundGas(vm.randomAddress());
     uint256 depositAmount = vm.randomUint(1, maxAddAmount);
 
     // Deposit first
@@ -262,11 +262,11 @@ abstract contract TokenizationScenarios is TokenizationActions {
     Types.ReserveInfo memory reserveInfo,
     uint256 maxAddAmount
   ) internal {
-    address depositor = makeAddr('TRANSFER_DEPOSITOR');
+    address depositor = _fundGas(makeAddr('TRANSFER_DEPOSITOR'));
     address[3] memory recipients = [
-      makeAddr('TRANSFER_RECIPIENT_0'),
-      makeAddr('TRANSFER_RECIPIENT_1'),
-      makeAddr('TRANSFER_RECIPIENT_2')
+      _fundGas(makeAddr('TRANSFER_RECIPIENT_0')),
+      _fundGas(makeAddr('TRANSFER_RECIPIENT_1')),
+      _fundGas(makeAddr('TRANSFER_RECIPIENT_2'))
     ];
 
     uint256 totalSupplyBefore = tokenizationSpoke.totalSupply();

@@ -456,8 +456,8 @@ abstract contract ProtocolV4TestBase is
 
     IGiverPositionManager giverPositionManager = _getPositionManagers().giver;
     address oracleAddr = spoke.ORACLE();
-    address owner = makeAddr('GIVER_OWNER');
-    address supplier = makeAddr('GIVER_SUPPLIER');
+    address owner = _fundGas(makeAddr('GIVER_OWNER'));
+    address supplier = _fundGas(makeAddr('GIVER_SUPPLIER'));
 
     // Owner approves GiverPositionManager
     vm.prank(owner);
@@ -545,8 +545,8 @@ abstract contract ProtocolV4TestBase is
     console.log('TAKER_PM: Testing withdrawOnBehalfOf and borrowOnBehalfOf');
 
     ITakerPositionManager takerPositionManager = _getPositionManagers().taker;
-    address owner = makeAddr('TAKER_OWNER');
-    address taker = makeAddr('TAKER_DELEGATEE');
+    address owner = _fundGas(makeAddr('TAKER_OWNER'));
+    address taker = _fundGas(makeAddr('TAKER_DELEGATEE'));
 
     // Owner approves TakerPositionManager
     vm.prank(owner);
@@ -669,8 +669,8 @@ abstract contract ProtocolV4TestBase is
 
     IConfigPositionManager configPositionManager = _getPositionManagers().config;
     address oracleAddr = spoke.ORACLE();
-    address owner = makeAddr('CONFIG_OWNER');
-    address configDelegatee = makeAddr('CONFIG_DELEGATEE');
+    address owner = _fundGas(makeAddr('CONFIG_OWNER'));
+    address configDelegatee = _fundGas(makeAddr('CONFIG_DELEGATEE'));
 
     // Owner approves ConfigPositionManager
     vm.prank(owner);
@@ -729,7 +729,7 @@ abstract contract ProtocolV4TestBase is
     console.log('E2E: Testing paused reserve %s (should revert)', pausedAsset.symbol);
 
     address oracleAddr = spoke.ORACLE();
-    address user = vm.randomAddress();
+    address user = _fundGas(vm.randomAddress());
     uint256 amount = _getTokenAmountByDollarValue({
       oracleAddr: oracleAddr,
       reserveInfo: pausedAsset,
@@ -763,7 +763,7 @@ abstract contract ProtocolV4TestBase is
     vm.stopPrank();
 
     // Liquidation should revert with ReservePaused (paused as debt asset)
-    address liquidator = vm.randomAddress();
+    address liquidator = _fundGas(vm.randomAddress());
     vm.prank(liquidator);
     vm.expectRevert(ISpoke.ReservePaused.selector);
     spoke.liquidationCall({
@@ -789,7 +789,7 @@ abstract contract ProtocolV4TestBase is
     console.log('E2E: Testing frozen reserve %s (should revert)', frozenAsset.symbol);
 
     address oracleAddr = spoke.ORACLE();
-    address user = vm.randomAddress();
+    address user = _fundGas(vm.randomAddress());
     uint256 amount = _getTokenAmountByDollarValue({
       oracleAddr: oracleAddr,
       reserveInfo: frozenAsset,
@@ -827,7 +827,11 @@ abstract contract ProtocolV4TestBase is
     uint256 scenarioSnapshot;
 
     scenarioSnapshot = vm.snapshotState();
-    _testZeroAmountReverts({spoke: spoke, reserveInfo: testAssetInfo, user: vm.randomAddress()});
+    _testZeroAmountReverts({
+      spoke: spoke,
+      reserveInfo: testAssetInfo,
+      user: _fundGas(vm.randomAddress())
+    });
     vm.revertToState(scenarioSnapshot);
 
     scenarioSnapshot = vm.snapshotState();
@@ -837,8 +841,8 @@ abstract contract ProtocolV4TestBase is
     // Set caps to max after cap testing for the rest of the flow
     _setCapsToMax(spoke);
 
-    address collateralSupplier = makeAddr('COLLATERAL_SUPPLIER');
-    address testAssetSupplier = makeAddr('TEST_ASSET_SUPPLIER');
+    address collateralSupplier = _fundGas(makeAddr('COLLATERAL_SUPPLIER'));
+    address testAssetSupplier = _fundGas(makeAddr('TEST_ASSET_SUPPLIER'));
 
     uint256 testAssetAmount = _setupPositions({
       spoke: spoke,

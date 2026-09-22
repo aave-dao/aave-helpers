@@ -351,7 +351,7 @@ abstract contract Scenarios is Helpers {
       'HEALTH: should be below 1 for liquidation'
     );
 
-    address liquidator = vm.randomAddress();
+    address liquidator = _fundGas(vm.randomAddress());
     uint256 snapshotBeforeLiquidation = vm.snapshotState();
     // Only request share-based liquidation when the collateral reserve allows
     // it — otherwise `LiquidationLogic._validateLiquidationCall` hard-reverts
@@ -599,7 +599,7 @@ abstract contract Scenarios is Helpers {
     }
 
     uint256 room = addCapScaled - currentSupply;
-    address supplier = vm.randomAddress();
+    address supplier = _fundGas(vm.randomAddress());
 
     // Supply more than addCap — should revert with AddCapExceeded
     uint256 overflowAmount = room + _toAssetDecimals(1, reserveInfo.decimals);
@@ -638,9 +638,14 @@ abstract contract Scenarios is Helpers {
       return;
     }
 
-    address borrower = vm.randomAddress();
+    address borrower = _fundGas(vm.randomAddress());
     _seedDrawCapCollateral(spoke, reserveInfo, collateralInfo, borrower, room);
-    _supply({spoke: spoke, reserveInfo: reserveInfo, user: vm.randomAddress(), amount: room});
+    _supply({
+      spoke: spoke,
+      reserveInfo: reserveInfo,
+      user: _fundGas(vm.randomAddress()),
+      amount: room
+    });
 
     uint256 overflowAmount = room + _toAssetDecimals(1, reserveInfo.decimals);
     vm.prank(borrower);

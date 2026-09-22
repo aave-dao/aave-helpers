@@ -41,7 +41,7 @@ abstract contract Helpers is Actions {
   /// @return signer Address derived from `privateKey`.
   function _makeSigner() internal returns (uint256 privateKey, address signer) {
     privateKey = vm.randomUint(1, type(uint248).max);
-    signer = vm.addr(privateKey);
+    signer = _fundGas(vm.addr(privateKey));
   }
 
   /// @notice Build ReserveInfo[] for all reserves on a spoke.
@@ -160,7 +160,12 @@ abstract contract Helpers is Actions {
     Types.ReserveInfo memory reserveInfo,
     uint256 amount
   ) internal {
-    _supply({spoke: spoke, reserveInfo: reserveInfo, user: vm.randomAddress(), amount: amount});
+    _supply({
+      spoke: spoke,
+      reserveInfo: reserveInfo,
+      user: _fundGas(vm.randomAddress()),
+      amount: amount
+    });
   }
 
   /// @notice Supply collateral to borrower on the same spoke, then enable as collateral.
