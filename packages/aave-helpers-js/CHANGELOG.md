@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.6.2
+
+### Patch Changes
+
+- 041432c: update address book to 4.70.2, which replaces the Base V4 Risk Steward with the newly deployed version.
+
 ## 1.6.1
 
 ### Patch Changes
