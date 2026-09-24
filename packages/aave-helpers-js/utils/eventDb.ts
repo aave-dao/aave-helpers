@@ -4002,4 +4002,260 @@ export const eventDb: AbiEvent[] = [
     name: 'GsmRemoved',
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'addr', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'isRestricted', type: 'bool' },
+    ],
+    name: 'AddressRestricted',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        components: [
+          {
+            components: [
+              { internalType: 'contract IHubConfigurator', name: 'configurator', type: 'address' },
+              {
+                components: [
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'optimalUsageRatio',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'baseDrawnRate',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'rateGrowthBeforeOptimal',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'rateGrowthAfterOptimal',
+                    type: 'tuple',
+                  },
+                ],
+                internalType: 'struct IRiskSteward.HubRateConfig',
+                name: 'rate',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'addCap',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'drawCap',
+                    type: 'tuple',
+                  },
+                ],
+                internalType: 'struct IRiskSteward.HubCapConfig',
+                name: 'cap',
+                type: 'tuple',
+              },
+            ],
+            internalType: 'struct IRiskSteward.HubConfig',
+            name: 'hub',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'contract ISpokeConfigurator',
+                name: 'configurator',
+                type: 'address',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                  { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'collateralRisk',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'collateralFactor',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'maxLiquidationBonus',
+                    type: 'tuple',
+                  },
+                ],
+                internalType: 'struct IRiskSteward.SpokeDynamicConfig',
+                name: 'dynamicUpdate',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'collateralFactor',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'maxLiquidationBonus',
+                    type: 'tuple',
+                  },
+                ],
+                internalType: 'struct IRiskSteward.SpokeDynamicConfig',
+                name: 'dynamicAdd',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'targetHealthFactor',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'healthFactorForMaxBonus',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'liquidationBonusFactor',
+                    type: 'tuple',
+                  },
+                ],
+                internalType: 'struct IRiskSteward.SpokeLiquidationConfig',
+                name: 'liquidation',
+                type: 'tuple',
+              },
+            ],
+            internalType: 'struct IRiskSteward.SpokeConfig',
+            name: 'spoke',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                  { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'priceCapLst',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                  { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'priceCapStable',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                  { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'discountRatePendle',
+                type: 'tuple',
+              },
+            ],
+            internalType: 'struct IRiskSteward.OracleConfig',
+            name: 'oracle',
+            type: 'tuple',
+          },
+        ],
+        indexed: false,
+        internalType: 'struct IRiskSteward.Config',
+        name: 'config',
+        type: 'tuple',
+      },
+    ],
+    name: 'ConfigSet',
+    type: 'event',
+  },
 ];
