@@ -37,12 +37,21 @@ contract CommonTestBaseGnosisTest is CommonTestBase {
   }
 }
 
+/**
+ * @dev Runs on forge's Base EVM (nightly), which executes the B20 precompiles. The fork block is on the
+ *      Beryl upgrade; switch to base:cobalt if the fork moves past 1790791200 (2026-09-30T10:00Z).
+ *      Isolation is off because isolated top-level calls are charged the L1 data fee and revert for
+ *      0-ETH pranked callers (foundry-rs/foundry#17010).
+ * forge-config: default.networks.network = "base"
+ * forge-config: default.hardfork = "base:beryl"
+ * forge-config: default.isolate = false
+ */
 contract CommonTestBaseBaseTest is CommonTestBase {
   function setUp() public {
     vm.createSelectFork('base', 51605828);
   }
 
-  // The factory is a precompile: it returns data only when forge runs the Base EVM (`--network base`).
+  // The factory is a precompile: it returns data only when forge runs the Base EVM.
   function _factoryExecutable() internal view returns (bool) {
     (, bytes memory ret) = B20_FACTORY.staticcall(
       abi.encodeCall(IB20Factory.isB20, (AaveV4BaseAssets.AAPLc_UNDERLYING))
@@ -51,14 +60,14 @@ contract CommonTestBaseBaseTest is CommonTestBase {
   }
 
   function test_deal2_b20_detectedViaFactoryAndMinted() public {
-    vm.skip(!_factoryExecutable(), 'requires forge with --network base');
+    vm.skip(!_factoryExecutable(), 'requires forge with the Base EVM');
     assertTrue(_isB20(AaveV4BaseAssets.AAPLc_UNDERLYING));
     deal2(AaveV4BaseAssets.AAPLc_UNDERLYING, address(this), 100e8);
     assertEq(IERC20(AaveV4BaseAssets.AAPLc_UNDERLYING).balanceOf(address(this)), 100e8);
   }
 
   function test_deal2_b20_revertsWhenSupplyManagerLacksMintRole() public {
-    vm.skip(!_factoryExecutable(), 'requires forge with --network base');
+    vm.skip(!_factoryExecutable(), 'requires forge with the Base EVM');
     address asset = AaveV4BaseAssets.AAPLc_UNDERLYING;
     vm.mockCall(
       asset,
@@ -78,7 +87,7 @@ contract CommonTestBaseBaseTest is CommonTestBase {
   }
 
   function test_knownEquities_areInitialisedB20sMintableBySupplyManager() public {
-    vm.skip(!_factoryExecutable(), 'requires forge with --network base');
+    vm.skip(!_factoryExecutable(), 'requires forge with the Base EVM');
     address[7] memory equities = [
       AaveV4BaseAssets.AAPLc_UNDERLYING,
       AaveV4BaseAssets.AMZNc_UNDERLYING,
