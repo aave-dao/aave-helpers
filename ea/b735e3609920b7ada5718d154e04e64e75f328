@@ -1,0 +1,22 @@
+.github/workflows/merge-main.yml
+  s_a9ef79e71af8e9::t_fee8ff47d3358d 18-19
+tests/CommonTestBase.t.sol
+  s_a9ef79e71af8e9::t_fee8ff47d3358d 40-48,63,70,90
+  s_a9ef79e71af8e9::t_4e961c54d018c0 54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "eab735e3609920b7ada5718d154e04e64e75f328",
+  "prompts": {},
+  "sessions": {
+    "s_a9ef79e71af8e9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a50da696-f5c6-4740-a5c9-6355892906f9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
