@@ -195,14 +195,12 @@ contract CommonTestBase is Test {
     }
     if (block.chainid == ChainIds.BASE) {
       // B20 tokens are node-native with balances outside EVM storage, so `deal` cannot find a slot.
-      // Mint from the MINT_ROLE holder instead; only executable under forge with `--network base`.
+      // Mint from the MINT_ROLE holder instead; only executable on forge's Base EVM.
       if (_isB20(asset)) {
         require(
           IB20(asset).hasRole(IB20(asset).MINT_ROLE(), B20_SUPPLY_MANAGER),
           string(abi.encodePacked('B20 ', vm.toString(asset), ': no known MINT_ROLE holder'))
         );
-        // Upstream forge charges the L1 data fee of a B20 write to msg.sender, so the minter needs ETH.
-        vm.deal(B20_SUPPLY_MANAGER, 1 ether);
         vm.prank(B20_SUPPLY_MANAGER);
         IB20(asset).mint(user, amount);
         return true;

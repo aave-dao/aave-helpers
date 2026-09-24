@@ -63,7 +63,7 @@ abstract contract GatewayScenarios is Helpers {
     console.log('NATIVE_GATEWAY: Testing on spoke with WETH reserveId=%s', wethInfo.reserveId);
     uint256 gatewaySnapshot = vm.snapshotState();
 
-    address user = _fundGas(vm.randomAddress());
+    address user = vm.randomAddress();
     uint256 amount = _getTokenAmountByDollarValue(
       spoke.ORACLE(),
       wethInfo,
@@ -482,7 +482,7 @@ abstract contract GatewayScenarios is Helpers {
     Types.ReserveInfo memory collateralInfo
   ) internal {
     uint256 privateKey = vm.randomUint(1, type(uint248).max);
-    address user = _fundGas(vm.addr(privateKey));
+    address user = vm.addr(privateKey);
     uint256 amount = _getTokenAmountByDollarValue(
       spoke.ORACLE(),
       reserveInfo,

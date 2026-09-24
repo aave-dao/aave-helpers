@@ -18,13 +18,6 @@ abstract contract Actions is CommonTestBase {
   uint256 constant HEALTH_FACTOR_LIQUIDATION_THRESHOLD = 1e18;
   uint256 constant MAX_DEAL_UNIT = 1e12; // whole units not accounting for token decimals
 
-  /// @dev Fresh actors start with 0 ETH; under `forge --network base` the OP L1 data fee is charged
-  ///      to the pranked caller, so any state-changing call from an unfunded sender reverts.
-  function _fundGas(address user) internal returns (address) {
-    if (user.balance < 1 ether) vm.deal(user, 1 ether);
-    return user;
-  }
-
   function _getUserAccounting(
     ISpoke spoke,
     uint256 reserveId,
