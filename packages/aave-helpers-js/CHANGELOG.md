@@ -1,5 +1,23 @@
 # @aave-dao/aave-helpers-js
 
+## 1.6.3
+
+### Patch Changes
+
+- ae5d70b: Add Aave V4 RiskSteward events (AddressRestricted, ConfigSet) from Base 0x577dD4c67d4c7278CdF3bC03aE9a391C4C72DB4f to eventDb
+
+## 1.6.2
+
+### Patch Changes
+
+- 041432c: update address book to 4.70.2, which replaces the Base V4 Risk Steward with the newly deployed version.
+
+## 1.6.1
+
+### Patch Changes
+
+- 5d1d2b9: update address book to 4.70.0, which adds the V4 Risk Steward and Risk Council addresses on Ethereum, Base, Avalanche and Arc.
+
 ## 1.6.0
 
 ### Minor Changes
