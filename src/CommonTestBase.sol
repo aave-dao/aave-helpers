@@ -16,8 +16,8 @@ import {AaveV3ArbitrumAssets} from 'aave-address-book/AaveV3Arbitrum.sol';
 import {AaveV3GnosisAssets} from 'aave-address-book/AaveV3Gnosis.sol';
 import {AaveV3BaseAssets} from 'aave-address-book/AaveV3Base.sol';
 import {AaveV4ArcAssets} from 'aave-address-book/AaveV4Arc.sol';
-import {AaveV4BaseAssets} from 'aave-address-book/AaveV4Base.sol';
 import {IB20} from './interfaces/IB20.sol';
+import {IB20Factory} from './interfaces/IB20Factory.sol';
 import {ChainIds} from 'solidity-utils/contracts/utils/ChainHelpers.sol';
 import {IPool} from 'aave-address-book/AaveV3.sol';
 import {IPayloadsControllerCore} from 'aave-address-book/GovernanceV3.sol';
@@ -35,6 +35,11 @@ contract CommonTestBase is Test {
   address public constant ETH_MOCK_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
   address public constant EOA = 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045;
+
+  address public constant B20_FACTORY = 0xB20f000000000000000000000000000000000000;
+
+  // Coinbase supply manager, MINT_ROLE holder of the Coinbase equity B20s
+  address public constant B20_SUPPLY_MANAGER = 0xD1Ca4dAcdf3231011D175351f1f02D15C7c5664C;
 
   function executePayload(Vm vm, address payload) internal virtual {
     GovV3Helpers.executePayload(vm, payload);
@@ -189,23 +194,36 @@ contract CommonTestBase is Test {
       }
     }
     if (block.chainid == ChainIds.BASE) {
-      // B20 equities are node-native (code 0xef) with balances outside EVM storage, so `deal` cannot
-      // find a slot. Mint from the MINT_ROLE holder instead; only executable under base-anvil's forge.
-      if (
-        asset == AaveV4BaseAssets.AAPLc_UNDERLYING ||
-        asset == AaveV4BaseAssets.AMZNc_UNDERLYING ||
-        asset == AaveV4BaseAssets.GOOGLc_UNDERLYING ||
-        asset == AaveV4BaseAssets.METAc_UNDERLYING ||
-        asset == AaveV4BaseAssets.MSFTc_UNDERLYING ||
-        asset == AaveV4BaseAssets.NVDAc_UNDERLYING ||
-        asset == AaveV4BaseAssets.TSLAc_UNDERLYING
-      ) {
-        vm.prank(0xD1Ca4dAcdf3231011D175351f1f02D15C7c5664C);
+      // B20 tokens are node-native with balances outside EVM storage, so `deal` cannot find a slot.
+      // Mint from the MINT_ROLE holder instead; only executable on forge's Base EVM.
+      if (_isB20(asset)) {
+        require(
+          IB20(asset).hasRole(IB20(asset).MINT_ROLE(), B20_SUPPLY_MANAGER),
+          string(abi.encodePacked('B20 ', vm.toString(asset), ': no known MINT_ROLE holder'))
+        );
+        vm.prank(B20_SUPPLY_MANAGER);
         IB20(asset).mint(user, amount);
         return true;
       }
     }
     return false;
+  }
+
+  /**
+   * @dev Asks the B20 factory precompile whether `asset` is an initialized B20. The factory is itself a
+   * precompile: under stock forge its account is empty and the call returns no data, which is treated
+   * as "not a B20" so `deal` proceeds exactly as on any other chain. Account code 0xef is not a
+   * substitute, other Base precompiles carry the same byte.
+   */
+  function _isB20(address asset) internal view returns (bool) {
+    return
+      _b20FactoryAnswersTrue(abi.encodeCall(IB20Factory.isB20, (asset))) &&
+      _b20FactoryAnswersTrue(abi.encodeCall(IB20Factory.isB20Initialized, (asset)));
+  }
+
+  function _b20FactoryAnswersTrue(bytes memory query) private view returns (bool) {
+    (bool ok, bytes memory ret) = B20_FACTORY.staticcall(query);
+    return ok && ret.length == 32 && abi.decode(ret, (bool));
   }
 
   /**
