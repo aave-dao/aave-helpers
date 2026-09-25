@@ -1,0 +1,27 @@
+zksync/src/SnapshotHelpersV3.sol
+  s_a285ac47a8a541::t_a433072413ba4f 147-149,166,172-173
+zksync/tests/ProtocolV3TestBase.t.sol
+  s_a285ac47a8a541::t_92f55c65f8ac9a 37
+  s_a285ac47a8a541::t_2b887c0a132f79 8-9,24-29,31-32,38,46-49,54-72,76-95
+  s_a285ac47a8a541::t_e4eddf6dfc0aeb 30,33-36,39-45,50-53,73-75
+zksync/src/ProtocolV3TestBase.sol
+  s_a285ac47a8a541::t_a433072413ba4f 168,461-463,472-473
+foundry.toml
+  s_a285ac47a8a541::t_2b887c0a132f79 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "7c70655231030e7708524d87f869ea7ccb3d4df6",
+  "prompts": {},
+  "sessions": {
+    "s_a285ac47a8a541": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a09fb3-23a6-7602-9d62-c22cb56d71aa",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "AlbertoCentonze <11707683+AlbertoCentonze@users.noreply.github.com>"
+    }
+  }
+}

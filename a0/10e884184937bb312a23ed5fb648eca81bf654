@@ -1,0 +1,23 @@
+foundry.toml
+  s_6d076541254270::t_286055d5213e6c 61
+src/v4-config-engine/AaveV4PayloadArc.sol
+  s_6d076541254270::t_286055d5213e6c 1-11
+.changeset/arc-mainnet-support.md
+  s_6d076541254270::t_286055d5213e6c 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a010e884184937bb312a23ed5fb648eca81bf654",
+  "prompts": {},
+  "sessions": {
+    "s_6d076541254270": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a0aa6d-d937-72b1-8071-e418990d5c6f",
+        "model": "gpt-6-astra"
+      },
+      "human_author": "AlbertoCentonze <11707683+AlbertoCentonze@users.noreply.github.com>"
+    }
+  }
+}

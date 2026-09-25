@@ -1,0 +1,19 @@
+tests/bridges/ccip/AaveGhoCcipBridgeUnitTest.t.sol
+  s_2a72824b479751::t_422d2d69d91275 233
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "99933782d6ab96c2be0424f74edca357566993dc",
+  "prompts": {},
+  "sessions": {
+    "s_2a72824b479751": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e1e940de-2d75-4bd0-af96-a214d1c2142b",
+        "model": "claude-opus-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}

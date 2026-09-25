@@ -1,0 +1,21 @@
+packages/aave-helpers-js/utils/eventDb.ts
+  s_06694e249345ce::t_a393334231d72c 4005-4260
+.changeset/base-events-577dd4.md
+  s_06694e249345ce::t_a57153ab7f83d5 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a847324db31c8cedc209f308f6752c1a8b63931e",
+  "prompts": {},
+  "sessions": {
+    "s_06694e249345ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8381dbec-f237-4191-be44-4acb5b49b0b6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}

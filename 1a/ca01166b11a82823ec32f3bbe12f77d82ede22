@@ -1,0 +1,23 @@
+packages/aave-helpers-js/CHANGELOG.md
+  s_5cb454b1abacbb::t_166675f1715da8 3-8
+packages/aave-helpers-js/package.json
+  s_5cb454b1abacbb::t_15e5fbdbc09ae3 3,39
+pnpm-lock.yaml
+  s_5cb454b1abacbb::t_ba93c14f3cdd8a 36-37,69-70,1352
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "1aca01166b11a82823ec32f3bbe12f77d82ede22",
+  "prompts": {},
+  "sessions": {
+    "s_5cb454b1abacbb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf6c5f8c-2bd0-4298-a34d-805f54004688",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
