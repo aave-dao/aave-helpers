@@ -40,11 +40,12 @@ abstract contract Scenarios is Helpers {
       uint256 userDebt = spoke.getUserTotalDebt(i, user);
 
       if (userSupply > 0 && userDebt == 0) {
+        // /10, not more: collateral must stay above the partial liquidation dust guard
         uint256 currentPrice = IAaveOracle(oracle).getReservePrice(i);
         vm.mockCall(
           oracle,
           abi.encodeWithSelector(IPriceOracle.getReservePrice.selector, i),
-          abi.encode(currentPrice / 100)
+          abi.encode(currentPrice / 10)
         );
       } else if (userDebt > 0 && userSupply == 0) {
         uint256 currentPrice = IAaveOracle(oracle).getReservePrice(i);

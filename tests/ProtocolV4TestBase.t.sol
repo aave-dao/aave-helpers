@@ -80,6 +80,31 @@ contract ProtocolV4TestE2EDistinctSpokes is ProtocolV4TestBaseTest {
   }
 }
 
+contract ProtocolV4TestE2ECollateralSelection is ProtocolV4TestBaseTest {
+  function test_defaultRunsLatestFiveCollaterals() public view {
+    assertEq(_e2eMaxCollaterals(), 5);
+    assertEq(_e2eFirstCollateralIndex(12), 7);
+    assertEq(_e2eFirstCollateralIndex(5), 0);
+    assertEq(_e2eFirstCollateralIndex(3), 0);
+    assertEq(_e2eFirstCollateralIndex(0), 0);
+  }
+}
+
+contract ProtocolV4TestE2ECollateralSelectionOverride is ProtocolV4TestBaseTest {
+  function _e2eMaxCollaterals() internal pure override returns (uint256) {
+    return type(uint256).max;
+  }
+
+  function test_overrideRunsAllCollaterals() public view {
+    assertEq(_e2eFirstCollateralIndex(12), 0);
+    assertEq(_e2eFirstCollateralIndex(7), 0);
+  }
+
+  function test_e2eMainSpokeAllCollaterals() public gasless {
+    e2eTestSpoke({spoke: AaveV4EthereumSpokes.MAIN_SPOKE});
+  }
+}
+
 contract ProtocolV4TestE2EAllSpokes is ProtocolV4TestBaseTest {
   function test_e2eAllSpokes() public gasless {
     e2eTestAllSpokes({spokes: AaveV4EthereumGetters.getAllSpokes(), testPositionManagers: true});
