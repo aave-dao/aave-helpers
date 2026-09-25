@@ -301,6 +301,29 @@ describe('risk stewards', () => {
     ).toBeUndefined();
   });
 
+  it('resolves V4 hubs/spokes by address-book group, excluding treasury spokes and oracles', () => {
+    const none = new Map<string, string>();
+    // AaveV4Base.HUBS.EQUITIES_HUB
+    expect(resolveContractKind('0xa4d5947Eb727A052bae69C593FfC84247EC9864E', 8453, none)).toBe(
+      'HubInstance'
+    );
+    // AaveV4Ethereum.SPOKES.MAIN_SPOKE
+    expect(resolveContractKind('0x94e7A5dCbE816e498b89aB752661904E2F56c485', 1, none)).toBe(
+      'SpokeInstance'
+    );
+    // AaveV4Ethereum.SPOKES.MAIN_SPOKE_ORACLE and .TREASURY_SPOKE are other contracts
+    expect(
+      resolveContractKind('0x99B2B6CEa9C3D2fd8F4d90f86741C44B212a6127', 1, none)
+    ).toBeUndefined();
+    expect(
+      resolveContractKind('0xB9B0b8616f6Bf6841972a52058132BE08d723155', 1, none)
+    ).toBeUndefined();
+    // GovernanceV3InkWhitelabel.PERMISSIONED_PAYLOADS_CONTROLLER
+    expect(resolveContractKind('0x1dE9CB9420Dd1f2cCeFFf9393E126b800D413b7A', 57073, none)).toBe(
+      'PermissionedPayloadsController'
+    );
+  });
+
   it('narrows contract-typed keys so triple-nested mappings resolve within budget', () => {
     const layout: StorageLayout = {
       storage: [

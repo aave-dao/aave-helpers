@@ -21,13 +21,22 @@ const REFERENCE_SEGMENT_TO_KIND: Record<string, { kind: string; topLevelOnly?: b
   ORACLE: { kind: 'AaveOracle', topLevelOnly: true },
   DEFAULT_INCENTIVES_CONTROLLER: { kind: 'RewardsController', topLevelOnly: true },
   PAYLOADS_CONTROLLER: { kind: 'PayloadsController' },
+  PERMISSIONED_PAYLOADS_CONTROLLER: { kind: 'PermissionedPayloadsController' },
   GOVERNANCE: { kind: 'Governance', topLevelOnly: true },
   CROSS_CHAIN_CONTROLLER: { kind: 'CrossChainController' },
   A_TOKEN: { kind: 'ATokenInstance' },
   V_TOKEN: { kind: 'VariableDebtTokenInstance' },
-  HUB: { kind: 'HubInstance' },
-  SPOKE: { kind: 'SpokeInstance' },
   ACCESS_MANAGER: { kind: 'AccessManagerEnumerable' },
+};
+
+/**
+ * V4 nests hubs and spokes one level down (`AaveV4Base.HUBS.EQUITIES_HUB`), so these match
+ * on the parent segment. `SPOKES` also lists the treasury spoke and each spoke's oracle,
+ * which are different contracts.
+ */
+const REFERENCE_GROUP_TO_KIND: Record<string, { kind: string; exclude?: RegExp }> = {
+  HUBS: { kind: 'HubInstance' },
+  SPOKES: { kind: 'SpokeInstance', exclude: /^TREASURY_SPOKE$|_ORACLE$/ },
 };
 
 function set(ctx: SnapshotContext, address: string | undefined, kind: string) {
@@ -80,8 +89,11 @@ export function resolveContractKind(
 
   for (const reference of getAddressBookReferences(address, chainId)) {
     const segments = reference.split('.');
-    const match = REFERENCE_SEGMENT_TO_KIND[segments[segments.length - 1]];
+    const leaf = segments[segments.length - 1];
+    const match = REFERENCE_SEGMENT_TO_KIND[leaf];
     if (match && (!match.topLevelOnly || segments.length === 2)) return match.kind;
+    const group = REFERENCE_GROUP_TO_KIND[segments[segments.length - 2]];
+    if (group && !group.exclude?.test(leaf)) return group.kind;
   }
   return undefined;
 }

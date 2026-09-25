@@ -6,6 +6,7 @@ import type { LayoutEntry } from './storageLayoutTypes';
 // Each entry lives in utils/storage-layouts/<Kind>.ts and is generated — do not edit by hand.
 
 // <auto-imports>
+import { PermissionedPayloadsController } from './storage-layouts/PermissionedPayloadsController';
 import { V3RiskStewardFlatConfig } from './storage-layouts/V3RiskStewardFlatConfig';
 import { V3RiskStewardDebtCeiling } from './storage-layouts/V3RiskStewardDebtCeiling';
 import { V3RiskSteward } from './storage-layouts/V3RiskSteward';
@@ -28,6 +29,7 @@ import { PoolInstance } from './storage-layouts/PoolInstance';
 
 export const storageLayoutDb: Record<string, LayoutEntry> = {
   // <auto-entries>
+  PermissionedPayloadsController,
   V3RiskStewardFlatConfig,
   V3RiskStewardDebtCeiling,
   V3RiskSteward,
