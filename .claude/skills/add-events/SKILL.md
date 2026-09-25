@@ -31,16 +31,16 @@ When the user wants to add events from a block explorer URL (e.g. etherscan, pol
    - If given a chain ID and address directly, use those
    - Strip any URL fragments (e.g. `#code`) and query parameters
 
-2. Run the script:
+2. Run the script (from the repo root):
 
    ```bash
-   cd /Volumes/sensitive/BGD/aave-helpers/packages/aave-helpers-js && npx tsx scripts/add-events.ts <chainId> <address>
+   cd packages/aave-helpers-js && npx tsx scripts/add-events.ts <chainId> <address>
    ```
 
-3. Run lint fix:
+3. Run lint fix (from the repo root):
 
    ```bash
-   cd /Volumes/sensitive/BGD/aave-helpers && npm run lint:fix
+   npm run lint:fix
    ```
 
 4. Report the results to the user (how many events were added, which ones).

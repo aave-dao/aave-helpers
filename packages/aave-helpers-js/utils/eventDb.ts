@@ -3682,4 +3682,580 @@ export const eventDb: AbiEvent[] = [
     name: 'RiskConfigSet',
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'proxy', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'implementation', type: 'address' },
+    ],
+    name: 'ATokenUpgraded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint8', name: 'categoryId', type: 'uint8' },
+      { indexed: false, internalType: 'bool', name: 'ltvzero', type: 'bool' },
+    ],
+    name: 'AssetLtvzeroInEModeChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'uint8', name: 'categoryId', type: 'uint8' },
+      { indexed: false, internalType: 'bool', name: 'isolated', type: 'bool' },
+    ],
+    name: 'EModeCategoryIsolationChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint128',
+        name: 'oldFlashloanPremiumToProtocol',
+        type: 'uint128',
+      },
+      {
+        indexed: false,
+        internalType: 'uint128',
+        name: 'newFlashloanPremiumToProtocol',
+        type: 'uint128',
+      },
+    ],
+    name: 'FlashloanPremiumToProtocolUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint128',
+        name: 'oldFlashloanPremiumTotal',
+        type: 'uint128',
+      },
+      {
+        indexed: false,
+        internalType: 'uint128',
+        name: 'newFlashloanPremiumTotal',
+        type: 'uint128',
+      },
+    ],
+    name: 'FlashloanPremiumTotalUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint40', name: 'gracePeriodUntil', type: 'uint40' },
+    ],
+    name: 'LiquidationGracePeriodChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'address', name: 'asset', type: 'address' }],
+    name: 'LiquidationGracePeriodDisabled',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'ltv', type: 'uint256' },
+    ],
+    name: 'PendingLtvChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'active', type: 'bool' },
+    ],
+    name: 'ReserveActive',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'frozen', type: 'bool' },
+    ],
+    name: 'ReserveFrozen',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'oldStrategy', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'newStrategy', type: 'address' },
+    ],
+    name: 'ReserveInterestRateStrategyChanged',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'paused', type: 'bool' },
+    ],
+    name: 'ReservePaused',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'proxy', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'implementation', type: 'address' },
+    ],
+    name: 'VariableDebtTokenUpgraded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'backer', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'ghoAmount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'remainingLoss', type: 'uint256' },
+    ],
+    name: 'BackingProvided',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'burner', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'ghoOutstanding', type: 'uint256' },
+    ],
+    name: 'BurnAfterSeize',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'originator', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'receiver', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'underlyingAmount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'ghoAmount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'fee', type: 'uint256' },
+    ],
+    name: 'BuyAsset',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'uint256', name: 'oldExposureCap', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'newExposureCap', type: 'uint256' },
+    ],
+    name: 'ExposureCapUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'oldFeeStrategy', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newFeeStrategy', type: 'address' },
+    ],
+    name: 'FeeStrategyUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'ghoTreasury', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'asset', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'FeesDistributedToTreasury',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'address', name: 'oldReserve', type: 'address' },
+      { indexed: false, internalType: 'address', name: 'newReserve', type: 'address' },
+    ],
+    name: 'GhoReserveUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'oldGhoTreasury', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newGhoTreasury', type: 'address' },
+    ],
+    name: 'GhoTreasuryUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'seizer', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'recipient', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'underlyingAmount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'ghoOutstanding', type: 'uint256' },
+    ],
+    name: 'Seized',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'originator', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'receiver', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'underlyingAmount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'ghoAmount', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'fee', type: 'uint256' },
+    ],
+    name: 'SellAsset',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'freezer', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'enabled', type: 'bool' },
+    ],
+    name: 'SwapFreeze',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'tokenRescued', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'recipient', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amountRescued', type: 'uint256' },
+    ],
+    name: 'TokensRescued',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'address', name: 'entity', type: 'address' }],
+    name: 'EntityAdded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'address', name: 'entity', type: 'address' }],
+    name: 'EntityRemoved',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'entity', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'limit', type: 'uint256' },
+    ],
+    name: 'GhoLimitUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'entity', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'GhoRestored',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'to', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'GhoTransferred',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'entity', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'GhoUsed',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'address', name: 'gsmAddress', type: 'address' }],
+    name: 'GsmAdded',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: true, internalType: 'address', name: 'gsmAddress', type: 'address' }],
+    name: 'GsmRemoved',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'addr', type: 'address' },
+      { indexed: false, internalType: 'bool', name: 'isRestricted', type: 'bool' },
+    ],
+    name: 'AddressRestricted',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        components: [
+          {
+            components: [
+              { internalType: 'contract IHubConfigurator', name: 'configurator', type: 'address' },
+              {
+                components: [
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'optimalUsageRatio',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'baseDrawnRate',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'rateGrowthBeforeOptimal',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'rateGrowthAfterOptimal',
+                    type: 'tuple',
+                  },
+                ],
+                internalType: 'struct IRiskSteward.HubRateConfig',
+                name: 'rate',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'addCap',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'drawCap',
+                    type: 'tuple',
+                  },
+                ],
+                internalType: 'struct IRiskSteward.HubCapConfig',
+                name: 'cap',
+                type: 'tuple',
+              },
+            ],
+            internalType: 'struct IRiskSteward.HubConfig',
+            name: 'hub',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                internalType: 'contract ISpokeConfigurator',
+                name: 'configurator',
+                type: 'address',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                  { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'collateralRisk',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'collateralFactor',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'maxLiquidationBonus',
+                    type: 'tuple',
+                  },
+                ],
+                internalType: 'struct IRiskSteward.SpokeDynamicConfig',
+                name: 'dynamicUpdate',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'collateralFactor',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'maxLiquidationBonus',
+                    type: 'tuple',
+                  },
+                ],
+                internalType: 'struct IRiskSteward.SpokeDynamicConfig',
+                name: 'dynamicAdd',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'targetHealthFactor',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'healthFactorForMaxBonus',
+                    type: 'tuple',
+                  },
+                  {
+                    components: [
+                      { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                      { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                      { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                    ],
+                    internalType: 'struct IRiskSteward.RiskParamConfig',
+                    name: 'liquidationBonusFactor',
+                    type: 'tuple',
+                  },
+                ],
+                internalType: 'struct IRiskSteward.SpokeLiquidationConfig',
+                name: 'liquidation',
+                type: 'tuple',
+              },
+            ],
+            internalType: 'struct IRiskSteward.SpokeConfig',
+            name: 'spoke',
+            type: 'tuple',
+          },
+          {
+            components: [
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                  { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'priceCapLst',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                  { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'priceCapStable',
+                type: 'tuple',
+              },
+              {
+                components: [
+                  { internalType: 'uint40', name: 'minDelay', type: 'uint40' },
+                  { internalType: 'uint208', name: 'maxPercentChange', type: 'uint208' },
+                  { internalType: 'bool', name: 'isChangeRelative', type: 'bool' },
+                ],
+                internalType: 'struct IRiskSteward.RiskParamConfig',
+                name: 'discountRatePendle',
+                type: 'tuple',
+              },
+            ],
+            internalType: 'struct IRiskSteward.OracleConfig',
+            name: 'oracle',
+            type: 'tuple',
+          },
+        ],
+        indexed: false,
+        internalType: 'struct IRiskSteward.Config',
+        name: 'config',
+        type: 'tuple',
+      },
+    ],
+    name: 'ConfigSet',
+    type: 'event',
+  },
 ];

@@ -45,7 +45,9 @@ abstract contract Helpers is Actions {
   }
 
   /// @notice Build ReserveInfo[] for all reserves on a spoke.
-  function _getReserveInfo(ISpoke spoke) internal view returns (Types.ReserveInfo[] memory) {
+  function _getReserveInfo(
+    ISpoke spoke
+  ) internal view virtual returns (Types.ReserveInfo[] memory) {
     uint256 count = spoke.getReserveCount();
     Types.ReserveInfo[] memory info = new Types.ReserveInfo[](count);
 
@@ -476,8 +478,12 @@ abstract contract Helpers is Actions {
 
   /// @notice Return a token's `symbol()`. Falls back to `bytes32` decoding for
   ///         non-standard tokens like MKR; returns "<unknown>" on any failure.
+  /// @dev Gas-capped: a token whose code the EVM cannot run (Base B20, code 0xef, under stock forge)
+  ///      burns everything forwarded, and 63/64 of the test's gas per probe starves the snapshot.
   function _safeSymbol(address token) internal view returns (string memory) {
-    (bool ok, bytes memory data) = token.staticcall(abi.encodeCall(IERC20Metadata.symbol, ()));
+    (bool ok, bytes memory data) = token.staticcall{gas: 100_000}(
+      abi.encodeCall(IERC20Metadata.symbol, ())
+    );
     if (!ok || data.length == 0) {
       return '<unknown>';
     }

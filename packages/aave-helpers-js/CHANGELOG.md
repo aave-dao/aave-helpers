@@ -1,5 +1,53 @@
 # @aave-dao/aave-helpers-js
 
+## 1.6.3
+
+### Patch Changes
+
+- ae5d70b: Add Aave V4 RiskSteward events (AddressRestricted, ConfigSet) from Base 0x577dD4c67d4c7278CdF3bC03aE9a391C4C72DB4f to eventDb
+
+## 1.6.2
+
+### Patch Changes
+
+- 041432c: update address book to 4.70.2, which replaces the Base V4 Risk Steward with the newly deployed version.
+
+## 1.6.1
+
+### Patch Changes
+
+- 5d1d2b9: update address book to 4.70.0, which adds the V4 Risk Steward and Risk Council addresses on Ethereum, Base, Avalanche and Arc.
+
+## 1.6.0
+
+### Minor Changes
+
+- 5175edf: Add the Base V4 bindings (`AaveV4PayloadBase`, `ProtocolV4TestBaseBase`) and update address book to 4.69.0. `_patchedDeal` now mints the Base B20 equities from their `MINT_ROLE` holder, since their balances live outside EVM storage and `deal` has no slot to patch, and `_safeSymbol` caps the gas it forwards so a token whose code the EVM cannot run does not starve the snapshot.
+
+## 1.5.2
+
+### Patch Changes
+
+- e3055ec: Update address-book to 4.68.1 and toolbox to 0.7.0 for Arc mainnet support.
+
+## 1.5.1
+
+### Patch Changes
+
+- e594e82: Add GSM events to eventDb (BuyAsset, SellAsset, Seized, BurnAfterSeize, BackingProvided, ExposureCapUpdated, FeeStrategyUpdated, FeesDistributedToTreasury, GhoReserveUpdated, GhoTreasuryUpdated, SwapFreeze, TokensRescued) so GSM transaction logs decode. Also adds the GhoReserve (EntityAdded, EntityRemoved, GhoLimitUpdated, GhoUsed, GhoRestored, GhoTransferred) and GsmRegistry (GsmAdded, GsmRemoved) events emitted alongside them.
+
+## 1.5.0
+
+### Minor Changes
+
+- 918ca30: Bump `@aave-dao/toolbox` to 0.6.1 for the latest chain list.
+
+## 1.4.2
+
+### Patch Changes
+
+- afde5f6: Decode additional Pool events (reserve state, liquidation grace period, flashloan premium, token upgrades) in protocol diffs.
+
 ## 1.4.1
 
 ### Patch Changes
