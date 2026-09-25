@@ -1,4 +1,4 @@
-import type { RawStorage, CHAIN_ID } from '../snapshot-types';
+import type { RawStorage } from '../snapshot-types';
 import { isKnownAddress } from '../utils/address';
 import type { DecodedStorage } from '../utils/decodeStorage';
 
@@ -9,7 +9,7 @@ function abbreviateSlot(slot: string): string {
 
 export function renderRawSection(
   raw: RawStorage | undefined,
-  chainId: CHAIN_ID,
+  chainId: number,
   decoded?: DecodedStorage
 ): string {
   if (!raw) return '';

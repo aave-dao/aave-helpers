@@ -63,7 +63,9 @@ export function buildV4Context(after: AaveV4Snapshot): SnapshotContext {
 
 /**
  * Resolves which storageLayoutDb kind an address belongs to, if any.
- * Order: snapshot context (covers fresh deployments) -> address book -> pinned addresses.
+ * Order: snapshot context (covers fresh deployments) -> pinned addresses -> address book.
+ * Pins beat address-book names because some keys (e.g. RISK_STEWARD) map to several
+ * deployed layout versions.
  */
 export function resolveContractKind(
   address: Address,
@@ -73,11 +75,13 @@ export function resolveContractKind(
   const fromContext = context.get(address.toLowerCase());
   if (fromContext) return fromContext;
 
+  const pinned = pinnedAddresses[`${chainId}:${address.toLowerCase()}`];
+  if (pinned) return pinned;
+
   for (const reference of getAddressBookReferences(address, chainId)) {
     const segments = reference.split('.');
     const match = REFERENCE_SEGMENT_TO_KIND[segments[segments.length - 1]];
     if (match && (!match.topLevelOnly || segments.length === 2)) return match.kind;
   }
-
-  return pinnedAddresses[`${chainId}:${address.toLowerCase()}`];
+  return undefined;
 }

@@ -1,9 +1,10 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { keccak256, toHex } from 'viem';
+import { encodeAbiParameters, keccak256, toHex, type Hex } from 'viem';
 import { describe, it, expect } from 'vitest';
 import { decodeRawStorage, buildCandidateKeys, buildWordIndex } from '../utils/decodeStorage';
 import type { StorageLayout } from '../utils/storageLayoutTypes';
+import { resolveContractKind } from '../utils/resolveContractKind';
 import { parseSnapshotLogs } from '../sections/logs';
 import type { AaveV3Snapshot } from '../snapshot-types';
 
@@ -232,5 +233,149 @@ describe('decodeRawStorage', () => {
       // raw diff account
       expect(candidates.addresses.has('0xdabad81af85554e9ae636395611c58f7ec1aaec5')).toBe(true);
     });
+  });
+});
+
+describe('risk stewards', () => {
+  // `vm.getStateDiffJson()` of executing pending payload 471 (V4 risk stewards activation)
+  // on a mainnet fork taken 2026-09-25, before it was executed on chain
+  const fixture = JSON.parse(
+    readFileSync(join(__dirname, 'fixtures', 'mainnet-payload-471.json'), 'utf-8')
+  );
+  const steward = '0x6f48d9cdb8ee6e17c96b2d8aec128af426a295c1';
+
+  it('decodes every changed slot of payload 471 with only a chainId snapshot', () => {
+    const decoded = decodeRawStorage(fixture.raw, { chainId: 1 }, parseSnapshotLogs(fixture.logs));
+    for (const [account, entry] of Object.entries<any>(fixture.raw)) {
+      expect(Object.keys(decoded[account] ?? {}).sort()).toEqual(
+        Object.keys(entry.stateDiff).sort()
+      );
+    }
+  });
+
+  it('decodes the V4 steward config into packed debounce fields', () => {
+    const decoded = decodeRawStorage(fixture.raw, { chainId: 1 }, parseSnapshotLogs(fixture.logs));
+    const fields = Object.values(decoded[steward]).flatMap((slot) => slot.fields);
+    expect(fields).toContainEqual({
+      label: '_config.hub.cap.addCap.isChangeRelative',
+      type: 'bool',
+      previousValue: 'false',
+      newValue: 'true',
+    });
+    expect(fields).toContainEqual({
+      label: '_config.oracle.priceCapStable.maxPercentChange',
+      type: 'uint208',
+      previousValue: '0',
+      newValue: '50',
+    });
+    expect(fields.find((f) => f.label === '_config.hub.configurator')).toEqual({
+      label: '_config.hub.configurator',
+      type: 'contract IHubConfigurator',
+      // zero address must not pick up the address book's 0x0 placeholder entries
+      previousValue: '0x0000000000000000000000000000000000000000',
+      newValue: '0x1F0753480bB03EaA00863224602267B7E0525C3d (AaveV4Ethereum.HUB_CONFIGURATOR)',
+    });
+  });
+
+  it('resolves V3 stewards by deployment, not by address-book key', () => {
+    const none = new Map<string, string>();
+    // AaveV3Ethereum.RISK_STEWARD runs the current layout
+    expect(resolveContractKind('0x13a9CC64344b02bACC5AD9Cf38B5711F1B9ec3d4', 1, none)).toBe(
+      'V3RiskSteward'
+    );
+    // AaveV3Metis.RISK_STEWARD is still on the debtCeiling generation
+    expect(resolveContractKind('0x97CB9e81d480A2AB03299760654C1DDC0C16bE07', 1088, none)).toBe(
+      'V3RiskStewardDebtCeiling'
+    );
+    // AaveV3Avalanche.EDGE_RISK_STEWARD_CAPS is the oldest, flat-config generation
+    expect(resolveContractKind('0x57218F3aB422A39115951c3Eb06881a7A719DfdD', 43114, none)).toBe(
+      'V3RiskStewardFlatConfig'
+    );
+    // same Edge address on two chains, pinned per chain
+    expect(resolveContractKind('0x655252250f4A453854040A49E8280951A76f3033', 100, none)).toBe(
+      'V3RiskStewardDebtCeiling'
+    );
+    // AaveV3Scroll.RISK_STEWARD has no verifiable source: stays undecoded
+    expect(
+      resolveContractKind('0xc524A770ae73e57F0295aA48fd7605927a628B3b', 534352, none)
+    ).toBeUndefined();
+  });
+
+  it('narrows contract-typed keys so triple-nested mappings resolve within budget', () => {
+    const layout: StorageLayout = {
+      storage: [
+        {
+          astId: 1,
+          contract: 'T.sol:T',
+          label: '_debounces',
+          offset: 0,
+          slot: '5',
+          type: 't_mapping(t_contract(IHub)1,t_mapping(t_contract(ISpoke)2,t_mapping(t_address,t_uint40)))',
+        },
+      ],
+      types: {
+        t_address: { encoding: 'inplace', label: 'address', numberOfBytes: '20' },
+        t_uint40: { encoding: 'inplace', label: 'uint40', numberOfBytes: '5' },
+        't_contract(IHub)1': { encoding: 'inplace', label: 'contract IHub', numberOfBytes: '20' },
+        't_contract(ISpoke)2': {
+          encoding: 'inplace',
+          label: 'contract ISpoke',
+          numberOfBytes: '20',
+        },
+        't_mapping(t_address,t_uint40)': {
+          encoding: 'mapping',
+          label: 'mapping(address => uint40)',
+          numberOfBytes: '32',
+          key: 't_address',
+          value: 't_uint40',
+        },
+        't_mapping(t_contract(ISpoke)2,t_mapping(t_address,t_uint40))': {
+          encoding: 'mapping',
+          label: 'mapping(contract ISpoke => mapping(address => uint40))',
+          numberOfBytes: '32',
+          key: 't_contract(ISpoke)2',
+          value: 't_mapping(t_address,t_uint40)',
+        },
+        't_mapping(t_contract(IHub)1,t_mapping(t_contract(ISpoke)2,t_mapping(t_address,t_uint40)))':
+          {
+            encoding: 'mapping',
+            label:
+              'mapping(contract IHub => mapping(contract ISpoke => mapping(address => uint40)))',
+            numberOfBytes: '32',
+            key: 't_contract(IHub)1',
+            value: 't_mapping(t_contract(ISpoke)2,t_mapping(t_address,t_uint40))',
+          },
+      },
+    };
+    const addresses = new Set<string>();
+    for (let i = 1; i <= 400; i++) addresses.add(toHex(BigInt(i), { size: 20 }));
+    const [hub, spoke, asset] = [
+      toHex(7n, { size: 20 }),
+      toHex(9n, { size: 20 }),
+      toHex(400n, { size: 20 }),
+    ];
+    const slotOf = (base: bigint, key: string) =>
+      BigInt(
+        keccak256(
+          encodeAbiParameters([{ type: 'address' }, { type: 'uint256' }], [key as Hex, base])
+        )
+      );
+    const target = slotOf(slotOf(slotOf(5n, hub), spoke), asset);
+    const index = buildWordIndex(
+      layout,
+      {
+        addresses,
+        uints: new Set(),
+        bytes32: new Set(),
+        addressesByKind: new Map([
+          ['HubInstance', new Set([hub])],
+          ['SpokeInstance', new Set([spoke])],
+        ]),
+      },
+      undefined,
+      new Set([target])
+    );
+    // 400^3 untyped combinations would blow the 100k budget long before this key
+    expect(index.get(target)?.[0].label).toBe(`_debounces[${hub}][${spoke}][${asset}]`);
   });
 });

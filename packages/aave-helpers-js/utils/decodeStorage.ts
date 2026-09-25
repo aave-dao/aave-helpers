@@ -14,6 +14,7 @@ import {
   slice,
   stringToHex,
   toHex,
+  zeroAddress,
   type Address,
   type Hex,
 } from 'viem';
@@ -46,9 +47,12 @@ export type CandidateKeys = {
   addresses: Set<string>;
   uints: Set<bigint>;
   bytes32: Set<Hex>;
+  /** candidate addresses grouped by resolved contract kind, for contract-typed mapping keys */
+  addressesByKind?: Map<string, Set<string>>;
 };
 
-type Snapshot = AaveV3Snapshot | AaveV4Snapshot;
+/** callers without a protocol snapshot (e.g. seatbelt) pass `{ chainId }` */
+export type DecodeSnapshot = AaveV3Snapshot | AaveV4Snapshot | { chainId: number };
 
 /** structural log type: accepts both snapshot logs (emitter) and toolbox parsed logs (address + args) */
 export type CandidateLog = {
@@ -70,7 +74,14 @@ const ADDRESSES_PROVIDER_IDS = [
   'INCENTIVES_CONTROLLER',
 ];
 
-const MAX_MAPPING_DEPTH = 2;
+// V4 RiskSteward nests three deep: _hubSpokeAssetDebounces[hub][spoke][asset]
+const MAX_MAPPING_DEPTH = 3;
+
+/** mapping keys typed as these interfaces only take candidates resolved to the matching kind */
+const CONTRACT_KEY_KINDS: Record<string, string> = {
+  IHub: 'HubInstance',
+  ISpoke: 'SpokeInstance',
+};
 const MAX_ARRAY_WORDS = 64;
 /** how many element words of a dynamic array get indexed */
 const DYNAMIC_ARRAY_WORDS = 32;
@@ -103,7 +114,7 @@ function addCandidateValue(candidates: CandidateKeys, value: unknown) {
 }
 
 export function buildCandidateKeys(
-  after: Snapshot,
+  after: DecodeSnapshot,
   raw: RawStorage,
   logs: CandidateLog[] | undefined
 ): CandidateKeys {
@@ -381,7 +392,9 @@ function expand(
         );
       };
       if (keyLabel.startsWith('address') || keyLabel.startsWith('contract')) {
-        for (const address of candidates.addresses) {
+        const keyKind = CONTRACT_KEY_KINDS[/^contract (\w+)$/.exec(keyLabel)?.[1] ?? ''];
+        const typed = keyKind ? candidates.addressesByKind?.get(keyKind) : undefined;
+        for (const address of typed?.size ? typed : candidates.addresses) {
           if (budget.remaining <= 0 || allTargetsResolved(budget)) return;
           expandForKey(getSolidityStorageSlotAddress(slot, address as Hex), address);
         }
@@ -598,9 +611,10 @@ function decodeSlotAgainstFields(
 
 // --- top level ---
 
-function buildContext(after: Snapshot): SnapshotContext {
+function buildContext(after: DecodeSnapshot): SnapshotContext {
   if ('reserves' in after) return buildV3Context(after);
-  return buildV4Context(after);
+  if ('spokeReserves' in after) return buildV4Context(after);
+  return new Map();
 }
 
 /**
@@ -610,7 +624,7 @@ function buildContext(after: Snapshot): SnapshotContext {
  */
 export function decodeRawStorage(
   raw: RawStorage | undefined,
-  after: Snapshot,
+  after: DecodeSnapshot,
   logs: CandidateLog[] | undefined
 ): DecodedStorage {
   const decoded: DecodedStorage = {};
@@ -619,6 +633,8 @@ export function decodeRawStorage(
   const chainId = after.chainId;
   const annotate = (address: string): string => {
     const checksummed = getAddress(address);
+    // the address book stores placeholder entries as 0x0 (e.g. retired oracles)
+    if (checksummed === zeroAddress) return checksummed;
     try {
       const references = getAddressBookReferences(checksummed, chainId);
       if (references.length) return `${checksummed} (${references[0]})`;
@@ -660,6 +676,26 @@ export function decodeRawStorage(
       }
     } catch {
       // unresolvable account: raw fallback
+    }
+  }
+
+  const typedKeyLabels = new Set(Object.keys(CONTRACT_KEY_KINDS).map((name) => `contract ${name}`));
+  const needsTypedKeys = [...new Set(kindByAccount.values())].some((kind) =>
+    Object.values(storageLayoutDb[kind].layout.types).some((t) => typedKeyLabels.has(t.label))
+  );
+  if (needsTypedKeys) {
+    const wanted = new Set(Object.values(CONTRACT_KEY_KINDS));
+    candidates.addressesByKind = new Map();
+    for (const address of candidates.addresses) {
+      try {
+        const kind = resolveContractKind(address as Address, chainId, context);
+        if (!kind || !wanted.has(kind)) continue;
+        let group = candidates.addressesByKind.get(kind);
+        if (!group) candidates.addressesByKind.set(kind, (group = new Set()));
+        group.add(address);
+      } catch {
+        // unresolvable candidate: only usable through the untyped fallback
+      }
     }
   }
 
