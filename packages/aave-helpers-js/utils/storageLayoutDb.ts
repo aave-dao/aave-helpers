@@ -6,6 +6,7 @@ import type { LayoutEntry } from './storageLayoutTypes';
 // Each entry lives in utils/storage-layouts/<Kind>.ts and is generated — do not edit by hand.
 
 // <auto-imports>
+import { AgentHub } from './storage-layouts/AgentHub';
 import { PermissionedPayloadsController } from './storage-layouts/PermissionedPayloadsController';
 import { V3RiskStewardFlatConfig } from './storage-layouts/V3RiskStewardFlatConfig';
 import { V3RiskStewardDebtCeiling } from './storage-layouts/V3RiskStewardDebtCeiling';
@@ -29,6 +30,7 @@ import { PoolInstance } from './storage-layouts/PoolInstance';
 
 export const storageLayoutDb: Record<string, LayoutEntry> = {
   // <auto-entries>
+  AgentHub,
   PermissionedPayloadsController,
   V3RiskStewardFlatConfig,
   V3RiskStewardDebtCeiling,
@@ -57,6 +59,17 @@ export const storageLayoutDb: Record<string, LayoutEntry> = {
  */
 export const pinnedAddresses: Record<string, string> = {
   // <auto-pins>
+  '59144:0xa1e306dfb12270b02960d5a612539fc587108ed7': 'AgentHub',
+  '57073:0x17781ba226b359e5c1e1ee5ac9e28ec5b84fd039': 'AgentHub',
+  '43114:0x556bbe96f04b4610e48ee003dacee1c74de7ac6a': 'AgentHub',
+  '42161:0xf4f2bc657abe96863dc1ae17c9e9fffc2b420e7b': 'AgentHub',
+  '9745:0x5f29acbfb6de4282bb4dd2017930cda730ed864d': 'AgentHub',
+  '8453:0x115e662fa3f0b83014eb3f6f86f3d94bec5eb411': 'AgentHub',
+  '137:0xd44342b1ac132353d3148ea6ed330d1ae6f0c664': 'AgentHub',
+  '100:0x7520bb9c237c864957e9a9881821bf882491bc5c': 'AgentHub',
+  '56:0x115e662fa3f0b83014eb3f6f86f3d94bec5eb411': 'AgentHub',
+  '10:0x1acec7abbcfe6dd10ea4bb50894908406ffe8719': 'AgentHub',
+  '1:0x95e3015c67ef62b866cc28ca5a9ab5017a55e336': 'AgentHub',
   '43114:0xd8d7abc42c1c938bdec94ff8da1b3cd5b7e3b107': 'V4RiskSteward',
   '8453:0x577dd4c67d4c7278cdf3bc03ae9a391c4c72db4f': 'V4RiskSteward',
   '1:0x6f48d9cdb8ee6e17c96b2d8aec128af426a295c1': 'V4RiskSteward',

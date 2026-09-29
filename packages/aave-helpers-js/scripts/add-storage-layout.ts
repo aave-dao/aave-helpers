@@ -23,16 +23,27 @@
  *
  *   npx tsx scripts/add-storage-layout.ts --kind SomeContract --pin 1:0x... --pin 8453:0x...
  *
+ *   npx tsx scripts/add-storage-layout.ts --kind AgentHub \
+ *     --repo aave-dao/aave-agent-hub \
+ *     --contract src/contracts/AgentHub.sol:AgentHub \
+ *     --namespace agent.storage.hub:AgentHubStorage \
+ *     --namespace openzeppelin.storage.Ownable:OwnableStorage
+ *
  * --pin <chainId:address> (repeatable, any mode) records the deployment in pinnedAddresses so
  * it resolves to this kind. Use it whenever the layout depends on the deployed version rather
  * than on the address-book key. Without a source mode it only adds pins to an existing kind.
+ *
+ * --namespace <erc7201-id>:<Struct> (repeatable, any source mode) adds an ERC-7201 namespaced
+ * struct, which `forge inspect storage` does not report. The struct is resolved through the
+ * --contract target (inherited structs included) and placed at its ERC-7201 base slot via a
+ * generated `layout at` harness, labelled by struct name.
  */
 import { execFileSync } from 'child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { tmpdir } from 'os';
 import { dirname, join, resolve, sep } from 'path';
 import { Command, InvalidArgumentError } from 'commander';
-import { getAddress, isAddress } from 'viem';
+import { getAddress, isAddress, keccak256, stringToHex, toHex, type Hex } from 'viem';
 import { getSourceCode } from '@aave-dao/toolbox';
 import type { StorageLayout } from '../utils/storageLayoutTypes';
 
@@ -50,6 +61,24 @@ function parsePin(value: string, pins: Pin[] = []): Pin[] {
   return [...pins, { chainId, address: getAddress(address) }];
 }
 
+type Namespace = { id: string; struct: string };
+
+function parseNamespace(value: string, namespaces: Namespace[] = []): Namespace[] {
+  const sep = value.lastIndexOf(':');
+  const id = value.slice(0, sep);
+  const struct = value.slice(sep + 1);
+  if (sep <= 0 || !/^[\w.-]+$/.test(id) || !/^[A-Za-z_]\w*$/.test(struct)) {
+    throw new InvalidArgumentError(`expected <erc7201-id>:<Struct>, got '${value}'`);
+  }
+  return [...namespaces, { id, struct }];
+}
+
+/** keccak256(abi.encode(uint256(keccak256(id)) - 1)) & ~bytes32(uint256(0xff)) */
+function erc7201Slot(id: string): Hex {
+  const inner = BigInt(keccak256(stringToHex(id))) - 1n;
+  return toHex(BigInt(keccak256(toHex(inner, { size: 32 }))) & ~0xffn, { size: 32 });
+}
+
 const program = new Command()
   .name('add-storage-layout')
   .requiredOption('--kind <kind>', 'storageLayoutDb kind (valid TS identifier)')
@@ -60,6 +89,12 @@ const program = new Command()
   .option('--chainId <id>', 'chain of the verified contract')
   .option('--address <0x..>', 'verified contract address')
   .option('--pin <chainId:address>', 'pin a deployment to this kind (repeatable)', parsePin, [])
+  .option(
+    '--namespace <erc7201-id:Struct>',
+    'add an ERC-7201 namespaced struct of --contract (repeatable)',
+    parseNamespace,
+    []
+  )
   .parse();
 
 const args = program.opts<{
@@ -71,21 +106,73 @@ const args = program.opts<{
   chainId?: string;
   address?: string;
   pin: Pin[];
+  namespace: Namespace[];
 }>();
 
 function usage(message: string): never {
   return program.error(message);
 }
 
-function forgeInspect(contract: string, cwd: string): StorageLayout {
+function forgeInspect(contract: string, cwd: string, extraArgs: string[] = []): StorageLayout {
   console.log(`Running forge inspect ${contract} storage in ${cwd}...`);
-  const out = execFileSync('forge', ['inspect', contract, 'storage', '--json'], {
+  const out = execFileSync('forge', ['inspect', contract, 'storage', '--json', ...extraArgs], {
     cwd,
     encoding: 'utf-8',
     maxBuffer: 64 * 1024 * 1024,
   });
   return JSON.parse(out) as StorageLayout;
 }
+
+// `layout at` needs solc >= 0.8.29; storage layout rules are the same across 0.8.x
+const NAMESPACE_SOLC = '0.8.30';
+
+/**
+ * Inspects `contract` plus every --namespace struct. Namespaces go through a harness written
+ * next to the contract (so its imports resolve) and removed afterwards; all targets compile
+ * in one run with the same solc so type ids stay consistent across the merged layout.
+ */
+function inspectLayout(contract: string, cwd: string): StorageLayout {
+  if (!args.namespace.length) return forgeInspect(contract, cwd);
+
+  const [path, name, ...rest] = contract.split(':');
+  if (rest.length || !path.endsWith('.sol') || !/^[A-Za-z_]\w*$/.test(name ?? '')) {
+    usage(`--namespace needs --contract as <path.sol>:<Name>, got '${contract}'`);
+  }
+  const harnessPath = join(dirname(path), '__Erc7201Layout.sol');
+  const harnessFile = resolve(cwd, harnessPath);
+  if (!harnessFile.startsWith(resolve(cwd) + sep)) {
+    throw new Error(`Contract path escapes project directory: ${path}`);
+  }
+  if (existsSync(harnessFile)) throw new Error(`Refusing to overwrite ${harnessFile}`);
+  const importPath = JSON.stringify(`./${path.split(/[\\/]/).pop()}`);
+  const harness = [
+    '// SPDX-License-Identifier: UNLICENSED',
+    'pragma solidity >=0.8.29;',
+    `import {${name}} from ${importPath};`,
+    ...args.namespace.map(
+      (ns, i) =>
+        `contract Erc7201Layout${i} layout at ${erc7201Slot(ns.id)} { ${name}.${ns.struct} ${ns.struct}; }`
+    ),
+  ].join('\n');
+  writeFileSync(harnessFile, harness, 'utf-8');
+  try {
+    const use = ['--use', NAMESPACE_SOLC];
+    const layout = forgeInspect(contract, cwd, use);
+    layout.types ??= {};
+    args.namespace.forEach((ns, i) => {
+      const namespaced = forgeInspect(`${harnessPath}:Erc7201Layout${i}`, cwd, use);
+      console.log(`  erc7201:${ns.id} ${ns.struct} at ${erc7201Slot(ns.id)}`);
+      layout.storage.push(...namespaced.storage);
+      Object.assign(layout.types, namespaced.types);
+    });
+    return layout;
+  } finally {
+    rmSync(harnessFile, { force: true });
+  }
+}
+
+const namespaceSuffix = () =>
+  args.namespace.map((ns) => ` + erc7201:${ns.id} ${ns.struct}`).join('');
 
 function cloneRepo(repo: string, ref: string | undefined, dest: string) {
   console.log(`Cloning ${repo}${ref ? `@${ref}` : ''}...`);
@@ -255,8 +342,8 @@ async function main() {
   if (args.root) {
     if (!args.contract) usage('--root mode requires --contract <src/File.sol:Name>');
     const root = resolve(args.root);
-    layout = forgeInspect(args.contract, root);
-    source = `${args.root} ${args.contract}`;
+    layout = inspectLayout(args.contract, root);
+    source = `${args.root} ${args.contract}${namespaceSuffix()}`;
   } else if (args.repo) {
     if (!args.contract) usage('--repo mode requires --contract <src/File.sol:Name>');
     const tmp = mkdtempSync(join(tmpdir(), 'add-storage-layout-'));
@@ -266,8 +353,8 @@ async function main() {
         cwd: tmp,
         encoding: 'utf-8',
       }).trim();
-      layout = forgeInspect(args.contract, tmp);
-      source = `${args.repo}@${commit} ${args.contract}`;
+      layout = inspectLayout(args.contract, tmp);
+      source = `${args.repo}@${commit} ${args.contract}${namespaceSuffix()}`;
     } finally {
       rmSync(tmp, { recursive: true, force: true });
     }
@@ -279,8 +366,8 @@ async function main() {
     const tmp = mkdtempSync(join(tmpdir(), 'add-storage-layout-'));
     try {
       const target = materializeEtherscanProject(verified, tmp);
-      layout = forgeInspect(args.contract ?? target, tmp);
-      source = `${chainId}:${address} ${(verified as any).ContractName} (etherscan)`;
+      layout = inspectLayout(args.contract ?? target, tmp);
+      source = `${chainId}:${address} ${(verified as any).ContractName} (etherscan)${namespaceSuffix()}`;
     } finally {
       rmSync(tmp, { recursive: true, force: true });
     }

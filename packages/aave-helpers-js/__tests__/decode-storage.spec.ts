@@ -402,3 +402,80 @@ describe('risk stewards', () => {
     expect(index.get(target)?.[0].label).toBe(`_debounces[${hub}][${spoke}][${asset}]`);
   });
 });
+
+describe('agent hub', () => {
+  // `vm.getStateDiffJson()` of executing pending Plasma payload 38 (two new agents) on a fork
+  // at block 33751427, taken 2026-09-29, before it was executed on chain
+  const fixture = JSON.parse(
+    readFileSync(join(__dirname, 'fixtures', 'plasma-payload-38.json'), 'utf-8')
+  );
+  const hub = '0x5f29acbfb6de4282bb4dd2017930cda730ed864d';
+  const decode = (raw: any) =>
+    decodeRawStorage(raw, { chainId: 9745 }, parseSnapshotLogs(fixture.logs));
+
+  it('decodes every ERC-7201 namespaced slot the payload changes', () => {
+    const decoded = decode(fixture.raw);
+    expect(Object.keys(decoded[hub]).sort()).toEqual(
+      Object.keys(fixture.raw[hub].stateDiff).sort()
+    );
+    const fields = Object.values(decoded[hub]).flatMap((slot) => slot.fields);
+    expect(fields).toContainEqual({
+      label: 'AgentHubStorage.agentCount',
+      type: 'uint240',
+      previousValue: '2',
+      newValue: '4',
+    });
+    expect(fields).toContainEqual({
+      label: 'AgentHubStorage.config[2].basicConfig.agentAddress',
+      type: 'address',
+      previousValue: '0x0000000000000000000000000000000000000000',
+      newValue: '0xC0F2BC223262338959732896758a9Fe95d2b4E29',
+    });
+    expect(fields).toContainEqual({
+      label: 'AgentHubStorage.config[3].updateType',
+      type: 'string',
+      previousValue: '""',
+      newValue: '"EModeCategoryUpdate"',
+    });
+    expect(fields).toContainEqual({
+      label: 'AgentHubStorage.config[3].admin',
+      type: 'address',
+      previousValue: '0x0000000000000000000000000000000000000000',
+      newValue: '0xEf323B194caD8e02D9E5D8F07B34f625f1c088f1 (MiscPlasma.PROTOCOL_GUARDIAN)',
+    });
+  });
+
+  it('decodes the OpenZeppelin Ownable namespace', () => {
+    const ownableSlot = '0x9016d09d72d40fdae2fd8ceac6b6234c7706214fd39c1cd1e609a0528c199300';
+    const decoded = decode({
+      [hub]: {
+        stateDiff: {
+          [ownableSlot]: {
+            previousValue: '0x00000000000000000000000047aadaae1f05c978e6abb7568d11b7f6e0fc4d6a',
+            newValue: '0x000000000000000000000000ef323b194cad8e02d9e5d8f07b34f625f1c088f1',
+          },
+        },
+      },
+    });
+    expect(decoded[hub][ownableSlot].fields).toEqual([
+      {
+        label: 'OwnableStorage._owner',
+        type: 'address',
+        previousValue: expect.stringMatching(/^0x47aAdaAE1F05C978E6aBb7568d11B7F6e0FC4d6A \(/),
+        newValue: '0xEf323B194caD8e02D9E5D8F07B34f625f1c088f1 (MiscPlasma.PROTOCOL_GUARDIAN)',
+      },
+    ]);
+  });
+
+  it('resolves agent hubs by pinned deployment', () => {
+    const none = new Map<string, string>();
+    // MiscPlasma.AGENT_HUB
+    expect(resolveContractKind('0x5F29ACbFB6de4282bB4DD2017930cDA730eD864D', 9745, none)).toBe(
+      'AgentHub'
+    );
+    // MiscInkWhitelabel.AGENT_HUB runs a different implementation address with the same source
+    expect(resolveContractKind('0x17781Ba226b359e5C1E1ee5ac9E28Ec5b84fd039', 57073, none)).toBe(
+      'AgentHub'
+    );
+  });
+});
