@@ -1,0 +1,24 @@
+packages/aave-helpers-js/utils/decodeStorage.ts
+  s_b3728f09f98d66::t_88ceac56ed4809 502-503,615-623,683,737,741,743-744
+packages/aave-helpers-js/sections/raw.ts
+  s_b3728f09f98d66::t_88ceac56ed4809 3,16-17,43
+packages/aave-helpers-js/__tests__/decode-storage.spec.ts
+  s_b3728f09f98d66::t_c94641bb766407 9,484-541
+  s_b3728f09f98d66::t_3ec10222928f23 542
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "f320781d9263a60b20415f97384f759477b07762",
+  "prompts": {},
+  "sessions": {
+    "s_b3728f09f98d66": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6a08eca6-f321-4261-9c45-5e91162df330",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
