@@ -429,7 +429,8 @@ describe('agent hub', () => {
       label: 'AgentHubStorage.config[2].basicConfig.agentAddress',
       type: 'address',
       previousValue: '0x0000000000000000000000000000000000000000',
-      newValue: '0xC0F2BC223262338959732896758a9Fe95d2b4E29',
+      newValue:
+        '0xC0F2BC223262338959732896758a9Fe95d2b4E29 (MiscPlasma.LLAMARISK_PT_DISCOUNT_RATE_AGENT)',
     });
     expect(fields).toContainEqual({
       label: 'AgentHubStorage.config[3].updateType',
