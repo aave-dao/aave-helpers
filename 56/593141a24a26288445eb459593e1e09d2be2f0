@@ -1,0 +1,39 @@
+packages/aave-helpers-js/__tests__/fixtures/plasma-payload-38.json
+  s_b3728f09f98d66::t_8cc13fd309417d 1-411,413-416
+  s_b3728f09f98d66::t_cb01692ee8f166 412,417
+packages/aave-helpers-js/scripts/add-storage-layout.ts
+  s_b3728f09f98d66::t_6128df2d44940d 146
+  s_b3728f09f98d66::t_178901cd442316 116,118,126-145,147-160,162-175
+  s_b3728f09f98d66::t_aba395fbb2a27c 64-81
+  s_b3728f09f98d66::t_716e4e85796ec9 109
+  s_b3728f09f98d66::t_3ac991eea3d251 161,345-346,356-357,369-370
+  s_b3728f09f98d66::t_4f67e89dd0352d 92-97
+  s_b3728f09f98d66::t_2c82a0b60e7485 26-31,35-39
+  s_b3728f09f98d66::t_b90a9dd678ffc4 46
+  s_b3728f09f98d66::t_9be1c7ebc3ed62 176
+packages/aave-helpers-js/__tests__/decode-storage.spec.ts
+  s_b3728f09f98d66::t_cb01692ee8f166 405-481
+packages/aave-helpers-js/utils/storage-layouts/AgentHub.ts
+  s_b3728f09f98d66::t_cb01692ee8f166 5-339
+  s_b3728f09f98d66::t_a40a58086c958d 1-4,340
+packages/aave-helpers-js/utils/storageLayoutDb.ts
+  s_b3728f09f98d66::t_a40a58086c958d 9,33,62-72
+.changeset/decode-storage-slots.md
+  s_b3728f09f98d66::t_7fbae91625127b 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "56593141a24a26288445eb459593e1e09d2be2f0",
+  "prompts": {},
+  "sessions": {
+    "s_b3728f09f98d66": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6a08eca6-f321-4261-9c45-5e91162df330",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
