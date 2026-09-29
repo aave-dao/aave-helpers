@@ -1,6 +1,6 @@
 import type { RawStorage } from '../snapshot-types';
 import { isKnownAddress } from '../utils/address';
-import type { DecodedStorage } from '../utils/decodeStorage';
+import { decodeRawStorage, type DecodedStorage } from '../utils/decodeStorage';
 
 function abbreviateSlot(slot: string): string {
   if (slot.length <= 14) return slot;
@@ -13,6 +13,8 @@ export function renderRawSection(
   decoded?: DecodedStorage
 ): string {
   if (!raw) return '';
+  // direct callers without a decode still get foundry's upstream labels
+  decoded ??= decodeRawStorage(raw, { chainId }, undefined);
 
   const contracts = Object.keys(raw);
   if (!contracts.length) return '';
@@ -38,7 +40,7 @@ export function renderRawSection(
 
     const slots = Object.keys(entry.stateDiff);
     if (slots.length) {
-      const decodedSlots = decoded?.[address] ?? {};
+      const decodedSlots = decoded[address] ?? {};
       const hasDecoded = slots.some((slot) => decodedSlots[slot]?.fields.length);
 
       if (hasDecoded) {

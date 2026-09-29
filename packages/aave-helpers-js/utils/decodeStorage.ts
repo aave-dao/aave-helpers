@@ -499,13 +499,14 @@ function formatShortStringWord(word: bigint, typeLabel: string): string {
 
 /** renders one 32-byte overflow word of a long string/bytes variable */
 function formatBytesDataWord(word: bigint, typeLabel: string): string {
+  // without the length, trailing zero bytes of `bytes` data could be content, not padding
+  if (typeLabel !== 'string') return toHex(word, { size: 32 });
   if (word === 0n) return '""';
   // strip trailing zero BYTES (viem's trim works per nibble, which would shift
   // content ending in a low-nibble-zero character like '0' = 0x30)
   let hex = toHex(word, { size: 32 }).slice(2);
   while (hex.endsWith('00')) hex = hex.slice(0, -2);
   const content = `0x${hex}` as Hex;
-  if (typeLabel !== 'string') return content;
   try {
     return `"${hexToString(content)}"`;
   } catch {
@@ -611,6 +612,15 @@ function decodeSlotAgainstFields(
 
 // --- top level ---
 
+/** foundry marks slots it could not decode with a `0x` → `0x` decoded pair */
+function hasUpstreamDecode(diff: SlotDiff): boolean {
+  return (
+    !!diff.label &&
+    !!diff.decoded &&
+    (diff.decoded.previousValue !== '0x' || diff.decoded.newValue !== '0x')
+  );
+}
+
 function buildContext(after: DecodeSnapshot): SnapshotContext {
   if ('reserves' in after) return buildV3Context(after);
   if ('spokeReserves' in after) return buildV4Context(after);
@@ -670,7 +680,7 @@ export function decodeRawStorage(
       }
       for (const [slot, diff] of Object.entries(entry.stateDiff)) {
         // slots decoded upstream or via the well-known table never hit the index
-        if (diff.label && diff.decoded) continue;
+        if (hasUpstreamDecode(diff)) continue;
         if (wellKnownSlots[slot as Hex]) continue;
         targets.add(BigInt(slot));
       }
@@ -724,14 +734,14 @@ export function decodeRawStorage(
     for (const [slot, diff] of Object.entries(entry.stateDiff)) {
       try {
         // fields already decoded upstream (e.g. by foundry itself) win
-        if (diff.label && diff.decoded) {
+        if (hasUpstreamDecode(diff)) {
           slots[slot] = {
             fields: [
               {
-                label: diff.label,
+                label: diff.label!,
                 type: diff.type ?? '-',
-                previousValue: diff.decoded.previousValue,
-                newValue: diff.decoded.newValue,
+                previousValue: diff.decoded!.previousValue,
+                newValue: diff.decoded!.newValue,
               },
             ],
           };

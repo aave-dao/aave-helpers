@@ -6,6 +6,7 @@ import { decodeRawStorage, buildCandidateKeys, buildWordIndex } from '../utils/d
 import type { StorageLayout } from '../utils/storageLayoutTypes';
 import { resolveContractKind } from '../utils/resolveContractKind';
 import { parseSnapshotLogs } from '../sections/logs';
+import { renderRawSection } from '../sections/raw';
 import type { AaveV3Snapshot } from '../snapshot-types';
 
 function loadReport(name: string): AaveV3Snapshot {
@@ -478,5 +479,64 @@ describe('agent hub', () => {
     expect(resolveContractKind('0x17781Ba226b359e5C1E1ee5ac9E28Ec5b84fd039', 57073, none)).toBe(
       'AgentHub'
     );
+  });
+});
+
+describe('upstream decodes and bytes data', () => {
+  const account = '0x0000000000000000000000000000000000000001';
+  const zero = `0x${'0'.repeat(64)}`;
+
+  it('renders foundry-decoded slots when called without a precomputed decode', () => {
+    const raw: any = {
+      [account]: {
+        stateDiff: {
+          '0x01': {
+            previousValue: zero,
+            newValue: `0x${'0'.repeat(63)}5`,
+            label: '_count',
+            type: 'uint256',
+            decoded: { previousValue: '0', newValue: '5' },
+          },
+        },
+      },
+    };
+    expect(renderRawSection(raw, 1)).toContain('| 0x01 | _count | uint256 | 0 | 5 |');
+  });
+
+  it('treats a 0x -> 0x upstream decode as undecoded', () => {
+    const raw: any = {
+      [account]: {
+        stateDiff: {
+          '0x01': {
+            previousValue: zero,
+            newValue: `0x${'0'.repeat(63)}5`,
+            label: '_count',
+            type: 'uint256',
+            decoded: { previousValue: '0x', newValue: '0x' },
+          },
+        },
+      },
+    };
+    expect(decodeRawStorage(raw, { chainId: 1 }, undefined)[account]).toBeUndefined();
+  });
+
+  it('keeps trailing zero bytes of long bytes data words', () => {
+    // MiscPlasma.AGENT_HUB AgentHubStorage.config[3].basicConfig.agentContext (data)
+    const hub = '0x5f29acbfb6de4282bb4dd2017930cda730ed864d';
+    const slot = '0x5520394c87940966e77907cabc1857786d9ca409d191366e83812d347aae9539';
+    const word = `0x${'11'.repeat(30)}0000`;
+    const decoded = decodeRawStorage(
+      { [hub]: { stateDiff: { [slot]: { previousValue: zero, newValue: word } } } } as any,
+      { chainId: 9745 },
+      undefined
+    );
+    expect(decoded[hub][slot].fields).toEqual([
+      {
+        label: 'AgentHubStorage.config[3].basicConfig.agentContext (data)',
+        type: 'bytes',
+        previousValue: zero,
+        newValue: word,
+      },
+    ]);
   });
 });
