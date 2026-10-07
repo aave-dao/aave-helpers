@@ -1,5 +1,12 @@
 # @aave-dao/aave-helpers-js
 
+## 1.6.4
+
+### Patch Changes
+
+- 53cbdf8: update address book to 4.71.0, which adds the LlamaRisk PT risk oracle contracts on Plasma.
+- 62efe40: update address book to 4.72.1, which adds the AgentHub, RangeValidationModule and LlamaRisk PT risk oracle contracts on Monad.
+
 ## 1.6.3
 
 ### Patch Changes
