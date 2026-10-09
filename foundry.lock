@@ -1,8 +1,8 @@
 {
   "lib/aave-address-book": {
     "branch": {
-      "name": "main",
-      "rev": "f2a512e360d20a2d15214b6f63b9779a25c0d95e"
+      "name": "feat/sentora-curated-market",
+      "rev": "23b9bb5b76a0961b0bd0d94b15c4b6dd3057abd6"
     }
   },
   "lib/forge-std": {
