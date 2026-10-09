@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.6.5
+
+### Patch Changes
+
+- 28917e0: update address book to 4.73.0, which adds the AaveV4EtherFiOptimismWhitelabel (EtherFi Cash) instance.
+
 ## 1.6.4
 
 ### Patch Changes
