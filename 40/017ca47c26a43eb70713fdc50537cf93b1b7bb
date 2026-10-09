@@ -1,0 +1,25 @@
+.changeset/update-address-book-4-73-0.md
+  s_459952d577d704::t_0403c9fd70ea58 1-5
+foundry.lock
+  s_459952d577d704::t_2d1cd87e12eb7a 5
+packages/aave-helpers-js/package.json
+  s_459952d577d704::t_fec46f9adb1d2d 39
+pnpm-lock.yaml
+  s_459952d577d704::t_c1b3c6763b5fed 36-37,69-70,1352
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "40017ca47c26a43eb70713fdc50537cf93b1b7bb",
+  "prompts": {},
+  "sessions": {
+    "s_459952d577d704": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4decfe9-f719-4ac6-9922-05a8b063189b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
