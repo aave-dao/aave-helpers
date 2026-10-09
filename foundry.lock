@@ -2,7 +2,7 @@
   "lib/aave-address-book": {
     "branch": {
       "name": "main",
-      "rev": "e5bed1f0b32279b3f3259708b0a3b0fa29c058fc"
+      "rev": "f2a512e360d20a2d15214b6f63b9779a25c0d95e"
     }
   },
   "lib/forge-std": {
