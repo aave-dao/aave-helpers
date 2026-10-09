@@ -4258,4 +4258,25 @@ export const eventDb: AbiEvent[] = [
     name: 'ConfigSet',
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [{ indexed: false, internalType: 'address', name: 'account', type: 'address' }],
+    name: 'Paused',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      { indexed: false, internalType: 'uint256', name: 'amount', type: 'uint256' },
+    ],
+    name: 'StkGhoMigrated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [{ indexed: false, internalType: 'address', name: 'account', type: 'address' }],
+    name: 'Unpaused',
+    type: 'event',
+  },
 ];
