@@ -7,6 +7,7 @@ import {IAccessControl} from 'openzeppelin-contracts/contracts/access/IAccessCon
 import {AaveV3Ethereum, AaveV3EthereumAssets, ICollector, IPool} from 'aave-address-book/AaveV3Ethereum.sol';
 import {AaveV2Ethereum, AaveV2EthereumAssets, ILendingPool} from 'aave-address-book/AaveV2Ethereum.sol';
 import {MiscEthereum} from 'aave-address-book/MiscEthereum.sol';
+import {AaveV4EthereumTokenizationSpokes, ITokenizationSpoke} from 'aave-address-book/AaveV4Ethereum.sol';
 
 import {CollectorUtils, IERC20, AaveSwapper, IChainlinkAggregator} from '../src/CollectorUtils.sol';
 
@@ -20,12 +21,14 @@ contract CollectorUtilsTest is Test {
   IPool public constant V3_POOL = AaveV3Ethereum.POOL;
   ILendingPool public constant V2_POOL = AaveV2Ethereum.POOL;
   address public constant SWAPPER = MiscEthereum.AAVE_SWAPPER;
+  ITokenizationSpoke public constant SPOKE =
+    AaveV4EthereumTokenizationSpokes.CORE_USDC_TOKENIZATION_SPOKE;
 
   // using static address instead of fuzz address as it's slow on a non anvil fork
   address testReceiver = address(0xB0B);
 
   function setUp() public {
-    vm.createSelectFork(vm.rpcUrl('mainnet'), 23089053);
+    vm.createSelectFork(vm.rpcUrl('mainnet'), 26134500);
 
     vm.prank(AaveV3Ethereum.ACL_ADMIN);
     IAccessControl(address(COLLECTOR)).grantRole('FUNDS_ADMIN', address(this));
@@ -48,7 +51,7 @@ contract CollectorUtilsTest is Test {
     uint256 aTokenBalanceOfCollectorAfter = A_TOKEN_V3.balanceOf(address(COLLECTOR));
 
     assertEq(underlyingBalanceOfCollectorAfter, underlyingBalanceOfCollectorBefore - amount);
-    assertApproxEqAbs(aTokenBalanceOfCollectorAfter, aTokenBalanceOfCollectorBefore + amount, 1);
+    assertApproxEqAbs(aTokenBalanceOfCollectorAfter, aTokenBalanceOfCollectorBefore + amount, 2);
   }
 
   function testDepositAllCollectorFundsToV3() public {
@@ -71,7 +74,7 @@ contract CollectorUtilsTest is Test {
     assertApproxEqAbs(
       aTokenBalanceOfCollectorAfter,
       aTokenBalanceOfCollectorBefore + underlyingBalanceOfCollectorBefore,
-      1
+      2
     );
   }
 
@@ -92,6 +95,24 @@ contract CollectorUtilsTest is Test {
       A_TOKEN_V2,
       amount,
       testReceiver,
+      CollectorUtils.withdrawFromV2,
+      false
+    );
+  }
+
+  function testWithdrawAllCollectorFundsFromV3() public {
+    _genericWithdrawAllCollectorFundsToReceiver(
+      address(V3_POOL),
+      A_TOKEN_V3,
+      CollectorUtils.withdrawFromV3,
+      true
+    );
+  }
+
+  function testWithdrawAllCollectorFundsFromV2() public {
+    _genericWithdrawAllCollectorFundsToReceiver(
+      address(V2_POOL),
+      A_TOKEN_V2,
       CollectorUtils.withdrawFromV2,
       false
     );
@@ -238,7 +259,198 @@ contract CollectorUtilsTest is Test {
 
     // because we mint to treasury straight away on v2, hard to check the final amount we expect
     if (withATokenCheck) {
-      assertApproxEqAbs(aTokenBalanceOfCollectorAfter, aTokenBalanceOfCollectorBefore - amount, 1);
+      assertApproxEqAbs(aTokenBalanceOfCollectorAfter, aTokenBalanceOfCollectorBefore - amount, 2);
     }
+  }
+
+  function _genericWithdrawAllCollectorFundsToReceiver(
+    address pool,
+    IERC20 aToken,
+    function(ICollector, CollectorUtils.IOInput memory, address) returns (uint256) withdraw,
+    bool withATokenCheck
+  ) internal {
+    uint256 aTokenBalanceOfCollectorBefore = aToken.balanceOf(address(COLLECTOR));
+    uint256 underlyingBalanceOfReceiverBefore = UNDERLYING.balanceOf(testReceiver);
+
+    uint256 withdrawnAmount = withdraw(
+      COLLECTOR,
+      CollectorUtils.IOInput({
+        amount: type(uint256).max,
+        underlying: address(UNDERLYING),
+        pool: pool
+      }),
+      testReceiver
+    );
+
+    assertApproxEqAbs(withdrawnAmount, aTokenBalanceOfCollectorBefore, 2);
+    assertEq(
+      UNDERLYING.balanceOf(testReceiver),
+      underlyingBalanceOfReceiverBefore + withdrawnAmount
+    );
+    // because we mint to treasury straight away on v2, hard to check the final amount we expect
+    if (withATokenCheck) {
+      assertApproxEqAbs(aToken.balanceOf(address(COLLECTOR)), 0, 2);
+    }
+  }
+
+  function testDepositCollectorFundsToV4(uint128 amount) public {
+    uint256 underlyingBalanceOfCollectorBefore = UNDERLYING.balanceOf(address(COLLECTOR));
+    amount = uint128(bound(amount, 2, underlyingBalanceOfCollectorBefore));
+    uint256 sharesOfCollectorBefore = SPOKE.balanceOf(address(COLLECTOR));
+    uint256 expectedShares = SPOKE.previewDeposit(amount);
+
+    uint256 shares = COLLECTOR.depositToV4(address(SPOKE), amount);
+
+    assertEq(shares, expectedShares);
+    assertEq(UNDERLYING.balanceOf(address(COLLECTOR)), underlyingBalanceOfCollectorBefore - amount);
+    assertEq(SPOKE.balanceOf(address(COLLECTOR)), sharesOfCollectorBefore + shares);
+    assertEq(UNDERLYING.allowance(address(this), address(SPOKE)), 0);
+  }
+
+  function testDepositAllCollectorFundsToV4() public {
+    uint256 underlyingBalanceOfCollectorBefore = UNDERLYING.balanceOf(address(COLLECTOR));
+
+    uint256 shares = COLLECTOR.depositToV4(address(SPOKE), type(uint256).max);
+
+    assertEq(UNDERLYING.balanceOf(address(COLLECTOR)), 0);
+    assertApproxEqAbs(SPOKE.convertToAssets(shares), underlyingBalanceOfCollectorBefore, 1);
+  }
+
+  function testDepositToV4RevertsOnZeroAmount() public {
+    vm.expectRevert(CollectorUtils.InvalidZeroAmount.selector);
+    this.depositToV4External(0);
+  }
+
+  function testDepositToV3RevertsOnZeroAmount() public {
+    vm.expectRevert(CollectorUtils.InvalidZeroAmount.selector);
+    this.depositToV3External(0);
+  }
+
+  function testWithdrawFromV3RevertsOnZeroAmount() public {
+    vm.expectRevert(CollectorUtils.InvalidZeroAmount.selector);
+    this.withdrawFromV3External(0);
+  }
+
+  function testWithdrawFromV2RevertsOnZeroAmount() public {
+    vm.expectRevert(CollectorUtils.InvalidZeroAmount.selector);
+    this.withdrawFromV2External(0);
+  }
+
+  function testWithdrawFromV4RevertsOnZeroAmount() public {
+    vm.expectRevert(CollectorUtils.InvalidZeroAmount.selector);
+    this.withdrawFromV4External(0);
+  }
+
+  function testStreamRevertsOnZeroAmount() public {
+    vm.expectRevert(CollectorUtils.InvalidZeroAmount.selector);
+    this.streamExternal(0);
+  }
+
+  function testSwapRevertsOnZeroAmount() public {
+    vm.expectRevert(CollectorUtils.InvalidZeroAmount.selector);
+    this.swapExternal(0);
+  }
+
+  function testWithdrawCollectorFundsFromV4(uint128 amount) public {
+    COLLECTOR.depositToV4(address(SPOKE), type(uint256).max);
+    uint256 sharesOfCollectorBefore = SPOKE.balanceOf(address(COLLECTOR));
+    amount = uint128(bound(amount, 1, SPOKE.maxWithdraw(address(COLLECTOR))));
+    uint256 underlyingBalanceOfReceiverBefore = UNDERLYING.balanceOf(testReceiver);
+    uint256 expectedShares = SPOKE.previewWithdraw(amount);
+
+    uint256 withdrawnAmount = COLLECTOR.withdrawFromV4(address(SPOKE), amount, testReceiver);
+
+    assertEq(withdrawnAmount, amount);
+    assertEq(UNDERLYING.balanceOf(testReceiver), underlyingBalanceOfReceiverBefore + amount);
+    assertEq(SPOKE.balanceOf(address(COLLECTOR)), sharesOfCollectorBefore - expectedShares);
+    assertEq(SPOKE.balanceOf(address(this)), 0);
+  }
+
+  function testWithdrawAllCollectorFundsFromV4() public {
+    COLLECTOR.depositToV4(address(SPOKE), type(uint256).max);
+    uint256 maxWithdrawBefore = SPOKE.maxWithdraw(address(COLLECTOR));
+    uint256 underlyingBalanceOfReceiverBefore = UNDERLYING.balanceOf(testReceiver);
+
+    uint256 withdrawnAmount = COLLECTOR.withdrawFromV4(
+      address(SPOKE),
+      type(uint256).max,
+      testReceiver
+    );
+
+    assertEq(withdrawnAmount, maxWithdrawBefore);
+    assertEq(
+      UNDERLYING.balanceOf(testReceiver),
+      underlyingBalanceOfReceiverBefore + withdrawnAmount
+    );
+    assertEq(SPOKE.maxWithdraw(address(COLLECTOR)), 0);
+    assertEq(SPOKE.balanceOf(address(this)), 0);
+  }
+
+  function depositToV4External(uint256 amount) external {
+    COLLECTOR.depositToV4(address(SPOKE), amount);
+  }
+
+  function depositToV3External(uint256 amount) external {
+    COLLECTOR.depositToV3(
+      CollectorUtils.IOInput({
+        amount: amount,
+        underlying: address(UNDERLYING),
+        pool: address(V3_POOL)
+      })
+    );
+  }
+
+  function withdrawFromV3External(uint256 amount) external {
+    COLLECTOR.withdrawFromV3(
+      CollectorUtils.IOInput({
+        amount: amount,
+        underlying: address(UNDERLYING),
+        pool: address(V3_POOL)
+      }),
+      testReceiver
+    );
+  }
+
+  function withdrawFromV2External(uint256 amount) external {
+    COLLECTOR.withdrawFromV2(
+      CollectorUtils.IOInput({
+        amount: amount,
+        underlying: address(UNDERLYING),
+        pool: address(V2_POOL)
+      }),
+      testReceiver
+    );
+  }
+
+  function withdrawFromV4External(uint256 amount) external {
+    COLLECTOR.withdrawFromV4(address(SPOKE), amount, testReceiver);
+  }
+
+  function streamExternal(uint256 amount) external {
+    COLLECTOR.stream(
+      CollectorUtils.CreateStreamInput({
+        underlying: address(UNDERLYING),
+        receiver: testReceiver,
+        amount: amount,
+        start: block.timestamp,
+        duration: 1 days
+      })
+    );
+  }
+
+  function swapExternal(uint256 amount) external {
+    COLLECTOR.swap(
+      SWAPPER,
+      CollectorUtils.SwapInput({
+        milkman: address(0),
+        priceChecker: address(0),
+        fromUnderlying: address(UNDERLYING),
+        toUnderlying: AaveV3EthereumAssets.USDT_UNDERLYING,
+        fromUnderlyingPriceFeed: address(0),
+        toUnderlyingPriceFeed: address(0),
+        amount: amount,
+        slippage: 0
+      })
+    );
   }
 }

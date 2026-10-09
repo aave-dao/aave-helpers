@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import {IPool, DataTypes, ICollector} from 'aave-address-book/AaveV3.sol';
 import {ILendingPool, DataTypes as V2DataTypes} from 'aave-address-book/AaveV2.sol';
+import {ITokenizationSpoke} from 'aave-address-book/AaveV4.sol';
 import {IERC20} from 'openzeppelin-contracts/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from 'openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol';
 
@@ -85,11 +86,37 @@ library CollectorUtils {
   }
 
   /**
+   * @notice Deposit funds of the collector to an Aave v4 TokenizationSpoke
+   * @dev the underlying is derived from the spoke, as each TokenizationSpoke tokenizes a single asset
+   * @param collector aave collector
+   * @param spoke Aave v4 TokenizationSpoke (ERC4626 vault)
+   * @param amount of underlying to deposit, type(uint256).max for the full collector balance
+   * @return the amount of spoke shares minted to the collector
+   */
+  function depositToV4(
+    ICollector collector,
+    address spoke,
+    uint256 amount
+  ) internal returns (uint256) {
+    if (amount == 0) {
+      revert InvalidZeroAmount();
+    }
+
+    address underlying = ITokenizationSpoke(spoke).asset();
+    if (amount == type(uint256).max) {
+      amount = IERC20(underlying).balanceOf(address(collector));
+    }
+    collector.transfer(IERC20(underlying), address(this), amount);
+    IERC20(underlying).forceApprove(spoke, amount);
+    return ITokenizationSpoke(spoke).deposit(amount, address(collector));
+  }
+
+  /**
    * @notice Withdraw funds of the collector from the Aave v3 to the receiver
    * @dev due to imprecision may get 1-2 wei less then specified amount
    * @param collector aave collector
    * @param receiver receiver of the underlying
-   * @param input withdraw parameters wrapped as IOInput
+   * @param input withdraw parameters wrapped as IOInput, amount type(uint256).max for the full collector balance
    */
   function withdrawFromV3(
     ICollector collector,
@@ -101,11 +128,38 @@ library CollectorUtils {
   }
 
   /**
+   * @notice Withdraw funds of the collector from an Aave v4 TokenizationSpoke to the receiver
+   * @param collector aave collector
+   * @param spoke Aave v4 TokenizationSpoke (ERC4626 vault)
+   * @param amount of underlying to withdraw, type(uint256).max for the max withdrawable by the collector
+   * @param receiver receiver of the underlying
+   * @return the actual amount of underlying withdrawn
+   */
+  function withdrawFromV4(
+    ICollector collector,
+    address spoke,
+    uint256 amount,
+    address receiver
+  ) internal returns (uint256) {
+    if (amount == 0) {
+      revert InvalidZeroAmount();
+    }
+
+    if (amount == type(uint256).max) {
+      amount = ITokenizationSpoke(spoke).maxWithdraw(address(collector));
+    }
+    uint256 shares = ITokenizationSpoke(spoke).previewWithdraw(amount);
+    collector.transfer(IERC20(spoke), address(this), shares);
+    ITokenizationSpoke(spoke).withdraw(amount, receiver, address(this));
+    return amount;
+  }
+
+  /**
    * @notice Withdraw funds of the collector from the Aave v2 to the receiver
    * @dev due to imprecision may get 1-2 wei less then specified amount
    * @param collector aave collector
    * @param receiver receiver of the underlying
-   * @param input withdraw parameters wrapped as IOInput
+   * @param input withdraw parameters wrapped as IOInput, amount type(uint256).max for the full collector balance
    */
   function withdrawFromV2(
     ICollector collector,
@@ -203,6 +257,9 @@ library CollectorUtils {
       revert InvalidZeroAmount();
     }
 
+    if (input.amount == type(uint256).max) {
+      input.amount = IERC20(aTokenAddress).balanceOf(address(collector));
+    }
     uint256 balanceBeforeTransfer = IERC20(aTokenAddress).balanceOf(address(this));
 
     collector.transfer(IERC20(aTokenAddress), address(this), input.amount);
