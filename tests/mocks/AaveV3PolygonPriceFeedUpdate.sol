@@ -18,7 +18,7 @@ contract AaveV3PolygonPriceFeedUpdate is AaveV3Payload {
 
     priceFeedsUpdate[0] = IEngine.PriceFeedUpdate({
       asset: AaveV3PolygonAssets.AAVE_UNDERLYING,
-      priceFeed: AaveV3PolygonAssets.USDC_ORACLE
+      priceFeed: AaveV3PolygonAssets.USDCe_ORACLE
     });
 
     return priceFeedsUpdate;

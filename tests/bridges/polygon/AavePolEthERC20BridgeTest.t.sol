@@ -56,7 +56,7 @@ contract BridgeTest is AavePolEthERC20BridgeTest {
     uint256 amount = 1_000e6;
 
     vm.startPrank(USDC_WHALE);
-    IERC20(AaveV3PolygonAssets.USDC_UNDERLYING).transfer(address(bridgePolygon), amount);
+    IERC20(AaveV3PolygonAssets.USDCe_UNDERLYING).transfer(address(bridgePolygon), amount);
     vm.stopPrank();
 
     bridgePolygon.transferOwnership(GovernanceV3Polygon.EXECUTOR_LVL_1);
@@ -64,7 +64,7 @@ contract BridgeTest is AavePolEthERC20BridgeTest {
     vm.expectRevert(
       abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this))
     );
-    bridgePolygon.bridge(AaveV3PolygonAssets.USDC_UNDERLYING, amount);
+    bridgePolygon.bridge(AaveV3PolygonAssets.USDCe_UNDERLYING, amount);
   }
 
   function test_successful() public {
@@ -73,15 +73,15 @@ contract BridgeTest is AavePolEthERC20BridgeTest {
     uint256 amount = 1_000e6;
 
     vm.startPrank(USDC_WHALE);
-    IERC20(AaveV3PolygonAssets.USDC_UNDERLYING).transfer(address(bridgePolygon), amount);
+    IERC20(AaveV3PolygonAssets.USDCe_UNDERLYING).transfer(address(bridgePolygon), amount);
     vm.stopPrank();
 
     bridgePolygon.transferOwnership(GovernanceV3Polygon.EXECUTOR_LVL_1);
 
     vm.startPrank(GovernanceV3Polygon.EXECUTOR_LVL_1);
     vm.expectEmit();
-    emit Bridge(AaveV3PolygonAssets.USDC_UNDERLYING, amount);
-    bridgePolygon.bridge(AaveV3PolygonAssets.USDC_UNDERLYING, amount);
+    emit Bridge(AaveV3PolygonAssets.USDCe_UNDERLYING, amount);
+    bridgePolygon.bridge(AaveV3PolygonAssets.USDCe_UNDERLYING, amount);
     vm.stopPrank();
   }
 }
@@ -173,13 +173,13 @@ contract IsTokenMapped is AavePolEthERC20BridgeTest {
     vm.selectFork(polygonFork);
 
     vm.expectRevert(AavePolEthERC20Bridge.InvalidChain.selector);
-    bridgeMainnet.isTokenMapped(AaveV3PolygonAssets.USDC_UNDERLYING);
+    bridgeMainnet.isTokenMapped(AaveV3PolygonAssets.USDCe_UNDERLYING);
   }
 
   function test_successful_returnsTrue() public {
     vm.selectFork(mainnetFork);
 
-    assertTrue(bridgeMainnet.isTokenMapped(AaveV3PolygonAssets.USDC_UNDERLYING));
+    assertTrue(bridgeMainnet.isTokenMapped(AaveV3PolygonAssets.USDCe_UNDERLYING));
   }
 
   function test_successful_returnsFalse() public {

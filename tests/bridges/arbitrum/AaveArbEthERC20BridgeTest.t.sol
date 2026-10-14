@@ -56,7 +56,7 @@ contract BridgeTest is AaveArbEthERC20BridgeTest {
 
     vm.expectRevert(IAaveArbEthERC20Bridge.InvalidChain.selector);
     bridgeArbitrum.bridge(
-      AaveV3ArbitrumAssets.USDC_UNDERLYING,
+      AaveV3ArbitrumAssets.USDCe_UNDERLYING,
       AaveV3EthereumAssets.USDC_UNDERLYING,
       USDC_GATEWAY,
       1_000e6
@@ -69,7 +69,7 @@ contract BridgeTest is AaveArbEthERC20BridgeTest {
     uint256 amount = 1_000e6;
 
     vm.startPrank(USDC_WHALE);
-    IERC20(AaveV3ArbitrumAssets.USDC_UNDERLYING).transfer(address(bridgeArbitrum), amount);
+    IERC20(AaveV3ArbitrumAssets.USDCe_UNDERLYING).transfer(address(bridgeArbitrum), amount);
     vm.stopPrank();
 
     bridgeArbitrum.transferOwnership(GovernanceV3Arbitrum.EXECUTOR_LVL_1);
@@ -78,7 +78,7 @@ contract BridgeTest is AaveArbEthERC20BridgeTest {
       abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this))
     );
     bridgeArbitrum.bridge(
-      AaveV3ArbitrumAssets.USDC_UNDERLYING,
+      AaveV3ArbitrumAssets.USDCe_UNDERLYING,
       AaveV3EthereumAssets.USDC_UNDERLYING,
       USDC_GATEWAY,
       amount
@@ -91,7 +91,7 @@ contract BridgeTest is AaveArbEthERC20BridgeTest {
     uint256 amount = 1_000e6;
 
     vm.startPrank(USDC_WHALE);
-    IERC20(AaveV3ArbitrumAssets.USDC_UNDERLYING).transfer(address(bridgeArbitrum), amount);
+    IERC20(AaveV3ArbitrumAssets.USDCe_UNDERLYING).transfer(address(bridgeArbitrum), amount);
     vm.stopPrank();
 
     bridgeArbitrum.transferOwnership(GovernanceV3Arbitrum.EXECUTOR_LVL_1);
@@ -102,10 +102,10 @@ contract BridgeTest is AaveArbEthERC20BridgeTest {
     vm.etch(address(0x0000000000000000000000000000000000000064), address(arbsys).code);
 
     vm.expectEmit();
-    emit Bridge(AaveV3ArbitrumAssets.USDC_UNDERLYING, amount);
+    emit Bridge(AaveV3ArbitrumAssets.USDCe_UNDERLYING, amount);
 
     bridgeArbitrum.bridge(
-      AaveV3ArbitrumAssets.USDC_UNDERLYING,
+      AaveV3ArbitrumAssets.USDCe_UNDERLYING,
       AaveV3EthereumAssets.USDC_UNDERLYING,
       USDC_GATEWAY,
       amount
