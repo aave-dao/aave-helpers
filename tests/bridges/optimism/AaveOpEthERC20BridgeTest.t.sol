@@ -42,7 +42,7 @@ contract BridgeTest is AaveOpEthERC20BridgeTest {
 
     vm.expectRevert(IAaveOpEthERC20Bridge.InvalidChain.selector);
     mainnetBridge.bridge(
-      AaveV3OptimismAssets.USDC_UNDERLYING,
+      AaveV3OptimismAssets.USDCe_UNDERLYING,
       AaveV3EthereumAssets.USDC_UNDERLYING,
       1_000e6
     );
@@ -51,7 +51,7 @@ contract BridgeTest is AaveOpEthERC20BridgeTest {
   function test_revertsIf_notOwner() public {
     uint256 amount = 1_000e6;
 
-    deal(AaveV3OptimismAssets.USDC_UNDERLYING, address(bridge), amount);
+    deal(AaveV3OptimismAssets.USDCe_UNDERLYING, address(bridge), amount);
 
     bridge.transferOwnership(GovernanceV3Optimism.EXECUTOR_LVL_1);
 
@@ -59,7 +59,7 @@ contract BridgeTest is AaveOpEthERC20BridgeTest {
       abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, address(this))
     );
     bridge.bridge(
-      AaveV3OptimismAssets.USDC_UNDERLYING,
+      AaveV3OptimismAssets.USDCe_UNDERLYING,
       AaveV3EthereumAssets.USDC_UNDERLYING,
       1_000e6
     );
@@ -68,21 +68,21 @@ contract BridgeTest is AaveOpEthERC20BridgeTest {
   function test_successful() public {
     uint256 amount = 1_000e6;
 
-    deal(AaveV3OptimismAssets.USDC_UNDERLYING, address(bridge), amount);
+    deal(AaveV3OptimismAssets.USDCe_UNDERLYING, address(bridge), amount);
 
     bridge.transferOwnership(GovernanceV3Optimism.EXECUTOR_LVL_1);
 
     vm.startPrank(GovernanceV3Optimism.EXECUTOR_LVL_1);
     vm.expectEmit();
     emit Bridge(
-      AaveV3OptimismAssets.USDC_UNDERLYING,
+      AaveV3OptimismAssets.USDCe_UNDERLYING,
       AaveV3EthereumAssets.USDC_UNDERLYING,
       amount,
       address(AaveV3Ethereum.COLLECTOR),
       0
     );
     bridge.bridge(
-      AaveV3OptimismAssets.USDC_UNDERLYING,
+      AaveV3OptimismAssets.USDCe_UNDERLYING,
       AaveV3EthereumAssets.USDC_UNDERLYING,
       1_000e6
     );
@@ -112,7 +112,7 @@ contract EmergencyTokenTransfer is AaveOpEthERC20BridgeTest {
     vm.expectRevert(IRescuable.OnlyRescueGuardian.selector);
     vm.startPrank(makeAddr('random-caller'));
     bridge.emergencyTokenTransfer(
-      AaveV3OptimismAssets.USDC_UNDERLYING,
+      AaveV3OptimismAssets.USDCe_UNDERLYING,
       address(AaveV3Optimism.COLLECTOR),
       1_000e6
     );
@@ -120,28 +120,28 @@ contract EmergencyTokenTransfer is AaveOpEthERC20BridgeTest {
   }
 
   function test_successful_governanceCaller() public {
-    assertEq(IERC20(AaveV3OptimismAssets.USDC_UNDERLYING).balanceOf(address(bridge)), 0);
+    assertEq(IERC20(AaveV3OptimismAssets.USDCe_UNDERLYING).balanceOf(address(bridge)), 0);
 
     uint256 usdcAmount = 1_000e18;
 
-    deal(AaveV3OptimismAssets.USDC_UNDERLYING, address(bridge), usdcAmount);
+    deal(AaveV3OptimismAssets.USDCe_UNDERLYING, address(bridge), usdcAmount);
 
-    assertEq(IERC20(AaveV3OptimismAssets.USDC_UNDERLYING).balanceOf(address(bridge)), usdcAmount);
+    assertEq(IERC20(AaveV3OptimismAssets.USDCe_UNDERLYING).balanceOf(address(bridge)), usdcAmount);
 
-    uint256 initialCollectorBalBalance = IERC20(AaveV3OptimismAssets.USDC_UNDERLYING).balanceOf(
+    uint256 initialCollectorBalBalance = IERC20(AaveV3OptimismAssets.USDCe_UNDERLYING).balanceOf(
       address(AaveV3Optimism.COLLECTOR)
     );
 
     bridge.emergencyTokenTransfer(
-      AaveV3OptimismAssets.USDC_UNDERLYING,
+      AaveV3OptimismAssets.USDCe_UNDERLYING,
       address(AaveV3Optimism.COLLECTOR),
       usdcAmount
     );
 
     assertEq(
-      IERC20(AaveV3OptimismAssets.USDC_UNDERLYING).balanceOf(address(AaveV3Optimism.COLLECTOR)),
+      IERC20(AaveV3OptimismAssets.USDCe_UNDERLYING).balanceOf(address(AaveV3Optimism.COLLECTOR)),
       initialCollectorBalBalance + usdcAmount
     );
-    assertEq(IERC20(AaveV3OptimismAssets.USDC_UNDERLYING).balanceOf(address(bridge)), 0);
+    assertEq(IERC20(AaveV3OptimismAssets.USDCe_UNDERLYING).balanceOf(address(bridge)), 0);
   }
 }
