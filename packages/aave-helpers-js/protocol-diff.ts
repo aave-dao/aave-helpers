@@ -4,7 +4,8 @@ import { renderReservesSection } from './sections/reserves';
 import { renderEmodesSection } from './sections/emodes';
 import { renderPoolConfigSection } from './sections/pool-config';
 import { renderRawSection } from './sections/raw';
-import { renderLogsSection } from './sections/logs';
+import { renderLogsSection, parseSnapshotLogs } from './sections/logs';
+import { decodeRawStorage } from './utils/decodeStorage';
 
 /**
  * Diff two Aave V3 protocol snapshots and produce a formatted markdown report.
@@ -36,11 +37,18 @@ export async function diffSnapshots(
   // Assemble the markdown report
   let md = '';
 
+  // Parse logs once (pure); decoded args also feed mapping-key candidates for
+  // storage decoding. decodeRawStorage must run before renderLogsSection:
+  // enhanceLogs (called inside it) rewrites parsedLogs' args in place with
+  // prettified strings, which would no longer match as candidate keys.
+  const parsedLogs = logs ? parseSnapshotLogs(logs) : undefined;
+  const decodedStorage = decodeRawStorage(raw, after, parsedLogs);
+
   md += renderReservesSection(diffResult, before, after);
   md += renderEmodesSection(diffResult, before, after);
   md += renderPoolConfigSection(diffResult, after.chainId);
-  md += await renderLogsSection(logs, after.chainId);
-  md += renderRawSection(raw, after.chainId);
+  md += await renderLogsSection(logs, after.chainId, parsedLogs);
+  md += renderRawSection(raw, after.chainId, decodedStorage);
 
   // Append raw JSON diff as fallback (without raw/logs which have their own sections)
   const diffWithoutUnchanged = diff(before, postCopy, true);
