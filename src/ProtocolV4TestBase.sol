@@ -328,7 +328,8 @@ abstract contract ProtocolV4TestBase is
     }
   }
 
-  /// @notice Test all reserves on one spoke, looping over ALL good collaterals, then gateway tests.
+  /// @notice Test all reserves on one spoke, looping over the most recently listed usable
+  /// collaterals (see `_e2eMaxCollaterals`) as primary collateral.
   function e2eTestSpoke(ISpoke spoke) public {
     Types.ReserveInfo[] memory allReserves = _getReserveInfo(spoke);
     Types.ReserveInfo[] memory goodCollaterals = _getAllUsableCollaterals(allReserves);
@@ -338,12 +339,11 @@ abstract contract ProtocolV4TestBase is
       return;
     }
 
-    uint256 numCollateralsToTest = 5;
-    numCollateralsToTest = goodCollaterals.length < numCollateralsToTest
-      ? goodCollaterals.length
-      : numCollateralsToTest;
-
-    for (uint256 collateralIndex; collateralIndex < numCollateralsToTest; collateralIndex++) {
+    for (
+      uint256 collateralIndex = _e2eFirstCollateralIndex(goodCollaterals.length);
+      collateralIndex < goodCollaterals.length;
+      collateralIndex++
+    ) {
       console.log('--- E2E: Using collateral %s ---', goodCollaterals[collateralIndex].symbol);
 
       uint256 spokeSnapshot = vm.snapshotState();
@@ -990,6 +990,19 @@ abstract contract ProtocolV4TestBase is
 
   /// @notice Position managers and gateways exercised on each registered spoke.
   function _getPositionManagers() internal view virtual returns (PositionManagers memory);
+
+  /// @notice Maximum number of usable collaterals `e2eTestSpoke` runs as primary collateral, taken
+  /// from the most recently listed. Override to widen coverage, e.g. `type(uint256).max` for all.
+  function _e2eMaxCollaterals() internal view virtual returns (uint256) {
+    return 5;
+  }
+
+  /// @notice Index of the first collateral `e2eTestSpoke` runs, out of `collateralCount` usable ones.
+  /// @dev Reserves are listed in order, so the last ones are the most recently listed.
+  function _e2eFirstCollateralIndex(uint256 collateralCount) internal view returns (uint256) {
+    uint256 maxCollaterals = _e2eMaxCollaterals();
+    return collateralCount > maxCollaterals ? collateralCount - maxCollaterals : 0;
+  }
 
   /// @notice Default list of position-manager candidates checked per spoke.
   /// @dev Returning more addresses costs only one `isPositionManagerActive` call
