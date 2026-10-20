@@ -204,6 +204,149 @@ abstract contract ProtocolV4TestBase is
     }
   }
 
+  /// @notice Opt-in check of spoke invariants the contracts do not enforce at config time. Call after
+  ///         payload execution with every spoke to cover, including spokes not yet in the address-book.
+  function configInvariantsTest(ISpoke[] memory spokes) public view {
+    configInvariantsTest(createV4Snapshot(spokes, _hubsWithReserveHubs(spokes)));
+  }
+
+  /// @notice Reverts when, on any spoke in `snapshot`:
+  ///         - a reserve that is borrowable with a non-zero draw cap has a risk premium threshold that is
+  ///           neither unlimited nor strictly above the spoke's highest collateral risk;
+  ///         - a dynamic config with a non-zero collateral factor has
+  ///           `maxLiquidationBonus * collateralFactor > healthFactorForMaxBonus`.
+  /// @dev Collateral risk counts for every reserve with a non-zero collateral factor in any dynamic config
+  ///      key, since positions stay bound to the key they last refreshed on. RPT equal to the highest
+  ///      collateral risk is not enough: user premium shares round up one by one, so the spoke total can
+  ///      exceed the hub bound and revert `InvalidPremiumChange`.
+  function configInvariantsTest(Types.V4Snapshot memory snapshot) public pure {
+    for (uint256 i; i < snapshot.spokeLiquidationConfigs.length; i++) {
+      address spoke = snapshot.spokeLiquidationConfigs[i].spokeAddress;
+      uint256 healthFactorForMaxBonus = snapshot.spokeLiquidationConfigs[i].healthFactorForMaxBonus;
+      uint256 maxCollateralRisk = _maxCollateralRisk(snapshot.spokeReserves, spoke);
+
+      for (uint256 j; j < snapshot.spokeReserves.length; j++) {
+        Types.SpokeReserveSnapshot memory reserve = snapshot.spokeReserves[j];
+        if (reserve.spokeAddress != spoke) {
+          continue;
+        }
+
+        for (uint256 k; k < reserve.dynamicConfigs.length; k++) {
+          Types.DynamicConfigSnapshot memory config = reserve.dynamicConfigs[k];
+          // BPS * BPS * 1e10 = WAD, the unit of healthFactorForMaxBonus
+          require(
+            uint256(config.maxLiquidationBonus) * config.collateralFactor * 1e10 <=
+              healthFactorForMaxBonus,
+            string.concat(
+              'CI_LIQUIDATION_BONUS_ABOVE_HF_FOR_MAX_BONUS ',
+              Strings.toHexString(spoke),
+              ' ',
+              reserve.symbol,
+              ' key ',
+              Strings.toString(config.key)
+            )
+          );
+        }
+
+        if (maxCollateralRisk == 0 || !reserve.borrowable) {
+          continue;
+        }
+        bool found;
+        for (uint256 c; c < snapshot.spokeConfigs.length; c++) {
+          Types.SpokeConfigSnapshot memory spokeConfig = snapshot.spokeConfigs[c];
+          if (
+            spokeConfig.spokeAddress != spoke ||
+            spokeConfig.hubAddress != reserve.hub ||
+            spokeConfig.assetId != reserve.assetId
+          ) {
+            continue;
+          }
+          found = true;
+          if (spokeConfig.drawCap == 0) {
+            continue;
+          }
+          require(
+            spokeConfig.riskPremiumThreshold == type(uint24).max ||
+              spokeConfig.riskPremiumThreshold > maxCollateralRisk,
+            string.concat(
+              'CI_RPT_NOT_ABOVE_MAX_COLLATERAL_RISK ',
+              Strings.toHexString(spoke),
+              ' ',
+              reserve.symbol
+            )
+          );
+        }
+        require(
+          found,
+          string.concat(
+            'CI_SPOKE_CONFIG_NOT_IN_SNAPSHOT ',
+            Strings.toHexString(spoke),
+            ' ',
+            reserve.symbol
+          )
+        );
+      }
+    }
+  }
+
+  /// @dev `_getHubs()` plus the hub of every reserve on `spokes`, so hubs not yet in the address-book
+  ///      still contribute their spoke configs.
+  function _hubsWithReserveHubs(ISpoke[] memory spokes) internal view returns (IHub[] memory) {
+    IHub[] memory known = _getHubs();
+    uint256 maxCount = known.length;
+    for (uint256 s; s < spokes.length; s++) {
+      maxCount += spokes[s].getReserveCount();
+    }
+
+    IHub[] memory hubs = new IHub[](maxCount);
+    uint256 count;
+    for (uint256 h; h < known.length; h++) {
+      count = _appendUniqueHub(hubs, count, known[h]);
+    }
+    for (uint256 s; s < spokes.length; s++) {
+      uint256 reserveCount = spokes[s].getReserveCount();
+      for (uint256 r; r < reserveCount; r++) {
+        count = _appendUniqueHub(hubs, count, IHub(address(spokes[s].getReserve(r).hub)));
+      }
+    }
+
+    assembly {
+      mstore(hubs, count)
+    }
+    return hubs;
+  }
+
+  function _appendUniqueHub(
+    IHub[] memory hubs,
+    uint256 count,
+    IHub hub
+  ) internal pure returns (uint256) {
+    for (uint256 i; i < count; i++) {
+      if (hubs[i] == hub) {
+        return count;
+      }
+    }
+    hubs[count] = hub;
+    return count + 1;
+  }
+
+  function _maxCollateralRisk(
+    Types.SpokeReserveSnapshot[] memory reserves,
+    address spoke
+  ) internal pure returns (uint256 maxCollateralRisk) {
+    for (uint256 i; i < reserves.length; i++) {
+      if (reserves[i].spokeAddress != spoke || reserves[i].collateralRisk <= maxCollateralRisk) {
+        continue;
+      }
+      for (uint256 k; k < reserves[i].dynamicConfigs.length; k++) {
+        if (reserves[i].dynamicConfigs[k].collateralFactor > 0) {
+          maxCollateralRisk = reserves[i].collateralRisk;
+          break;
+        }
+      }
+    }
+  }
+
   /// @notice Assert a payload's declared role wiring landed on its AccessManager. Call after execution.
   /// @param item One entry of the payload's `accessManagerTargetFunctionRoleUpdates()`.
   /// @param referenceTarget Already-wired contract asserted to carry the same role per selector,
