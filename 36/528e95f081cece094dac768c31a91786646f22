@@ -1,0 +1,25 @@
+tests/ProtocolV4TestBase.ConfigInvariants.t.sol
+  s_dd9fcb6717c7bb::t_6c29ddc7117514 1-54,66-263
+  s_dd9fcb6717c7bb::t_f4ba73aca8745d 55-65
+src/ProtocolV4TestBase.sol
+  s_dd9fcb6717c7bb::t_52b8d4392a7810 210
+  s_dd9fcb6717c7bb::t_2477b21a633233 254,260,262-265
+  s_dd9fcb6717c7bb::t_b87054ba4f535f 207-209,211-253,255-259,261,266-278,288-289,331-349
+  s_dd9fcb6717c7bb::t_8bd784a34e0b73 279-287,290-330
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "36528e95f081cece094dac768c31a91786646f22",
+  "prompts": {},
+  "sessions": {
+    "s_dd9fcb6717c7bb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a97acf50-1024-43d0-b556-9b50b16d2d09",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
