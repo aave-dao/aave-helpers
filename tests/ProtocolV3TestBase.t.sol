@@ -84,7 +84,7 @@ contract ProtocolV3TestE2ETestAsset is ProtocolV3TestBase {
     e2eTestAsset(
       AaveV3Optimism.POOL,
       _findReserveConfig(configs, AaveV3OptimismAssets.DAI_UNDERLYING),
-      _findReserveConfig(configs, AaveV3OptimismAssets.USDC_UNDERLYING)
+      _findReserveConfig(configs, AaveV3OptimismAssets.USDCe_UNDERLYING)
     );
   }
 }
