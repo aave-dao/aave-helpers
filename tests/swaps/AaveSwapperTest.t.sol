@@ -445,7 +445,7 @@ contract GetExpectedOut is AaveSwapperTest {
       AaveV3EthereumAssets.WETH_UNDERLYING,
       AaveV3EthereumAssets.BAL_UNDERLYING,
       AaveV3EthereumAssets.WETH_ORACLE,
-      AaveV3EthereumAssets.BAL_ORACLE
+      ChainlinkEthereum.BAL__USD
     );
 
     // July 3, 2024 ETH/BAL is 1 ETH is around 2617 BAL tokens
