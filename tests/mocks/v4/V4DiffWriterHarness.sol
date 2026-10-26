@@ -7,6 +7,9 @@ import {Types} from 'src/dependencies/v4/Types.sol';
 /// @title V4DiffWriterHarness
 /// @notice Harness contract that exposes internal helpers as external entrypoints
 contract V4DiffWriterHarness {
+  /// @dev Marks this test-only harness so `forge build --sizes` leaves it out of the size check.
+  bool public constant IS_TEST = true;
+
   function writeSnapshotJson(string memory reportName, Types.V4Snapshot memory snapshot) external {
     V4DiffWriter.writeSnapshotJson(reportName, snapshot);
   }
