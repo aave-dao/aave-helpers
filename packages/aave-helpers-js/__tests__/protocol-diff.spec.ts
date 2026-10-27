@@ -895,7 +895,7 @@ describe('diffSnapshots', () => {
 
       | index | event |
       | --- | --- |
-      | 187 | topics: \`0x5326514eeca90494a14bedabcff812a0e683029ee85d1e23824d44fd14cd6ae7\`, \`0x0000000000000000000000000000000000000000000000000000000000000000\`, \`0x00000000000000000000000098f756b77d6fde14e08bb064b248ec7512f9f8ba\`, data: \`0x\` |
+      | 187 | PriceOracleSentinelUpdated(oldAddress: 0x0000000000000000000000000000000000000000, newAddress: 0x98F756B77D6Fde14E08bb064b248ec7512F9f8ba) |
 
       #### 0xE2E8Badc5d50f8a6188577B89f50701cDE2D4e19 (AaveV3MegaEth.ACL_ADMIN, GovernanceV3MegaEth.EXECUTOR_LVL_1)
 

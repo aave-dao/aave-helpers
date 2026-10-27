@@ -4279,4 +4279,112 @@ export const eventDb: AbiEvent[] = [
     name: 'Unpaused',
     type: 'event',
   },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'oldAddress', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newAddress', type: 'address' },
+    ],
+    name: 'ACLAdminUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'oldAddress', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newAddress', type: 'address' },
+    ],
+    name: 'ACLManagerUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'bytes32', name: 'id', type: 'bytes32' },
+      { indexed: true, internalType: 'address', name: 'oldAddress', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newAddress', type: 'address' },
+    ],
+    name: 'AddressSet',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'bytes32', name: 'id', type: 'bytes32' },
+      { indexed: true, internalType: 'address', name: 'proxyAddress', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'oldImplementationAddress',
+        type: 'address',
+      },
+      { indexed: true, internalType: 'address', name: 'newImplementationAddress', type: 'address' },
+    ],
+    name: 'AddressSetAsProxy',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'string', name: 'oldMarketId', type: 'string' },
+      { indexed: true, internalType: 'string', name: 'newMarketId', type: 'string' },
+    ],
+    name: 'MarketIdSet',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'oldAddress', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newAddress', type: 'address' },
+    ],
+    name: 'PoolConfiguratorUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'oldAddress', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newAddress', type: 'address' },
+    ],
+    name: 'PoolDataProviderUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'oldAddress', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newAddress', type: 'address' },
+    ],
+    name: 'PoolUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'oldAddress', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newAddress', type: 'address' },
+    ],
+    name: 'PriceOracleSentinelUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'address', name: 'oldAddress', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'newAddress', type: 'address' },
+    ],
+    name: 'PriceOracleUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: 'bytes32', name: 'id', type: 'bytes32' },
+      { indexed: true, internalType: 'address', name: 'proxyAddress', type: 'address' },
+      { indexed: true, internalType: 'address', name: 'implementationAddress', type: 'address' },
+    ],
+    name: 'ProxyCreated',
+    type: 'event',
+  },
 ];
