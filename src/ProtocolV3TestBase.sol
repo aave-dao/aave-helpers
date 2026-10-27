@@ -602,21 +602,6 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
   }
 
   /**
-   * @dev Pools before v3.6 have no ltvzero bitmap; the getter reverts there and is treated as empty.
-   */
-  function _isLtvzeroInEMode(
-    IPool pool,
-    uint8 categoryId,
-    uint16 reserveId
-  ) internal view returns (bool) {
-    try pool.getEModeCategoryLtvzeroBitmap(categoryId) returns (uint128 ltvzeroBitmap) {
-      return EModeConfiguration.isReserveEnabledOnBitmap(ltvzeroBitmap, reserveId);
-    } catch {
-      return false;
-    }
-  }
-
-  /**
    * @dev Returns the first eMode category where collateralAsset is collateral AND borrowAsset is borrowable.
    * Categories flagging collateralAsset as ltvzero are skipped, as it cannot back a borrow there.
    * Returns 0 if no shared eMode exists.
@@ -640,10 +625,11 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
       emptyCounter = 0;
       uint128 collateralBitmap = pool.getEModeCategoryCollateralBitmap(uint8(categoryId));
       uint128 borrowableBitmap = pool.getEModeCategoryBorrowableBitmap(uint8(categoryId));
+      uint128 ltvzeroBitmap = pool.getEModeCategoryLtvzeroBitmap(uint8(categoryId));
       if (
         EModeConfiguration.isReserveEnabledOnBitmap(collateralBitmap, collateralReserveId) &&
         EModeConfiguration.isReserveEnabledOnBitmap(borrowableBitmap, borrowReserveId) &&
-        !_isLtvzeroInEMode(pool, uint8(categoryId), collateralReserveId)
+        !EModeConfiguration.isReserveEnabledOnBitmap(ltvzeroBitmap, collateralReserveId)
       ) {
         return uint8(categoryId);
       }
