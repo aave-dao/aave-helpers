@@ -1,0 +1,19 @@
+tests/ProtocolV3TestBase.t.sol
+  s_090817cd75c4c9::t_dcb095fa00fe4a 27,30-31,33,40,51,53,70,73,77-78,86-87,94,114,128,142,152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1dff3cc2407ab56031383f8c4dc7b637e2fcd5f3",
+  "prompts": {},
+  "sessions": {
+    "s_090817cd75c4c9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5de360bc-600d-4ada-a4ab-0deadf6bca6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
