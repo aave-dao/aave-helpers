@@ -1,0 +1,23 @@
+.changeset/pool-addresses-provider-events.md
+  s_090817cd75c4c9::t_1ea67e63d40c74 1-5
+packages/aave-helpers-js/__tests__/protocol-diff.spec.ts
+  s_090817cd75c4c9::t_2c15136fa2e1b7 898
+packages/aave-helpers-js/utils/eventDb.ts
+  s_090817cd75c4c9::t_12c8fccc6c58fa 4282-4389
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bf7b446a0c863dd57eb2181e4053c6bde1a4cdde",
+  "prompts": {},
+  "sessions": {
+    "s_090817cd75c4c9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5de360bc-600d-4ada-a4ab-0deadf6bca6b",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
