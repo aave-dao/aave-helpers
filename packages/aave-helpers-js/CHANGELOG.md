@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.6.7
+
+### Patch Changes
+
+- 734c955: Add PoolAddressesProvider events (PoolUpdated, PoolConfiguratorUpdated, PriceOracleUpdated, ACLManagerUpdated, ACLAdminUpdated, PriceOracleSentinelUpdated, PoolDataProviderUpdated, ProxyCreated, AddressSet, AddressSetAsProxy, MarketIdSet) from Ethereum 0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e to eventDb
+
 ## 1.6.6
 
 ### Patch Changes
