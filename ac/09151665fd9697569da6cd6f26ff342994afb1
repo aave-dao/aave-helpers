@@ -1,0 +1,37 @@
+tests/ProtocolV4TestBase.t.sol
+  s_2c28d22a698ef1::t_6cb8c17f21da2e 248
+tests/ProtocolV4TestBase.Assertions.t.sol
+  s_2c28d22a698ef1::t_6cb8c17f21da2e 163,167,171,175,179
+foundry.toml
+  s_2c28d22a698ef1::t_47f4d16ce4be7f 16-18
+src/dependencies/v4/Helpers.sol
+  s_2c28d22a698ef1::t_6cb8c17f21da2e 42
+src/ProtocolV3TestBase.sol
+  s_2c28d22a698ef1::t_6cb8c17f21da2e 198
+src/ProtocolV4TestBase.sol
+  s_2c28d22a698ef1::t_6cb8c17f21da2e 309
+src/CommonTestBase.sol
+  s_2c28d22a698ef1::t_6cb8c17f21da2e 85
+tests/ProtocolV3TestBase.t.sol
+  s_2c28d22a698ef1::t_6cb8c17f21da2e 197,311
+foundry.lock
+  s_2c28d22a698ef1::t_b9971dd95b6d70 10-11
+lib/forge-std
+  s_2c28d22a698ef1::t_b122adad2f3ecf 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ac09151665fd9697569da6cd6f26ff342994afb1",
+  "prompts": {},
+  "sessions": {
+    "s_2c28d22a698ef1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8f75e5b3-8b8c-479f-8e59-3610d7bec837",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
