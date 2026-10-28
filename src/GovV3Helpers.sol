@@ -80,8 +80,6 @@ interface IGovernance_V2_5 {
 }
 
 library GovV3Helpers {
-  Vm private constant VM = Vm(address(uint160(uint256(keccak256('hevm cheat code')))));
-
   error CannotFindPayload(uint256 chainId);
   error CannotFindPayloadsController();
   error ExecutorNotFound();
@@ -377,14 +375,14 @@ library GovV3Helpers {
   function createPayload(
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (uint40) {
-    IPayloadsControllerCore payloadsController = getPayloadsController(VM.getChainId());
+    IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
     require(actions.length > 0, 'INVALID ACTIONS');
 
     (, IPayloadsControllerCore.Payload memory payload, bool payloadCreated) = _findCreatedPayload(
       payloadsController,
       actions
     );
-    if (payloadCreated && payload.createdAt > VM.getBlockTimestamp() - 7 days) {
+    if (payloadCreated && payload.createdAt > block.timestamp - 7 days) {
       revert PayloadAlreadyCreated();
     } else {
       return payloadsController.createPayload(actions);
@@ -406,7 +404,7 @@ library GovV3Helpers {
       IPayloadsControllerCore(permissionedPayloadsController),
       actions
     );
-    if (payloadCreated && payload.createdAt > VM.getBlockTimestamp() - 7 days) {
+    if (payloadCreated && payload.createdAt > block.timestamp - 7 days) {
       revert PayloadAlreadyCreated();
     } else {
       for (uint256 i = 0; i < actions.length; i++) {
@@ -1279,6 +1277,7 @@ library GovV3Helpers {
   ) internal returns (PayloadsControllerUtils.AccessControl, uint40) {
     (uint256 prevFork, uint256 currentFork) = ChainHelpers.selectChain(vm, chainId);
     (uint40 payloadId, IPayloadsControllerCore.Payload memory payload) = _findPayloadId(
+      vm,
       payloadsController,
       actions
     );
@@ -1317,6 +1316,7 @@ library GovV3Helpers {
   }
 
   function _findPayloadId(
+    Vm vm,
     IPayloadsControllerCore payloadsController,
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) private view returns (uint40, IPayloadsControllerCore.Payload memory) {
@@ -1328,7 +1328,7 @@ library GovV3Helpers {
     if (payloadCreated) {
       return (payloadId, payload);
     } else {
-      revert CannotFindPayload(VM.getChainId());
+      revert CannotFindPayload(vm.getChainId());
     }
   }
 
