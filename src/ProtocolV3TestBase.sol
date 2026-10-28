@@ -195,7 +195,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     {
       uint256 snapshotId = vm.snapshotState();
       executePayload(vm, payload, payloadsController);
-      _assertPayloadGasWithinLimit(vm.lastCallGas().gasTotalUsed);
+      _assertPayloadGasWithinLimit(vm.lastFrameGas().gasTotalUsed);
       vm.revertToState(snapshotId);
     }
 

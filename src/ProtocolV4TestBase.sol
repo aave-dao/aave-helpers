@@ -306,7 +306,7 @@ abstract contract ProtocolV4TestBase is
     // This run is reverted and has no effect on the recorded snapshot/diff.
     uint256 snapshotId = vm.snapshotState();
     GovV3Helpers.executePayload(vm, payload, payloadsController);
-    _assertPayloadGasWithinLimit(vm.lastCallGas().gasTotalUsed);
+    _assertPayloadGasWithinLimit(vm.lastFrameGas().gasTotalUsed);
     vm.revertToState(snapshotId);
 
     vm.startStateDiffRecording();

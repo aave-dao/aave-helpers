@@ -82,7 +82,7 @@ contract CommonTestBase is Test {
   function _requireIsolation() internal {
     (bool success, ) = address(0).call('');
     success;
-    require(vm.lastCallGas().gasTotalUsed >= 21_000, 'PAYLOAD_GAS_CHECK_REQUIRES_ISOLATION');
+    require(vm.lastFrameGas().gasTotalUsed >= 21_000, 'PAYLOAD_GAS_CHECK_REQUIRES_ISOLATION');
   }
 
   /**
