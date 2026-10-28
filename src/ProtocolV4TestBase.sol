@@ -91,7 +91,7 @@ abstract contract ProtocolV4TestBase is
       if (runSeatbelt) {
         generateSeatbeltReport(
           reportName,
-          address(GovV3Helpers.getPayloadsController(block.chainid)),
+          address(GovV3Helpers.getPayloadsController(vm.getChainId())),
           payload.code
         );
       }
@@ -272,7 +272,7 @@ abstract contract ProtocolV4TestBase is
     // as executor does delegateCall to the payload, the executor should have no storage changes.
     // Walk every configured access level so payloads run by Level_2+ are also covered.
     {
-      IPayloadsControllerCore pc = GovV3Helpers.getPayloadsController(block.chainid);
+      IPayloadsControllerCore pc = GovV3Helpers.getPayloadsController(vm.getChainId());
       PayloadsControllerUtils.AccessControl[2] memory levels = [
         PayloadsControllerUtils.AccessControl.Level_1,
         PayloadsControllerUtils.AccessControl.Level_2
@@ -299,7 +299,7 @@ abstract contract ProtocolV4TestBase is
   function _executePayloadWithRecording(
     address payload
   ) internal virtual returns (string memory rawDiff, string memory logsJson) {
-    address payloadsController = address(GovV3Helpers.getPayloadsController(block.chainid));
+    address payloadsController = address(GovV3Helpers.getPayloadsController(vm.getChainId()));
 
     // Meter execution on a dedicated run: vm.startStateDiffRecording (needed for the diff below)
     // suppresses isolate's transaction-level gas accounting, so gas must be measured without it.
@@ -307,7 +307,7 @@ abstract contract ProtocolV4TestBase is
     uint256 snapshotId = vm.snapshotState();
     GovV3Helpers.executePayload(vm, payload, payloadsController);
     _assertPayloadGasWithinLimit(vm.lastFrameGas().gasTotalUsed);
-    vm.revertToState(snapshotId);
+    require(vm.revertToState(snapshotId), 'REVERT_TO_STATE_FAILED');
 
     vm.startStateDiffRecording();
     vm.recordLogs();
@@ -351,13 +351,13 @@ abstract contract ProtocolV4TestBase is
       for (uint256 assetIndex; assetIndex < allReserves.length; assetIndex++) {
         if (allReserves[assetIndex].paused) {
           e2eTestPausedAsset({spoke: spoke, pausedAsset: allReserves[assetIndex]});
-          vm.revertToState(spokeSnapshot);
+          require(vm.revertToState(spokeSnapshot), 'REVERT_TO_STATE_FAILED');
           continue;
         }
 
         if (allReserves[assetIndex].frozen) {
           e2eTestFrozenAsset({spoke: spoke, frozenAsset: allReserves[assetIndex]});
-          vm.revertToState(spokeSnapshot);
+          require(vm.revertToState(spokeSnapshot), 'REVERT_TO_STATE_FAILED');
           continue;
         }
 
@@ -367,7 +367,7 @@ abstract contract ProtocolV4TestBase is
           primaryCollateralIndex: collateralIndex,
           testAssetInfo: allReserves[assetIndex]
         });
-        vm.revertToState(spokeSnapshot);
+        require(vm.revertToState(spokeSnapshot), 'REVERT_TO_STATE_FAILED');
       }
     }
   }
@@ -407,7 +407,7 @@ abstract contract ProtocolV4TestBase is
       if (hasWeth) {
         uint256 gatewaySnapshot = vm.snapshotState();
         _testNativeGateway(nativeGateway, spoke, wethInfo);
-        vm.revertToState(gatewaySnapshot);
+        require(vm.revertToState(gatewaySnapshot), 'REVERT_TO_STATE_FAILED');
       }
     }
 
@@ -420,7 +420,7 @@ abstract contract ProtocolV4TestBase is
         reserveInfo: goodDebtReserves[0],
         collateralInfo: goodCollaterals[0]
       });
-      vm.revertToState(gatewaySnapshot);
+      require(vm.revertToState(gatewaySnapshot), 'REVERT_TO_STATE_FAILED');
     }
   }
 
@@ -532,7 +532,7 @@ abstract contract ProtocolV4TestBase is
       2,
       'GIVER_PM: repayOnBehalfOf debt should decrease'
     );
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
   }
 
   /// @notice Test TakerPositionManager: withdrawOnBehalfOf and borrowOnBehalfOf.
@@ -562,7 +562,7 @@ abstract contract ProtocolV4TestBase is
 
     _testTakerWithdraw(spoke, takerPositionManager, collateralInfo, owner, taker, supplyAmount / 4);
     _testTakerBorrow(spoke, takerPositionManager, debtReserveInfo, collateralInfo, owner, taker);
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
   }
 
   function _testTakerWithdraw(
@@ -721,7 +721,7 @@ abstract contract ProtocolV4TestBase is
       owner
     );
     assertEq(usingAsCollateralAfterDisable, false, 'CONFIG_PM: collateral should be disabled');
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
   }
 
   /// @notice Test that a paused reserve correctly reverts on all actions.
@@ -828,11 +828,11 @@ abstract contract ProtocolV4TestBase is
 
     scenarioSnapshot = vm.snapshotState();
     _testZeroAmountReverts({spoke: spoke, reserveInfo: testAssetInfo, user: vm.randomAddress()});
-    vm.revertToState(scenarioSnapshot);
+    require(vm.revertToState(scenarioSnapshot), 'REVERT_TO_STATE_FAILED');
 
     scenarioSnapshot = vm.snapshotState();
     _testCaps({spoke: spoke, reserveInfo: testAssetInfo});
-    vm.revertToState(scenarioSnapshot);
+    require(vm.revertToState(scenarioSnapshot), 'REVERT_TO_STATE_FAILED');
 
     // Set caps to max after cap testing for the rest of the flow
     _setCapsToMax(spoke);
@@ -856,7 +856,7 @@ abstract contract ProtocolV4TestBase is
       testAssetSupplier: testAssetSupplier,
       testAssetAmount: testAssetAmount
     });
-    vm.revertToState(scenarioSnapshot);
+    require(vm.revertToState(scenarioSnapshot), 'REVERT_TO_STATE_FAILED');
 
     scenarioSnapshot = vm.snapshotState();
     _testFullWithdrawal({
@@ -864,7 +864,7 @@ abstract contract ProtocolV4TestBase is
       testAssetInfo: testAssetInfo,
       testAssetSupplier: testAssetSupplier
     });
-    vm.revertToState(scenarioSnapshot);
+    require(vm.revertToState(scenarioSnapshot), 'REVERT_TO_STATE_FAILED');
 
     if (testAssetInfo.borrowable) {
       scenarioSnapshot = vm.snapshotState();
@@ -879,21 +879,21 @@ abstract contract ProtocolV4TestBase is
 
         // Partial repay
         _testPartialRepay(spoke, testAssetInfo, collateralSupplier);
-        vm.revertToState(postBorrowSnapshot);
+        require(vm.revertToState(postBorrowSnapshot), 'REVERT_TO_STATE_FAILED');
 
         // Full repay
         _testFullRepay(spoke, testAssetInfo, collateralSupplier);
-        vm.revertToState(postBorrowSnapshot);
+        require(vm.revertToState(postBorrowSnapshot), 'REVERT_TO_STATE_FAILED');
 
         // Repay after interest accrual
         _testRepayAfterInterest(spoke, testAssetInfo, collateralSupplier);
-        vm.revertToState(postBorrowSnapshot);
+        require(vm.revertToState(postBorrowSnapshot), 'REVERT_TO_STATE_FAILED');
 
         // Liquidation
         _testLiquidation(spoke, collateralInfo, testAssetInfo, collateralSupplier);
-        vm.revertToState(postBorrowSnapshot);
+        require(vm.revertToState(postBorrowSnapshot), 'REVERT_TO_STATE_FAILED');
       }
-      vm.revertToState(scenarioSnapshot);
+      require(vm.revertToState(scenarioSnapshot), 'REVERT_TO_STATE_FAILED');
     } else {
       // Non-borrowable: verify borrow reverts with ReserveNotBorrowable
       vm.prank(collateralSupplier);
@@ -915,7 +915,7 @@ abstract contract ProtocolV4TestBase is
         collateralSupplier: collateralSupplier,
         testAssetAmount: testAssetAmount
       });
-      vm.revertToState(scenarioSnapshot);
+      require(vm.revertToState(scenarioSnapshot), 'REVERT_TO_STATE_FAILED');
     }
   }
 
@@ -936,7 +936,7 @@ abstract contract ProtocolV4TestBase is
     uint256 snapshot = vm.snapshotState();
 
     _testTokenizationAddCap(tokenizationSpoke, reserveInfo);
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
 
     _setTokenizationCapsToMax(tokenizationSpoke);
     snapshot = vm.snapshotState();
@@ -948,35 +948,35 @@ abstract contract ProtocolV4TestBase is
       reserveInfo: reserveInfo,
       maxAddAmount: maxAddAmount
     });
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
 
     _testTokenizationMintRedeem({
       tokenizationSpoke: tokenizationSpoke,
       reserveInfo: reserveInfo,
       maxAddAmount: maxAddAmount
     });
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
 
     _testTokenizationPermitDeposit({
       tokenizationSpoke: tokenizationSpoke,
       reserveInfo: reserveInfo,
       maxAddAmount: maxAddAmount
     });
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
 
     _testTokenizationTimeSkip({
       tokenizationSpoke: tokenizationSpoke,
       reserveInfo: reserveInfo,
       maxAddAmount: maxAddAmount
     });
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
 
     _testTokenizationTransferAndWithdraw({
       tokenizationSpoke: tokenizationSpoke,
       reserveInfo: reserveInfo,
       maxAddAmount: maxAddAmount
     });
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
   }
 
   /// @notice Hubs to snapshot and diff.

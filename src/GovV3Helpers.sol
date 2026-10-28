@@ -80,6 +80,8 @@ interface IGovernance_V2_5 {
 }
 
 library GovV3Helpers {
+  Vm private constant VM = Vm(address(uint160(uint256(keccak256('hevm cheat code')))));
+
   error CannotFindPayload(uint256 chainId);
   error CannotFindPayloadsController();
   error ExecutorNotFound();
@@ -375,14 +377,14 @@ library GovV3Helpers {
   function createPayload(
     IPayloadsControllerCore.ExecutionAction[] memory actions
   ) internal returns (uint40) {
-    IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
+    IPayloadsControllerCore payloadsController = getPayloadsController(VM.getChainId());
     require(actions.length > 0, 'INVALID ACTIONS');
 
     (, IPayloadsControllerCore.Payload memory payload, bool payloadCreated) = _findCreatedPayload(
       payloadsController,
       actions
     );
-    if (payloadCreated && payload.createdAt > block.timestamp - 7 days) {
+    if (payloadCreated && payload.createdAt > VM.getBlockTimestamp() - 7 days) {
       revert PayloadAlreadyCreated();
     } else {
       return payloadsController.createPayload(actions);
@@ -404,7 +406,7 @@ library GovV3Helpers {
       IPayloadsControllerCore(permissionedPayloadsController),
       actions
     );
-    if (payloadCreated && payload.createdAt > block.timestamp - 7 days) {
+    if (payloadCreated && payload.createdAt > VM.getBlockTimestamp() - 7 days) {
       revert PayloadAlreadyCreated();
     } else {
       for (uint256 i = 0; i < actions.length; i++) {
@@ -436,7 +438,7 @@ library GovV3Helpers {
    * @param payloadId id of the payload
    */
   function executePayload(Vm vm, uint40 payloadId) internal {
-    IPayloadsControllerCore payloadsController = getPayloadsController(block.chainid);
+    IPayloadsControllerCore payloadsController = getPayloadsController(vm.getChainId());
     IPayloadsControllerCore.Payload memory payload = payloadsController.getPayloadById(payloadId);
     require(payload.state != IPayloadsControllerCore.PayloadState.None, 'PAYLOAD DOES NOT EXIST');
 
@@ -453,7 +455,7 @@ library GovV3Helpers {
    * @param payloadAddress address of the payload to execute
    */
   function executePayload(Vm vm, address payloadAddress) internal {
-    executePayload(vm, payloadAddress, address(getPayloadsController(block.chainid)));
+    executePayload(vm, payloadAddress, address(getPayloadsController(vm.getChainId())));
   }
 
   /**
@@ -477,7 +479,7 @@ library GovV3Helpers {
    * @param payloadAddress address of the payload to execute
    */
   function readyPayload(Vm vm, address payloadAddress) internal returns (uint40) {
-    return readyPayload(vm, payloadAddress, address(getPayloadsController(block.chainid)));
+    return readyPayload(vm, payloadAddress, address(getPayloadsController(vm.getChainId())));
   }
 
   /**
@@ -1218,7 +1220,7 @@ library GovV3Helpers {
     bytes32 ipfsHash,
     address votingPortal
   ) private returns (uint256) {
-    require(block.chainid == ChainIds.MAINNET, 'MAINNET_ONLY');
+    require(vm.getChainId() == ChainIds.MAINNET, 'MAINNET_ONLY');
     require(payloads.length != 0, 'MINIMUM_ONE_PAYLOAD');
     require(ipfsHash != bytes32(0), 'NON_ZERO_IPFS_HASH');
     require(votingPortal != address(0), 'INVALID_VOTING_PORTAL');
@@ -1285,7 +1287,7 @@ library GovV3Helpers {
       MustBeInCreatedState(chainId, payloadId)
     );
     require(
-      payload.expirationTime >= block.timestamp + 7 days,
+      payload.expirationTime >= vm.getBlockTimestamp() + 7 days,
       ExpirationMustBeInTheFuture(chainId, payloadId)
     );
     if (prevFork != currentFork) {
@@ -1326,7 +1328,7 @@ library GovV3Helpers {
     if (payloadCreated) {
       return (payloadId, payload);
     } else {
-      revert CannotFindPayload(block.chainid);
+      revert CannotFindPayload(VM.getChainId());
     }
   }
 
@@ -1475,7 +1477,9 @@ library GovV3StorageHelpers {
       16,
       56,
       storageBefore,
-      bytes32(uint256(block.timestamp - GovernanceV3Ethereum.GOVERNANCE.PROPOSAL_EXPIRATION_TIME()))
+      bytes32(
+        uint256(vm.getBlockTimestamp() - GovernanceV3Ethereum.GOVERNANCE.PROPOSAL_EXPIRATION_TIME())
+      )
     );
     vm.store(address(GovernanceV3Ethereum.GOVERNANCE), bytes32(proposalBaseSlot), storageBefore);
   }
@@ -1544,7 +1548,7 @@ library GovV3StorageHelpers {
       bytes32(payloadBaseSlot + 1),
       80,
       120,
-      bytes32(uint256(block.timestamp + payloadsController.EXPIRATION_DELAY()))
+      bytes32(uint256(vm.getBlockTimestamp() + payloadsController.EXPIRATION_DELAY()))
     );
 
     // overwrite gracePeriod
@@ -1634,7 +1638,7 @@ library GovV3StorageHelpers {
       216,
       256,
       storageBefore,
-      bytes32(uint256(uint40(block.timestamp - payload.delay - 1)))
+      bytes32(uint256(uint40(vm.getBlockTimestamp() - payload.delay - 1)))
     );
     // persist
     vm.store(address(payloadsController), bytes32(payloadBaseSlot), storageBefore);

@@ -17,7 +17,7 @@ contract SeatbeltUtils is Test {
     inputs[1] = '@aave-dao/aave-helpers-js@^1.0.0';
     inputs[2] = 'seatbelt-report';
     inputs[3] = '--chainId';
-    inputs[4] = vm.toString(block.chainid);
+    inputs[4] = vm.toString(vm.getChainId());
     inputs[5] = '--payloadsController';
     inputs[6] = vm.toString(payloadsController);
     inputs[7] = '--payloadBytecode';

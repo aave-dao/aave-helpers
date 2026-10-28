@@ -46,7 +46,7 @@ contract CommonTestBase is Test {
   }
 
   function executePayload(Vm vm, address payload, IPool pool) internal virtual {
-    executePayload(vm, payload, GovV3Helpers.getPayloadsController(pool, block.chainid));
+    executePayload(vm, payload, GovV3Helpers.getPayloadsController(pool, vm.getChainId()));
   }
 
   /**
@@ -64,9 +64,9 @@ contract CommonTestBase is Test {
 
   function _getMaxPayloadGas() internal view virtual returns (uint256) {
     if (
-      block.chainid == ChainIds.MANTLE ||
-      block.chainid == ChainIds.MONAD ||
-      block.chainid == ChainIds.MEGAETH
+      vm.getChainId() == ChainIds.MANTLE ||
+      vm.getChainId() == ChainIds.MONAD ||
+      vm.getChainId() == ChainIds.MEGAETH
     ) return 30_000_000;
     return 16_777_216;
   }
@@ -98,7 +98,7 @@ contract CommonTestBase is Test {
     address user,
     uint256 amount
   ) internal virtual returns (bool) {
-    if (block.chainid == ChainIds.MAINNET) {
+    if (vm.getChainId() == ChainIds.MAINNET) {
       // FXS
       if (asset == 0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0) {
         vm.prank(0xF977814e90dA44bFA03b6295A0616a897441aceC);
@@ -142,7 +142,7 @@ contract CommonTestBase is Test {
         return true;
       }
     }
-    if (block.chainid == ChainIds.OPTIMISM) {
+    if (vm.getChainId() == ChainIds.OPTIMISM) {
       // sUSD
       if (asset == AaveV3OptimismAssets.sUSD_UNDERLYING) {
         deal(
@@ -156,14 +156,14 @@ contract CommonTestBase is Test {
         return true;
       }
     }
-    if (block.chainid == ChainIds.GNOSIS) {
+    if (vm.getChainId() == ChainIds.GNOSIS) {
       if (asset == AaveV3GnosisAssets.EURe_UNDERLYING) {
         vm.prank(0x93b7a3d164585B52f096F6eAE1EC42ee267878E1);
         IERC20(asset).transfer(user, amount);
         return true;
       }
     }
-    if (block.chainid == ChainIds.AVALANCHE) {
+    if (vm.getChainId() == ChainIds.AVALANCHE) {
       // AUSD
       if (asset == AaveV3AvalancheAssets.AUSD_UNDERLYING) {
         vm.prank(0x12A0d0F4Ea75A01C69eD6bfD20aa7d1ef1550458);
@@ -171,7 +171,7 @@ contract CommonTestBase is Test {
         return true;
       }
     }
-    if (block.chainid == ChainIds.MONAD) {
+    if (vm.getChainId() == ChainIds.MONAD) {
       // AUSD
       if (asset == AaveV3MonadAssets.AUSD_UNDERLYING) {
         vm.prank(0xBA3d60f5000f472aef947FB8020a3E6319F9a0B7);
@@ -179,21 +179,21 @@ contract CommonTestBase is Test {
         return true;
       }
     }
-    if (block.chainid == ChainIds.CELO) {
+    if (vm.getChainId() == ChainIds.CELO) {
       // CELO
       if (asset == 0x471EcE3750Da237f93B8E339c536989b8978a438) {
         vm.deal(user, amount);
         return true;
       }
     }
-    if (block.chainid == ChainIds.ARC) {
+    if (vm.getChainId() == ChainIds.ARC) {
       // USDC is the native coin: the ERC20 reports account.balance / 1e12
       if (asset == AaveV4ArcAssets.USDC_UNDERLYING) {
         vm.deal(user, amount * 1e12);
         return true;
       }
     }
-    if (block.chainid == ChainIds.BASE) {
+    if (vm.getChainId() == ChainIds.BASE) {
       // B20 tokens are node-native with balances outside EVM storage, so `deal` cannot find a slot.
       // Mint from the MINT_ROLE holder instead; only executable on forge's Base EVM.
       if (_isB20(asset)) {

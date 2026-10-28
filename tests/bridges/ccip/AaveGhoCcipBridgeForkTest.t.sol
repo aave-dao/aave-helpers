@@ -54,7 +54,7 @@ contract AaveGhoCcipBridgeForkTestBase is Test, Constants {
       registryModuleOwnerCustomAddress: ARBITRUM_REGISTRY_OWNER,
       tokenAdminRegistryAddress: ARBITRUM_TOKEN_ADMIN
     });
-    ccipLocalSimulatorFork.setNetworkDetails(block.chainid, arbitrumNetworkDetails);
+    ccipLocalSimulatorFork.setNetworkDetails(vm.getChainId(), arbitrumNetworkDetails);
 
     arbitrumBridge = new AaveGhoCcipBridge(
       arbitrumNetworkDetails.routerAddress,
@@ -79,7 +79,7 @@ contract AaveGhoCcipBridgeForkTestBase is Test, Constants {
       registryModuleOwnerCustomAddress: MAINNET_REGISTRY_OWNER,
       tokenAdminRegistryAddress: MAINNET_TOKEN_ADMIN
     });
-    ccipLocalSimulatorFork.setNetworkDetails(block.chainid, mainnetDetails);
+    ccipLocalSimulatorFork.setNetworkDetails(vm.getChainId(), mainnetDetails);
 
     mainnetBridge = new AaveGhoCcipBridge(
       mainnetDetails.routerAddress,

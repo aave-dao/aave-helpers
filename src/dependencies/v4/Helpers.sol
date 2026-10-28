@@ -409,7 +409,7 @@ abstract contract Helpers is Actions {
       spoke.borrow({reserveId: reserveInfo.reserveId, amount: amount, onBehalfOf: user});
     }
 
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
   }
 
   /// @notice Set all addCap/drawCap to max for every reserve on the spoke.

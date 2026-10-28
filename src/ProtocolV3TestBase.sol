@@ -78,17 +78,18 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     string memory content = '{}';
     vm.serializeJson(eModesKey, '{}');
     uint8 emptyCounter = 0;
-    for (uint8 i = 0; i < 256; i++) {
-      DataTypes.CollateralConfig memory cfg = pool.getEModeCategoryCollateralConfig(i);
+    for (uint256 i = 0; i < 256; i++) {
+      uint8 categoryId = uint8(i);
+      DataTypes.CollateralConfig memory cfg = pool.getEModeCategoryCollateralConfig(categoryId);
       if (cfg.liquidationThreshold == 0) {
         if (++emptyCounter > 2) break;
       } else {
-        string memory key = vm.toString(i);
+        string memory key = vm.toString(categoryId);
         vm.serializeJson(key, '{}');
-        vm.serializeUint(key, 'eModeCategory', i);
-        vm.serializeString(key, 'label', pool.getEModeCategoryLabel(i));
+        vm.serializeUint(key, 'eModeCategory', categoryId);
+        vm.serializeString(key, 'label', pool.getEModeCategoryLabel(categoryId));
         vm.serializeUint(key, 'ltv', cfg.ltv);
-        try pool.getIsEModeCategoryIsolated(i) returns (bool isolated) {
+        try pool.getIsEModeCategoryIsolated(categoryId) returns (bool isolated) {
           vm.serializeBool(key, 'isolated', isolated);
         } catch {
           vm.serializeBool(key, 'isolated', false);
@@ -96,12 +97,12 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
         vm.serializeString(
           key,
           'collateralBitmap',
-          vm.toString(pool.getEModeCategoryCollateralBitmap(i))
+          vm.toString(pool.getEModeCategoryCollateralBitmap(categoryId))
         );
         vm.serializeString(
           key,
           'borrowableBitmap',
-          vm.toString(pool.getEModeCategoryBorrowableBitmap(i))
+          vm.toString(pool.getEModeCategoryBorrowableBitmap(categoryId))
         );
         vm.serializeUint(key, 'liquidationThreshold', cfg.liquidationThreshold);
         string memory object = vm.serializeUint(key, 'liquidationBonus', cfg.liquidationBonus);
@@ -173,7 +174,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
         payload,
         runE2E,
         runSeatbelt,
-        GovV3Helpers.getPayloadsController(pool, block.chainid)
+        GovV3Helpers.getPayloadsController(pool, vm.getChainId())
       );
   }
 
@@ -196,7 +197,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
       uint256 snapshotId = vm.snapshotState();
       executePayload(vm, payload, payloadsController);
       _assertPayloadGasWithinLimit(vm.lastFrameGas().gasTotalUsed);
-      vm.revertToState(snapshotId);
+      require(vm.revertToState(snapshotId), 'REVERT_TO_STATE_FAILED');
     }
 
     vm.startStateDiffRecording();
@@ -733,7 +734,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
         } else {
           console.log('E2E: TestAsset %s SKIPPED (no suitable collateral)', configs[i].symbol);
         }
-        vm.revertToState(snapshot);
+        require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
       } else {
         console.log('E2E: TestAsset %s SKIPPED', configs[i].symbol);
       }
@@ -871,12 +872,12 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
         });
       }
 
-      vm.revertToState(snapshotAfterDeposits);
+      require(vm.revertToState(snapshotAfterDeposits), 'REVERT_TO_STATE_FAILED');
 
       _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
       _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
 
-      vm.revertToState(snapshotAfterDeposits);
+      require(vm.revertToState(snapshotAfterDeposits), 'REVERT_TO_STATE_FAILED');
     }
 
     // test borrows, repayments and liquidations
@@ -910,7 +911,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
           withATokens: false
         });
 
-        vm.revertToState(snapshotBeforeRepay);
+        require(vm.revertToState(snapshotBeforeRepay), 'REVERT_TO_STATE_FAILED');
 
         _repay({
           config: testAssetConfig,
@@ -920,12 +921,12 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
           withATokens: true
         });
 
-        vm.revertToState(snapshotBeforeRepay);
+        require(vm.revertToState(snapshotBeforeRepay), 'REVERT_TO_STATE_FAILED');
       }
 
       _testLiquidation(pool, collateralConfig, testAssetConfig, collateralSupplier);
 
-      vm.revertToState(snapshotAfterDeposits);
+      require(vm.revertToState(snapshotAfterDeposits), 'REVERT_TO_STATE_FAILED');
     }
 
     // test flashloans
@@ -1052,7 +1053,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
     vm.startPrank(user);
     uint256 aTokenBefore = IERC20(config.aToken).balanceOf(user);
     if (
-      block.chainid == ChainIds.CELO &&
+      vm.getChainId() == ChainIds.CELO &&
       config.underlying == 0x471EcE3750Da237f93B8E339c536989b8978a438
     ) {
       vm.deal(config.aToken, aTokenBefore);
@@ -1165,7 +1166,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, SeatbeltUtils, CommonTestB
       type(uint256).max,
       false
     );
-    vm.revertToState(snapshotBeforeLiquidation);
+    require(vm.revertToState(snapshotBeforeLiquidation), 'REVERT_TO_STATE_FAILED');
     _liquidationCall(
       collateralConfig,
       testAssetConfig,

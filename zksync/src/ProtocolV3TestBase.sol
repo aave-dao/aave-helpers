@@ -170,7 +170,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
         e2eTestAsset(pool, collateralConfig, configs[i]);
-        vm.revertToState(snapshot);
+        require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
       } else {
         console.log('E2E: TestAsset %s SKIPPED', configs[i].symbol);
       }
@@ -283,12 +283,12 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
         });
       }
 
-      vm.revertToState(snapshotAfterDeposits);
+      require(vm.revertToState(snapshotAfterDeposits), 'REVERT_TO_STATE_FAILED');
 
       _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
       _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
 
-      vm.revertToState(snapshotAfterDeposits);
+      require(vm.revertToState(snapshotAfterDeposits), 'REVERT_TO_STATE_FAILED');
     }
 
     // test borrows, repayments and liquidations
@@ -317,7 +317,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
           withATokens: false
         });
 
-        vm.revertToState(snapshotBeforeRepay);
+        require(vm.revertToState(snapshotBeforeRepay), 'REVERT_TO_STATE_FAILED');
 
         _repay({
           config: testAssetConfig,
@@ -327,7 +327,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
           withATokens: true
         });
 
-        vm.revertToState(snapshotBeforeRepay);
+        require(vm.revertToState(snapshotBeforeRepay), 'REVERT_TO_STATE_FAILED');
       }
 
       if (testAssetConfig.underlying != collateralConfig.underlying) {
@@ -356,7 +356,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
         receiveAToken: false
       });
 
-      vm.revertToState(snapshotBeforeLiquidation);
+      require(vm.revertToState(snapshotBeforeLiquidation), 'REVERT_TO_STATE_FAILED');
 
       // receive ATokens
       _liquidationCall({
@@ -369,7 +369,7 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
         receiveAToken: true
       });
 
-      vm.revertToState(snapshotAfterDeposits);
+      require(vm.revertToState(snapshotAfterDeposits), 'REVERT_TO_STATE_FAILED');
     }
 
     // test flashloans
@@ -378,7 +378,6 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
         config: testAssetConfig,
         pool: pool,
         user: collateralSupplier,
-        receiverAddress: address(this),
         amount: testAssetAmount,
         interestRateMode: 0
       });
@@ -388,7 +387,6 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
           config: testAssetConfig,
           pool: pool,
           user: collateralSupplier,
-          receiverAddress: address(this),
           amount: testAssetAmount,
           interestRateMode: 2
         });
@@ -640,7 +638,6 @@ contract ProtocolV3TestBase is RawProtocolV3TestBase, CommonTestBase, DiffUtils 
     ReserveConfig memory config,
     IPool pool,
     address user,
-    address receiverAddress,
     uint256 amount,
     uint256 interestRateMode
   ) internal {
