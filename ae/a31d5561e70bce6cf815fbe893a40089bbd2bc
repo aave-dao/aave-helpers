@@ -1,0 +1,19 @@
+src/GovV3Helpers.sol
+  s_2c28d22a698ef1::t_7d393fa695d069 439,456,480,1221,1288,1329,1478,1547,1637
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "aea31d5561e70bce6cf815fbe893a40089bbd2bc",
+  "prompts": {},
+  "sessions": {
+    "s_2c28d22a698ef1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8f75e5b3-8b8c-479f-8e59-3610d7bec837",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
