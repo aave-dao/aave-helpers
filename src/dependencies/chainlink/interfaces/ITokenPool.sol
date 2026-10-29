@@ -17,6 +17,9 @@ interface ITokenPool {
   /// @return The amount of tokens transferred out to other chains
   function getCurrentBridgedAmount() external view returns (uint256);
 
+  /// @notice Gets the CCIP router used by the pool
+  function getRouter() external view returns (address);
+
   /// @notice Gets the token bucket with its values for the block it was requested at.
   function getCurrentOutboundRateLimiterState(
     uint64 remoteChainSelector
