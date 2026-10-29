@@ -1,0 +1,19 @@
+lib/aave-address-book
+  s_27070cf0ae3899::t_77b5625a9cb1d3 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a6c13bbf6c8b3a646c5f332e819225144df9a648",
+  "prompts": {},
+  "sessions": {
+    "s_27070cf0ae3899": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c0b34d16-8be4-488b-bc86-602f235678e9",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "DhairyaSethi <55102840+DhairyaSethi@users.noreply.github.com>"
+    }
+  }
+}
