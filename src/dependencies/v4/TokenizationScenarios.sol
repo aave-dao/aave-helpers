@@ -80,13 +80,13 @@ abstract contract TokenizationScenarios is TokenizationActions {
     if (userAssets > 1) {
       uint256 partialWithdraw = vm.randomUint(1, userAssets - 1);
       _tokenizationWithdraw(tokenizationSpoke, reserveInfo, user, partialWithdraw);
-      vm.revertToState(snapshot);
+      require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
     }
 
     // Full redeem
     _tokenizationRedeem(tokenizationSpoke, reserveInfo, user, tokenizationSpoke.balanceOf(user));
     assertEq(tokenizationSpoke.balanceOf(user), 0, 'DEPOSIT_WITHDRAW: user should have no shares');
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
 
     // Full redeem with sig
     _tokenizationRedeemWithSig(
@@ -96,7 +96,7 @@ abstract contract TokenizationScenarios is TokenizationActions {
       tokenizationSpoke.balanceOf(user)
     );
     assertEq(tokenizationSpoke.balanceOf(user), 0, 'DEPOSIT_WITHDRAW: user should have no shares');
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
   }
 
   /// @dev Test mint + partial redeem + full redeem cycle, including mintWithSig.
@@ -120,13 +120,13 @@ abstract contract TokenizationScenarios is TokenizationActions {
       uint256 postMintSnapshot = vm.snapshotState();
       uint256 partialRedeem = vm.randomUint(1, userShares - 1);
       _tokenizationRedeem(tokenizationSpoke, reserveInfo, user, partialRedeem);
-      vm.revertToState(postMintSnapshot);
+      require(vm.revertToState(postMintSnapshot), 'REVERT_TO_STATE_FAILED');
     }
 
     // Full redeem
     _tokenizationRedeem(tokenizationSpoke, reserveInfo, user, userShares);
     assertEq(tokenizationSpoke.balanceOf(user), 0, 'MINT_REDEEM: user should have no shares');
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
 
     // Mint with sig (clean slate — no prior mint consuming addCap)
     _tokenizationMintWithSig({

@@ -157,7 +157,7 @@ abstract contract Actions is CommonTestBase {
       'TIME_SKIP: drawn index should be greater than default 1 RAY'
     );
 
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
   }
 
   function _supply(
