@@ -160,23 +160,23 @@ contract ProtocolV4TestBaseAssertionsTest is ProtocolV4TestBase {
     return address(accessManager);
   }
 
-  function _spokeConfigurator() internal view override returns (ISpokeConfigurator) {
+  function _spokeConfigurator() internal pure override returns (ISpokeConfigurator) {
     return ISpokeConfigurator(address(0));
   }
 
-  function _getHubs() internal view override returns (IHub[] memory) {
+  function _getHubs() internal pure override returns (IHub[] memory) {
     return new IHub[](0);
   }
 
-  function _getSpokes() internal view override returns (ISpoke[] memory) {
+  function _getSpokes() internal pure override returns (ISpoke[] memory) {
     return new ISpoke[](0);
   }
 
-  function _getTokenizationSpokes() internal view override returns (ITokenizationSpoke[] memory) {
+  function _getTokenizationSpokes() internal pure override returns (ITokenizationSpoke[] memory) {
     return new ITokenizationSpoke[](0);
   }
 
-  function _getPositionManagers() internal view override returns (PositionManagers memory) {
+  function _getPositionManagers() internal pure override returns (PositionManagers memory) {
     return
       PositionManagers({
         giver: IGiverPositionManager(address(0)),

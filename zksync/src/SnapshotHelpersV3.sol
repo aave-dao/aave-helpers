@@ -52,25 +52,26 @@ contract SnapshotHelpersV3 is CommonTestBase, DiffUtils {
     string memory content = '{}';
     vm.serializeJson(eModesKey, '{}');
     uint8 emptyCounter = 0;
-    for (uint8 i = 0; i < 256; i++) {
-      DataTypes.CollateralConfig memory cfg = pool.getEModeCategoryCollateralConfig(i);
+    for (uint256 i = 0; i < 256; i++) {
+      uint8 categoryId = uint8(i);
+      DataTypes.CollateralConfig memory cfg = pool.getEModeCategoryCollateralConfig(categoryId);
       if (cfg.liquidationThreshold == 0) {
         if (++emptyCounter > 2) break;
       } else {
-        string memory key = vm.toString(i);
+        string memory key = vm.toString(categoryId);
         vm.serializeJson(key, '{}');
-        vm.serializeUint(key, 'eModeCategory', i);
-        vm.serializeString(key, 'label', pool.getEModeCategoryLabel(i));
+        vm.serializeUint(key, 'eModeCategory', categoryId);
+        vm.serializeString(key, 'label', pool.getEModeCategoryLabel(categoryId));
         vm.serializeUint(key, 'ltv', cfg.ltv);
         vm.serializeString(
           key,
           'collateralBitmap',
-          vm.toString(pool.getEModeCategoryCollateralBitmap(i))
+          vm.toString(pool.getEModeCategoryCollateralBitmap(categoryId))
         );
         vm.serializeString(
           key,
           'borrowableBitmap',
-          vm.toString(pool.getEModeCategoryBorrowableBitmap(i))
+          vm.toString(pool.getEModeCategoryBorrowableBitmap(categoryId))
         );
         vm.serializeUint(key, 'liquidationThreshold', cfg.liquidationThreshold);
         string memory object = vm.serializeUint(key, 'liquidationBonus', cfg.liquidationBonus);

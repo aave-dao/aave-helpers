@@ -367,7 +367,7 @@ abstract contract Scenarios is Helpers {
       borrower: collateralSupplier,
       receiveShares: receiveShares
     });
-    vm.revertToState(snapshotBeforeLiquidation);
+    require(vm.revertToState(snapshotBeforeLiquidation), 'REVERT_TO_STATE_FAILED');
 
     // Full liquidation - receive underlying
     _liquidationCall({
@@ -379,7 +379,7 @@ abstract contract Scenarios is Helpers {
       debtToCover: UINT256_MAX,
       receiveShares: false
     });
-    vm.revertToState(snapshotBeforeLiquidation);
+    require(vm.revertToState(snapshotBeforeLiquidation), 'REVERT_TO_STATE_FAILED');
 
     // Full liquidation - receive shares (only if enabled on collateral reserve)
     if (receiveShares) {
@@ -392,7 +392,7 @@ abstract contract Scenarios is Helpers {
         debtToCover: UINT256_MAX,
         receiveShares: true
       });
-      vm.revertToState(snapshotBeforeLiquidation);
+      require(vm.revertToState(snapshotBeforeLiquidation), 'REVERT_TO_STATE_FAILED');
     }
 
     // Clear oracle price mocks
@@ -429,7 +429,7 @@ abstract contract Scenarios is Helpers {
     // Skip if either debt or collateral is too small — partial liq leads to dust
     if (totalDebt <= minDebtAssets || totalCollateral <= minCollateralAssets) {
       console.log('PARTIAL_LIQUIDATION: skipping, position too small after oracle manipulation');
-      vm.revertToState(snapshot);
+      require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
       return;
     }
 
@@ -467,7 +467,7 @@ abstract contract Scenarios is Helpers {
       'PARTIAL_LIQUIDATION: debt should not be fully repaid'
     );
 
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
   }
 
   /// @dev Disable all collaterals, verify borrow reverts, re-enable all, verify borrow works.
@@ -578,7 +578,7 @@ abstract contract Scenarios is Helpers {
     if (spokeConfig.addCap > 0 && spokeConfig.addCap < type(uint40).max) {
       uint256 snap = vm.snapshotState();
       _testAddCap({spoke: spoke, reserveInfo: reserveInfo, addCap: spokeConfig.addCap});
-      vm.revertToState(snap);
+      require(vm.revertToState(snap), 'REVERT_TO_STATE_FAILED');
     }
 
     if (
@@ -586,7 +586,7 @@ abstract contract Scenarios is Helpers {
     ) {
       uint256 snap = vm.snapshotState();
       _testDrawCap({spoke: spoke, reserveInfo: reserveInfo, drawCap: spokeConfig.drawCap});
-      vm.revertToState(snap);
+      require(vm.revertToState(snap), 'REVERT_TO_STATE_FAILED');
     }
   }
 

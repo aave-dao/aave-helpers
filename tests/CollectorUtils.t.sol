@@ -171,12 +171,12 @@ contract CollectorUtilsTest is Test {
         underlying: address(UNDERLYING),
         receiver: testReceiver,
         amount: amount,
-        start: block.timestamp,
+        start: vm.getBlockTimestamp(),
         duration: 1 days
       })
     );
 
-    vm.warp(block.timestamp + 2 days);
+    vm.warp(vm.getBlockTimestamp() + 2 days);
     vm.prank(testReceiver);
     COLLECTOR.withdrawFromStream(nextStreamId, actualAmount);
 

@@ -245,7 +245,7 @@ contract ProtocolV4TestPlausibility is Test, ProtocolV4TestBaseEthereum {
   address internal hubA = makeAddr('hubA');
   address internal hubB = makeAddr('hubB');
 
-  function test_emptyCapsPasses() public view {
+  function test_emptyCapsPasses() public pure {
     Types.SpokeConfigSnapshot[] memory caps = new Types.SpokeConfigSnapshot[](0);
     configChangePlausibilityTest(_snapshot(caps));
   }

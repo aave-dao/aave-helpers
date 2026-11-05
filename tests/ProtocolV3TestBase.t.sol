@@ -194,7 +194,7 @@ contract ProtocolV3TestMantleSnapshot is ProtocolV3TestBase {
   function _validateNoExecutorStorageChange(string memory, address) internal view override {}
 
   // Mantle's per-tx limit is well above the EIP-7825 floor; raise it so this payload fits.
-  function _getMaxPayloadGas() internal view override returns (uint256) {
+  function _getMaxPayloadGas() internal pure override returns (uint256) {
     return 30_000_000;
   }
 }
@@ -308,7 +308,7 @@ contract ProtocolV3TestPlausibilityEMode is ProtocolV3TestBase {
     this.configChangePlausibilityTest(AaveV3EthereumEtherFi.POOL, configsBefore, configsAfter);
   }
 
-  function test_borrowCapIncrease_borrowEnabled_passes() public {
+  function test_borrowCapIncrease_borrowEnabled_passes() public view {
     ReserveConfig[] memory configsBefore = _getReservesConfigs(AaveV3Ethereum.POOL);
     ReserveConfig[] memory configsAfter = _getReservesConfigs(AaveV3Ethereum.POOL);
 

@@ -13,6 +13,9 @@ ffi = true
 evm_version = 'cancun'
 decode_external_storage = true
 
+[profile.default.lint]
+lint_on_build = false
+
 [profile.zksync]
 src = 'zksync/src'
 test = 'zksync/tests'
