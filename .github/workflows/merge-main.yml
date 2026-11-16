@@ -14,7 +14,7 @@ jobs:
   lint:
     uses: aave-dao/github-workflows/.github/workflows/foundry-lint-prettier.yml@main
   test:
-    uses: aave-dao/github-workflows/.github/workflows/foundry-test.yml@feat/foundry-profile-input
+    uses: aave-dao/github-workflows/.github/workflows/foundry-test.yml@main
     with:
       foundryVersion: nightly
       foundryProfile: test
