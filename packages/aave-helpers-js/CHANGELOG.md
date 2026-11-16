@@ -1,5 +1,11 @@
 # @aave-dao/aave-helpers-js
 
+## 1.6.9
+
+### Patch Changes
+
+- 180d90f: update address book to 4.77.8, which bumps aave-v4 to its current main.
+
 ## 1.6.8
 
 ### Patch Changes
