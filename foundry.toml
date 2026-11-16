@@ -13,6 +13,9 @@ ffi = true
 evm_version = 'cancun'
 decode_external_storage = true
 
+[profile.test]
+gas_limit = 9223372036854775807
+
 [profile.zksync]
 src = 'zksync/src'
 test = 'zksync/tests'
