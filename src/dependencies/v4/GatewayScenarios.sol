@@ -640,7 +640,7 @@ abstract contract GatewayScenarios is Helpers {
     assertApproxEqAbs(
       userAssetsBefore - spoke.getUserSuppliedAssets(reserveInfo.reserveId, user),
       amountWithdrawn,
-      1,
+      2,
       'SIG_WITHDRAW: user assets mismatch'
     );
     assertEq(
@@ -652,7 +652,7 @@ abstract contract GatewayScenarios is Helpers {
       hubAssetsBefore -
         IHubBase(reserveInfo.hub).getSpokeAddedAssets(reserveInfo.assetId, address(spoke)),
       amountWithdrawn,
-      1,
+      2,
       'SIG_WITHDRAW: hub assets mismatch'
     );
 

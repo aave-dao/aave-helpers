@@ -484,10 +484,11 @@ abstract contract ProtocolV4TestBase is
     vm.stopPrank();
 
     uint256 ownerSupplyAfter = spoke.getUserSuppliedAssets(collateralInfo.reserveId, owner);
+    // Shares<->assets conversion rounds twice, so up to 2 wei off
     assertApproxEqAbs(
       ownerSupplyAfter,
       ownerSupplyBefore + supplyAmount,
-      1,
+      2,
       'GIVER_PM: supplyOnBehalfOf owner balance mismatch'
     );
 
@@ -595,7 +596,7 @@ abstract contract ProtocolV4TestBase is
     assertApproxEqAbs(
       ownerSupplyBefore - spoke.getUserSuppliedAssets(collateralInfo.reserveId, owner),
       withdrawAmount,
-      1,
+      2,
       'TAKER_PM: owner supply should decrease'
     );
     assertEq(
