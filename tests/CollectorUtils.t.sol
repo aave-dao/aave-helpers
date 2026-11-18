@@ -1131,7 +1131,7 @@ contract CollectorUtilsTest is Test {
         underlying: address(UNDERLYING),
         receiver: testReceiver,
         amount: amount,
-        start: block.timestamp,
+        start: vm.getBlockTimestamp(),
         duration: 1 days
       })
     );
