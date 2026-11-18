@@ -91,7 +91,7 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
 
     // as executor does delegateCall to the payload, the executor should have no storage changes
     {
-      IPayloadsControllerCore pc = GovV3Helpers.getPayloadsController(block.chainid);
+      IPayloadsControllerCore pc = GovV3Helpers.getPayloadsController(vm.getChainId());
       _validateNoExecutorStorageChange(
         rawDiff,
         pc
@@ -109,7 +109,7 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
     if (runSeatbelt) {
       generateSeatbeltReport(
         reportName,
-        address(GovV3Helpers.getPayloadsController(block.chainid)),
+        address(GovV3Helpers.getPayloadsController(vm.getChainId())),
         payload.code
       );
     }
@@ -131,7 +131,7 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
     string memory path = string(abi.encodePacked('./reports/', reportName, '.json'));
     ReportFileUtils.ensureExists(path);
     vm.writeFile(path, '{ "reserves": {}, "strategies": {}, "poolConfiguration": {} }');
-    vm.serializeUint('root', 'chainId', block.chainid);
+    vm.serializeUint('root', 'chainId', vm.getChainId());
     ReserveConfig[] memory configs = _getReservesConfigs(pool);
     ILendingPoolAddressesProvider addressesProvider = ILendingPoolAddressesProvider(
       pool.getAddressesProvider()
@@ -155,7 +155,7 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
     for (uint256 i; i < configs.length; i++) {
       if (_includeInE2e(configs[i])) {
         e2eTestAsset(pool, collateralConfig, configs[i]);
-        vm.revertToState(snapshot);
+        require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
       }
     }
   }
@@ -185,15 +185,15 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
     // test withdrawal
     _withdraw(testAssetConfig, pool, testAssetSupplier, testAssetAmount / 2);
     _withdraw(testAssetConfig, pool, testAssetSupplier, type(uint256).max);
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
     // test variable borrowing
     if (testAssetConfig.borrowingEnabled) {
       _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, false);
-      vm.revertToState(snapshot);
+      require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
       // test stable borrowing
       if (testAssetConfig.stableBorrowRateEnabled) {
         _e2eTestBorrowRepay(pool, collateralSupplier, testAssetConfig, testAssetAmount, true);
-        vm.revertToState(snapshot);
+        require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
       }
     }
   }
@@ -237,7 +237,7 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
       pool.swapBorrowRateMode(testAssetConfig.underlying, stable ? 1 : 2);
     }
     _repay(testAssetConfig, pool, borrower, amount, stable);
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
   }
 
   /**
@@ -302,7 +302,7 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
     console.log('SUPPLY: %s, Amount: %s', config.symbol, amount);
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
     if (
-      block.chainid == ChainIds.MAINNET &&
+      vm.getChainId() == ChainIds.MAINNET &&
       config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
     ) {
       assertApproxEqAbs(aTokenAfter, aTokenBefore + amount, 2, '_deposit(): STETH_DUST_GT_2');
@@ -325,7 +325,7 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
     uint256 aTokenAfter = IERC20(config.aToken).balanceOf(user);
     if (aTokenBefore < amount) {
       if (
-        block.chainid == ChainIds.MAINNET &&
+        vm.getChainId() == ChainIds.MAINNET &&
         config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
       ) {
         assertApproxEqAbs(aTokenAfter, 0, 2, '_withdraw(): STETH_DUST_GT_2');
@@ -334,7 +334,7 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
       }
     } else {
       if (
-        block.chainid == ChainIds.MAINNET &&
+        vm.getChainId() == ChainIds.MAINNET &&
         config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
       ) {
         assertApproxEqAbs(aTokenAfter, aTokenBefore - amount, 2, '_withdraw(): STETH_DUST_GT_2');
@@ -360,7 +360,7 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
     pool.borrow(config.underlying, amount, stable ? 1 : 2, 0, user);
     uint256 debtAfter = IERC20(debtToken).balanceOf(user);
     if (
-      block.chainid == ChainIds.MAINNET &&
+      vm.getChainId() == ChainIds.MAINNET &&
       config.underlying == AaveV2EthereumAssets.stETH_UNDERLYING
     ) {
       assertApproxEqAbs(debtAfter, debtBefore + amount, 2, '_borrow(): DUST_GT_2');
@@ -1064,7 +1064,7 @@ contract ProtocolV2TestBase is CommonTestBase, SeatbeltUtils, DiffUtils {
    * @dev forwards time by x blocks
    */
   function _skipBlocks(uint128 blocks) internal {
-    vm.roll(block.number + blocks);
-    vm.warp(block.timestamp + blocks * 12); // assuming a block is around 12seconds
+    vm.roll(vm.getBlockNumber() + blocks);
+    vm.warp(vm.getBlockTimestamp() + blocks * 12); // assuming a block is around 12seconds
   }
 }

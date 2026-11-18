@@ -100,7 +100,7 @@ abstract contract GatewayScenarios is Helpers {
         amount: amount
       });
     }
-    vm.revertToState(gatewaySnapshot);
+    require(vm.revertToState(gatewaySnapshot), 'REVERT_TO_STATE_FAILED');
   }
 
   function _setupPositions(
@@ -112,7 +112,7 @@ abstract contract GatewayScenarios is Helpers {
   ) internal {
     uint256 snapshot = vm.snapshotState();
     _supplyNative({gateway: gateway, spoke: spoke, wethInfo: wethInfo, user: user, amount: amount});
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
     _supplyAsCollateralNative({
       gateway: gateway,
       spoke: spoke,
@@ -165,7 +165,7 @@ abstract contract GatewayScenarios is Helpers {
       2,
       'NATIVE_SUPPLY: hub assets mismatch'
     );
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
   }
 
   function _supplyAsCollateralNative(
@@ -229,7 +229,7 @@ abstract contract GatewayScenarios is Helpers {
       user: user,
       withdrawAmount: withdrawAmount
     });
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
     // --- Full withdraw native ---
     _withdrawNative({
       gateway: gateway,
@@ -238,7 +238,7 @@ abstract contract GatewayScenarios is Helpers {
       user: user,
       withdrawAmount: UINT256_MAX
     });
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
   }
 
   function _withdrawNative(

@@ -30,7 +30,9 @@ contract GovernanceV3Test is ProtocolV3TestBase {
 
   function test_injectProposalIntoGovernance() public {
     uint256 count = GovernanceV3Ethereum.GOVERNANCE.getProposalsCount();
-    IPayloadsControllerCore payloadsController = GovV3Helpers.getPayloadsController(block.chainid);
+    IPayloadsControllerCore payloadsController = GovV3Helpers.getPayloadsController(
+      vm.getChainId()
+    );
 
     // 1. create action & register on payloadscontroller
     IPayloadsControllerCore.ExecutionAction[]
@@ -63,7 +65,9 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     actions[0] = GovV3Helpers.buildAction(address(payload));
     actions[1] = GovV3Helpers.buildAction(address(payload));
 
-    IPayloadsControllerCore payloadsController = GovV3Helpers.getPayloadsController(block.chainid);
+    IPayloadsControllerCore payloadsController = GovV3Helpers.getPayloadsController(
+      vm.getChainId()
+    );
 
     uint40 countBefore = payloadsController.getPayloadsCount();
     GovV3StorageHelpers.injectPayload(vm, payloadsController, actions);
@@ -87,14 +91,16 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     actions[0] = GovV3Helpers.buildAction(address(payload));
     uint40 payloadId = GovV3Helpers.createPayload(actions);
 
-    IPayloadsControllerCore payloadsController = GovV3Helpers.getPayloadsController(block.chainid);
+    IPayloadsControllerCore payloadsController = GovV3Helpers.getPayloadsController(
+      vm.getChainId()
+    );
 
     GovV3StorageHelpers.readyPayloadId(vm, payloadsController, payloadId);
     IPayloadsControllerCore.Payload memory pl = payloadsController.getPayloadById(payloadId);
     assertEq(uint256(pl.state), uint256(IPayloadsControllerCore.PayloadState.Queued));
-    assertEq(pl.queuedAt, block.timestamp - pl.delay - 1);
+    assertEq(pl.queuedAt, vm.getBlockTimestamp() - pl.delay - 1);
     assertEq(uint256(pl.maximumAccessLevelRequired), 1);
-    assertEq(pl.createdAt, block.timestamp);
+    assertEq(pl.createdAt, vm.getBlockTimestamp());
     assertEq(pl.creator, address(this));
   }
 
@@ -179,7 +185,7 @@ contract GovernanceV3Test is ProtocolV3TestBase {
     actions[0] = GovV3Helpers.buildAction(address(42));
 
     // should revert as payload 0x42 does not exist
-    vm.expectRevert(abi.encodePacked(GovV3Helpers.CannotFindPayload.selector, block.chainid));
+    vm.expectRevert(abi.encodePacked(GovV3Helpers.CannotFindPayload.selector, vm.getChainId()));
     this.selfExternalCallToBuildMainnetPayload(vm, actions);
   }
 

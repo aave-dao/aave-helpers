@@ -20,7 +20,7 @@ library V4DiffWriter {
       path,
       '{ "spokeReserves": {}, "spokeLiquidationConfigs": {}, "hubAssets": {}, "spokeConfigs": {}, "positionManagers": {}, "accessManagerRoles": {} }'
     );
-    vm.serializeUint('root', 'chainId', block.chainid);
+    vm.serializeUint('root', 'chainId', vm.getChainId());
 
     _writeSpokeReserves(path, snapshot.spokeReserves);
     _writeSpokeLiqConfigs(path, snapshot.spokeLiquidationConfigs);

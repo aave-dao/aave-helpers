@@ -39,7 +39,7 @@ abstract contract Helpers is Actions {
   ///      down its ERC-1271 branch, so every `*WithSig` call reverts on a latest-block fork.
   /// @return privateKey Key to pass to `vm.sign`.
   /// @return signer Address derived from `privateKey`.
-  function _makeSigner() internal returns (uint256 privateKey, address signer) {
+  function _makeSigner() internal view returns (uint256 privateKey, address signer) {
     privateKey = vm.randomUint(1, type(uint248).max);
     signer = vm.addr(privateKey);
   }
@@ -409,7 +409,7 @@ abstract contract Helpers is Actions {
       spoke.borrow({reserveId: reserveInfo.reserveId, amount: amount, onBehalfOf: user});
     }
 
-    vm.revertToState(snapshot);
+    require(vm.revertToState(snapshot), 'REVERT_TO_STATE_FAILED');
   }
 
   /// @notice Set all addCap/drawCap to max for every reserve on the spoke.
