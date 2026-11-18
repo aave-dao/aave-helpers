@@ -219,11 +219,11 @@ abstract contract TokenizationActions is Helpers {
       snapshotBefore.userShares - sharesBurned,
       'TOKENIZATION_WITHDRAW: user shares mismatch'
     );
-    // Vault totalAssets decreased
+    // Vault totalAssets decreased (shares<->assets conversion rounds twice, so up to 2 wei off)
     assertApproxEqAbs(
       snapshotBefore.totalAssets - snapshotAfter.totalAssets,
       assets,
-      1,
+      2,
       'TOKENIZATION_WITHDRAW: totalAssets mismatch'
     );
     // Hub spoke collateral decreased
