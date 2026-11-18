@@ -16,6 +16,9 @@ decode_external_storage = true
 [profile.default.lint]
 lint_on_build = false
 
+[profile.test]
+gas_limit = 9223372036854775807
+
 [profile.zksync]
 src = 'zksync/src'
 test = 'zksync/tests'
