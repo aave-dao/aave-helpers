@@ -1,0 +1,21 @@
+.github/workflows/merge-main.yml
+  s_477c0d90c4846f::t_d95f2f0a783cd0 17,20
+foundry.toml
+  s_477c0d90c4846f::t_d5ba723baa1bf0 15-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fae2f5c1c6d56d6e051778d6a2ef0434c7d18a41",
+  "prompts": {},
+  "sessions": {
+    "s_477c0d90c4846f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9de15bb6-ef2d-4870-b4ab-7a2a27701508",
+        "model": "claude-fable-5-2"
+      },
+      "human_author": "Alexandru Niculae <43644109+avniculae@users.noreply.github.com>"
+    }
+  }
+}
