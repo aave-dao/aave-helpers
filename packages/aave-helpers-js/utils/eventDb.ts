@@ -4479,4 +4479,81 @@ export const eventDb: AbiEvent[] = [
     ],
     anonymous: false,
   },
+  {
+    type: 'event',
+    name: 'ConfigSet',
+    inputs: [
+      {
+        type: 'tuple',
+        name: 'staticConfig',
+        components: [
+          { type: 'uint64', name: 'chainSelector' },
+          { type: 'address', name: 'rmnRemote' },
+          { type: 'uint32', name: 'maxUSDCentsPerMessage' },
+          { type: 'address', name: 'tokenAdminRegistry' },
+        ],
+      },
+      {
+        type: 'tuple',
+        name: 'dynamicConfig',
+        components: [
+          { type: 'address', name: 'feeQuoter' },
+          { type: 'bool', name: 'reentrancyGuardEntered' },
+          { type: 'address', name: 'feeAggregator' },
+        ],
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'DestChainConfigSet',
+    inputs: [
+      { type: 'uint64', name: 'destChainSelector', indexed: true },
+      { type: 'uint64', name: 'messageNumber' },
+      {
+        type: 'tuple',
+        name: 'config',
+        components: [
+          { type: 'uint64', name: 'destChainSelector' },
+          { type: 'address', name: 'router' },
+          { type: 'uint8', name: 'addressBytesLength' },
+          { type: 'bool', name: 'tokenReceiverAllowed' },
+          { type: 'uint16', name: 'messageNetworkFeeUSDCents' },
+          { type: 'uint16', name: 'tokenNetworkFeeUSDCents' },
+          { type: 'uint32', name: 'baseExecutionGasCost' },
+          { type: 'address[]', name: 'defaultCCVs' },
+          { type: 'address[]', name: 'laneMandatedCCVs' },
+          { type: 'address', name: 'defaultExecutor' },
+          { type: 'bytes', name: 'offRamp' },
+        ],
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'CCIPMessageSent',
+    inputs: [
+      { type: 'uint64', name: 'destChainSelector', indexed: true },
+      { type: 'address', name: 'sender', indexed: true },
+      { type: 'bytes32', name: 'messageId', indexed: true },
+      { type: 'address', name: 'feeToken' },
+      { type: 'uint256', name: 'tokenAmountBeforeTokenPoolFees' },
+      { type: 'bytes', name: 'encodedMessage' },
+      {
+        type: 'tuple[]',
+        name: 'receipts',
+        components: [
+          { type: 'address', name: 'issuer' },
+          { type: 'uint32', name: 'destGasLimit' },
+          { type: 'uint32', name: 'destBytesOverhead' },
+          { type: 'uint256', name: 'feeTokenAmount' },
+          { type: 'bytes', name: 'extraArgs' },
+        ],
+      },
+      { type: 'bytes[]', name: 'verifierBlobs' },
+    ],
+    anonymous: false,
+  },
 ];
