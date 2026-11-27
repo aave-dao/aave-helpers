@@ -4387,4 +4387,85 @@ export const eventDb: AbiEvent[] = [
     name: 'ProxyCreated',
     type: 'event',
   },
+  {
+    type: 'event',
+    name: 'AgentSet',
+    inputs: [
+      { name: 'agentId', type: 'uint256', indexed: true, internalType: 'uint256' },
+      {
+        name: 'direction',
+        type: 'uint8',
+        indexed: false,
+        internalType: 'enum ICapsRangeValidationModule.Direction',
+      },
+      {
+        name: 'kind',
+        type: 'uint8',
+        indexed: false,
+        internalType: 'enum ICapsRangeValidationModule.CapKind',
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'BoundsSet',
+    inputs: [
+      {
+        name: 'kind',
+        type: 'uint8',
+        indexed: true,
+        internalType: 'enum ICapsRangeValidationModule.CapKind',
+      },
+      {
+        name: 'bounds',
+        type: 'tuple',
+        indexed: false,
+        internalType: 'struct ICapsRangeValidationModule.Bounds',
+        components: [
+          { name: 'alphaBpsLimit', type: 'uint16', internalType: 'uint16' },
+          { name: 'cutBandBpsLimit', type: 'uint16', internalType: 'uint16' },
+          { name: 'maxIncreaseBps', type: 'uint16', internalType: 'uint16' },
+          { name: 'cooldown', type: 'uint40', internalType: 'uint40' },
+        ],
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RateLimitConfigSet',
+    inputs: [
+      { name: 'asset', type: 'address', indexed: true, internalType: 'address' },
+      {
+        name: 'kind',
+        type: 'uint8',
+        indexed: true,
+        internalType: 'enum ICapsRangeValidationModule.CapKind',
+      },
+      {
+        name: 'rateLimitConfig',
+        type: 'tuple',
+        indexed: false,
+        internalType: 'struct ICapsRangeValidationModule.RateLimitConfig',
+        components: [
+          { name: 'maxCap', type: 'uint64', internalType: 'uint64' },
+          { name: 'maxHeadroom', type: 'uint64', internalType: 'uint64' },
+          { name: 'alphaBps', type: 'uint16', internalType: 'uint16' },
+          { name: 'cutBandBps', type: 'uint16', internalType: 'uint16' },
+        ],
+      },
+      { name: 'caller', type: 'address', indexed: false, internalType: 'address' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RiskCouncilChanged',
+    inputs: [
+      { name: 'previousRiskCouncil', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'newRiskCouncil', type: 'address', indexed: true, internalType: 'address' },
+    ],
+    anonymous: false,
+  },
 ];
