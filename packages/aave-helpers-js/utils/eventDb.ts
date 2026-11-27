@@ -4389,6 +4389,188 @@ export const eventDb: AbiEvent[] = [
   },
   {
     type: 'event',
+    name: 'BridgeLimitAdminUpdated',
+    inputs: [
+      { name: 'oldAdmin', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'newAdmin', type: 'address', indexed: true, internalType: 'address' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'BridgeLimitUpdated',
+    inputs: [
+      { name: 'oldBridgeLimit', type: 'uint256', indexed: false, internalType: 'uint256' },
+      { name: 'newBridgeLimit', type: 'uint256', indexed: false, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'LiquidityAdded',
+    inputs: [
+      { name: 'provider', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'amount', type: 'uint256', indexed: true, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'LiquidityRemoved',
+    inputs: [
+      { name: 'provider', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'amount', type: 'uint256', indexed: true, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'LiquidityTransferred',
+    inputs: [
+      { name: 'from', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'amount', type: 'uint256', indexed: false, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'BridgeMessageFailed',
+    inputs: [
+      { name: 'messageId', type: 'bytes32', indexed: true, internalType: 'bytes32' },
+      { name: 'err', type: 'bytes', indexed: false, internalType: 'bytes' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'BridgeMessageFinalized',
+    inputs: [
+      { name: 'messageId', type: 'bytes32', indexed: true, internalType: 'bytes32' },
+      { name: 'to', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'amount', type: 'uint256', indexed: false, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'BridgeMessageInitiated',
+    inputs: [
+      { name: 'messageId', type: 'bytes32', indexed: true, internalType: 'bytes32' },
+      { name: 'destinationChainSelector', type: 'uint64', indexed: true, internalType: 'uint64' },
+      { name: 'from', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'amount', type: 'uint256', indexed: false, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'BridgeMessageRecovered',
+    inputs: [{ name: 'messageId', type: 'bytes32', indexed: true, internalType: 'bytes32' }],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'DestinationChainSet',
+    inputs: [
+      { name: 'chainSelector', type: 'uint64', indexed: true, internalType: 'uint64' },
+      { name: 'destination', type: 'bytes', indexed: false, internalType: 'bytes' },
+      { name: 'gasLimit', type: 'uint32', indexed: false, internalType: 'uint32' },
+      { name: 'extraArgs', type: 'bytes', indexed: false, internalType: 'bytes' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'ConfigSet',
+    inputs: [
+      {
+        name: 'staticConfig',
+        type: 'tuple',
+        indexed: false,
+        internalType: 'struct OnRamp.StaticConfig',
+        components: [
+          { name: 'chainSelector', type: 'uint64', internalType: 'uint64' },
+          { name: 'rmnRemote', type: 'address', internalType: 'contract IRMNRemote' },
+          { name: 'maxUSDCentsPerMessage', type: 'uint32', internalType: 'uint32' },
+          { name: 'tokenAdminRegistry', type: 'address', internalType: 'address' },
+        ],
+      },
+      {
+        name: 'dynamicConfig',
+        type: 'tuple',
+        indexed: false,
+        internalType: 'struct OnRamp.DynamicConfig',
+        components: [
+          { name: 'feeQuoter', type: 'address', internalType: 'address' },
+          { name: 'reentrancyGuardEntered', type: 'bool', internalType: 'bool' },
+          { name: 'feeAggregator', type: 'address', internalType: 'address' },
+        ],
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'DestChainConfigSet',
+    inputs: [
+      { name: 'destChainSelector', type: 'uint64', indexed: true, internalType: 'uint64' },
+      { name: 'messageNumber', type: 'uint64', indexed: false, internalType: 'uint64' },
+      {
+        name: 'config',
+        type: 'tuple',
+        indexed: false,
+        internalType: 'struct OnRamp.DestChainConfigArgs',
+        components: [
+          { name: 'destChainSelector', type: 'uint64', internalType: 'uint64' },
+          { name: 'router', type: 'address', internalType: 'contract IRouter' },
+          { name: 'addressBytesLength', type: 'uint8', internalType: 'uint8' },
+          { name: 'tokenReceiverAllowed', type: 'bool', internalType: 'bool' },
+          { name: 'messageNetworkFeeUSDCents', type: 'uint16', internalType: 'uint16' },
+          { name: 'tokenNetworkFeeUSDCents', type: 'uint16', internalType: 'uint16' },
+          { name: 'baseExecutionGasCost', type: 'uint32', internalType: 'uint32' },
+          { name: 'defaultCCVs', type: 'address[]', internalType: 'address[]' },
+          { name: 'laneMandatedCCVs', type: 'address[]', internalType: 'address[]' },
+          { name: 'defaultExecutor', type: 'address', internalType: 'address' },
+          { name: 'offRamp', type: 'bytes', internalType: 'bytes' },
+        ],
+      },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'CCIPMessageSent',
+    inputs: [
+      { name: 'destChainSelector', type: 'uint64', indexed: true, internalType: 'uint64' },
+      { name: 'sender', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'messageId', type: 'bytes32', indexed: true, internalType: 'bytes32' },
+      { name: 'feeToken', type: 'address', indexed: false, internalType: 'address' },
+      {
+        name: 'tokenAmountBeforeTokenPoolFees',
+        type: 'uint256',
+        indexed: false,
+        internalType: 'uint256',
+      },
+      { name: 'encodedMessage', type: 'bytes', indexed: false, internalType: 'bytes' },
+      {
+        name: 'receipts',
+        type: 'tuple[]',
+        indexed: false,
+        internalType: 'struct OnRamp.Receipt[]',
+        components: [
+          { name: 'issuer', type: 'address', internalType: 'address' },
+          { name: 'destGasLimit', type: 'uint32', internalType: 'uint32' },
+          { name: 'destBytesOverhead', type: 'uint32', internalType: 'uint32' },
+          { name: 'feeTokenAmount', type: 'uint256', internalType: 'uint256' },
+          { name: 'extraArgs', type: 'bytes', internalType: 'bytes' },
+        ],
+      },
+      { name: 'verifierBlobs', type: 'bytes[]', indexed: false, internalType: 'bytes[]' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
     name: 'AgentSet',
     inputs: [
       { name: 'agentId', type: 'uint256', indexed: true, internalType: 'uint256' },
