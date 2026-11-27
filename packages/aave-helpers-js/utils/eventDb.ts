@@ -4387,4 +4387,96 @@ export const eventDb: AbiEvent[] = [
     name: 'ProxyCreated',
     type: 'event',
   },
+  {
+    type: 'event',
+    name: 'BridgeLimitAdminUpdated',
+    inputs: [
+      { name: 'oldAdmin', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'newAdmin', type: 'address', indexed: true, internalType: 'address' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'BridgeLimitUpdated',
+    inputs: [
+      { name: 'oldBridgeLimit', type: 'uint256', indexed: false, internalType: 'uint256' },
+      { name: 'newBridgeLimit', type: 'uint256', indexed: false, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'LiquidityAdded',
+    inputs: [
+      { name: 'provider', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'amount', type: 'uint256', indexed: true, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'LiquidityRemoved',
+    inputs: [
+      { name: 'provider', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'amount', type: 'uint256', indexed: true, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'LiquidityTransferred',
+    inputs: [
+      { name: 'from', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'amount', type: 'uint256', indexed: false, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'BridgeMessageFailed',
+    inputs: [
+      { name: 'messageId', type: 'bytes32', indexed: true, internalType: 'bytes32' },
+      { name: 'err', type: 'bytes', indexed: false, internalType: 'bytes' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'BridgeMessageFinalized',
+    inputs: [
+      { name: 'messageId', type: 'bytes32', indexed: true, internalType: 'bytes32' },
+      { name: 'to', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'amount', type: 'uint256', indexed: false, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'BridgeMessageInitiated',
+    inputs: [
+      { name: 'messageId', type: 'bytes32', indexed: true, internalType: 'bytes32' },
+      { name: 'destinationChainSelector', type: 'uint64', indexed: true, internalType: 'uint64' },
+      { name: 'from', type: 'address', indexed: true, internalType: 'address' },
+      { name: 'amount', type: 'uint256', indexed: false, internalType: 'uint256' },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'BridgeMessageRecovered',
+    inputs: [{ name: 'messageId', type: 'bytes32', indexed: true, internalType: 'bytes32' }],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'DestinationChainSet',
+    inputs: [
+      { name: 'chainSelector', type: 'uint64', indexed: true, internalType: 'uint64' },
+      { name: 'destination', type: 'bytes', indexed: false, internalType: 'bytes' },
+      { name: 'gasLimit', type: 'uint32', indexed: false, internalType: 'uint32' },
+      { name: 'extraArgs', type: 'bytes', indexed: false, internalType: 'bytes' },
+    ],
+    anonymous: false,
+  },
 ];
